@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grade 12 Science Adventures</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header { text-align: center; margin-bottom: 40px; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+    .header h1 { font-size: 3rem; margin-bottom: 10px; background: linear-gradient(45deg, #fff, #f0f8ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .header p { font-size: 1.2rem; opacity: 0.9; }
+    .topics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-bottom: 40px; }
+    .topic-card { background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer; position: relative; overflow: hidden; }
+    .topic-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+    .topic-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4); }
+    .topic-header { display: flex; align-items: center; margin-bottom: 15px; }
+    .topic-icon { width: 60px; height: 60px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin-right: 15px; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+    .topic-title { font-size: 1.4rem; font-weight: bold; color: #333; margin-bottom: 5px; }
+    .topic-subtitle { font-size: 0.9rem; color: #666; }
+    .story-preview { margin-top: 15px; padding: 15px; background: linear-gradient(135deg, #f5f7fa, #c3cfe2); border-radius: 10px; border-left: 4px solid #667eea; }
+    .story-title { font-weight: bold; color: #333; margin-bottom: 8px; font-size: 1.1rem; }
+    .story-excerpt { font-size: 0.9rem; color: #555; line-height: 1.5; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000; overflow-y: auto; }
+    .modal-content { background: white; margin: 50px auto; padding: 40px; border-radius: 20px; max-width: 800px; position: relative; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }
+    .close { position: absolute; right: 20px; top: 20px; font-size: 2rem; cursor: pointer; color: #666; transition: color 0.3s ease; }
+    .close:hover { color: #333; }
+    .story-image { width: 100%; height: 200px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 15px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; font-size: 4rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+    .story-content { line-height: 1.8; font-size: 1.1rem; color: #333; }
+    .story-content h3 { color: #667eea; margin: 25px 0 15px 0; font-size: 1.3rem; }
+    .concept-box { background: linear-gradient(135deg, #e8f4f8, #d1ecf1); padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 5px solid #4ecdc4; }
+    .concept-title { font-weight: bold; color: #2c3e50; margin-bottom: 10px; font-size: 1.1rem; }
+    .footer { text-align: center; color: white; margin-top: 40px; opacity: 0.8; }
+  </style>
+  <link rel="icon" href="/favicon.ico">
+  <meta name="robots" content="noindex">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🚀 Science Adventures</h1>
+      <p>Explore Grade 12 Physics, Chemistry & Biology through Exciting Stories</p>
+    </div>
+
+    <div class="topics-grid">
+      <div class="topic-card" onclick="openStory('electrostatics')">
+        <div class="topic-header">
+          <div class="topic-icon">⚡</div>
+          <div>
+            <div class="topic-title">Electric Charges & Fields</div>
+            <div class="topic-subtitle">Electrostatics</div>
+          </div>
+        </div>
+        <div class="story-preview">
+          <div class="story-title">The Lightning Detective</div>
+          <div class="story-excerpt">Maya discovers the secrets of electric charges while investigating mysterious lightning patterns...</div>
+        </div>
+      </div>
+      <div class="topic-card" onclick="openStory('current')">
+        <div class="topic-header">
+          <div class="topic-icon">🔌</div>
+          <div>
+            <div class="topic-title">Current Electricity</div>
+            <div class="topic-subtitle">Magnetism</div>
+          </div>
+        </div>
+        <div class="story-preview">
+          <div class="story-title">The Power Grid Mystery</div>
+          <div class="story-excerpt">Alex becomes an electrical engineer for a day, solving power outages and learning about current flow...</div>
+        </div>
+      </div>
+      <div class="topic-card" onclick="openStory('induction')">
+        <div class="topic-header">
+          <div class="topic-icon">🌊</div>
+          <div>
+            <div class="topic-title">Electromagnetic Induction</div>
+            <div class="topic-subtitle">Alternating Current</div>
+          </div>
+        </div>
+        <div class="story-preview">
+          <div class="story-title">The Wireless Energy Quest</div>
+          <div class="story-excerpt">Zara invents a wireless charging system and discovers the magic of electromagnetic induction...</div>
+        </div>
+      </div>
+      <div class="topic-card" onclick="openStory('optics')">
+        <div class="topic-header">
+          <div class="topic-icon">🔍</div>
+          <div>
+            <div class="topic-title">Optics & Wave Optics</div>
+            <div class="topic-subtitle">Light & Waves</div>
+          </div>
+        </div>
+        <div class="story-preview">
+          <div class="story-title">The Hologram Hunter</div>
+          <div class="story-excerpt">Sam creates stunning holograms while learning about interference, diffraction, and wave properties...</div>
+        </div>
+      </div>
+      <div class="topic-card" onclick="openStory('atomic')">
+        <div class="topic-header">
+          <div class="topic-icon">⚛</div>
+          <div>
+            <div class="topic-title">Atoms & Nuclei</div>
+            <div class="topic-subtitle">Nuclear Physics</div>
+          </div>
+        </div>
+        <div class="story-preview">
+          <div class="story-title">Journey to the Atomic Realm</div>
+          <div class="story-excerpt">Dr. Chen explores atoms, witnessing nuclear reactions and radioactive decay...</div>
+        </div>
+      </div>
+      <div class="topic-card" onclick="openStory('semiconductors')">
+        <div class="topic-header">
+          <div class="topic-icon">💻</div>
+          <div>
+            <div class="topic-title">Semiconductors</div>
+            <div class="topic-subtitle">Communication</div>
+          </div>
+        </div>
+        <div class="story-preview">
+          <div class="story-title">The Silicon Valley Dream</div>
+          <div class="story-excerpt">Priya builds a processor, learning semiconductors and electronic communication...</div>
+        </div>
+      </div>
+      <div class="topic-card" onclick="openStory('chemistry')">
+        <div class="topic-header">
+          <div class="topic-icon">🧪</div>
+          <div>
+            <div class="topic-title">Solid State Chemistry</div>
+            <div class="topic-subtitle">Solutions & Kinetics</div>
+          </div>
+        </div>
+        <div class="story-preview">
+          <div class="story-title">The Crystal Detective</div>
+          <div class="story-excerpt">Emma investigates crystal structures and reaction rates in a lab mystery...</div>
+        </div>
+      </div>
+      <div class="topic-card" onclick="openStory('genetics')">
+        <div class="topic-header">
+          <div class="topic-icon">🧬</div>
+          <div>
+            <div class="topic-title">Reproduction & Genetics</div>
+            <div class="topic-subtitle">Evolution</div>
+          </div>
+        </div>
+        <div class="story-preview">
+          <div class="story-title">The DNA Detective</div>
+          <div class="story-excerpt">Noah uncovers family secrets through genetics and witnesses evolution...</div>
+        </div>
+      </div>
+      <div class="topic-card" onclick="openStory('ecology')">
+        <div class="topic-header">
+          <div class="topic-icon">🌱</div>
+          <div>
+            <div class="topic-title">Ecology & Biotechnology</div>
+            <div class="topic-subtitle">Human Health</div>
+          </div>
+        </div>
+        <div class="story-preview">
+          <div class="story-title">The Ecosystem Guardian</div>
+          <div class="story-excerpt">Aria restores a polluted lake using biotechnology and ecology...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Click on any story card to begin your scientific adventure! 🌟</p>
+    </div>
+  </div>
+
+  <!-- Minimal modals: link to full stories could be added similarly to user content -->
+  <div id="electrostatics" class="modal"><div class="modal-content"><span class="close" onclick="closeStory()">&times;</span><div class="story-image">⚡</div><div class="story-content"><h2 style="color:#667eea;margin-bottom:20px;">The Lightning Detective</h2><div class="concept-box"><div class="concept-title">🔬 Key Concepts:</div><p>Coulomb's Law, Electric Field, Gauss's Law</p></div><p>Story content...</p></div></div></div>
+  <div id="current" class="modal"><div class="modal-content"><span class="close" onclick="closeStory()">&times;</span><div class="story-image">🔌</div><div class="story-content"><h2 style="color:#667eea;margin-bottom:20px;">The Power Grid Mystery</h2><p>Story content...</p></div></div></div>
+  <div id="induction" class="modal"><div class="modal-content"><span class="close" onclick="closeStory()">&times;</span><div class="story-image">🌊</div><div class="story-content"><h2 style="color:#667eea;margin-bottom:20px;">The Wireless Energy Quest</h2><p>Story content...</p></div></div></div>
+  <div id="optics" class="modal"><div class="modal-content"><span class="close" onclick="closeStory()">&times;</span><div class="story-image">🔍</div><div class="story-content"><h2 style="color:#667eea;margin-bottom:20px;">The Hologram Hunter</h2><p>Story content...</p></div></div></div>
+  <div id="atomic" class="modal"><div class="modal-content"><span class="close" onclick="closeStory()">&times;</span><div class="story-image">⚛</div><div class="story-content"><h2 style="color:#667eea;margin-bottom:20px;">Journey to the Atomic Realm</h2><p>Story content...</p></div></div></div>
+  <div id="semiconductors" class="modal"><div class="modal-content"><span class="close" onclick="closeStory()">&times;</span><div class="story-image">💻</div><div class="story-content"><h2 style="color:#667eea;margin-bottom:20px;">The Silicon Valley Dream</h2><p>Story content...</p></div></div></div>
+  <div id="chemistry" class="modal"><div class="modal-content"><span class="close" onclick="closeStory()">&times;</span><div class="story-image">🧪</div><div class="story-content"><h2 style="color:#667eea;margin-bottom:20px;">The Crystal Detective</h2><p>Story content...</p></div></div></div>
+  <div id="genetics" class="modal"><div class="modal-content"><span class="close" onclick="closeStory()">&times;</span><div class="story-image">🧬</div><div class="story-content"><h2 style="color:#667eea;margin-bottom:20px;">The DNA Detective</h2><p>Story content...</p></div></div></div>
+  <div id="ecology" class="modal"><div class="modal-content"><span class="close" onclick="closeStory()">&times;</span><div class="story-image">🌱</div><div class="story-content"><h2 style="color:#667eea;margin-bottom:20px;">The Ecosystem Guardian</h2><p>Story content...</p></div></div></div>
+
+  <script>
+    function openStory(storyId) { document.getElementById(storyId).style.display = 'block'; document.body.style.overflow = 'hidden'; }
+    function closeStory() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); document.body.style.overflow = 'auto'; }
+    window.onclick = function(e) { if (e.target.classList.contains('modal')) closeStory(); };
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeStory(); });
+  </script>
+</body>
+</html>
+
+

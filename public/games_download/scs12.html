@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Translation</title>
+<!-- ORIGINAL GAME CONTENT STARTS HERE -->
+<h1 class="title">💾 Semiconductors & Communication Hunt 📡</h1>
+            <p class="subtitle">Explore the digital world of semiconductors and communication!</p><div class="stats">
+            <div class="stat-item"><strong>Treasures Found: </strong><span id="foundCount">0</span>/8</div>
+            <div class="stat-item"><strong>Score: </strong><span id="score">0</span></div>
+            <div class="stat-item"><strong>Attempts: </strong><span id="attempts">0</span></div><div class="treasure-map" id="treasureMap"></div>
+        <div id="completionMessage" class="completion-message hidden">
+            <h2>🏆 Congratulations! 🏆</h2>
+            <p>You've mastered the semiconductor realm!</p>
+            <button class="btn" onclick="restartGame()">Explore Again</button><div id="modal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Treasure Challenge</h2>
+            <div id="modalQuestion" class="question"></div>
+            <div id="modalOptions" class="options"></div>
+            <div class="modal-buttons">
+                <button id="submitBtn" class="btn" onclick="submitAnswer()" disabled>Submit Answer</button>
+                <button class="btn" onclick="closeModal()">Close</button><script>
+        const treasures = [
+            { id: 1, icon: "💎", title: "P-N Junction", hint: "Foundation of semiconductor devices", question: "In a P-N junction, the depletion region is formed due to:", options: ["Recombination of holes and electrons", "Addition of impurities", "Applied voltage", "Temperature increase"], correct: 0, explanation: "Depletion region forms when holes and electrons recombine at the junction" },
+            { id: 2, icon: "🔄", title: "Diode", hint: "One-way conductor", question: "A diode allows current to flow:", options: ["In both directions equally", "Only from anode to cathode when forward biased", "Only when reverse biased", "Never"], correct: 1, explanation: "Diodes conduct current from anode to cathode only when forward biased" },
+            { id: 3, icon: "📶", title: "Transistor", hint: "Current amplifier and switch", question: "In an NPN transistor, the current is mainly due to:", options: ["Holes in all regions", "Electrons in all regions", "Electrons from emitter to collector", "Holes from base to emitter"], correct: 2, explanation: "In NPN transistors, electron flow from emitter to collector constitutes main current" },
+            { id: 4, icon: "🔌", title: "Logic Gates", hint: "Digital building blocks", question: "The output of an AND gate is HIGH when:", options: ["Any input is HIGH", "All inputs are HIGH", "Any input is LOW", "All inputs are LOW"], correct: 1, explanation: "AND gate outputs HIGH only when all inputs are HIGH" },
+            { id: 5, icon: "📡", title: "Modulation", hint: "Encoding information in waves", question: "In amplitude modulation (AM):", options: ["Frequency varies with signal", "Phase varies with signal", "Amplitude varies with signal", "Wavelength varies with signal"], correct: 2, explanation: "In AM, the amplitude of carrier wave varies according to the signal" },
+            { id: 6, icon: "🌐", title: "Communication Systems", hint: "Transmitting information", question: "The range of frequencies in AM radio broadcast is:", options: ["535-1605 kHz", "88-108 MHz", "54-88 MHz", "470-890 MHz"], correct: 0, explanation: "AM radio operates in medium frequency band 535-1605 kHz" },
+            { id: 7, icon: "📺", title: "Television Broadcasting", hint: "Visual and audio transmission", question: "In television broadcasting, video signals have:", options: ["Lower frequency than audio", "Higher frequency than audio", "Same frequency as audio", "No frequency"], correct: 1, explanation: "Video signals require higher frequencies due to larger bandwidth requirements" },
+            { id: 8, icon: "🛰️", title: "Satellite Communication", hint: "Space-based communication", question: "Geostationary satellites orbit at altitude of approximately:", options: ["2000 km", "20000 km", "36000 km", "50000 km"], correct: 2, explanation: "Geostationary orbit is at ~36,000 km altitude for 24-hour orbital period" }
+        ];
+        let gameState = { foundTreasures: [], score: 0, attempts: 0, currentTreasure: null };
+        function initGame() { createTreasureMap(); updateStats(); }
+        function createTreasureMap() {
+            const mapContainer = document.getElementById('treasureMap');
+            mapContainer.innerHTML = '';
+            treasures.forEach((treasure, index) => {
+                const spot = document.createElement('div');
+                spot.className = 'treasure-spot';
+                if (gameState.foundTreasures.includes(treasure.id)) spot.classList.add('completed');
+                else if (index === 0 || gameState.foundTreasures.includes(treasures[index - 1].id)) {
+                    spot.classList.add('active'); spot.onclick = () => openTreasure(treasure);
+                }
+                spot.innerHTML = `<div class="treasure-icon">${treasure.icon}</div><div class="treasure-title">${treasure.title}</div><div class="treasure-hint">${treasure.hint}</div>`;
+                mapContainer.appendChild(spot);
+            });
+        }
+        function openTreasure(treasure) {
+            gameState.currentTreasure = treasure;
+            document.getElementById('modalTitle').textContent = treasure.title;
+            document.getElementById('modalQuestion').textContent = treasure.question;
+            const optionsContainer = document.getElementById('modalOptions');
+            optionsContainer.innerHTML = '';
+            treasure.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option'; optionDiv.textContent = option;
+                optionDiv.onclick = () => selectOption(index); optionsContainer.appendChild(optionDiv);
+            });
+            document.getElementById('modal').style.display = 'block';
+            document.getElementById('submitBtn').disabled = true;
+        }
+        function selectOption(index) {
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelectorAll('.option')[index].classList.add('selected');
+            document.getElementById('submitBtn').disabled = false; gameState.selectedOption = index;
+        }
+        function submitAnswer() {
+            gameState.attempts++; const treasure = gameState.currentTreasure;
+            const isCorrect = gameState.selectedOption === treasure.correct;
+            document.querySelectorAll('.option').forEach((opt, index) => {
+                if (index === treasure.correct) opt.classList.add('correct');
+                else if (index === gameState.selectedOption) opt.classList.add('incorrect');
+                opt.onclick = null;
+            });
+            if (isCorrect) {
+                gameState.foundTreasures.push(treasure.id); gameState.score += 100;
+                setTimeout(() => { alert(`🎉 Correct! ${treasure.explanation}`); closeModal(); updateGame(); }, 1000);
+            } else setTimeout(() => alert(`❌ Incorrect. ${treasure.explanation}`), 1000);
+        }
+        function closeModal() { document.getElementById('modal').style.display = 'none'; gameState.selectedOption = null; }
+        function updateGame() {
+            createTreasureMap(); updateStats();
+            if (gameState.foundTreasures.length === treasures.length) document.getElementById('completionMessage').classList.remove('hidden');
+        }
+        function updateStats() {
+            document.getElementById('foundCount').textContent = gameState.foundTreasures.length;
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('attempts').textContent = gameState.attempts;
+        }
+        function restartGame() {
+            gameState = { foundTreasures: [], score: 0, attempts: 0, currentTreasure: null };
+            document.getElementById('completionMessage').classList.add('hidden'); initGame();
+        }
+        initGame();
+    </script></html>

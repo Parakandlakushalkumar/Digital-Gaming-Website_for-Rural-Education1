@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Learning Games</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --secondary: #10B981;
+            --accent: #F59E0B;
+            --danger: #EF4444;
+            --purple: #8B5CF6;
+            --dark: #1E293B;
+            --light: #F8FAFC;
+            --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            color: white;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--primary);
+        }
+
+        .game-card:nth-child(2)::before {
+            background: var(--secondary);
+        }
+
+        .game-card:nth-child(3)::before {
+            background: var(--accent);
+        }
+
+        .game-card:nth-child(4)::before {
+            background: var(--danger);
+        }
+
+        .game-card:nth-child(5)::before {
+            background: var(--purple);
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .game-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .game-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .game-description {
+            color: #64748b;
+            margin-bottom: 15px;
+        }
+
+        .game-learning {
+            background: #f1f5f9;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 900px;
+            margin: 50px auto;
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #64748b;
+            transition: color 0.3s;
+        }
+
+        .close-btn:hover {
+            color: var(--danger);
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .game-header h2 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .score-display {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            margin: 10px;
+        }
+
+        /* MCQ Game Styles */
+        .mcq-container {
+            margin: 20px 0;
+        }
+
+        .question {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            text-align: center;
+            color: var(--dark);
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+        }
+
+        .option:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .option.selected {
+            border-color: var(--primary);
+            background: #eef2ff;
+        }
+
+        .option.correct {
+            border-color: var(--secondary);
+            background: #dcfce7;
+        }
+
+        .option.incorrect {
+            border-color: var(--danger);
+            background: #fee2e2;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #4338ca;
+            transform: translateY(-3px);
+        }
+
+        .btn-secondary {
+            background: #64748b;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .feedback {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            min-height: 30px;
+        }
+
+        .feedback.success {
+            color: var(--secondary);
+        }
+
+        .feedback.error {
+            color: var(--danger);
+        }
+
+        /* Line Match Game Styles */
+        .match-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+
+        .equations, .graphs {
+            width: 45%;
+        }
+
+        .equations h3, .graphs h3 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #475569;
+        }
+
+        .equation-card, .graph-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .equation-card:hover, .graph-card:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .equation-card.selected, .graph-card.selected {
+            background: #dbeafe;
+            border-color: var(--primary);
+        }
+
+        .equation-card.matched, .graph-card.matched {
+            background: #dcfce7;
+            border-color: var(--secondary);
+        }
+
+        .mini-graph {
+            width: 100%;
+            height: 100px;
+            position: relative;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .mini-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px);
+            background-size: 10px 10px;
+        }
+
+        .mini-x-axis {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: #94a3b8;
+        }
+
+        .mini-y-axis {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 1px;
+            height: 100%;
+            background: #94a3b8;
+        }
+
+        .mini-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: var(--primary);
+            transform-origin: center;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .options {
+                grid-template-columns: 1fr;
+            }
+            
+            .match-container {
+                flex-direction: column;
+            }
+            
+            .equations, .graphs {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Math Learning Games</h1>
+            <p class="subtitle">Interactive games for mastering linear equations and conic sections</p>
+        </header>
+
+        <main class="games-grid">
+            <!-- Game 1: Line Equation MCQs -->
+            <div class="game-card" onclick="openGame('line-mcqs')">
+                <span class="game-icon">📏</span>
+                <h2 class="game-title">Line Equation Challenge</h2>
+                <p class="game-description">Test your knowledge of line equations, slope, and y-intercept.</p>
+                <div class="game-learning">
+                    <i class="fas fa-graduation-cap"></i> Learning: Understand slope and y-intercept
+                </div>
+            </div>
+
+            <!-- Game 2: Line Match -->
+            <div class="game-card" onclick="openGame('line-match')">
+                <span class="game-icon">🔍</span>
+                <h2 class="game-title">Line Match</h2>
+                <p class="game-description">Match line equations with their correct graph.</p>
+                <div class="game-learning">
+                    <i class="fas fa-graduation-cap"></i> Learning: Recognize line equations visually
+                </div>
+            </div>
+
+            <!-- Game 3: Conic Section MCQs -->
+            <div class="game-card" onclick="openGame('conic-mcqs')">
+                <span class="game-icon">🗂️</span>
+                <h2 class="game-title">Conic Section Quiz</h2>
+                <p class="game-description">Test your knowledge of circles, parabolas, ellipses, and hyperbolas.</p>
+                <div class="game-learning">
+                    <i class="fas fa-graduation-cap"></i> Learning: Identify types of conic sections
+                </div>
+            </div>
+
+            <!-- Game 4: Parabola MCQs -->
+            <div class="game-card" onclick="openGame('parabola-mcqs')">
+                <span class="game-icon">🎯</span>
+                <h2 class="game-title">Parabola Quiz</h2>
+                <p class="game-description">Test your knowledge of parabola equations and properties.</p>
+                <div class="game-learning">
+                    <i class="fas fa-graduation-cap"></i> Learning: Visualize the shape of a parabola
+                </div>
+            </div>
+
+            <!-- Game 5: Hyperbola MCQs -->
+            <div class="game-card" onclick="openGame('hyperbola-mcqs')">
+                <span class="game-icon">🦘</span>
+                <h2 class="game-title">Hyperbola Quiz</h2>
+                <p class="game-description">Test your knowledge of hyperbola equations and properties.</p>
+                <div class="game-learning">
+                    <i class="fas fa-graduation-cap"></i> Learning: Understand the basic shape and orientation of a hyperbola
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals for each game -->
+    <div id="line-mcqs-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeGame('line-mcqs')">&times;</span>
+            <div class="game-header">
+                <h2>Line Equation Challenge 📏</h2>
+                <div class="score-display">Score: <span id="line-mcqs-score">0</span></div>
+            </div>
+            
+            <div class="mcq-container">
+                <div class="question" id="line-mcqs-question"></div>
+                <div class="options" id="line-mcqs-options"></div>
+                <div class="feedback" id="line-mcqs-feedback"></div>
+                <div class="controls">
+                    <button class="btn" id="line-mcqs-submit" onclick="checkLineMCQ()">Submit Answer</button>
+                    <button class="btn btn-secondary" onclick="nextLineMCQ()">Next Question</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="line-match-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeGame('line-match')">&times;</span>
+            <div class="game-header">
+                <h2>Line Match 🔍</h2>
+                <div class="score-display">Score: <span id="line-match-score">0</span></div>
+            </div>
+            
+            <div class="match-container">
+                <div class="equations">
+                    <h3>Equations</h3>
+                    <div id="equations-list"></div>
+                </div>
+                
+                <div class="graphs">
+                    <h3>Graphs</h3>
+                    <div id="graphs-list"></div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn" onclick="checkMatches()">Check Matches</button>
+                <button class="btn btn-secondary" onclick="resetLineMatch()">Reset</button>
+            </div>
+            
+            <div class="feedback" id="line-match-feedback"></div>
+        </div>
+    </div>
+
+    <div id="conic-mcqs-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeGame('conic-mcqs')">&times;</span>
+            <div class="game-header">
+                <h2>Conic Section Quiz 🗂️</h2>
+                <div class="score-display">Score: <span id="conic-mcqs-score">0</span></div>
+            </div>
+            
+            <div class="mcq-container">
+                <div class="question" id="conic-mcqs-question"></div>
+                <div class="options" id="conic-mcqs-options"></div>
+                <div class="feedback" id="conic-mcqs-feedback"></div>
+                <div class="controls">
+                    <button class="btn" id="conic-mcqs-submit" onclick="checkConicMCQ()">Submit Answer</button>
+                    <button class="btn btn-secondary" onclick="nextConicMCQ()">Next Question</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="parabola-mcqs-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeGame('parabola-mcqs')">&times;</span>
+            <div class="game-header">
+                <h2>Parabola Quiz 🎯</h2>
+                <div class="score-display">Score: <span id="parabola-mcqs-score">0</span></div>
+            </div>
+            
+            <div class="mcq-container">
+                <div class="question" id="parabola-mcqs-question"></div>
+                <div class="options" id="parabola-mcqs-options"></div>
+                <div class="feedback" id="parabola-mcqs-feedback"></div>
+                <div class="controls">
+                    <button class="btn" id="parabola-mcqs-submit" onclick="checkParabolaMCQ()">Submit Answer</button>
+                    <button class="btn btn-secondary" onclick="nextParabolaMCQ()">Next Question</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="hyperbola-mcqs-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeGame('hyperbola-mcqs')">&times;</span>
+            <div class="game-header">
+                <h2>Hyperbola Quiz 🦘</h2>
+                <div class="score-display">Score: <span id="hyperbola-mcqs-score">0</span></div>
+            </div>
+            
+            <div class="mcq-container">
+                <div class="question" id="hyperbola-mcqs-question"></div>
+                <div class="options" id="hyperbola-mcqs-options"></div>
+                <div class="feedback" id="hyperbola-mcqs-feedback"></div>
+                <div class="controls">
+                    <button class="btn" id="hyperbola-mcqs-submit" onclick="checkHyperbolaMCQ()">Submit Answer</button>
+                    <button class="btn btn-secondary" onclick="nextHyperbolaMCQ()">Next Question</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state variables
+        let gameState = {
+            lineMCQs: {
+                score: 0,
+                currentQuestion: 0,
+                selectedOption: null,
+                answered: false,
+                questions: [
+                    {
+                        question: "What is the slope of the line y = 2x + 3?",
+                        options: ["2", "3", "5", "6"],
+                        correct: 0
+                    },
+                    {
+                        question: "What is the y-intercept of the line y = -4x + 7?",
+                        options: ["-4", "7", "4", "-7"],
+                        correct: 1
+                    },
+                    {
+                        question: "Which equation represents a horizontal line?",
+                        options: ["y = 3x + 2", "x = 5", "y = -2", "y = 4x"],
+                        correct: 2
+                    },
+                    {
+                        question: "What is the slope of a vertical line?",
+                        options: ["0", "1", "Undefined", "-1"],
+                        correct: 2
+                    },
+                    {
+                        question: "Which point lies on the line y = 2x - 1?",
+                        options: ["(1, 1)", "(2, 3)", "(0, -1)", "(3, 5)"],
+                        correct: 2
+                    }
+                ]
+            },
+            lineMatch: {
+                score: 0,
+                equations: [
+                    { id: 'eq1', text: 'y = 2x + 1', slope: 2, intercept: 1, matched: false },
+                    { id: 'eq2', text: 'y = -x + 3', slope: -1, intercept: 3, matched: false },
+                    { id: 'eq3', text: 'y = 0.5x - 2', slope: 0.5, intercept: -2, matched: false }
+                ],
+                graphs: [
+                    { id: 'graph1', slope: 2, intercept: 1, matched: false },
+                    { id: 'graph2', slope: -1, intercept: 3, matched: false },
+                    { id: 'graph3', slope: 0.5, intercept: -2, matched: false }
+                ],
+                selectedEquation: null,
+                selectedGraph: null,
+                matches: 0
+            },
+            conicMCQs: {
+                score: 0,
+                currentQuestion: 0,
+                selectedOption: null,
+                answered: false,
+                questions: [
+                    {
+                        question: "Which equation represents a circle?",
+                        options: ["x² + y² = 9", "y = x²", "x²/4 + y²/9 = 1", "x² - y² = 1"],
+                        correct: 0
+                    },
+                    {
+                        question: "Which conic section is defined as the set of all points equidistant from a fixed point?",
+                        options: ["Parabola", "Ellipse", "Hyperbola", "Circle"],
+                        correct: 3
+                    },
+                    {
+                        question: "The standard form of a parabola is:",
+                        options: ["(x-h)² + (y-k)² = r²", "(x-h)²/a² + (y-k)²/b² = 1", "(x-h)²/a² - (y-k)²/b² = 1", "y = a(x-h)² + k"],
+                        correct: 3
+                    },
+                    {
+                        question: "Which conic section has two foci?",
+                        options: ["Parabola", "Circle", "Ellipse and Hyperbola", "None of the above"],
+                        correct: 2
+                    },
+                    {
+                        question: "The equation x²/25 + y²/16 = 1 represents:",
+                        options: ["A circle", "An ellipse", "A hyperbola", "A parabola"],
+                        correct: 1
+                    }
+                ]
+            },
+            parabolaMCQs: {
+                score: 0,
+                currentQuestion: 0,
+                selectedOption: null,
+                answered: false,
+                questions: [
+                    {
+                        question: "What is the vertex of the parabola y = (x-3)² + 2?",
+                        options: ["(3, 2)", "(-3, 2)", "(3, -2)", "(-3, -2)"],
+                        correct: 0
+                    },
+                    {
+                        question: "Which parabola opens downward?",
+                        options: ["y = x²", "y = -2x²", "y = (x+1)²", "y = 3x²"],
+                        correct: 1
+                    },
+                    {
+                        question: "The focus of the parabola y² = 4x is at:",
+                        options: ["(1, 0)", "(0, 1)", "(4, 0)", "(0, 4)"],
+                        correct: 0
+                    },
+                    {
+                        question: "Which equation represents a parabola with vertex at the origin?",
+                        options: ["y = (x-2)² + 3", "y = x² + 4", "y = (x+1)² - 5", "y = x²"],
+                        correct: 3
+                    },
+                    {
+                        question: "The axis of symmetry for the parabola y = -2(x-4)² + 1 is:",
+                        options: ["x = 4", "y = 1", "x = -4", "y = -1"],
+                        correct: 0
+                    }
+                ]
+            },
+            hyperbolaMCQs: {
+                score: 0,
+                currentQuestion: 0,
+                selectedOption: null,
+                answered: false,
+                questions: [
+                    {
+                        question: "The standard form of a hyperbola opening horizontally is:",
+                        options: ["(x-h)²/a² + (y-k)²/b² = 1", "(x-h)²/a² - (y-k)²/b² = 1", "(y-k)²/a² - (x-h)²/b² = 1", "x² + y² = r²"],
+                        correct: 1
+                    },
+                    {
+                        question: "The asymptotes of the hyperbola x²/9 - y²/4 = 1 are:",
+                        options: ["y = ±(2/3)x", "y = ±(3/2)x", "y = ±(4/9)x", "y = ±(9/4)x"],
+                        correct: 0
+                    },
+                    {
+                        question: "Which equation represents a hyperbola?",
+                        options: ["x² + y² = 16", "y = x²", "x²/4 - y²/9 = 1", "x²/4 + y²/9 = 1"],
+                        correct: 2
+                    },
+                    {
+                        question: "The foci of the hyperbola x²/25 - y²/9 = 1 are at:",
+                        options: ["(±4, 0)", "(±5, 0)", "(±3, 0)", "(±√34, 0)"],
+                        correct: 3
+                    },
+                    {
+                        question: "A hyperbola with center at (2, -3) and transverse axis parallel to the y-axis has the standard form:",
+                        options: ["(x-2)²/a² - (y+3)²/b² = 1", "(y+3)²/a² - (x-2)²/b² = 1", "(x+2)²/a² - (y-3)²/b² = 1", "(y-3)²/a² - (x+2)²/b² = 1"],
+                        correct: 1
+                    }
+                ]
+            }
+        };
+
+        // Modal functions
+        function openGame(gameId) {
+            document.getElementById(`${gameId}-modal`).style.display = 'block';
+            
+            switch(gameId) {
+                case 'line-mcqs':
+                    initLineMCQs();
+                    break;
+                case 'line-match':
+                    initLineMatch();
+                    break;
+                case 'conic-mcqs':
+                    initConicMCQs();
+                    break;
+                case 'parabola-mcqs':
+                    initParabolaMCQs();
+                    break;
+                case 'hyperbola-mcqs':
+                    initHyperbolaMCQs();
+                    break;
+            }
+        }
+
+        function closeGame(gameId) {
+            document.getElementById(`${gameId}-modal`).style.display = 'none';
+        }
+
+        // Game 1: Line Equation MCQs
+        function initLineMCQs() {
+            // Reset game state
+            gameState.lineMCQs = {
+                score: 0,
+                currentQuestion: 0,
+                selectedOption: null,
+                answered: false,
+                questions: gameState.lineMCQs.questions
+            };
+            
+            // Shuffle questions
+            gameState.lineMCQs.questions.sort(() => Math.random() - 0.5);
+            
+            // Display first question
+            displayLineMCQ();
+            
+            // Update score display
+            document.getElementById('line-mcqs-score').textContent = gameState.lineMCQs.score;
+            document.getElementById('line-mcqs-feedback').innerHTML = '';
+        }
+
+        function displayLineMCQ() {
+            const question = gameState.lineMCQs.questions[gameState.lineMCQs.currentQuestion];
+            
+            // Display question
+            document.getElementById('line-mcqs-question').textContent = question.question;
+            
+            // Display options
+            const optionsContainer = document.getElementById('line-mcqs-options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionEl = document.createElement('div');
+                optionEl.className = 'option';
+                optionEl.textContent = option;
+                optionEl.onclick = () => selectLineMCQOption(index);
+                optionsContainer.appendChild(optionEl);
+            });
+            
+            // Reset state
+            gameState.lineMCQs.selectedOption = null;
+            gameState.lineMCQs.answered = false;
+            
+            // Reset UI
+            document.getElementById('line-mcqs-feedback').innerHTML = '';
+            document.getElementById('line-mcqs-submit').disabled = false;
+        }
+
+        function selectLineMCQOption(index) {
+            if (gameState.lineMCQs.answered) return;
+            
+            // Clear previous selection
+            document.querySelectorAll('#line-mcqs-options .option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Select new option
+            document.querySelectorAll('#line-mcqs-options .option')[index].classList.add('selected');
+            gameState.lineMCQs.selectedOption = index;
+        }
+
+        function checkLineMCQ() {
+            if (gameState.lineMCQs.answered || gameState.lineMCQs.selectedOption === null) return;
+            
+            gameState.lineMCQs.answered = true;
+            const question = gameState.lineMCQs.questions[gameState.lineMCQs.currentQuestion];
+            const feedback = document.getElementById('line-mcqs-feedback');
+            
+            // Mark correct and incorrect options
+            const options = document.querySelectorAll('#line-mcqs-options .option');
+            options[question.correct].classList.add('correct');
+            
+            if (gameState.lineMCQs.selectedOption !== question.correct) {
+                options[gameState.lineMCQs.selectedOption].classList.add('incorrect');
+                feedback.innerHTML = '<span class="error">✗ Incorrect. Try the next question!</span>';
+            } else {
+                gameState.lineMCQs.score += 10;
+                feedback.innerHTML = '<span class="success">✓ Correct! Well done!</span>';
+            }
+            
+            // Update score
+            document.getElementById('line-mcqs-score').textContent = gameState.lineMCQs.score;
+            
+            // Disable submit button
+            document.getElementById('line-mcqs-submit').disabled = true;
+        }
+
+        function nextLineMCQ() {
+            gameState.lineMCQs.currentQuestion++;
+            
+            if (gameState.lineMCQs.currentQuestion >= gameState.lineMCQs.questions.length) {
+                // Game completed
+                document.getElementById('line-mcqs-question').textContent = 'Quiz Completed!';
+                document.getElementById('line-mcqs-options').innerHTML = '';
+                document.getElementById('line-mcqs-feedback').innerHTML = 
+                    `<span class="success">🎉 Congratulations! Your final score is ${gameState.lineMCQs.score}.</span>`;
+                document.querySelector('#line-mcqs-modal .controls').style.display = 'none';
+            } else {
+                displayLineMCQ();
+            }
+        }
+
+        // Game 2: Line Match
+        function initLineMatch() {
+            // Reset game state
+            gameState.lineMatch = {
+                score: 0,
+                equations: [
+                    { id: 'eq1', text: 'y = 2x + 1', slope: 2, intercept: 1, matched: false },
+                    { id: 'eq2', text: 'y = -x + 3', slope: -1, intercept: 3, matched: false },
+                    { id: 'eq3', text: 'y = 0.5x - 2', slope: 0.5, intercept: -2, matched: false }
+                ],
+                graphs: [
+                    { id: 'graph1', slope: 2, intercept: 1, matched: false },
+                    { id: 'graph2', slope: -1, intercept: 3, matched: false },
+                    { id: 'graph3', slope: 0.5, intercept: -2, matched: false }
+                ],
+                selectedEquation: null,
+                selectedGraph: null,
+                matches: 0
+            };
+            
+            // Shuffle graphs
+            gameState.lineMatch.graphs.sort(() => Math.random() - 0.5);
+            
+            // Render equations
+            const equationsList = document.getElementById('equations-list');
+            equationsList.innerHTML = '';
+            
+            gameState.lineMatch.equations.forEach(eq => {
+                const eqEl = document.createElement('div');
+                eqEl.className = 'equation-card';
+                eqEl.textContent = eq.text;
+                eqEl.dataset.id = eq.id;
+                eqEl.onclick = () => selectEquation(eq.id);
+                equationsList.appendChild(eqEl);
+            });
+            
+            // Render graphs
+            const graphsList = document.getElementById('graphs-list');
+            graphsList.innerHTML = '';
+            
+            gameState.lineMatch.graphs.forEach(graph => {
+                const graphEl = document.createElement('div');
+                graphEl.className = 'graph-card';
+                graphEl.dataset.id = graph.id;
+                graphEl.onclick = () => selectGraph(graph.id);
+                
+                const miniGraph = document.createElement('div');
+                miniGraph.className = 'mini-graph';
+                
+                const miniGrid = document.createElement('div');
+                miniGrid.className = 'mini-grid';
+                miniGraph.appendChild(miniGrid);
+                
+                const miniXAxis = document.createElement('div');
+                miniXAxis.className = 'mini-x-axis';
+                miniGraph.appendChild(miniXAxis);
+                
+                const miniYAxis = document.createElement('div');
+                miniYAxis.className = 'mini-y-axis';
+                miniGraph.appendChild(miniYAxis);
+                
+                const miniLine = document.createElement('div');
+                miniLine.className = 'mini-line';
+                
+                // Calculate rotation based on slope
+                const angle = Math.atan(graph.slope) * (180 / Math.PI);
+                miniLine.style.transform = `translateY(-50%) rotate(${angle}deg)`;
+                
+                miniGraph.appendChild(miniLine);
+                graphEl.appendChild(miniGraph);
+                
+                graphsList.appendChild(graphEl);
+            });
+            
+            // Update score display
+            document.getElementById('line-match-score').textContent = gameState.lineMatch.score;
+            document.getElementById('line-match-feedback').innerHTML = '';
+        }
+
+        function selectEquation(id) {
+            // Clear previous selection
+            document.querySelectorAll('.equation-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Select new equation
+            document.querySelector(`.equation-card[data-id="${id}"]`).classList.add('selected');
+            gameState.lineMatch.selectedEquation = id;
+            
+            // Check if we have a match
+            checkForMatch();
+        }
+
+        function selectGraph(id) {
+            // Clear previous selection
+            document.querySelectorAll('.graph-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Select new graph
+            document.querySelector(`.graph-card[data-id="${id}"]`).classList.add('selected');
+            gameState.lineMatch.selectedGraph = id;
+            
+            // Check if we have a match
+            checkForMatch();
+        }
+
+        function checkForMatch() {
+            if (!gameState.lineMatch.selectedEquation || !gameState.lineMatch.selectedGraph) return;
+            
+            const equation = gameState.lineMatch.equations.find(eq => eq.id === gameState.lineMatch.selectedEquation);
+            const graph = gameState.lineMatch.graphs.find(g => g.id === gameState.lineMatch.selectedGraph);
+            
+            if (equation.slope === graph.slope && equation.intercept === graph.intercept) {
+                // Match found
+                equation.matched = true;
+                graph.matched = true;
+                gameState.lineMatch.matches++;
+                
+                // Update UI
+                document.querySelector(`.equation-card[data-id="${equation.id}"]`).classList.add('matched');
+                document.querySelector(`.graph-card[data-id="${graph.id}"]`).classList.add('matched');
+                
+                // Reset selection
+                gameState.lineMatch.selectedEquation = null;
+                gameState.lineMatch.selectedGraph = null;
+                
+                // Check if all matches are found
+                if (gameState.lineMatch.matches === 3) {
+                    gameState.lineMatch.score += 30;
+                    document.getElementById('line-match-feedback').innerHTML = 
+                        '<span class="success">🎉 Congratulations! You matched all equations!</span>';
+                }
+                
+                document.getElementById('line-match-score').textContent = gameState.lineMatch.score;
+            }
+        }
+
+        function checkMatches() {
+            const feedback = document.getElementById('line-match-feedback');
+            
+            if (gameState.lineMatch.matches === 3) {
+                feedback.innerHTML = '<span class="success">✓ All matches are correct!</span>';
+            } else {
+                feedback.innerHTML = '<span class="error">✗ Some matches are incorrect. Keep trying!</span>';
+            }
+        }
+
+        function resetLineMatch() {
+            initLineMatch();
+        }
+
+        // Game 3: Conic Section MCQs
+        function initConicMCQs() {
+            // Reset game state
+            gameState.conicMCQs = {
+                score: 0,
+                currentQuestion: 0,
+                selectedOption: null,
+                answered: false,
+                questions: gameState.conicMCQs.questions
+            };
+            
+            // Shuffle questions
+            gameState.conicMCQs.questions.sort(() => Math.random() - 0.5);
+            
+            // Display first question
+            displayConicMCQ();
+            
+            // Update score display
+            document.getElementById('conic-mcqs-score').textContent = gameState.conicMCQs.score;
+            document.getElementById('conic-mcqs-feedback').innerHTML = '';
+        }
+
+        function displayConicMCQ() {
+            const question = gameState.conicMCQs.questions[gameState.conicMCQs.currentQuestion];
+            
+            // Display question
+            document.getElementById('conic-mcqs-question').textContent = question.question;
+            
+            // Display options
+            const optionsContainer = document.getElementById('conic-mcqs-options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionEl = document.createElement('div');
+                optionEl.className = 'option';
+                optionEl.textContent = option;
+                optionEl.onclick = () => selectConicMCQOption(index);
+                optionsContainer.appendChild(optionEl);
+            });
+            
+            // Reset state
+            gameState.conicMCQs.selectedOption = null;
+            gameState.conicMCQs.answered = false;
+            
+            // Reset UI
+            document.getElementById('conic-mcqs-feedback').innerHTML = '';
+            document.getElementById('conic-mcqs-submit').disabled = false;
+        }
+
+        function selectConicMCQOption(index) {
+            if (gameState.conicMCQs.answered) return;
+            
+            // Clear previous selection
+            document.querySelectorAll('#conic-mcqs-options .option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Select new option
+            document.querySelectorAll('#conic-mcqs-options .option')[index].classList.add('selected');
+            gameState.conicMCQs.selectedOption = index;
+        }
+
+        function checkConicMCQ() {
+            if (gameState.conicMCQs.answered || gameState.conicMCQs.selectedOption === null) return;
+            
+            gameState.conicMCQs.answered = true;
+            const question = gameState.conicMCQs.questions[gameState.conicMCQs.currentQuestion];
+            const feedback = document.getElementById('conic-mcqs-feedback');
+            
+            // Mark correct and incorrect options
+            const options = document.querySelectorAll('#conic-mcqs-options .option');
+            options[question.correct].classList.add('correct');
+            
+            if (gameState.conicMCQs.selectedOption !== question.correct) {
+                options[gameState.conicMCQs.selectedOption].classList.add('incorrect');
+                feedback.innerHTML = '<span class="error">✗ Incorrect. Try the next question!</span>';
+            } else {
+                gameState.conicMCQs.score += 10;
+                feedback.innerHTML = '<span class="success">✓ Correct! Well done!</span>';
+            }
+            
+            // Update score
+            document.getElementById('conic-mcqs-score').textContent = gameState.conicMCQs.score;
+            
+            // Disable submit button
+            document.getElementById('conic-mcqs-submit').disabled = true;
+        }
+
+        function nextConicMCQ() {
+            gameState.conicMCQs.currentQuestion++;
+            
+            if (gameState.conicMCQs.currentQuestion >= gameState.conicMCQs.questions.length) {
+                // Game completed
+                document.getElementById('conic-mcqs-question').textContent = 'Quiz Completed!';
+                document.getElementById('conic-mcqs-options').innerHTML = '';
+                document.getElementById('conic-mcqs-feedback').innerHTML = 
+                    `<span class="success">🎉 Congratulations! Your final score is ${gameState.conicMCQs.score}.</span>`;
+                document.querySelector('#conic-mcqs-modal .controls').style.display = 'none';
+            } else {
+                displayConicMCQ();
+            }
+        }
+
+        // Game 4: Parabola MCQs
+        function initParabolaMCQs() {
+            // Reset game state
+            gameState.parabolaMCQs = {
+                score: 0,
+                currentQuestion: 0,
+                selectedOption: null,
+                answered: false,
+                questions: gameState.parabolaMCQs.questions
+            };
+            
+            // Shuffle questions
+            gameState.parabolaMCQs.questions.sort(() => Math.random() - 0.5);
+            
+            // Display first question
+            displayParabolaMCQ();
+            
+            // Update score display
+            document.getElementById('parabola-mcqs-score').textContent = gameState.parabolaMCQs.score;
+            document.getElementById('parabola-mcqs-feedback').innerHTML = '';
+        }
+
+        function displayParabolaMCQ() {
+            const question = gameState.parabolaMCQs.questions[gameState.parabolaMCQs.currentQuestion];
+            
+            // Display question
+            document.getElementById('parabola-mcqs-question').textContent = question.question;
+            
+            // Display options
+            const optionsContainer = document.getElementById('parabola-mcqs-options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionEl = document.createElement('div');
+                optionEl.className = 'option';
+                optionEl.textContent = option;
+                optionEl.onclick = () => selectParabolaMCQOption(index);
+                optionsContainer.appendChild(optionEl);
+            });
+            
+            // Reset state
+            gameState.parabolaMCQs.selectedOption = null;
+            gameState.parabolaMCQs.answered = false;
+            
+            // Reset UI
+            document.getElementById('parabola-mcqs-feedback').innerHTML = '';
+            document.getElementById('parabola-mcqs-submit').disabled = false;
+        }
+
+        function selectParabolaMCQOption(index) {
+            if (gameState.parabolaMCQs.answered) return;
+            
+            // Clear previous selection
+            document.querySelectorAll('#parabola-mcqs-options .option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Select new option
+            document.querySelectorAll('#parabola-mcqs-options .option')[index].classList.add('selected');
+            gameState.parabolaMCQs.selectedOption = index;
+        }
+
+        function checkParabolaMCQ() {
+            if (gameState.parabolaMCQs.answered || gameState.parabolaMCQs.selectedOption === null) return;
+            
+            gameState.parabolaMCQs.answered = true;
+            const question = gameState.parabolaMCQs.questions[gameState.parabolaMCQs.currentQuestion];
+            const feedback = document.getElementById('parabola-mcqs-feedback');
+            
+            // Mark correct and incorrect options
+            const options = document.querySelectorAll('#parabola-mcqs-options .option');
+            options[question.correct].classList.add('correct');
+            
+            if (gameState.parabolaMCQs.selectedOption !== question.correct) {
+                options[gameState.parabolaMCQs.selectedOption].classList.add('incorrect');
+                feedback.innerHTML = '<span class="error">✗ Incorrect. Try the next question!</span>';
+            } else {
+                gameState.parabolaMCQs.score += 10;
+                feedback.innerHTML = '<span class="success">✓ Correct! Well done!</span>';
+            }
+            
+            // Update score
+            document.getElementById('parabola-mcqs-score').textContent = gameState.parabolaMCQs.score;
+            
+            // Disable submit button
+            document.getElementById('parabola-mcqs-submit').disabled = true;
+        }
+
+        function nextParabolaMCQ() {
+            gameState.parabolaMCQs.currentQuestion++;
+            
+            if (gameState.parabolaMCQs.currentQuestion >= gameState.parabolaMCQs.questions.length) {
+                // Game completed
+                document.getElementById('parabola-mcqs-question').textContent = 'Quiz Completed!';
+                document.getElementById('parabola-mcqs-options').innerHTML = '';
+                document.getElementById('parabola-mcqs-feedback').innerHTML = 
+                    `<span class="success">🎉 Congratulations! Your final score is ${gameState.parabolaMCQs.score}.</span>`;
+                document.querySelector('#parabola-mcqs-modal .controls').style.display = 'none';
+            } else {
+                displayParabolaMCQ();
+            }
+        }
+
+        // Game 5: Hyperbola MCQs
+        function initHyperbolaMCQs() {
+            // Reset game state
+            gameState.hyperbolaMCQs = {
+                score: 0,
+                currentQuestion: 0,
+                selectedOption: null,
+                answered: false,
+                questions: gameState.hyperbolaMCQs.questions
+            };
+            
+            // Shuffle questions
+            gameState.hyperbolaMCQs.questions.sort(() => Math.random() - 0.5);
+            
+            // Display first question
+            displayHyperbolaMCQ();
+            
+            // Update score display
+            document.getElementById('hyperbola-mcqs-score').textContent = gameState.hyperbolaMCQs.score;
+            document.getElementById('hyperbola-mcqs-feedback').innerHTML = '';
+        }
+
+        function displayHyperbolaMCQ() {
+            const question = gameState.hyperbolaMCQs.questions[gameState.hyperbolaMCQs.currentQuestion];
+            
+            // Display question
+            document.getElementById('hyperbola-mcqs-question').textContent = question.question;
+            
+            // Display options
+            const optionsContainer = document.getElementById('hyperbola-mcqs-options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionEl = document.createElement('div');
+                optionEl.className = 'option';
+                optionEl.textContent = option;
+                optionEl.onclick = () => selectHyperbolaMCQOption(index);
+                optionsContainer.appendChild(optionEl);
+            });
+            
+            // Reset state
+            gameState.hyperbolaMCQs.selectedOption = null;
+            gameState.hyperbolaMCQs.answered = false;
+            
+            // Reset UI
+            document.getElementById('hyperbola-mcqs-feedback').innerHTML = '';
+            document.getElementById('hyperbola-mcqs-submit').disabled = false;
+        }
+
+        function selectHyperbolaMCQOption(index) {
+            if (gameState.hyperbolaMCQs.answered) return;
+            
+            // Clear previous selection
+            document.querySelectorAll('#hyperbola-mcqs-options .option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Select new option
+            document.querySelectorAll('#hyperbola-mcqs-options .option')[index].classList.add('selected');
+            gameState.hyperbolaMCQs.selectedOption = index;
+        }
+
+        function checkHyperbolaMCQ() {
+            if (gameState.hyperbolaMCQs.answered || gameState.hyperbolaMCQs.selectedOption === null) return;
+            
+            gameState.hyperbolaMCQs.answered = true;
+            const question = gameState.hyperbolaMCQs.questions[gameState.hyperbolaMCQs.currentQuestion];
+            const feedback = document.getElementById('hyperbola-mcqs-feedback');
+            
+            // Mark correct and incorrect options
+            const options = document.querySelectorAll('#hyperbola-mcqs-options .option');
+            options[question.correct].classList.add('correct');
+            
+            if (gameState.hyperbolaMCQs.selectedOption !== question.correct) {
+                options[gameState.hyperbolaMCQs.selectedOption].classList.add('incorrect');
+                feedback.innerHTML = '<span class="error">✗ Incorrect. Try the next question!</span>';
+            } else {
+                gameState.hyperbolaMCQs.score += 10;
+                feedback.innerHTML = '<span class="success">✓ Correct! Well done!</span>';
+            }
+            
+            // Update score
+            document.getElementById('hyperbola-mcqs-score').textContent = gameState.hyperbolaMCQs.score;
+            
+            // Disable submit button
+            document.getElementById('hyperbola-mcqs-submit').disabled = true;
+        }
+
+        function nextHyperbolaMCQ() {
+            gameState.hyperbolaMCQs.currentQuestion++;
+            
+            if (gameState.hyperbolaMCQs.currentQuestion >= gameState.hyperbolaMCQs.questions.length) {
+                // Game completed
+                document.getElementById('hyperbola-mcqs-question').textContent = 'Quiz Completed!';
+                document.getElementById('hyperbola-mcqs-options').innerHTML = '';
+                document.getElementById('hyperbola-mcqs-feedback').innerHTML = 
+                    `<span class="success">🎉 Congratulations! Your final score is ${gameState.hyperbolaMCQs.score}.</span>`;
+                document.querySelector('#hyperbola-mcqs-modal .controls').style.display = 'none';
+            } else {
+                displayHyperbolaMCQ();
+            }
+        }
+    </script>
+</body>
+</html>

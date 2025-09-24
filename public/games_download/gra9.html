@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Translation</title>
+<!-- ORIGINAL GAME CONTENT STARTS HERE -->
+<h1>Gravitation & Energy Word Puzzle</h1>
+      <div class="score-box">Score: <span id="score">0%</span></div><div id="questions-area">
+      <!-- Questions will be inserted here by JS --><div class="progress">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div><p id="progress-text">0 / 0 Complete</p><div style="text-align: center; margin-top: 20px;">
+      <button id="reset-btn" class="btn-reset">Reset Puzzle</button><script>
+    // Data
+    const questions = [
+      { id: 1, question: "What force attracts objects toward Earth's center?", answer: "GRAVITY", hint: "Force pulling things down", category: "Forces" },
+      { id: 2, question: "What type of energy is stored due to position?", answer: "POTENTIAL", hint: "Energy at height", category: "Energy" },
+      { id: 3, question: "What is energy of motion called?", answer: "KINETIC", hint: "Moving energy", category: "Energy" },
+      { id: 4, question: "What equals force times distance?", answer: "WORK", hint: "W = F × d", category: "Physics" },
+      { id: 5, question: "What is the rate of doing work?", answer: "POWER", hint: "P = W/t", category: "Physics" },
+      { id: 6, question: "Who discovered the law of universal gravitation?", answer: "NEWTON", hint: "Famous physicist", category: "Scientists" },
+      { id: 7, question: "What is the unit of energy?", answer: "JOULE", hint: "SI unit symbol J", category: "Units" },
+      { id: 8, question: "What can neither be created nor destroyed?", answer: "ENERGY", hint: "Conservation law", category: "Laws" }
+    ];
+
+    // State
+    let answers = {};
+    let hintsUsed = new Set();
+    let gameComplete = false;
+
+    const questionsArea = document.getElementById('questions-area');
+    const scoreDisplay = document.getElementById('score');
+    const progressFill = document.getElementById('progress-fill');
+    const progressText = document.getElementById('progress-text');
+    const resetBtn = document.getElementById('reset-btn');
+
+    function initialize() {
+      answers = {};
+      hintsUsed = new Set();
+      gameComplete = false;
+      questions.forEach(q => {
+        answers[q.id] = '';
+      });
+      scoreDisplay.textContent = '0%';
+      progressFill.style.width = '0%';
+      progressText.textContent = `0 / ${questions.length} Complete`;
+      renderQuestions();
+    }
+
+    function renderQuestions() {
+      questionsArea.innerHTML = '';
+      questions.forEach((q, idx) => {
+        const div = document.createElement('div');
+        div.className = 'question';
+        
+        const h3 = document.createElement('h3');
+        h3.textContent = `${idx + 1}. ${q.question}`;
+        div.appendChild(h3);
+
+        const label = document.createElement('label');
+        label.textContent = `Answer (${q.answer.length} letters)`;
+        div.appendChild(label);
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.maxLength = q.answer.length;
+        input.value = answers[q.id];
+        input.disabled = gameComplete;
+        input.addEventListener('input', (e) => {
+          answers[q.id] = e.target.value.toUpperCase();
+          updateQuestionState(q, input, statusDiv);
+          computeScore();
+        });
+        div.appendChild(input);
+
+        const buttonsDiv = document.createElement('div');
+        buttonsDiv.className = 'buttons';
+
+        const hintBtn = document.createElement('button');
+        hintBtn.textContent = 'Hint';
+        hintBtn.className = 'btn-hint';
+        hintBtn.disabled = hintsUsed.has(q.id) || answers[q.id] === q.answer;
+        hintBtn.addEventListener('click', () => {
+          answers[q.id] = q.answer[0];
+          hintsUsed.add(q.id);
+          input.value = answers[q.id];
+          updateQuestionState(q, input, statusDiv);
+          computeScore();
+        });
+        buttonsDiv.appendChild(hintBtn);
+
+        const showBtn = document.createElement('button');
+        showBtn.textContent = 'Show Answer';
+        showBtn.className = 'btn-show';
+        showBtn.disabled = answers[q.id] === q.answer;
+        showBtn.addEventListener('click', () => {
+          answers[q.id] = q.answer;
+          input.value = q.answer;
+          updateQuestionState(q, input, statusDiv);
+          computeScore();
+        });
+        buttonsDiv.appendChild(showBtn);
+
+        div.appendChild(buttonsDiv);
+
+        const hintTextDiv = document.createElement('div');
+        hintTextDiv.className = 'hint-text';
+        hintTextDiv.style.display = 'none';
+        hintTextDiv.textContent = `Hint: ${q.hint}`;
+        div.appendChild(hintTextDiv);
+
+        const correctDiv = document.createElement('div');
+        correctDiv.className = 'correct-text';
+        correctDiv.style.display = 'none';
+        correctDiv.textContent = `✅ Correct! ${q.answer}`;
+        div.appendChild(correctDiv);
+
+        // statusDiv to unify update
+        const statusDiv = { hintTextDiv, correctDiv, input, hintBtn, showBtn, q };
+
+        updateQuestionState(q, input, statusDiv);
+
+        questionsArea.appendChild(div);
+      });
+    }
+
+    function updateQuestionState(q, input, statusDiv) {
+      // statusDiv has hintTextDiv, correctDiv, etc.
+      // Remove any classes first:
+      input.classList.remove('correct', 'incorrect');
+      statusDiv.hintTextDiv.style.display = 'none';
+      statusDiv.correctDiv.style.display = 'none';
+      
+      if (answers[q.id] === q.answer) {
+        input.classList.add('correct');
+        statusDiv.correctDiv.style.display = 'block';
+        statusDiv.hintTextDiv.style.display = 'none';
+      } else {
+        // not fully correct
+        if (answers[q.id].length === q.answer.length && answers[q.id] !== q.answer) {
+          input.classList.add('incorrect');
+        }
+        // If hint used, show hint
+        if (hintsUsed.has(q.id) && answers[q.id] !== q.answer) {
+          statusDiv.hintTextDiv.style.display = 'block';
+        }
+      }
+    }
+
+    function computeScore() {
+      let correctCount = 0;
+      questions.forEach(q => {
+        if (answers[q.id] === q.answer) correctCount++;
+      });
+      const percent = Math.round((correctCount / questions.length) * 100);
+      scoreDisplay.textContent = percent + '%';
+      progressFill.style.width = percent + '%';
+      progressText.textContent = `${correctCount} / ${questions.length} Complete`;
+      if (correctCount === questions.length) {
+        gameComplete = true;
+        // disable all inputs & buttons
+        disableAll();
+      }
+    }
+
+    function disableAll() {
+      // re-render to reflect disabled state
+      renderQuestions();
+    }
+
+    resetBtn.addEventListener('click', initialize);
+
+    // Init
+    initialize();
+  </script></html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Translation</title>
+<!-- ORIGINAL GAME CONTENT STARTS HERE -->
+<h1 class="text-2xl font-bold text-gray-800 flex items-center gap-2">🌾 Food Resources Management</h1>
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2 bg-green-100 px-3 py-2 rounded-lg">
+            <span class="font-semibold text-green-600" id="score">Score: 0</span><button onclick="initializeGame()" class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+            🔄 Reset Farm
+          </button><!-- Stats -->
+      <div class="grid md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-blue-100 p-4 rounded-lg text-center">
+          <div class="text-2xl mb-1">📅</div>
+          <div class="font-semibold" id="year">Year 1</div>
+          <div class="text-sm text-gray-600" id="season">Season: kharif</div><div class="bg-blue-100 p-4 rounded-lg text-center">
+          <div class="text-2xl mb-1">💧</div>
+          <div class="font-semibold" id="water">Water: 100%</div>
+          <div class="text-sm text-gray-600">Available</div><div class="bg-green-100 p-4 rounded-lg text-center">
+          <div class="text-2xl mb-1">🌱</div>
+          <div class="font-semibold">Plots</div>
+          <div class="text-sm text-gray-600" id="plots-status">0/4 Planted</div><div class="bg-yellow-100 p-4 rounded-lg text-center">
+          <div class="text-2xl mb-1">🌾</div>
+          <div class="font-semibold">Total Yield</div>
+          <div class="text-sm text-gray-600" id="yield">0 units</div><div id="messages" class="space-y-2"></div><div class="grid lg:grid-cols-4 gap-6">
+      <!-- Crop Selection -->
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Select Crops</h2>
+        <div class="space-y-3" id="crops"></div><!-- Farm Plots -->
+      <div class="lg:col-span-2 bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold text-gray-800">Farm Plots</h2>
+          <button onclick="harvest()" class="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700">🌾 Harvest All</button><div class="grid grid-cols-2 gap-4" id="farm-plots"></div><!-- Techniques -->
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Techniques</h2>
+        <div class="space-y-3" id="techniques"></div><!-- Instructions -->
+    <div class="mt-6 bg-white rounded-xl shadow-lg p-6">
+      <h2 class="text-lg font-bold text-gray-800 mb-3">How to Play</h2>
+      <div class="grid md:grid-cols-3 gap-4 text-sm text-gray-600">
+        <div><strong>1. Select & Plant:</strong> Choose a crop and click "Plant". Consider season and water!</div>
+        <div><strong>2. Apply Techniques:</strong> Select farming techniques to improve yield.</div>
+        <div><strong>3. Harvest:</strong> Click "Harvest All" to collect crops and advance years.</div><script>
+const gameData = {
+  crops: [
+    { id: 1, name: 'Wheat', type: 'cereal', season: 'rabi', water: 'medium', icon: '🌾' },
+    { id: 2, name: 'Rice', type: 'cereal', season: 'kharif', water: 'high', icon: '🌾' },
+    { id: 3, name: 'Maize', type: 'cereal', season: 'kharif', water: 'medium', icon: '🌽' },
+    { id: 4, name: 'Sugarcane', type: 'cash', season: 'year-round', water: 'high', icon: '🎋' },
+    { id: 5, name: 'Cotton', type: 'cash', season: 'kharif', water: 'medium', icon: '🌸' },
+    { id: 6, name: 'Potato', type: 'tuber', season: 'rabi', water: 'medium', icon: '🥔' },
+    { id: 7, name: 'Tomato', type: 'vegetable', season: 'year-round', water: 'medium', icon: '🍅' },
+    { id: 8, name: 'Onion', type: 'vegetable', season: 'rabi', water: 'low', icon: '🧅' }
+  ],
+  techniques: [
+    { id: 1, name: 'Crop Rotation', benefit: 'Improves soil fertility', type: 'sustainable' },
+    { id: 2, name: 'Organic Manure', benefit: 'Natural fertilizer', type: 'sustainable' },
+    { id: 3, name: 'Drip Irrigation', benefit: 'Water conservation', type: 'sustainable' },
+    { id: 4, name: 'Pesticide Spraying', benefit: 'Pest control', type: 'chemical' },
+    { id: 5, name: 'Chemical Fertilizers', benefit: 'Quick nutrients', type: 'chemical' },
+    { id: 6, name: 'Hybrid Seeds', benefit: 'Higher yield', type: 'modern' },
+    { id: 7, name: 'Greenhouse Farming', benefit: 'Controlled environment', type: 'modern' },
+    { id: 8, name: 'Intercropping', benefit: 'Multiple crops together', type: 'sustainable' }
+  ]
+};
+
+let farmPlots = [];
+let selectedCrop = null;
+let selectedTechnique = null;
+let season = "kharif";
+let waterAvailable = 100;
+let score = 0;
+let year = 1;
+
+function initializeGame() {
+  farmPlots = [
+    { id: 1, crop: null, technique: null, yield: 0 },
+    { id: 2, crop: null, technique: null, yield: 0 },
+    { id: 3, crop: null, technique: null, yield: 0 },
+    { id: 4, crop: null, technique: null, yield: 0 }
+  ];
+  selectedCrop = null;
+  selectedTechnique = null;
+  season = "kharif";
+  waterAvailable = 100;
+  score = 0;
+  year = 1;
+  updateUI();
+}
+
+function addMessage(text, type="info") {
+  const colors = {
+    success: "bg-green-100 text-green-800",
+    error: "bg-red-100 text-red-800",
+    warning: "bg-yellow-100 text-yellow-800",
+    info: "bg-blue-100 text-blue-800"
+  };
+  const msg = document.createElement("div");
+  msg.className = `p-3 rounded-lg ${colors[type]}`;
+  msg.textContent = text;
+  document.getElementById("messages").prepend(msg);
+  setTimeout(()=>msg.remove(),3000);
+}
+
+function plantCrop(plotId) {
+  if (!selectedCrop) return addMessage("Select a crop first!","warning");
+  const crop = gameData.crops.find(c=>c.id===selectedCrop);
+  let waterNeeded = crop.water==="high"?40:crop.water==="medium"?25:10;
+  if (waterAvailable<waterNeeded) return addMessage("Not enough water!","error");
+  if (crop.season!==season && crop.season!=="year-round") return addMessage(`${crop.name} not suitable for ${season}`,"error");
+  const plot = farmPlots.find(p=>p.id===plotId);
+  if (plot.crop) return;
+  plot.crop = selectedCrop;
+  plot.yield=0;
+  waterAvailable -= waterNeeded;
+  addMessage(`${crop.name} planted!`,"success");
+  selectedCrop=null;
+  updateUI();
+}
+
+function applyTechnique(plotId) {
+  if (!selectedTechnique) return addMessage("Select a technique first!","warning");
+  const plot=farmPlots.find(p=>p.id===plotId);
+  if(!plot.crop) return addMessage("Plant a crop first!","warning");
+  if(plot.technique) return;
+  plot.technique=selectedTechnique;
+  const tech=gameData.techniques.find(t=>t.id===selectedTechnique);
+  addMessage(`${tech.name} applied!`,"success");
+  selectedTechnique=null;
+  updateUI();
+}
+
+function harvest() {
+  let totalYield=0;
+  farmPlots.forEach(plot=>{
+    if(plot.crop){
+      const crop=gameData.crops.find(c=>c.id===plot.crop);
+      const tech=plot.technique?gameData.techniques.find(t=>t.id===plot.technique):null;
+      let base=50, mult=1;
+      if(crop.season===season||crop.season==="year-round") mult+=0.2;
+      if(tech){
+        if(tech.type==="sustainable") mult+=0.3;
+        if(tech.type==="modern") mult+=0.4;
+        if(tech.type==="chemical") mult+=0.2;
+      }
+      const yieldAmt=Math.floor(base*mult);
+      plot.yield=yieldAmt;
+      totalYield+=yieldAmt;
+      plot.crop=null;
+      plot.technique=null;
+    }
+  });
+  score+=totalYield;
+  year++;
+  waterAvailable=100;
+  season= season==="kharif"?"rabi":"kharif";
+  addMessage(`Harvested ${totalYield} units!`,"success");
+  updateUI();
+}
+
+function updateUI() {
+  document.getElementById("score").textContent="Score: "+score;
+  document.getElementById("year").textContent="Year "+year;
+  document.getElementById("season").textContent="Season: "+season;
+  document.getElementById("water").textContent="Water: "+waterAvailable+"%";
+  document.getElementById("yield").textContent=score+" units";
+  document.getElementById("plots-status").textContent=farmPlots.filter(p=>p.crop).length+"/4 Planted";
+
+  const cropsDiv=document.getElementById("crops");
+  cropsDiv.innerHTML="";
+  gameData.crops.forEach(crop=>{
+    const btn=document.createElement("button");
+    btn.className=`w-full text-left p-3 rounded-lg border-2 mb-2 ${selectedCrop===crop.id?"border-green-500 bg-green-50":"border-gray-200 hover:border-green-300"}`;
+    btn.innerHTML=`<div class="flex items-center gap-3"><span class="text-xl">${crop.icon}</span>
+      <div><div class="font-semibold">${crop.name}</div><div class="text-sm text-gray-600">${crop.type} • ${crop.season} • water: ${crop.water}</div></div></div>`;
+    btn.onclick=()=>{selectedCrop=crop.id;updateUI();};
+    cropsDiv.appendChild(btn);
+  });
+
+  const techniquesDiv=document.getElementById("techniques");
+  techniquesDiv.innerHTML="";
+  gameData.techniques.forEach(tech=>{
+    const btn=document.createElement("button");
+    btn.className=`w-full text-left p-3 rounded-lg border-2 mb-2 ${selectedTechnique===tech.id?"border-blue-500 bg-blue-50":"border-gray-200 hover:border-blue-300"}`;
+    btn.innerHTML=`<div class="font-semibold">${tech.name}</div><div class="text-xs text-gray-600">${tech.benefit}</div>
+    <div class="text-xs ${tech.type==="sustainable"?"text-green-600":tech.type==="modern"?"text-purple-600":"text-red-600"}">${tech.type}</div>`;
+    btn.onclick=()=>{selectedTechnique=tech.id;updateUI();};
+    techniquesDiv.appendChild(btn);
+  });
+
+  const plotsDiv=document.getElementById("farm-plots");
+  plotsDiv.innerHTML="";
+  farmPlots.forEach(plot=>{
+    const crop=plot.crop?gameData.crops.find(c=>c.id===plot.crop):null;
+    const tech=plot.technique?gameData.techniques.find(t=>t.id===plot.technique):null;
+    const card=document.createElement("div");
+    card.className="border-2 rounded-lg p-4 min-h-[120px] "+(crop?(tech?"bg-green-200 border-green-400":"bg-blue-100 border-blue-300"):"bg-amber-100 border-amber-300");
+    card.innerHTML=`<div class="text-center mb-3"><h3 class="font-semibold">Plot ${plot.id}</h3></div>
+      ${crop?`<div class="text-center"><div class="text-2xl mb-1">${crop.icon}</div><div>${crop.name}</div>${tech?`<div class="text-xs text-green-700">${tech.name}</div>`:""}${plot.yield>0?`<div class="text-sm font-bold">Yield: ${plot.yield}</div>`:""}</div>`:`<div class="text-center text-gray-500"><div class="text-2xl mb-1">🌱</div><div class="text-sm">Empty Plot</div></div>`}
+      <div class="flex gap-1 mt-3"><button onclick="plantCrop(${plot.id})" ${plot.crop?"disabled":""} class="flex-1 bg-green-600 text-white text-xs py-1 rounded ${plot.crop?"bg-gray-300":""}">Plant</button>
+      <button onclick="applyTechnique(${plot.id})" ${!plot.crop||plot.technique?"disabled":""} class="flex-1 bg-blue-600 text-white text-xs py-1 rounded ${!plot.crop||plot.technique?"bg-gray-300":""}">Tech</button></div>`;
+    plotsDiv.appendChild(card);
+  });
+}
+
+initializeGame();
+</script></html>

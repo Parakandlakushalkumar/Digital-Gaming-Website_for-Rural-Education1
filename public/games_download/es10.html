@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Translation</title>
+<!-- ORIGINAL GAME CONTENT STARTS HERE -->
+<h1>🌍 Environment & Sustainability Simulator</h1>
+        <div class="game-info">
+            <span>Score: <span id="score">0</span></span>
+            <span>Ecosystem: <span id="ecosystem-health">Healthy</span></span>
+            <span>Questions: <span id="correct-answers">0</span>/10</span><div class="ecosystem-area" id="ecosystemArea">
+            <div class="ecosystem" onclick="ecosystemClicked()" title="Ecosystem - Click to explore">
+                <!-- Producers -->
+                <div class="organism producer" style="left: 50px; top: 50px;" onclick="organismClicked('producer')" title="Producer - Plants">🌱</div>
+                <div class="organism producer" style="left: 100px; top: 80px;" onclick="organismClicked('producer')" title="Producer - Trees">🌳</div>
+                <div class="organism producer" style="left: 150px; top: 60px;" onclick="organismClicked('producer')" title="Producer - Algae">🌿</div>
+                
+                <!-- Primary Consumers -->
+                <div class="organism primary-consumer" style="left: 80px; top: 120px;" onclick="organismClicked('primary-consumer')" title="Primary Consumer - Rabbit">🐰</div>
+                <div class="organism primary-consumer" style="left: 120px; top: 140px;" onclick="organismClicked('primary-consumer')" title="Primary Consumer - Deer">🦌</div>
+                <div class="organism primary-consumer" style="left: 200px; top: 130px;" onclick="organismClicked('primary-consumer')" title="Primary Consumer - Fish">🐟</div>
+                
+                <!-- Secondary Consumers -->
+                <div class="organism secondary-consumer" style="left: 100px; top: 180px;" onclick="organismClicked('secondary-consumer')" title="Secondary Consumer - Fox">🦊</div>
+                <div class="organism secondary-consumer" style="left: 180px; top: 200px;" onclick="organismClicked('secondary-consumer')" title="Secondary Consumer - Eagle">🦅</div>
+                
+                <!-- Decomposers -->
+                <div class="organism decomposer" style="left: 50px; top: 220px;" onclick="organismClicked('decomposer')" title="Decomposer - Fungi">🍄</div>
+                <div class="organism decomposer" style="left: 250px; top: 240px;" onclick="organismClicked('decomposer')" title="Decomposer - Bacteria">🦠</div>
+                
+                <!-- Pollution -->
+                <div class="pollution smoke" style="left: 300px; top: 50px;" onclick="pollutionClicked('smoke')" title="Air Pollution - Smoke">💨</div>
+                <div class="pollution waste" style="left: 320px; top: 150px;" onclick="pollutionClicked('waste')" title="Water Pollution - Waste">🗑️</div>
+                <div class="pollution chemical" style="left: 280px; top: 200px;" onclick="pollutionClicked('chemical')" title="Chemical Pollution">☢️</div><div class="control-panel">
+            <button class="control-btn" onclick="startFoodChain()">Food Chain</button>
+            <button class="control-btn" onclick="startPollution()">Pollution Impact</button>
+            <button class="control-btn" onclick="startConservation()">Conservation</button>
+            <button class="control-btn" onclick="startSustainability()">Sustainability</button><div class="ecosystem-controls">
+            <h3>🌿 Environmental Factors</h3>
+            <div class="environmental-factors">
+                <div class="factor" onclick="selectFactor('temperature')">Temperature</div>
+                <div class="factor" onclick="selectFactor('rainfall')">Rainfall</div>
+                <div class="factor" onclick="selectFactor('sunlight')">Sunlight</div>
+                <div class="factor" onclick="selectFactor('oxygen')">Oxygen</div>
+                <div class="factor" onclick="selectFactor('nutrients')">Nutrients</div>
+                <div class="factor" onclick="selectFactor('ph')">pH Level</div><div class="sustainability-meter">
+            <h3>📊 Ecosystem Health</h3>
+            <div>
+                <label>Biodiversity:</label>
+                <div class="meter">
+                    <div class="meter-fill" id="biodiversityMeter" style="width: 80%;"></div><div>
+                <label>Air Quality:</label>
+                <div class="meter">
+                    <div class="meter-fill" id="airQualityMeter" style="width: 70%;"></div><div>
+                <label>Water Quality:</label>
+                <div class="meter">
+                    <div class="meter-fill" id="waterQualityMeter" style="width: 75%;"></div><div>
+                <label>Soil Health:</label>
+                <div class="meter">
+                    <div class="meter-fill" id="soilHealthMeter" style="width: 85%;"></div><div class="conservation-tips">
+            <h3>💡 Conservation Tips</h3>
+            <p>Click on tips to learn more about environmental conservation:</p>
+            <div class="tip" onclick="showTip('reduce')">Reduce Waste</div>
+            <div class="tip" onclick="showTip('reuse')">Reuse Materials</div>
+            <div class="tip" onclick="showTip('recycle')">Recycle</div>
+            <div class="tip" onclick="showTip('energy')">Save Energy</div>
+            <div class="tip" onclick="showTip('water')">Conserve Water</div>
+            <div class="tip" onclick="showTip('transport')">Green Transport</div><div class="info-panel" id="infoPanel">
+            <h3>🌍 Environment & Sustainability</h3>
+            <p><strong>Ecosystem:</strong> A community of living organisms and their physical environment.</p>
+            <p><strong>Food Chain:</strong> The flow of energy from producers to consumers to decomposers.</p>
+            <p><strong>Pollution:</strong> Introduction of harmful substances into the environment.</p>
+            <p><strong>Sustainability:</strong> Meeting present needs without compromising future generations.</p><div class="quiz-section" id="quizSection">
+            <div class="question" id="questionText">
+                What is the main source of energy in most ecosystems?<div class="options" id="optionsContainer">
+                <div class="option" onclick="selectOption(this, false)">Water</div>
+                <div class="option" onclick="selectOption(this, true)">Sunlight</div>
+                <div class="option" onclick="selectOption(this, false)">Soil</div>
+                <div class="option" onclick="selectOption(this, false)">Air</div><div class="controls">
+            <button class="btn btn-simulate" onclick="runSimulation()">Run Simulation</button>
+            <button class="btn btn-quiz" onclick="checkQuizAnswer()">Submit Answer</button>
+            <button class="btn btn-next" onclick="nextQuestion()">Next Question</button><div id="result" class="result" style="display: none;"></div><script>
+        const questions = [
+            {
+                question: "What is the main source of energy in most ecosystems?",
+                options: ["Water", "Sunlight", "Soil", "Air"],
+                correct: 1
+            },
+            {
+                question: "What is the process by which plants make their own food?",
+                options: ["Respiration", "Photosynthesis", "Digestion", "Fermentation"],
+                correct: 1
+            },
+            {
+                question: "What is the term for the variety of life in an ecosystem?",
+                options: ["Ecosystem", "Biodiversity", "Population", "Community"],
+                correct: 1
+            },
+            {
+                question: "What is the main cause of air pollution?",
+                options: ["Water", "Soil", "Fossil fuels", "Plants"],
+                correct: 2
+            },
+            {
+                question: "What is the greenhouse effect?",
+                options: ["Cooling of the Earth", "Warming of the Earth", "Ozone depletion", "Acid rain"],
+                correct: 1
+            },
+            {
+                question: "What is the 3R principle in waste management?",
+                options: ["Reduce, Reuse, Recycle", "Read, Write, Remember", "Run, Rest, Relax", "Red, Green, Blue"],
+                correct: 0
+            },
+            {
+                question: "What is the main cause of water pollution?",
+                options: ["Sunlight", "Industrial waste", "Trees", "Animals"],
+                correct: 1
+            },
+            {
+                question: "What is sustainable development?",
+                options: ["Fast development", "Development that meets present needs without compromising future", "Expensive development", "Slow development"],
+                correct: 1
+            },
+            {
+                question: "What is the role of decomposers in an ecosystem?",
+                options: ["Produce food", "Break down dead matter", "Consume producers", "Pollute water"],
+                correct: 1
+            },
+            {
+                question: "What is the main cause of deforestation?",
+                options: ["Animals", "Humans", "Weather", "Rocks"],
+                correct: 1
+            }
+        ];
+        
+        const conservationTips = {
+            reduce: "Reduce Waste: Use less plastic, buy only what you need, and choose products with minimal packaging.",
+            reuse: "Reuse Materials: Use containers multiple times, donate old items, and find creative ways to repurpose things.",
+            recycle: "Recycle: Separate recyclable materials and use recycling programs to give materials a new life.",
+            energy: "Save Energy: Turn off lights when not needed, use energy-efficient appliances, and consider renewable energy.",
+            water: "Conserve Water: Fix leaks, take shorter showers, and use water-saving devices.",
+            transport: "Green Transport: Walk, bike, or use public transportation instead of driving alone."
+        };
+        
+        const factorInfo = {
+            temperature: "Temperature: Affects the rate of chemical reactions and organism activity in the ecosystem.",
+            rainfall: "Rainfall: Provides water for plants and animals, affects soil moisture and water availability.",
+            sunlight: "Sunlight: Essential for photosynthesis, drives the entire food chain and ecosystem energy flow.",
+            oxygen: "Oxygen: Required for respiration by most organisms, produced by plants during photosynthesis.",
+            nutrients: "Nutrients: Essential elements like nitrogen and phosphorus needed for plant growth and ecosystem health.",
+            ph: "pH Level: Measures acidity or alkalinity, affects chemical processes and organism survival in water and soil."
+        };
+        
+        let currentQuestion = 0;
+        let score = 0;
+        let correctAnswers = 0;
+        let selectedOption = null;
+        let ecosystemHealth = 80;
+        
+        function ecosystemClicked() {
+            showInfo("Ecosystem: A complex network of living organisms interacting with their physical environment. Click on organisms to learn more!");
+        }
+        
+        function organismClicked(type) {
+            const organismInfo = {
+                'producer': "Producer: Plants that make their own food through photosynthesis using sunlight, water, and carbon dioxide.",
+                'primary-consumer': "Primary Consumer: Animals that eat plants (herbivores) and get energy from producers.",
+                'secondary-consumer': "Secondary Consumer: Animals that eat other animals (carnivores) and get energy from primary consumers.",
+                'decomposer': "Decomposer: Organisms like bacteria and fungi that break down dead matter and return nutrients to the soil."
+            };
+            showInfo(organismInfo[type]);
+        }
+        
+        function pollutionClicked(type) {
+            const pollutionInfo = {
+                'smoke': "Air Pollution: Smoke from factories and vehicles releases harmful gases that affect air quality and health.",
+                'waste': "Water Pollution: Waste dumped into water bodies contaminates water and harms aquatic life.",
+                'chemical': "Chemical Pollution: Toxic chemicals from industries and agriculture pollute soil and water."
+            };
+            showInfo(pollutionInfo[type]);
+            
+            // Update ecosystem health
+            ecosystemHealth = Math.max(0, ecosystemHealth - 10);
+            updateEcosystemHealth();
+        }
+        
+        function selectFactor(factor) {
+            document.querySelectorAll('.factor').forEach(f => f.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            showInfo(factorInfo[factor]);
+        }
+        
+        function showTip(tip) {
+            showInfo(conservationTips[tip]);
+        }
+        
+        function showInfo(message) {
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'result correct';
+            infoDiv.textContent = message;
+            infoDiv.style.position = 'fixed';
+            infoDiv.style.top = '20px';
+            infoDiv.style.right = '20px';
+            infoDiv.style.zIndex = '1000';
+            infoDiv.style.maxWidth = '300px';
+            document.body.appendChild(infoDiv);
+            
+            setTimeout(() => {
+                infoDiv.remove();
+            }, 4000);
+        }
+        
+        function startFoodChain() {
+            document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Show food chain connections
+            showInfo("Food Chain: Energy flows from producers → primary consumers → secondary consumers → decomposers");
+            
+            // Animate energy flow
+            setTimeout(() => {
+                document.querySelectorAll('.organism').forEach(organism => {
+                    organism.style.animation = 'pulse 1s ease-in-out 3';
+                });
+            }, 500);
+        }
+        
+        function startPollution() {
+            document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Highlight pollution effects
+            document.querySelectorAll('.pollution').forEach(pollution => {
+                pollution.style.animation = 'pulse 1s ease-in-out 5';
+            });
+            
+            showInfo("Pollution Impact: Pollution affects air quality, water quality, and soil health, harming all organisms in the ecosystem.");
+        }
+        
+        function startConservation() {
+            document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Show conservation efforts
+            showInfo("Conservation: Protecting and preserving natural resources and ecosystems for future generations.");
+            
+            // Improve ecosystem health
+            ecosystemHealth = Math.min(100, ecosystemHealth + 20);
+            updateEcosystemHealth();
+        }
+        
+        function startSustainability() {
+            document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Show sustainability practices
+            showInfo("Sustainability: Meeting present needs without compromising the ability of future generations to meet their own needs.");
+            
+            // Improve all health meters
+            updateEcosystemHealth();
+        }
+        
+        function updateEcosystemHealth() {
+            const healthLevel = ecosystemHealth;
+            const healthText = healthLevel > 80 ? 'Healthy' : healthLevel > 60 ? 'Moderate' : healthLevel > 40 ? 'Poor' : 'Critical';
+            
+            document.getElementById('ecosystem-health').textContent = healthText;
+            
+            // Update meters
+            document.getElementById('biodiversityMeter').style.width = healthLevel + '%';
+            document.getElementById('airQualityMeter').style.width = Math.max(0, healthLevel - 10) + '%';
+            document.getElementById('waterQualityMeter').style.width = Math.max(0, healthLevel - 5) + '%';
+            document.getElementById('soilHealthMeter').style.width = Math.max(0, healthLevel + 5) + '%';
+        }
+        
+        function loadQuestion() {
+            const question = questions[currentQuestion];
+            document.getElementById('questionText').textContent = question.question;
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => selectOption(optionDiv, index === question.correct);
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            selectedOption = null;
+        }
+        
+        function selectOption(element, isCorrect) {
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedOption = { element, isCorrect };
+        }
+        
+        function checkQuizAnswer() {
+            if (!selectedOption) return;
+            
+            const resultDiv = document.getElementById('result');
+            
+            document.querySelectorAll('.option').forEach((opt, index) => {
+                const question = questions[currentQuestion];
+                if (index === question.correct) {
+                    opt.classList.add('correct');
+                } else if (opt.classList.contains('selected') && !selectedOption.isCorrect) {
+                    opt.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedOption.isCorrect) {
+                score += 10;
+                correctAnswers++;
+                resultDiv.textContent = '🎉 Correct! Well done!';
+                resultDiv.className = 'result correct';
+            } else {
+                resultDiv.textContent = '❌ Incorrect. The correct answer is highlighted in green.';
+                resultDiv.className = 'result incorrect';
+            }
+            
+            resultDiv.style.display = 'block';
+            updateDisplay();
+        }
+        
+        function nextQuestion() {
+            currentQuestion = (currentQuestion + 1) % questions.length;
+            loadQuestion();
+            document.getElementById('result').style.display = 'none';
+        }
+        
+        function runSimulation() {
+            // Run a comprehensive environment simulation
+            startFoodChain();
+            setTimeout(() => startPollution(), 2000);
+            setTimeout(() => startConservation(), 4000);
+            setTimeout(() => startSustainability(), 6000);
+        }
+        
+        function updateDisplay() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('correct-answers').textContent = correctAnswers;
+        }
+        
+        // Initialize game
+        loadQuestion();
+        updateDisplay();
+        updateEcosystemHealth();
+        startFoodChain();
+    </script></html>

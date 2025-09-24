@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Translation</title>
+<!-- ORIGINAL GAME CONTENT STARTS HERE -->
+<h1>📐 Engineering Graphics Puzzle 📐</h1>
+        
+        <div class="game-info">
+            <div>📏 Level: <span id="level">1</span></div>
+            <div>🎯 Score: <span id="score">0</span></div>
+            <div>⏱️ Time: <span id="timer">00:00</span></div>
+            <div>✅ Correct: <span id="correct">0</span>/10</div><div class="drawing-board">
+            <div class="grid-lines"></div>
+            <div class="dimension-lines" id="dimensionLines"></div>
+            
+            <div class="challenge-title" id="challengeTitle">
+                Match the isometric view with the correct orthographic projections!<div class="projection-challenge">
+                <div class="isometric-view">
+                    <h3>Isometric View</h3>
+                    <div id="isometricShape">
+                        <!-- 3D shape will be displayed here --><div>
+                    <h3>Select Correct Orthographic Projections</h3>
+                    <div class="orthographic-options" id="orthographicOptions">
+                        <!-- Projection options will be populated here --><div id="completion" style="display: none;">
+            <div class="completion-screen">
+                <h2>🎉 Engineering Drawing Mastery! 🎉</h2>
+                <p>Excellent! You've mastered orthographic projections!</p>
+                <p>Final Score: <span id="finalScore"></span> points</p>
+                <p>Accuracy: <span id="accuracy"></span>%</p><div class="controls">
+            <button class="btn" onclick="nextChallenge()">➡️ Next Drawing</button>
+            <button class="btn" onclick="restartGame()">🔄 New Project</button>
+            <button class="btn" onclick="showHint()">💡 Engineering Hint</button></html>

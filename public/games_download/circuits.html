@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Basic Circuits Treasure Hunt ⚡</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom, #f3e8ff, #e0f2fe);
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      color: #6b21a8;
+    }
+    .score-board {
+      background: #fff;
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .stage {
+      background: #fff;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .story {
+      background: #ede9fe;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+    .options button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 12px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 2px solid transparent;
+      background: #f9fafb;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .options button:hover {
+      background: #f3e8ff;
+      border-color: #c084fc;
+    }
+    .correct {
+      color: #16a34a;
+      font-size: 1.5rem;
+      margin: 10px 0;
+    }
+    .wrong {
+      color: #dc2626;
+      font-size: 1.5rem;
+      margin: 10px 0;
+    }
+    .explanation {
+      background: #fef9c3;
+      padding: 10px;
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+    .btn {
+      background: #7e22ce;
+      color: #fff;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .btn:hover {
+      background: #6b21a8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>⚡ Basic Circuits Treasure Hunt ⚡</h1>
+    <div class="score-board">
+      <div id="score">Score: 0/100</div>
+      <div id="stage-info">Stage 1 of 6</div>
+    </div>
+    <div id="game"></div>
+  </div>
+
+  <script>
+    const stages = [
+      {
+        title: "🔋 The Battery Cave",
+        story: "Deep in an ancient cave, glowing crystals store electrical energy. These are like batteries - they provide the 'push' that makes electricity flow.",
+        question: "A battery in a circuit provides:",
+        options: [
+          { text: "Voltage (electrical pressure)", correct: true },
+          { text: "Resistance (blocking electricity)", correct: false },
+          { text: "Color to the wires", correct: false }
+        ],
+        explanation: "Batteries provide voltage - the electrical 'pressure' that pushes current through a circuit!"
+      },
+      {
+        title: "🔌 The Wire Bridge",
+        story: "You find a copper wire bridge. Electricity flows through wires like water flows through pipes.",
+        question: "Wires in a circuit:",
+        options: [
+          { text: "Block the flow of electricity", correct: false },
+          { text: "Provide a path for electricity to flow", correct: true },
+          { text: "Create electricity from nothing", correct: false }
+        ],
+        explanation: "Wires are conductors - they provide a pathway for electric current to flow!"
+      },
+      {
+        title: "⛰️ The Resistance Mountain",
+        story: "Climbing a steep mountain feels harder. Similarly, some materials resist the flow of electricity.",
+        question: "Resistance in a circuit:",
+        options: [
+          { text: "Makes electricity flow faster", correct: false },
+          { text: "Opposes the flow of current", correct: true },
+          { text: "Creates more voltage", correct: false }
+        ],
+        explanation: "Resistance opposes electric current flow, like friction slows movement!"
+      },
+      {
+        title: "💡 The Light Bulb Tower",
+        story: "Magical orbs glow when electricity flows through them, just like light bulbs in a circuit.",
+        question: "For a light bulb to work, you need:",
+        options: [
+          { text: "A complete circuit from battery to bulb and back", correct: true },
+          { text: "Just a battery touching the bulb", correct: false },
+          { text: "Magic words to activate it", correct: false }
+        ],
+        explanation: "A complete circuit forms a closed loop - electricity flows through the bulb and back to the battery!"
+      },
+      {
+        title: "🏰 The Switch Castle",
+        story: "Switches act like magical doors - they open and close the flow of electricity.",
+        question: "A switch in a circuit can:",
+        options: [
+          { text: "Increase the voltage", correct: false },
+          { text: "Open or close the circuit", correct: true },
+          { text: "Change the color of electricity", correct: false }
+        ],
+        explanation: "Switches control the flow of electricity by opening or closing the circuit!"
+      },
+      {
+        title: "📘 The Circuit Diagram Library",
+        story: "Ancient books show simple circuit drawings. Engineers use these symbols to plan circuits.",
+        question: "Circuit diagrams use:",
+        options: [
+          { text: "Photographs of real circuits", correct: false },
+          { text: "Standard symbols to represent components", correct: true },
+          { text: "Only colors with no shapes", correct: false }
+        ],
+        explanation: "Circuit diagrams use standardized symbols (like lines for wires, circles for bulbs) to show connections!"
+      }
+    ];
+
+    let currentStage = 0;
+    let score = 0;
+
+    function renderStage() {
+      const stage = stages[currentStage];
+      document.getElementById("stage-info").textContent = `Stage ${currentStage + 1} of ${stages.length}`;
+      document.getElementById("score").textContent = `Score: ${score}/100`;
+
+      let html = `
+        <div class="stage">
+          <h2>${stage.title}</h2>
+          <div class="story">${stage.story}</div>
+          <h3>${stage.question}</h3>
+          <div class="options">
+            ${stage.options.map((opt, i) => 
+              `<button onclick="handleAnswer(${i})">${opt.text}</button>`
+            ).join("")}
+          </div>
+          <div id="result"></div>
+        </div>
+      `;
+
+      document.getElementById("game").innerHTML = html;
+    }
+
+    function handleAnswer(i) {
+      const stage = stages[currentStage];
+      const resultDiv = document.getElementById("result");
+      if (stage.options[i].correct) {
+        score += Math.round(100 / stages.length);
+        resultDiv.innerHTML = `<div class="correct">✅ Correct!</div><div class="explanation">${stage.explanation}</div><button class="btn" onclick="nextStage()">Next ➡️</button>`;
+      } else {
+        resultDiv.innerHTML = `<div class="wrong">❌ Not quite!</div><div class="explanation">${stage.explanation}</div><button class="btn" onclick="nextStage()">Next ➡️</button>`;
+      }
+      document.querySelectorAll(".options button").forEach(b => b.disabled = true);
+      document.getElementById("score").textContent = `Score: ${score}/100`;
+    }
+
+    function nextStage() {
+      if (currentStage < stages.length - 1) {
+        currentStage++;
+        renderStage();
+      } else {
+        document.getElementById("game").innerHTML = `
+          <div class="stage">
+            <h2>🏆 Circuit Master!</h2>
+            <p>Your final score: <strong>${score}/100</strong></p>
+            <div class="explanation">
+              <h3>What You Learned:</h3>
+              <ul>
+                <li>🔋 Batteries provide voltage</li>
+                <li>🔌 Wires conduct electricity</li>
+                <li>⛰️ Resistance opposes current</li>
+                <li>💡 Bulbs need complete circuits</li>
+                <li>🏰 Switches control flow</li>
+                <li>📘 Circuit diagrams use symbols</li>
+              </ul>
+            </div>
+            <button class="btn" onclick="restartGame()">Play Again 🔄</button>
+          </div>
+        `;
+      }
+    }
+
+    function restartGame() {
+      currentStage = 0;
+      score = 0;
+      renderStage();
+    }
+
+    renderStage();
+  </script>
+</body>
+</html>

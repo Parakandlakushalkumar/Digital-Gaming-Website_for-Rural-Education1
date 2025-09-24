@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Translation</title>
+<!-- ORIGINAL GAME CONTENT STARTS HERE -->
+<h1>🧪 Chemical Reactions Puzzle</h1>
+        <div class="game-info">
+            <span>Score: <span id="score">0</span></span>
+            <span>Level: <span id="level">1</span></span>
+            <span>Streak: <span id="streak">0</span></span><div class="equation-container">
+            <div id="equation" class="equation">
+                <!-- Dynamic equation will be inserted here --><div class="controls">
+            <button class="btn btn-check" onclick="checkAnswer()">Check Answer</button>
+            <button class="btn btn-next" onclick="nextQuestion()">Next Question</button><div id="result" class="result" style="display: none;"></div>
+        <div id="hint" class="hint" style="display: none;"></div><div id="celebration" class="celebration"></div>
+    
+    <script>
+        const equations = [
+            {
+                reactants: [{ formula: "H₂", coeff: 2 }, { formula: "O₂", coeff: 1 }],
+                products: [{ formula: "H₂O", coeff: 2 }],
+                hint: "Remember: In water formation, you need 2 hydrogen molecules for every oxygen molecule."
+            },
+            {
+                reactants: [{ formula: "CH₄", coeff: 1 }, { formula: "O₂", coeff: 2 }],
+                products: [{ formula: "CO₂", coeff: 1 }, { formula: "H₂O", coeff: 2 }],
+                hint: "Methane combustion: Count carbon and hydrogen atoms on both sides."
+            },
+            {
+                reactants: [{ formula: "Fe", coeff: 4 }, { formula: "O₂", coeff: 3 }],
+                products: [{ formula: "Fe₂O₃", coeff: 2 }],
+                hint: "Iron oxidation: Balance iron first, then oxygen."
+            },
+            {
+                reactants: [{ formula: "Al", coeff: 2 }, { formula: "HCl", coeff: 6 }],
+                products: [{ formula: "AlCl₃", coeff: 2 }, { formula: "H₂", coeff: 3 }],
+                hint: "Aluminum with hydrochloric acid produces aluminum chloride and hydrogen gas."
+            },
+            {
+                reactants: [{ formula: "Ca(OH)₂", coeff: 1 }, { formula: "CO₂", coeff: 1 }],
+                products: [{ formula: "CaCO₃", coeff: 1 }, { formula: "H₂O", coeff: 1 }],
+                hint: "Lime water test for CO₂: This equation is already balanced!"
+            }
+        ];
+        
+        let currentQuestion = 0;
+        let score = 0;
+        let streak = 0;
+        let inputs = [];
+        
+        function displayEquation() {
+            const eq = equations[currentQuestion];
+            const equationDiv = document.getElementById('equation');
+            equationDiv.innerHTML = '';
+            inputs = [];
+            
+            // Create reactants
+            eq.reactants.forEach((reactant, index) => {
+                if (index > 0) {
+                    const plus = document.createElement('span');
+                    plus.textContent = ' + ';
+                    plus.className = 'compound';
+                    equationDiv.appendChild(plus);
+                }
+                
+                const coeffInput = document.createElement('input');
+                coeffInput.type = 'number';
+                coeffInput.className = 'coefficient-input';
+                coeffInput.min = '1';
+                coeffInput.max = '10';
+                coeffInput.id = `reactant-${index}`;
+                inputs.push({ element: coeffInput, answer: reactant.coeff });
+                equationDiv.appendChild(coeffInput);
+                
+                const formula = document.createElement('span');
+                formula.textContent = reactant.formula;
+                formula.className = 'compound';
+                equationDiv.appendChild(formula);
+            });
+            
+            // Add arrow
+            const arrow = document.createElement('span');
+            arrow.textContent = ' → ';
+            arrow.className = 'arrow';
+            equationDiv.appendChild(arrow);
+            
+            // Create products
+            eq.products.forEach((product, index) => {
+                if (index > 0) {
+                    const plus = document.createElement('span');
+                    plus.textContent = ' + ';
+                    plus.className = 'compound';
+                    equationDiv.appendChild(plus);
+                }
+                
+                const coeffInput = document.createElement('input');
+                coeffInput.type = 'number';
+                coeffInput.className = 'coefficient-input';
+                coeffInput.min = '1';
+                coeffInput.max = '10';
+                coeffInput.id = `product-${index}`;
+                inputs.push({ element: coeffInput, answer: product.coeff });
+                equationDiv.appendChild(coeffInput);
+                
+                const formula = document.createElement('span');
+                formula.textContent = product.formula;
+                formula.className = 'compound';
+                equationDiv.appendChild(formula);
+            });
+        }
+        
+        function checkAnswer() {
+            const resultDiv = document.getElementById('result');
+            const hintDiv = document.getElementById('hint');
+            let allCorrect = true;
+            
+            inputs.forEach(input => {
+                const userAnswer = parseInt(input.element.value) || 0;
+                if (userAnswer !== input.answer) {
+                    allCorrect = false;
+                    input.element.style.borderColor = '#e53e3e';
+                    input.element.style.backgroundColor = '#fed7d7';
+                } else {
+                    input.element.style.borderColor = '#48bb78';
+                    input.element.style.backgroundColor = '#c6f6d5';
+                }
+            });
+            
+            if (allCorrect) {
+                resultDiv.textContent = '🎉 Correct! Well balanced!';
+                resultDiv.className = 'result correct';
+                score += 10 + (streak * 2);
+                streak++;
+                createCelebration();
+                hintDiv.style.display = 'none';
+            } else {
+                resultDiv.textContent = '❌ Not quite right. Check your coefficients!';
+                resultDiv.className = 'result incorrect';
+                streak = 0;
+                hintDiv.innerHTML = `💡 <strong>Hint:</strong> ${equations[currentQuestion].hint}`;
+                hintDiv.style.display = 'block';
+            }
+            
+            resultDiv.style.display = 'block';
+            updateDisplay();
+        }
+        
+        function nextQuestion() {
+            currentQuestion = (currentQuestion + 1) % equations.length;
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('hint').style.display = 'none';
+            document.getElementById('level').textContent = Math.floor(currentQuestion / 5) + 1;
+            displayEquation();
+        }
+        
+        function updateDisplay() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('streak').textContent = streak;
+        }
+        
+        function createCelebration() {
+            const celebration = document.getElementById('celebration');
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.animationDelay = Math.random() * 3 + 's';
+                confetti.style.backgroundColor = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f7b731', '#5f27cd'][Math.floor(Math.random() * 5)];
+                celebration.appendChild(confetti);
+                
+                setTimeout(() => confetti.remove(), 3000);
+            }
+        }
+        
+        // Initialize game
+        displayEquation();
+        updateDisplay();
+        
+        // Add keyboard support
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+    </script></html>

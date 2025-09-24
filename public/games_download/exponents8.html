@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Exponent Challenge Science Games</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #eef8fc, #ddf1f8);
+    min-height: 100vh;
+    user-select: none;
+  }
+  h1 {
+    text-align: center;
+    color: #265a83;
+    font-size: 2.4em;
+    margin-top: 48px;
+    margin-bottom: 32px;
+    text-shadow: 0 1px 7px #b5d9ee;
+  }
+  .cards-container {
+    max-width: 1200px;
+    margin: 0 auto 60px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+    padding: 0 12px;
+  }
+  .game-card {
+    background: linear-gradient(135deg, #fffffc, #daf3f8);
+    box-shadow: 0 8px 25px #87b8d780;
+    width: 210px;
+    height: 345px;
+    border-radius: 22px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 24px 28px;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    user-select:none;
+  }
+  .game-card:hover {
+    transform: scale(1.07) translateY(-8px);
+    box-shadow: 0 16px 45px #7badcdcc;
+    background: linear-gradient(135deg, #e1f8fd, #c4e9f9);
+    z-index: 10;
+  }
+  .card-icon {
+    font-size: 56px;
+    margin-bottom: 18px;
+    user-select:none;
+    text-shadow: 0 1px 6px #a2d6ffdb;
+  }
+  .game-title {
+    font-weight: 900;
+    font-size: 1.24rem;
+    text-align: center;
+    margin-bottom: 6px;
+    color: #235975;
+    user-select:none;
+  }
+  .game-desc {
+    font-size: 1.05rem;
+    color: #4a738c;
+    text-align: center;
+    user-select:none;
+  }
+
+  /* Modal Window */
+  .modal-bg {
+    display: none;
+    position: fixed;
+    left: 0; top: 0; width: 100vw; height: 100vh;
+    background: rgba(30,60,110,0.18);
+    backdrop-filter: blur(7px);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+  .modal-content {
+    background: #ffffffee;
+    border-radius: 26px;
+    padding: 28px 26px 36px;
+    max-width: 720px;
+    width: 98vw;
+    max-height: 94vh;
+    overflow-y: auto;
+    box-shadow: 0 0 38px #8dc0e38c;
+    position: relative;
+    font-size: 1rem;
+    user-select:none;
+  }
+  .close-modal {
+    position: absolute;
+    top: 16px; right: 22px;
+    font-size: 2.1em;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #2371adcc;
+    transition: color 0.2s ease;
+    padding: 0 8px 4px 0;
+    user-select:none;
+    outline:none;
+  }
+  .close-modal:hover { color: #eb5757; }
+  h2 {
+    font-weight: 900;
+    color: #24486d;
+    font-size: 1.44em;
+    margin-top: 0;
+    user-select:none;
+  }
+  button, .btn-option {
+    cursor: pointer;
+    border-radius: 9px;
+    border: none;
+    font-weight: 700;
+    font-size: 1.1em;
+    padding: 11px 22px;
+    color: #134a75;
+    background: linear-gradient(120deg, #b7d9ee 40%, #7eb4e2 130%);
+    box-shadow: 0 3px 12px #aed6f152;
+    margin: 8px 10px 8px 0;
+    transition: background 0.22s ease, color 0.22s ease;
+    user-select:none;
+  }
+  button:hover, .btn-option:hover {
+    background: linear-gradient(120deg,#5aa1d9 35%, #3882be 140%);
+    color: #dbe9f7;
+    outline:none;
+  }
+  .question-text {
+    font-weight: 700;
+    font-size: 1.3em;
+    margin: 20px 0 16px;
+    color: #2a4c71;
+  }
+  .feedback {
+    margin: 10px 0 8px;
+    min-height: 28px;
+    font-size: 1.15em;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  /* Power Tower Challenge */
+  .power-tower {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 250px;
+  }
+  .tower-container {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    min-height: 180px;
+    max-height: 280px;
+    width: 90px;
+    margin-bottom: 20px;
+    border: 2px solid #95c960;
+    border-radius: 14px;
+    padding: 6px 0 4px;
+    background: #e6f3cf;
+    box-shadow: inset 0 0 12px #a6cca84d;
+    overflow-y: auto;
+  }
+  .tower-block {
+    width: 72px;
+    height: 26px;
+    margin: 4px 0;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #81c566, #4b8f22);
+    box-shadow: 0 2px 4px #355917aa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #e3f1ce;
+    font-weight: 900;
+    font-size: 1.25em;
+    text-shadow: 0 1px 1px #2e471a;
+    user-select:none;
+  }
+  .tower-feedback {
+    color: #417f3f;
+    font-weight: 700;
+  }
+  .input-answer {
+    width: 110px;
+    font-size: 1.15em;
+    padding: 7px 10px;
+    border-radius: 8px;
+    border: 2px solid #7abe5d;
+    outline: none;
+    user-select:auto;
+  }
+  .input-answer:focus {
+    border-color: #44993b;
+  }
+
+  /* Rocket Launch */
+  .rocket-area {
+    text-align: center;
+  }
+  .rocket-container {
+    position: relative;
+    width: 100px;
+    height: 300px;
+    margin: 0 auto 22px;
+    background: linear-gradient(to top, #d8f1fc 0%, transparent 70%);
+    border-radius: 24px 24px 0 0;
+    box-shadow: inset 0 -10px 16px #8cc3de9c;
+    border: 2px solid #87c8e7;
+    overflow: hidden;
+  }
+  .rocket {
+    font-size: 72px;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: bottom 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select:none;
+  }
+  .rocket-question {
+    margin: 20px 0 14px;
+    font-weight: 700;
+    font-size: 1.3em;
+    color: #206a98;
+  }
+  .rocket-btns {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  /* Exponent Match Cards */
+  .match-cards-area {
+    user-select: none;
+  }
+  .exponent-card {
+    width: 88px;
+    height: 70px;
+    border-radius: 14px;
+    background: linear-gradient(to right, #bee6ff 20%, #8ac1f1 120%);
+    box-shadow: 0 4px 12px #a0c8ff94;
+    font-weight: 900;
+    font-size: 1.75em;
+    color: #134e93;
+    margin: 6px 9px;
+    line-height: 70px;
+    text-align: center;
+    cursor: pointer;
+    display: inline-block;
+    perspective: 700px;
+    position: relative;
+  }
+  .exponent-card.flipped .front {
+    transform: rotateY(180deg);
+  }
+  .exponent-card.flipped .back {
+    transform: rotateY(0deg);
+  }
+  .exponent-card .front, .exponent-card .back {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0; left: 0;
+    backface-visibility: hidden;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .exponent-card .front {
+    background: #5aa4ed;
+    color: white;
+    font-size: 2em;
+  }
+  .exponent-card .back {
+    background: #d0e8ff;
+    color: #1a3e80;
+    font-size: 1.5em;
+    transform: rotateY(180deg);
+  }
+  .match-result {
+    margin-top: 14px;
+    font-size: 1.15em;
+    font-weight: 700;
+    text-align: center;
+    min-height: 28px;
+  }
+
+  /* Power Quiz Race */
+  .power-race-area {
+    background: #d4edf4;
+    border-radius: 20px;
+    padding: 24px 20px 32px;
+    box-shadow: 0 7px 24px #a2cce47d;
+  }
+  .power-track {
+    position: relative;
+    background: #c4e2ee;
+    height: 56px;
+    border-radius: 20px;
+    margin: 0 auto 20px;
+    max-width: 320px;
+    box-shadow: inset 0 3px 17px #95b4c69d;
+  }
+  .runner-char {
+    font-size: 46px;
+    position: absolute;
+    top: 5px;
+    transition: left 0.48s ease;
+    user-select:none;
+  }
+  .runner-player {
+    left: 0; color: #114a89;
+  }
+  .runner-cpu {
+    top: 30px; left: 0; color: #a0b5ce;
+  }
+  .quiz-question {
+    font-size: 1.28em;
+    font-weight: 900;
+    margin-bottom: 16px;
+    text-align: center;
+    color: #114a89;
+    user-select:none;
+  }
+  .quiz-options {
+    text-align: center;
+  }
+  .quiz-option {
+    background: linear-gradient(120deg, #b1d3f9 50%, #7aa6f3 150%);
+    color: #1a3680;
+    font-weight: 700;
+    padding: 11px 24px;
+    margin: 4px 10px 12px 10px;
+    border-radius: 14px;
+    border: none;
+    cursor: pointer;
+    font-size: 1.12em;
+    transition: background 0.28s ease;
+    user-select:none;
+  }
+  .quiz-option:hover {
+    background: linear-gradient(120deg,#6291e4 40%, #4777ce 120%);
+    color: #def0ff;
+  }
+  .quiz-feedback {
+    font-weight: 700;
+    font-size: 1.14em;
+    min-height: 30px;
+    margin-top: 8px;
+    text-align: center;
+    user-select:none;
+  }
+
+  /* Mystery Box Solver */
+  .mystery-boxes {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .box {
+    width: 100px;
+    height: 112px;
+    background: linear-gradient(135deg,#cbe1e2 70%,#f7fcf9 125%);
+    border-radius: 24px;
+    box-shadow: 0 6px 18px #add1d488;
+    cursor: pointer;
+    user-select:none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    color: #376863;
+    position: relative;
+  }
+  .box.locked {
+    background: linear-gradient(135deg,#eff6f3 85%,#d9efea 125%);
+    cursor: default;
+    color: #9d9d9d;
+    box-shadow: inset 0 0 22px #d8eae3;
+  }
+  .box-label {
+    font-size: 1.35em;
+    margin-bottom: 7px;
+  }
+  .box-status {
+    font-size: 0.95em;
+    font-weight: 700;
+    color: #18941e;
+  }
+  .mystery-question {
+    margin-top: 16px;
+    font-weight: 700;
+    font-size: 1.3em;
+    color: #317046;
+    user-select:none;
+  }
+  .mystery-options {
+    margin-top: 12px;
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+  }
+  .mystery-option-btn {
+    background: linear-gradient(130deg,#b6ebce 70%,#7fbc8d 130%);
+    font-weight: 700;
+    padding: 9px 22px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1em;
+    color: #225a2e;
+    box-shadow: 0 3px 9px #84c37c8c;
+    transition: background 0.18s ease;
+    user-select:none;
+  }
+  .mystery-option-btn:hover {
+    background: linear-gradient(130deg,#5aa85a 70%,#3d7b39 130%);
+    color: #d0f1be;
+  }
+  .mystery-feedback {
+    text-align: center;
+    margin-top: 10px;
+    font-weight: 700;
+    font-size: 1.15em;
+    min-height: 28px;
+    user-select:none;
+  }
+</style>
+</head>
+<body>
+<h1>Exponent Challenge Mini-Games!</h1>
+<div class="cards-container" role="list" aria-label="Exponent challenge games">
+  <div class="game-card" role="listitem" tabindex="0" aria-describedby="desc-0" onclick="openGame(0)">
+    <div class="card-icon" aria-hidden="true">🏰</div>
+    <span class="game-title">Power Tower Challenge</span>
+    <span class="game-desc" id="desc-0">Build a tower by answering exponent questions!</span>
+  </div>
+  <div class="game-card" role="listitem" tabindex="0" aria-describedby="desc-1" onclick="openGame(1)">
+    <div class="card-icon" aria-hidden="true">🚀</div>
+    <span class="game-title">Rocket Launch Game</span>
+    <span class="game-desc" id="desc-1">Solve powers to launch the rocket high!</span>
+  </div>
+  <div class="game-card" role="listitem" tabindex="0" aria-describedby="desc-2" onclick="openGame(2)">
+    <div class="card-icon" aria-hidden="true">🔗</div>
+    <span class="game-title">Exponent Match Cards</span>
+    <span class="game-desc" id="desc-2">Match exponents with their values!</span>
+  </div>
+  <div class="game-card" role="listitem" tabindex="0" aria-describedby="desc-3" onclick="openGame(3)">
+    <div class="card-icon" aria-hidden="true">🏁</div>
+    <span class="game-title">Power Quiz Race</span>
+    <span class="game-desc" id="desc-3">Answer exponent questions and win the race!</span>
+  </div>
+  <div class="game-card" role="listitem" tabindex="0" aria-describedby="desc-4" onclick="openGame(4)">
+    <div class="card-icon" aria-hidden="true">🎁</div>
+    <span class="game-title">Mystery Box Solver</span>
+    <span class="game-desc" id="desc-4">Solve powers to open mystery boxes!</span>
+  </div>
+</div>
+
+<div id="gameModal" class="modal-bg" role="dialog" aria-modal="true" tabindex="-1">
+  <div class="modal-content" role="document">
+    <button class="close-modal" aria-label="Close game" onclick="closeModal()">&times;</button>
+    <div id="modalBody" tabindex="0"></div>
+  </div>
+</div>
+
+<script>
+  function shuffle(arr) {
+    for(let i = arr.length-1; i>0; i--) {
+      const j = Math.floor(Math.random() * (i+1));
+      [arr[i],arr[j]] = [arr[j],arr[i]];
+    }
+    return arr;
+  }
+  const modal = document.getElementById("gameModal");
+  const modalBody = document.getElementById("modalBody");
+  function openGame(index) {
+    modalBody.innerHTML = '';
+    if(index === 0) powerTower.start();
+    else if(index === 1) rocketLaunch.start();
+    else if(index === 2) exponentMatchCards.start();
+    else if(index === 3) powerQuizRace.start();
+    else if(index === 4) mysteryBoxSolver.start();
+    modal.style.display = "flex";
+    modalBody.focus();
+  }
+  function closeModal() {
+    modal.style.display = "none";
+    modalBody.innerHTML = "";
+  }
+  window.onclick = e => { if(e.target === modal) closeModal(); };
+
+  /* Power Tower Challenge 🏰 */
+  const powerTower = {
+    towerHeightGoal: 8,
+    questions:[
+      {q:"2³ = ?", ans:"8"},
+      {q:"3² = ?", ans:"9"},
+      {q:"4⁴ = ?", ans:"256"},
+      {q:"5³ = ?", ans:"125"},
+      {q:"6² = ?", ans:"36"},
+      {q:"2⁵ = ?", ans:"32"},
+      {q:"7² = ?", ans:"49"},
+      {q:"10³ = ?", ans:"1000"}
+    ],
+    currentQ:0,
+    towerBlocks:[],
+    start() {
+      this.currentQ = 0;
+      this.towerBlocks = [];
+      this._render();
+    },
+    _render() {
+      modalBody.innerHTML = `
+        <h2>Power Tower Challenge</h2>
+        <div class="power-tower" aria-live="polite" aria-atomic="true">
+          <div class="tower-container" id="towerContainer" aria-label="Tower building area" role="list">
+            ${this.towerBlocks.map((b,i)=>`<div class="tower-block" role="listitem">${b}</div>`).join('')}
+          </div>
+          <div class="question-text" id="ptQuestion">${this.questions[this.currentQ].q}</div>
+          <input type="text" id="ptAnswer" class="input-answer" aria-label="Your answer for the exponent question" autocomplete="off" />
+          <button id="ptSubmit" >Submit Answer</button>
+          <div class="feedback" id="ptFeedback"></div>
+        </div>
+      `;
+      document.getElementById('ptAnswer').focus();
+      document.getElementById('ptSubmit').onclick = () => this._checkAnswer();
+      document.getElementById('ptAnswer').onkeydown = e => {
+        if (e.key === 'Enter') this._checkAnswer();
+      };
+    },
+    _checkAnswer() {
+      const inp = document.getElementById('ptAnswer');
+      const val = inp.value.trim();
+      const feedback = document.getElementById('ptFeedback');
+      if (val === this.questions[this.currentQ].ans) {
+        feedback.textContent = "Correct! Tower grows.";
+        feedback.style.color = "#2f7f2f";
+        this.towerBlocks.push(this.questions[this.currentQ].q.split('=')[0].trim());
+        this.currentQ++;
+        inp.value = '';
+        if (this.towerBlocks.length >= this.towerHeightGoal) {
+          setTimeout(() => this._win(), 900);
+        } else {
+          setTimeout(() => this._render(), 900);
+        }
+      } else {
+        feedback.textContent = "Wrong! Block falls!";
+        feedback.style.color = "#b52e2e";
+        if (this.towerBlocks.length) this.towerBlocks.pop();
+        inp.focus();
+        setTimeout(() => this._render(), 900);
+      }
+    },
+    _win() {
+      modalBody.innerHTML = `
+        <h2>Power Tower Challenge</h2>
+        <div style="min-height:180px; text-align:center; font-size:1.5em; font-weight:700; color:#28a228; padding-top: 50px;">
+          Tower reached the goal! You win! 🎉🏰
+        </div>
+        <button onclick="powerTower.start()" style="margin-top:20px; font-weight:700; padding: 10px 22px;">Play Again</button>
+      `;
+    }
+  };
+
+  /* Rocket Launch Game 🚀 */
+  const rocketLaunch = {
+    questions:[
+      {q:"5² = ?", ans:"25"},
+      {q:"3³ = ?", ans:"27"},
+      {q:"2⁴ = ?", ans:"16"},
+      {q:"4³ = ?", ans:"64"},
+      {q:"6² = ?", ans:"36"},
+      {q:"7² = ?", ans:"49"},
+      {q:"8³ = ?", ans:"512"},
+      {q:"10² = ?", ans:"100"},
+      {q:"9³ = ?", ans:"729"}
+    ],
+    currentQ:0,
+    heightStep: 22,
+    rocketHeight:0,
+    start() {
+      this.currentQ = 0;
+      this.rocketHeight = 0;
+      this._render();
+    },
+    _render() {
+      modalBody.innerHTML = `
+        <h2>Rocket Launch Game</h2>
+        <div class="rocket-area" aria-live="polite" aria-atomic="true">
+          <div class="rocket-container" aria-label="Rocket launch container">
+            <div id="rocket" class="rocket" style="bottom:${this.rocketHeight}px;">🚀</div>
+          </div>
+          <div class="rocket-question">${this.questions[this.currentQ].q}</div>
+          <div class="rocket-btns">
+            ${shuffle([this.questions[this.currentQ].ans, "15", "81", "1000"]).map(opt => `<button class='btn-option'>${opt}</button>`).join('')}
+          </div>
+          <div class="feedback" id="rlFeedback"></div>
+        </div>
+      `;
+      modalBody.querySelectorAll('.btn-option').forEach(btn => {
+        btn.onclick = () => {
+          const feedback = document.getElementById('rlFeedback');
+          if (btn.textContent === this.questions[this.currentQ].ans) {
+            this.rocketHeight += this.heightStep;
+            feedback.textContent = "Correct! Rocket flies higher.";
+            feedback.style.color = "#207233";
+            this.currentQ++;
+            document.getElementById('rocket').style.bottom = this.rocketHeight + 'px';
+            if (this.currentQ >= this.questions.length) {
+              setTimeout(() => this._win(), 1000);
+              return;
+            }
+            setTimeout(() => this._render(), 1000);
+          } else {
+            feedback.textContent = "Wrong! Rocket stays put.";
+            feedback.style.color = "#a62626";
+            setTimeout(() => feedback.textContent = '', 1300);
+          }
+        }
+      });
+    },
+    _win() {
+      modalBody.innerHTML = `
+        <h2>Rocket Launch Game</h2>
+        <div style="min-height: 160px; font-weight: 700; font-size: 1.6em; color: #2a7f2a; text-align: center; padding-top: 70px;">
+          Rocket reached orbit! 🚀🎉
+        </div>
+        <button onclick="rocketLaunch.start()" style="margin-top:20px; font-weight:700; padding: 10px 22px;">Play Again</button>
+      `;
+    }
+  };
+
+  /* Exponent Match Cards 🔗 */
+  const exponentMatchCards = {
+    sets: [
+      { exp: '3²', val: '9' },
+      { exp: '2³', val: '8' },
+      { exp: '4²', val: '16' },
+      { exp: '5³', val: '125' },
+      { exp: '10²', val: '100' },
+      { exp: '6³', val: '216' }
+    ],
+    cards: [],
+    flipped: [],
+    matches: 0,
+    start() {
+      this.cards = [];
+      this.flipped = [];
+      this.matches = 0;
+      this.cards = shuffle([...this.sets.map(c=>({type:'exp', text:c.exp, pair:c.val})).concat(this.sets.map(c=>({type:'val', text:c.val, pair:c.val})))]);
+      this._render();
+    },
+    _render() {
+      modalBody.innerHTML = `
+        <h2>Exponent Match Cards</h2>
+        <div style="user-select:none;text-align:center;">
+          ${this.cards.map((c,idx) => `
+            <div class="exponent-card" data-idx="${idx}">
+              <div class="front"></div>
+              <div class="back">${c.text}</div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="match-result" id="matchResult"></div>
+        <button id="restartMatch" style="margin-top:10px; display:none;">Restart Game</button>
+      `;
+      this._setupCards();
+    },
+    _setupCards() {
+      const cardsEls = modalBody.querySelectorAll('.exponent-card');
+      this.flipped = [];
+      const self = this;
+      cardsEls.forEach(card => {
+        card.classList.remove('flipped');
+        card.onclick = function() {
+          if(card.classList.contains('flipped') || self.flipped.length >= 2) return;
+          card.classList.add('flipped');
+          self.flipped.push(card);
+          if(self.flipped.length === 2) {
+            const idx1 = +self.flipped[0].dataset.idx;
+            const idx2 = +self.flipped[1].dataset.idx;
+            const c1 = self.cards[idx1];
+            const c2 = self.cards[idx2];
+            if(c1.pair === c2.pair && c1.type !== c2.type) {
+              self.matches++;
+              modalBody.querySelector('#matchResult').textContent = `Good job! Matches found: ${self.matches}`;
+              self.flipped = [];
+              if(self.matches === self.sets.length) {
+                modalBody.querySelector('#matchResult').textContent = "All pairs matched! 🎉";
+                modalBody.querySelector('#restartMatch').style.display = 'inline-block';
+              }
+            } else {
+              modalBody.querySelector('#matchResult').textContent = `Try again!`;
+              setTimeout(() => {
+                self.flipped.forEach(c => c.classList.remove('flipped'));
+                self.flipped = [];
+              }, 900);
+            }
+          }
+        };
+      });
+      modalBody.querySelector('#restartMatch').onclick = () => this.start();
+    }
+  };
+
+  /* Power Quiz Race 🏁 */
+  const powerQuizRace = {
+    questions:[
+      {q:"What is 2⁴?", ans:"16", opts:["8","16","32"]},
+      {q:"3³ equals?", ans:"27", opts:["27","9","18"]},
+      {q:"5² is?", ans:"25", opts:["10","25","20"]},
+      {q:"4³ equals?", ans:"64", opts:["44","64","84"]},
+      {q:"6² is?", ans:"36", opts:["36","26","56"]}
+    ],
+    currentQ: 0,
+    playerPos: 0,
+    cpuPos: 0,
+    trackMax: 300,
+    start() {
+      this.currentQ = 0;
+      this.playerPos = 0;
+      this.cpuPos = 0;
+      this._render();
+    },
+    _render() {
+      if(this.currentQ >= this.questions.length) {
+        modalBody.innerHTML = `
+          <h2>Power Quiz Race</h2>
+          <div style="min-height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight:bold; font-size:1.6em; color:#247631; padding-top:40px;">
+            Race finished! <br>${this.playerPos > this.cpuPos ? "You won! 🎉" : "Computer won! Try again!"}
+          </div>
+          <button onclick="powerQuizRace.start()" style="margin-top: 20px; font-weight:700; padding: 8px 22px;">Play Again</button>
+        `;
+        return;
+      }
+      const q = this.questions[this.currentQ];
+      modalBody.innerHTML = `
+        <h2>Power Quiz Race</h2>
+        <div class="power-race-area" aria-label="Exponent race track">
+          <div class="power-track" role="list" aria-live="polite">
+            <div class="runner-char runner-player" id="player-car" role="listitem" aria-label="Player character" style="left:${this.playerPos}px;">🚶‍♂️</div>
+            <div class="runner-char runner-cpu" id="cpu-car" role="listitem" aria-label="CPU character" style="left:${this.cpuPos}px;">🤖</div>
+          </div>
+          <div class="quiz-question">${q.q}</div>
+          <div class="quiz-options" role="radiogroup">
+            ${q.opts.map(o => `<button class="quiz-option" type="button">${o}</button>`).join('')}
+          </div>
+          <div class="quiz-feedback" id="raceFeedback"></div>
+        </div>
+      `;
+      this._setupOptions(q);
+    },
+    _setupOptions(q) {
+      const options = modalBody.querySelectorAll('.quiz-option');
+      const feedback = modalBody.querySelector('#raceFeedback');
+      options.forEach(btn =>{
+        btn.onclick = () => {
+          const selected = btn.textContent;
+          if(selected === q.ans){
+            this.playerPos = Math.min(this.playerPos + 75, this.trackMax);
+            modalBody.querySelector('#player-car').style.left = this.playerPos + 'px';
+            feedback.textContent = "Correct! You move ahead.";
+          } else {
+            this.cpuPos = Math.min(this.cpuPos + 70, this.trackMax);
+            modalBody.querySelector('#cpu-car').style.left = this.cpuPos + 'px';
+            feedback.textContent = "Wrong! CPU moves ahead.";
+          }
+          this.currentQ++;
+          setTimeout(() => this._render(), 850);
+        };
+      });
+    }
+  };
+
+  /* Mystery Box Solver 🎁 */
+  const mysteryBoxSolver = {
+    boxes:[
+      {id:0, question:"Which box contains 2³?", answer:"Box 1", options:["Box 1","Box 2","Box 3"]},
+      {id:1, question:"Which box contains 3²?", answer:"Box 3", options:["Box 1","Box 3","Box 2"]},
+      {id:2, question:"Which box contains 5²?", answer:"Box 2", options:["Box 2","Box 3","Box 1"]},
+      {id:3, question:"Which box contains 4³?", answer:"Box 1", options:["Box 3","Box 1","Box 2"]},
+      {id:4, question:"Which box contains 10²?", answer:"Box 2", options:["Box 3","Box 2","Box 1"]}
+    ],
+    currentQ: 0,
+    collected: [],
+    start() {
+      this.currentQ = 0;
+      this.collected = [];
+      this._render();
+    },
+    _render() {
+      if(this.collected.length === this.boxes.length) {
+        modalBody.innerHTML = `
+          <h2>Mystery Box Solver</h2>
+          <div style="min-height: 180px; text-align: center; font-size:1.6em; font-weight:700; color:#309255; padding-top: 40px;">
+            All mystery boxes opened! 🎁🔓🎉
+          </div>
+          <button onclick="mysteryBoxSolver.start()" style="margin-top: 20px; font-weight:700; padding: 8px 22px;">Play Again</button>
+        `;
+        return;
+      }
+      const q = this.boxes[this.currentQ];
+      modalBody.innerHTML = `
+        <h2>Mystery Box Solver</h2>
+        <div class="mystery-boxes" role="list" aria-label="Mystery boxes">
+          ${['Box 1','Box 2','Box 3'].map(b => `
+            <div class="box${this.collected.includes(this.currentQ) && q.answer === b ? '' : ''}" role="listitem" id="box-${b.replace(' ', '')}" aria-label="${b}" tabindex="0">
+              <div class="box-label">${b}</div>
+              <div class="box-status">${this.collected.includes(this.currentQ) && q.answer === b ? 'Opened 🔓' : 'Closed 🎁'}</div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="mystery-question">${q.question}</div>
+        <div class="mystery-options" role="radiogroup" aria-labelledby="mystery-question">
+          ${q.options.map(opt => `<button class="mystery-option-btn">${opt}</button>`).join('')}
+        </div>  
+        <div class="mystery-feedback" id="mysteryFeedback"></div>
+      `;
+      this._setupOptions(q);
+    },
+    _setupOptions(q) {
+      const self = this;
+      const feedback = document.getElementById('mysteryFeedback');
+      modalBody.querySelectorAll('.mystery-option-btn').forEach(btn => {
+        btn.onclick = () => {
+          if (btn.textContent === q.answer) {
+            // Mark box as opened
+            document.getElementById('box-'+q.answer.replace(' ','')).querySelector('.box-status').textContent = 'Opened 🔓';
+            if (!self.collected.includes(self.currentQ)) self.collected.push(self.currentQ);
+            feedback.textContent = 'Correct! Box opened.';
+            feedback.style.color = '#2f7f2f';
+            self.currentQ++;
+            setTimeout(() => self._render(), 1000);
+          } else {
+            feedback.textContent = 'Wrong box! Try again.';
+            feedback.style.color = '#a92626';
+          }
+        };
+      });
+    }
+  };
+</script>
+</body>
+</html>

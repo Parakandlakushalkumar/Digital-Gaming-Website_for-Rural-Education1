@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>The Mathematical Adventure of Maya and Arjun</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+		body {
+			font-family: 'Arial', sans-serif;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			min-height: 100vh;
+			color: #333;
+			overflow-x: hidden;
+		}
+		.container {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 20px;
+		}
+		.header {
+			text-align: center;
+			margin-bottom: 30px;
+			background: rgba(255, 255, 255, 0.1);
+			backdrop-filter: blur(10px);
+			border-radius: 20px;
+			padding: 30px;
+			border: 1px solid rgba(255, 255, 255, 0.2);
+		}
+		.title {
+			font-size: 2.5rem;
+			color: white;
+			margin-bottom: 10px;
+			text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+		}
+		.subtitle {
+			font-size: 1.2rem;
+			color: #f0f0f0;
+			margin-bottom: 20px;
+		}
+		.language-selector {
+			display: flex;
+			justify-content: center;
+			gap: 15px;
+			margin-bottom: 20px;
+		}
+		.lang-btn {
+			padding: 10px 20px;
+			border: none;
+			border-radius: 25px;
+			background: rgba(255, 255, 255, 0.2);
+			color: white;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			backdrop-filter: blur(5px);
+		}
+		.lang-btn:hover {
+			background: rgba(255, 255, 255, 0.3);
+			transform: translateY(-2px);
+		}
+		.lang-btn.active {
+			background: #ff6b6b;
+			box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+		}
+		.story-section {
+			background: rgba(255, 255, 255, 0.95);
+			border-radius: 15px;
+			padding: 30px;
+			margin-bottom: 30px;
+			box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+			border: 1px solid rgba(255, 255, 255, 0.2);
+			transition: transform 0.3s ease;
+		}
+		.story-section:hover {
+			transform: translateY(-5px);
+		}
+		.topic-header {
+			display: flex;
+			align-items: center;
+			margin-bottom: 20px;
+			padding-bottom: 15px;
+			border-bottom: 3px solid #667eea;
+		}
+		.topic-number {
+			width: 50px;
+			height: 50px;
+			border-radius: 50%;
+			background: linear-gradient(45deg, #667eea, #764ba2);
+			color: white;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: bold;
+			margin-right: 15px;
+			font-size: 1.2rem;
+		}
+		.topic-title {
+			font-size: 1.8rem;
+			color: #333;
+			font-weight: bold;
+		}
+		.story-content {
+			line-height: 1.8;
+			font-size: 1.1rem;
+			margin-bottom: 20px;
+		}
+		.interactive-element {
+			background: linear-gradient(45deg, #ff9a9e, #fecfef);
+			border-radius: 10px;
+			padding: 20px;
+			margin: 20px 0;
+			border: 2px dashed #ff6b6b;
+		}
+		.math-problem {
+			background: #e8f4fd;
+			border-left: 5px solid #2196F3;
+			padding: 15px;
+			margin: 15px 0;
+			border-radius: 5px;
+		}
+		.solution-btn {
+			background: #4CAF50;
+			color: white;
+			border: none;
+			padding: 10px 20px;
+			border-radius: 20px;
+			cursor: pointer;
+			margin-top: 10px;
+			transition: all 0.3s ease;
+		}
+		.solution-btn:hover {
+			background: #45a049;
+			transform: scale(1.05);
+		}
+		.solution {
+			display: none;
+			background: #d4edda;
+			border: 1px solid #c3e6cb;
+			border-radius: 5px;
+			padding: 10px;
+			margin-top: 10px;
+		}
+		.character {
+			display: inline-block;
+			padding: 5px 10px;
+			border-radius: 15px;
+			font-weight: bold;
+			margin: 5px 0;
+		}
+		.maya {
+			background: #ffeb3b;
+			color: #333;
+		}
+		.arjun {
+			background: #4caf50;
+			color: white;
+		}
+		.visual-aid {
+			text-align: center;
+			margin: 20px 0;
+			padding: 20px;
+			background: #f8f9fa;
+			border-radius: 10px;
+		}
+		.chart-container {
+			width: 100%;
+			max-width: 400px;
+			margin: 0 auto;
+		}
+		.progress-bar {
+			width: 100%;
+			height: 8px;
+			background: #e0e0e0;
+			border-radius: 4px;
+			margin: 20px 0;
+			position: relative;
+		}
+		.progress-fill {
+			height: 100%;
+			background: linear-gradient(90deg, #667eea, #764ba2);
+			border-radius: 4px;
+			transition: width 0.5s ease;
+		}
+		@keyframes fadeIn {
+			from { opacity: 0; transform: translateY(20px); }
+			to { opacity: 1; transform: translateY(0); }
+		}
+		.story-section {
+			animation: fadeIn 0.6s ease forwards;
+		}
+		.hidden {
+			display: none;
+		}
+		@media (max-width: 768px) {
+			.title {
+				font-size: 2rem;
+			}
+			.container {
+				padding: 10px;
+			}
+			.story-section {
+				padding: 20px;
+			}
+			.language-selector {
+				flex-wrap: wrap;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="header">
+			<h1 class="title">The Mathematical Adventure of Maya and Arjun</h1>
+			<p class="subtitle">मया और अर्जुन का गणितीय साहसिक कार्य | మాయ మరియు అర్జున్ యొక్క గణిత సాహసం</p>
+			<div class="language-selector">
+				<button class="lang-btn active" onclick="switchLanguage('en')">English</button>
+				<button class="lang-btn" onclick="switchLanguage('hi')">हिंदी</button>
+				<button class="lang-btn" onclick="switchLanguage('te')">తెలుగు</button>
+			</div>
+			<div class="progress-bar">
+				<div class="progress-fill" id="progressFill" style="width: 0%"></div>
+			</div>
+		</div>
+		<!-- ...rest of the full story HTML content from src/components/stories/6math.html... -->
+	</div>
+	<script>
+		// ...full script from src/components/stories/6math.html...
+	</script>
+</body>

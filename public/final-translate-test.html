@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Translation Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .translate-icon {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 10000;
+            width: 40px;
+            height: 40px;
+            background: #4285f4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .translate-dropdown {
+            position: fixed;
+            top: 60px;
+            right: 15px;
+            z-index: 9999;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            border: 1px solid #ddd;
+            min-width: 220px;
+            display: none;
+        }
+        
+        .goog-te-banner-frame { display: none !important; }
+        body { top: 0 !important; }
+        .goog-te-gadget { 
+            font-family: inherit !important; 
+            font-size: 14px !important;
+        }
+        .goog-te-combo { 
+            width: 100% !important; 
+            padding: 6px 8px !important;
+            font-size: 14px !important;
+            border: 1px solid #ccc !important;
+            border-radius: 4px !important;
+            margin: 0 !important;
+            box-sizing: border-box !important;
+        }
+        .goog-te-gadget-simple {
+            background: transparent !important;
+            border: none !important;
+        }
+        .goog-te-gadget-icon {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Translation Icon -->
+    <div class="translate-icon" onclick="toggleDropdown()">
+        <span style="font-size: 18px; color: white;">🌐</span>
+    </div>
+    
+    <!-- Translation Dropdown -->
+    <div id="translate-dropdown" class="translate-dropdown">
+        <div style="margin-bottom: 10px; font-weight: bold; font-size: 14px;">Choose Language:</div>
+        <div id="google_translate_element"></div>
+        <div id="loading" style="color: #666; font-size: 11px; margin-top: 5px; text-align: center;">
+            Loading languages...
+        </div>
+    </div>
+
+    <!-- Page Content -->
+    <h1>Final Translation Test</h1>
+    <p>This page tests the Google Translate widget functionality.</p>
+    <p>Click the blue globe icon in the top-right corner.</p>
+    <p>You should see a dropdown with language options that work directly on this page.</p>
+    <p>Select any language to translate this content immediately.</p>
+    <p>The translation should happen on the same page without opening new tabs.</p>
+
+    <script>
+        let dropdownOpen = false;
+        let translateLoaded = false;
+        
+        function googleTranslateElementInit() {
+            try {
+                new google.translate.TranslateElement({
+                    pageLanguage: 'en',
+                    includedLanguages: 'en,hi,bn,te,ta,gu,kn,ml,mr,pa,or,as,ur,ne,si,my,th,vi,id,ms,tl,zh,ja,ko,fr,es,pt,de,it,ru,ar,fa,tr,pl,nl,sv,da,no,fi,he,el,hu,cs,sk,ro,bg,hr,sr,sl,et,lv,lt,uk,be,ka,hy,az,kk,ky,uz,tg,mn,bo,km,lo,dz,am,ti,sw,zu,xh,af,ig,yo,ha,ff,wo,sn,rw,lg,ny,st,tn,ts,ve,nr,ss,nd',
+                    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                    autoDisplay: false
+                }, 'google_translate_element');
+                
+                translateLoaded = true;
+                document.getElementById('loading').style.display = 'none';
+                console.log('Google Translate loaded successfully');
+            } catch (error) {
+                console.error('Translation init error:', error);
+                document.getElementById('loading').innerHTML = 'Translation failed to load';
+            }
+        }
+        
+        function toggleDropdown() {
+            const dropdown = document.getElementById('translate-dropdown');
+            dropdownOpen = !dropdownOpen;
+            dropdown.style.display = dropdownOpen ? 'block' : 'none';
+            console.log('Dropdown toggled:', dropdownOpen ? 'OPEN' : 'CLOSED');
+        }
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const icon = document.querySelector('.translate-icon');
+            const dropdown = document.getElementById('translate-dropdown');
+            
+            if (dropdownOpen && !icon.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdownOpen = false;
+                dropdown.style.display = 'none';
+            }
+        });
+        
+        // Load Google Translate script
+        window.addEventListener('load', function() {
+            console.log('Page loaded, initializing Google Translate...');
+        });
+    </script>
+    
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

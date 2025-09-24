@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arjun's Engineering Adventure</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c);
+            background-size: 400% 400%;
+            animation: gradientShift 4s ease-in-out infinite;
+            color: white;
+            text-align: center;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(255,255,255,0.2) 2px, transparent 2px),
+                radial-gradient(circle at 80% 80%, rgba(255,255,255,0.15) 1px, transparent 1px),
+                radial-gradient(circle at 40% 70%, rgba(255,255,255,0.1) 1.5px, transparent 1.5px);
+            background-size: 50px 50px, 30px 30px, 70px 70px;
+            animation: sparkle 3s ease-in-out infinite;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+        
+        .header h1 {
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header p {
+            font-size: 1.3em;
+            margin: 10px 0 0 0;
+            position: relative;
+            z-index: 1;
+            opacity: 0.9;
+        }
+        
+        .story-section {
+            padding: 35px;
+            border-bottom: 4px solid #f0f0f0;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+        
+        .story-section:hover {
+            transform: translateY(-2px);
+        }
+        
+        .story-section:last-child {
+            border-bottom: none;
+        }
+        
+        .topic-badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1em;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .topic-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .topic-badge:hover::before {
+            left: 100%;
+        }
+        
+        .illustration {
+            width: 100%;
+            height: 250px;
+            border-radius: 20px;
+            margin: 25px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5em;
+            color: white;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .illustration::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.1);
+            border-radius: 20px;
+        }
+        
+        .machines-bg { 
+            background: linear-gradient(45deg, #ff6b6b, #feca57, #48cae4);
+            background-size: 400% 400%;
+            animation: gradientShift 3s ease-in-out infinite;
+        }
+        .energy-bg { 
+            background: linear-gradient(45deg, #ffd93d, #6bcf7f, #4d96ff);
+            background-size: 400% 400%;
+            animation: gradientShift 3s ease-in-out infinite;
+        }
+        .circuits-bg { 
+            background: linear-gradient(45deg, #a8edea, #fed6e3, #d299c2);
+            background-size: 400% 400%;
+            animation: gradientShift 3s ease-in-out infinite;
+        }
+        .engineering-bg { 
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb);
+            background-size: 400% 400%;
+            animation: gradientShift 3s ease-in-out infinite;
+        }
+        
+        .translation-tabs {
+            display: flex;
+            margin: 25px 0 15px 0;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 15px;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tab-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .tab-button:hover::before {
+            left: 100%;
+        }
+        
+        .tab-button.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .tab-button:hover:not(.active) {
+            background: #e9ecef;
+            transform: translateY(-1px);
+        }
+        
+        .translation-content {
+            display: none;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            border-radius: 0 0 15px 15px;
+            border: 3px solid #e9ecef;
+            position: relative;
+        }
+        
+        .translation-content.active {
+            display: block;
+            animation: fadeInUp 0.6s ease;
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .story-text {
+            font-size: 1.2em;
+            line-height: 1.9;
+            text-align: justify;
+            position: relative;
+        }
+        
+        .character {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff7675, #fd79a8);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 0 3px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .science-highlight {
+            background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #2d3436;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .engineering-highlight {
+            background: linear-gradient(120deg, #fdcb6e 0%, #e17055 100%);
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .footer {
+            background: linear-gradient(45deg, #2d3436, #636e72, #74b9ff);
+            color: white;
+            text-align: center;
+            padding: 30px;
+            font-style: italic;
+            position: relative;
+        }
+        
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 2px, transparent 2px),
+                radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 40px 40px, 60px 60px;
+        }
+        
+        .footer p {
+            position: relative;
+            z-index: 1;
+            margin: 10px 0;
+        }
+        
+        .tools-animation {
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .circuit-animation {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+    </style>
+    <script>
+        function showTranslation(button, contentId) {
+            // Hide all translation contents in the same section
+            const section = button.closest('.story-section');
+            const contents = section.querySelectorAll('.translation-content');
+            const buttons = section.querySelectorAll('.tab-button');
+            
+            contents.forEach(content => content.classList.remove('active'));
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected content and activate button
+            document.getElementById(contentId).classList.add('active');
+            button.classList.add('active');
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙ Arjun's Engineering Adventure ⚙</h1>
+            <p>A Journey Through the Amazing World of Engineering & Technology</p>
+        </div>
+        
+        <!-- Topic 1: Simple Machines -->
+        <div class="story-section">
+            <div class="topic-badge">⚙ Topic 1: Simple Machines - Making Work Easier</div>
+            <div class="illustration machines-bg">
+                <span class="tools-animation">🔧⚙🏗</span>
+            </div>
+            
+            <div class="translation-tabs">
+                <button class="tab-button active" onclick="showTranslation(this, 'machines-en')">English</button>
+                <button class="tab-button" onclick="showTranslation(this, 'machines-tel')">తెలుగు</button>
+                <button class="tab-button" onclick="showTranslation(this, 'machines-hin')">हिंदी</button>
+            </div>
+            
+            <div class="translation-content active" id="machines-en">
+                <div class="story-text">
+                    <span class="character">Arjun</span> woke up excited because today was the school's Science Fair, and he had to help set up heavy equipment. As he struggled to lift a big table, his grandfather showed him how to use a <span class="science-highlight">lever</span> - a simple wooden plank placed on a fulcrum. "See how much easier it is now?" his grandfather smiled. Next, they used a <span class="science-highlight">wheel and axle</span> (a trolley) to move boxes, an <span class="science-highlight">inclined plane</span> (ramp) to load heavy items, and a <span class="science-highlight">pulley</span> to hoist a banner. Arjun realized that <span class="engineering-highlight">simple machines</span> don't create energy - they just make our work easier by changing the direction or amount of force we need to apply!
+                </div>
+            </div>
+            
+            <div class="translation-content" id="machines-tel">
+                <div class="story-text">
+                    <span class="character">అర్జున్</span> ఉత్సాహంతో లేచాడు ఎందుకంటే ఈరోజు పాఠశాలలో సైన్స్ ఫెయిర్ ఉంది, మరియు అతను భారీ పరికరాలను అమర్చడంలో సహాయం చేయాలి. అతను పెద్ద టేబుల్‌ను ఎత్తడానికి కష్టపడుతున్నప్పుడు, అతని తాత ఒక <span class="science-highlight">లివర్</span> - ఫుల్‌క్రమ్‌పై ఉంచిన సాధారణ చెక్క పలకను ఎలా ఉపయోగించాలో చూపించాడు. "ఇప్పుడు ఎంత సులభంగా ఉందో చూడు?" అతని తాత నవ్వాడు. తర్వాత, వారు పెట్టెలను తరలించడానికి <span class="science-highlight">చక్రం మరియు అక్షం</span> (ట్రాలీ)ని, భారీ వస్తువులను ఎక్కించడానికి <span class="science-highlight">వంపుతిరిగిన తలం</span> (రాంప్)ని, మరియు బ్యానర్‌ను ఎత్తడానికి <span class="science-highlight">పుల్లీని</span> ఉపయోగించారు. <span class="engineering-highlight">సాధారణ యంత్రాలు</span> శక్తిని సృష్టించవని - అవి కేవలం మనం చేసే పని దిశను లేదా బలం మొత్తాన్ని మార్చడం ద్వారా మన పనిని సులభతరం చేస్తాయని అర్జున్ గ్రహించాడు!
+                </div>
+            </div>
+            
+            <div class="translation-content" id="machines-hin">
+                <div class="story-text">
+                    <span class="character">अर्जुन</span> उत्साह से उठा क्योंकि आज स्कूल में साइंस फेयर था, और उसे भारी उपकरण लगाने में मदद करनी थी। जब वह एक बड़ी मेज उठाने के लिए संघर्ष कर रहा था, तो उसके दादाजी ने उसे दिखाया कि <span class="science-highlight">लीवर</span> का उपयोग कैसे करें - एक सरल लकड़ी का तख्ता जो एक आधार बिंदु पर रखा गया था। "देखो अब कितना आसान है?" उसके दादाजी मुस्कराए। फिर, उन्होंने डिब्बों को हिलाने के लिए <span class="science-highlight">पहिया और धुरी</span> (ट्रॉली) का, भारी सामान लादने के लिए <span class="science-highlight">झुके हुए तल</span> (रैंप) का, और बैनर उठाने के लिए <span class="science-highlight">चरखी</span> का उपयोग किया। अर्जुन ने महसूस किया कि <span class="engineering-highlight">सरल मशीनें</span> ऊर्जा नहीं बनातीं - वे सिर्फ हमारे काम को आसान बनाती हैं बल की दिशा या मात्रा को बदलकर जो हमें लगाना पड़ता है!
+                </div>
+            </div>
+        </div>
+        
+        <!-- Topic 2: Energy Sources -->
+        <div class="story-section">
+            <div class="topic-badge">⚡ Topic 2: Energy Sources - Powering Our World</div>
+            <div class="illustration energy-bg">🌞⚡🔋</div>
+            
+            <div class="translation-tabs">
+                <button class="tab-button active" onclick="showTranslation(this, 'energy-en')">English</button>
+                <button class="tab-button" onclick="showTranslation(this, 'energy-tel')">తెలుగు</button>
+                <button class="tab-button" onclick="showTranslation(this, 'energy-hin')">हिंदी</button>
+            </div>
+            
+            <div class="translation-content active" id="energy-en">
+                <div class="story-text">
+                    At the Science Fair, <span class="character">Arjun</span> was amazed by the different <span class="science-highlight">energy sources</span> on display. The solar panel demonstration showed how <span class="science-highlight">solar energy</span> from the sun converts sunlight into electricity. A small wind turbine model explained how <span class="science-highlight">wind energy</span> spins blades to generate power. The teacher explained that we also use <span class="science-highlight">fossil fuels</span> like coal and oil, but these are limited and pollute our environment. <span class="science-highlight">Renewable energy sources</span> like solar, wind, and water are unlimited and clean. Arjun learned that <span class="engineering-highlight">energy transformation</span> happens everywhere - from the food we eat (chemical energy) to the electricity in our homes (electrical energy)!
+                </div>
+            </div>
+            
+            <div class="translation-content" id="energy-tel">
+                <div class="story-text">
+                    సైన్స్ ఫెయిర్‌లో, <span class="character">అర్జున్</span> ప్రదర్శనలో ఉన్న విభిన్న <span class="science-highlight">శక్తి వనరుల</span> చూసి ఆశ్చర్యపోయాడు. సోలార్ ప్యానెల్ ప్రదర్శన సూర్యుడి నుండి <span class="science-highlight">సౌర శక్తి</span> ఎలా సూర్య కాంతిని విద్యుత్తుగా మారుస్తుందో చూపించింది. చిన్న విండ్ టర్బైన్ మోడల్ <span class="science-highlight">గాలి శక్తి</span> ఎలా బ్లేడ్‌లను తిప్పి శక్తిని ఉత్పత్తి చేస్తుందో వివరించింది. బోధకుడు మనం <span class="science-highlight">శిలాజ ఇంధనాలు</span> అయిన బొగ్గు మరియు చమురును కూడా ఉపయోగిస్తామని, కానీ ఇవి పరిమితమైనవి మరియు మన పర్యావరణాన్ని కలుషితం చేస్తాయని వివరించాడు. సౌర, గాలి మరియు నీరు వంటి <span class="science-highlight">పునరుత్పాదక శక్తి వనరులు</span> అపరిమితమైనవి మరియు స్వచ్ఛమైనవి. మనం తినే ఆహారం (రసాయన శక్తి) నుండి మన ఇళ్లలోని విద్యుత్తు (విద్యుత్ శక్తి) వరకు <span class="engineering-highlight">శక్తి రూపాంతరం</span> ప్రతిచోటా జరుగుతుందని అర్జున్ నేర్చుకున్నాడు!
+                </div>
+            </div>
+            
+            <div class="translation-content" id="energy-hin">
+                <div class="story-text">
+                    साइंस फेयर में, <span class="character">अर्जुन</span> प्रदर्शन में विभिन्न <span class="science-highlight">ऊर्जा स्रोतों</span> को देखकर हैरान रह गया। सोलर पैनल प्रदर्शन ने दिखाया कि सूर्य से <span class="science-highlight">सौर ऊर्जा</span> कैसे सूर्य की रोशनी को बिजली में बदलती है। एक छोटे पवन टरबाइन मॉडल ने समझाया कि <span class="science-highlight">पवन ऊर्जा</span> कैसे ब्लेडों को घुमाकर शक्ति पैदा करती है। शिक्षक ने बताया कि हम कोयला और तेल जैसे <span class="science-highlight">जीवाश्म ईंधन</span> का भी उपयोग करते हैं, लेकिन ये सीमित हैं और हमारे पर्यावरण को प्रदूषित करते हैं। सौर, पवन और पानी जैसे <span class="science-highlight">नवीकरणीय ऊर्जा स्रोत</span> असीमित और स्वच्छ हैं। अर्जुन ने सीखा कि <span class="engineering-highlight">ऊर्जा रूपांतरण</span> हर जगह होता है - हमारे खाने के भोजन (रासायनिक ऊर्जा) से लेकर हमारे घरों की बिजली (विद्युत ऊर्जा) तक!
+                </div>
+            </div>
+        </div>
+        
+        <!-- Topic 3: Basic Circuits -->
+        <div class="story-section">
+            <div class="topic-badge">🔌 Topic 3: Basic Circuits - The Path of Electricity</div>
+            <div class="illustration circuits-bg">
+                <span class="circuit-animation">💡🔋⚡</span>
+            </div>
+            
+            <div class="translation-tabs">
+                <button class="tab-button active" onclick="showTranslation(this, 'circuits-en')">English</button>
+                <button class="tab-button" onclick="showTranslation(this, 'circuits-tel')">తెలుగు</button>
+                <button class="tab-button" onclick="showTranslation(this, 'circuits-hin')">हिंदी</button>
+            </div>
+            
+            <div class="translation-content active" id="circuits-en">
+                <div class="story-text">
+                    The most exciting part for <span class="character">Arjun</span> was the circuit-building workshop! He learned that an <span class="science-highlight">electric circuit</span> is a complete path that allows electricity to flow. Using a battery (power source), wires (conductors), and an LED bulb (load), he made his first <span class="science-highlight">series circuit</span> where all components are connected in a single path. When he added a switch, he could control the flow of <span class="science-highlight">electric current</span>. Then he built a <span class="science-highlight">parallel circuit</span> where components have multiple paths - even if one bulb burns out, others keep glowing! Arjun discovered that <span class="engineering-highlight">circuit design</span> is everywhere: in our phones, computers, cars, and even LED street lights!
+                </div>
+            </div>
+            
+            <div class="translation-content" id="circuits-tel">
+                <div class="story-text">
+                    <span class="character">అర్జున్</span>‌కు అత్యంత ఉత్తేజకరమైన భాగం సర్క్యూట్-బిల్డింగ్ వర్క్‌షాప్! <span class="science-highlight">విద్యుత్ సర్క్యూట్</span> అనేది విద్యుత్తు ప్రవహించడానికి అనుమతించే పూర్తి మార్గం అని అతను నేర్చుకున్నాడు. బ్యాటరీ (శక్తి మూలం), వైర్లు (వాహకాలు), మరియు LED బల్బు (లోడ్) ఉపయోగించి, అతను తన మొదటి <span class="science-highlight">శ్రేణి సర్క్యూట్</span>‌ను తయారు చేశాడు, ఇక్కడ అన్ని భాగాలు ఒకే మార్గంలో అనుసంధానించబడతాయి. అతను స్విచ్‌ను జోడించినప్పుడు, అతను <span class="science-highlight">విద్యుత్ ప్రవాహం</span> ప్రవాహాన్ని నియంత్రించగలిగాడు. తర్వాత అతను <span class="science-highlight">సమాంతర సర్క్యూట్</span>‌ను నిర్మించాడు, ఇక్కడ భాగాలకు బహుళ మార్గాలు ఉంటాయి - ఒక బల్బు కాలిపోయినా, ఇతరవి మెరుస్తూనే ఉంటాయి! మన ఫోన్లు, కంప్యూటర్లు, కార్లు, మరియు LED వీధి దీపాలలో కూడా <span class="engineering-highlight">సర్క్యూట్ డిజైన్</span> ప్రతిచోటా ఉందని అర్జున్ కనుగొన్నాడు!
+                </div>
+            </div>
+            
+            <div class="translation-content" id="circuits-hin">
+                <div class="story-text">
+                    <span class="character">अर्जुन</span> के लिए सबसे रोमांचक हिस्सा सर्किट-बिल्डिंग वर्कशॉप था! उसने सीखा कि <span class="science-highlight">विद्युत सर्किट</span> एक पूरा रास्ता है जो बिजली को प्रवाहित होने देता है। बैटरी (पावर स्रोत), तारों (चालक), और एक LED बल्ब (लोड) का उपयोग करके, उसने अपना पहला <span class="science-highlight">श्रेणी सर्किट</span> बनाया जहाँ सभी घटक एक ही रास्ते में जुड़े होते हैं। जब उसने स्विच जोड़ा, तो वह <span class="science-highlight">विद्युत धारा</span> के प्रवाह को नियंत्रित कर सकता था। फिर उसने एक <span class="science-highlight">समांतर सर्किट</span> बनाया जहाँ घटकों के कई रास्ते होते हैं - भले ही एक बल्ब जल जाए, दूसरे चमकते रहते हैं! अर्जुन ने खोजा कि <span class="engineering-highlight">सर्किट डिजाइन</span> हर जगह है: हमारे फोन, कंप्यूटर, कार, और यहाँ तक कि LED स्ट्रीट लाइटों में भी!
+                </div>
+            </div>
+        </div>
+        
+        <!-- Topic 4: Engineering in Daily Life -->
+        <div class="story-section">
+            <div class="topic-badge">🏗 Topic 4: Engineering in Daily Life - Solutions Everywhere</div>
+            <div class="illustration engineering-bg">🏗🌉📱</div>
+            
+            <div class="translation-tabs">
+                <button class="tab-button active" onclick="showTranslation(this, 'engineering-en')">English</button>
+                <button class="tab-button" onclick="showTranslation(this, 'engineering-tel')">తెలుగు</button>
+                <button class="tab-button" onclick="showTranslation(this, 'engineering-hin')">हिंदी</button>
+            </div>
+            
+            <div class="translation-content active" id="engineering-en">
+                <div class="story-text">
+                    Walking home from the Science Fair, <span class="character">Arjun</span> began to notice <span class="engineering-highlight">engineering solutions</span> everywhere! The bridge he crossed used <span class="science-highlight">structural engineering</span> to support heavy loads, the traffic lights used <span class="science-highlight">electrical engineering</span> for safety, and his smartphone combined <span class="science-highlight">mechanical, electrical, and software engineering</span>. At home, he saw how the water tap used simple valve engineering, the ceiling fan used motor engineering, and even the stairs were designed using principles of <span class="science-highlight">civil engineering</span>. His mother's pressure cooker was a perfect example of <span class="engineering-highlight">mechanical engineering</span> - using steam pressure to cook food faster and save energy. Arjun realized that engineers solve problems to make our lives better, safer, and more comfortable!
+                </div>
+            </div>
+            
+            <div class="translation-content" id="engineering-tel">
+                <div class="story-text">
+                    సైన్స్ ఫెయిర్ నుండి ఇంటికి నడుస్తూ, <span class="character">అర్జున్</span> ప్రతిచోటా <span class="engineering-highlight">ఇంజినీరింగ్ పరిష్కారాలను</span> గమనించడం మొదలుపెట్టాడు! అతను దాటిన వంతెన భారీ లోడ్‌లను మోయడానికి <span class="science-highlight">నిర్మాణ ఇంజినీరింగ్</span>‌ను ఉపయోగించింది, ట్రాఫిక్ లైట్లు భద్రత కోసం <span class="science-highlight">విద్యుత్ ఇంజినీరింగ్</span>‌ను ఉపయోగించాయి, మరియు అతని స్మార్ట్‌ఫోన్ <span class="science-highlight">యాంత్రిక, విద్యుత్ మరియు సాఫ్ట్‌వేర్ ఇంజినీరింగ్</span>‌ను కలిపింది. ఇంట్లో, నీటి కుళాయి సాధారణ వాల్వ్ ఇంజినీరింగ్‌ను, సీలింగ్ ఫ్యాన్ మోటార్ ఇంజినీరింగ్‌ను ఎలా ఉపయోగించాయో అతను చూశాడు, మరియు మెట్లు కూడా <span class="science-highlight">సివిల్ ఇంజినీరింగ్</span> సూత్రాలను ఉపయోగించి రూపొందించబడ్డాయి. అతని తల్లి ప్రెషర్ కుక్కర్ <span class="engineering-highlight">యాంత్రిక ఇంజినీరింగ్</span>‌కు పరిపూర్ణ ఉదాహరణ - ఆహారాన్ని వేగంగా వండటానికి మరియు శక్తిని ఆదా చేయడానికి ఆవిరి ఒత్తిడిని ఉపయోగించడం. మన జీవితాలను మెరుగ్గా, సురక్షితంగా మరియు మరింత సౌకర్యవంతంగా చేయడానికి ఇంజినీర్లు సమస్యలను పరిష్కరిస్తారని అర్జున్ గ్రహించాడు!
+                </div>
+            </div>
+            
+            <div class="translation-content" id="engineering-hin">
+                <div class="story-text">
+                    साइंस फेयर से घर जाते समय, <span class="character">अर्जुन</span> ने हर जगह <span class="engineering-highlight">इंजीनियरिंग समाधान</span> देखना शुरू किया! जिस पुल को उसने पार किया, उसमें भारी भार को सहारा देने के लिए <span class="science-highlight">संरचनात्मक इंजीनियरिंग</span> का उपयोग किया गया था, ट्रैफिक लाइटों में सुरक्षा के लिए <span class="science-highlight">विद्युत इंजीनियरिंग</span> का उपयोग किया गया था, और उसके स्मार्टफोन में <span class="science-highlight">यांत्रिक, विद्युत और सॉफ्टवेयर इंजीनियरिंग</span> का संयोजन था। घर पर, उसने देखा कि पानी का नल सरल वाल्व इंजीनियरिंग का उपयोग करता है, छत का पंखा मोटर इंजीनियरिंग का उपयोग करता है, और यहाँ तक कि सीढ़ियाँ भी <span class="science-highlight">सिविल इंजीनियरिंग</span> के सिद्धांतों का उपयोग करके डिज़ाइन की गई थीं। उसकी माँ का प्रेशर कुकर <span class="engineering-highlight">मैकेनिकल इंजीनियरिंग</span> का एक बेहतरीन उदाहरण था - भाप के दबाव का उपयोग करके खाना तेजी से पकाना और ऊर्जा बचाना। अर्जुन ने महसूस किया कि इंजीनियर हमारे जीवन को बेहतर, सुरक्षित और अधिक आरामदायक बनाने के लिए समस्याओं का समाधान करते हैं!
+                </div>
+            </div>
+        </div>
+        
+        <!-- Conclusion -->
+        <div class="story-section">
+            <div class="topic-badge">🎓 Arjun's Engineering Journey Completed!</div>
+            <div class="illustration" style="background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c, #4facfe, #00f2fe); height: 200px; background-size: 600% 600%; animation: gradientShift 2s ease-in-out infinite;">🌟⚙💡🚀</div>
+            
+            <div class="translation-tabs">
+                <button class="tab-button active" onclick="showTranslation(this, 'conclusion-en')">English</button>
+                <button class="tab-button" onclick="showTranslation(this, 'conclusion-tel')">తెలుగు</button>
+                <button class="tab-button" onclick="showTranslation(this, 'conclusion-hin')">हिंदी</button>
+            </div>
+            
+            <div class="translation-content active" id="conclusion-en">
+                <div class="story-text">
+                    That evening, <span class="character">Arjun</span> excitedly wrote in his journal: "Today I discovered that engineering is not just about big machines or complicated inventions - it's about solving everyday problems! <span class="engineering-highlight">Simple machines</span> help us work smarter, not harder. <span class="engineering-highlight">Energy sources</span> power our world, and we must choose renewable ones for a sustainable future. <span class="engineering-highlight">Electric circuits</span> are the pathways that bring light and power to our lives. And most importantly, <span class="engineering-highlight">engineering solutions</span> are everywhere around us, making our world safer and more comfortable. Tomorrow, I want to start my own engineering project - maybe a solar-powered fan using simple machines and circuits! Engineering is not just a subject, it's a way of thinking to make the world a better place!"
+                </div>
+            </div>
+            
+            <div class="translation-content" id="conclusion-tel">
+                <div class="story-text">
+                    ఆ సాయంత్రం, <span class="character">అర్జున్</span> ఉత్సాహంతో తన జర్నల్‌లో రాశాడు: "ఈరోజు నేను ఇంజినీరింగ్ అనేది కేవలం పెద్ద యంత్రాలు లేదా సంక్లిష్ట ఆవిష్కరణల గురించి మాత్రమే కాదని - ఇది రోజువారీ సమస్యలను పరిష్కరించడం గురించిన అని కనుగొన్నాను! <span class="engineering-highlight">సాధారణ యంత్రాలు</span> మనకు కష్టపడకుండా తెలివిగా పనిచేయడానికి సహాయపడతాయి. <span class="engineering-highlight">శక్తి వనరులు</span> మన ప్రపంచానికి శక్తినిస్తాయి, మరియు స్థిరమైన భవిష్యత్తు కోసం మనం పునరుత్పాదక వాటిని ఎంచుకోవాలి. <span class="engineering-highlight">విద్యుత్ సర్క్యూట్లు</span> మన జీవితాలకు కాంతి మరియు శక్తిని తీసుకువచ్చే మార్గాలు. మరియు అతి ముఖ్యంగా, <span class="engineering-highlight">ఇంజినీరింగ్ పరిష్కారాలు</span> మన చుట్టూ ప్రతిచోటా ఉన్నాయి, మన ప్రపంచాన్ని సురక్షితంగా మరియు మరింత సౌకర్యవంతంగా చేస్తున్నాయి. రేపు, నేను నా స్వంత ఇంజినీరింగ్ ప్రాజెక్ట్‌ను ప్రారంభించాలని అనుకుంటున్నాను - బహుశా సాధారణ యంత్రాలు మరియు సర్క్యూట్లను ఉపయోగించి సౌర-శక్తితో పనిచేసే ఫ్యాన్! ఇంజినీరింగ్ కేవలం ఒక విషయం మాత్రమే కాదు, ఇది ప్రపంచాన్ని మెరుగైన ప్రదేశంగా మార్చడానికి ఆలోచించే విధానం!"
+                </div>
+            </div>
+            
+            <div class="translation-content" id="conclusion-hin">
+                <div class="story-text">
+                    उस शाम, <span class="character">अर्जुन</span> ने उत्साह से अपनी डायरी में लिखा: "आज मैंने खोजा कि इंजीनियरिंग केवल बड़ी मशीनों या जटिल आविष्कारों के बारे में नहीं है - यह रोजमर्रा की समस्याओं का समाधान करने के बारे में है! <span class="engineering-highlight">सरल मशीनें</span> हमें कड़ी मेहनत के बजाय स्मार्ट तरीके से काम करने में मदद करती हैं। <span class="engineering-highlight">ऊर्जा स्रोत</span> हमारी दुनिया को शक्ति देते हैं, और स्थायी भविष्य के लिए हमें नवीकरणीय स्रोतों को चुनना चाहिए। <span class="engineering-highlight">विद्युत सर्किट</span> वे रास्ते हैं जो हमारे जीवन में रोशनी और शक्ति लाते हैं। और सबसे महत्वपूर्ण बात, <span class="engineering-highlight">इंजीनियरिंग समाधान</span> हमारे चारों ओर हर जगह हैं, हमारी दुनिया को सुरक्षित और अधिक आरामदायक बनाते हैं। कल, मैं अपना खुद का इंजीनियरिंग प्रोजेक्ट शुरू करना चाहता हूँ - शायद सरल मशीनों और सर्किट का उपयोग करके सौर-संचालित पंखा! इंजीनियरिंग केवल एक विषय नहीं है, यह दुनिया को बेहतर जगह बनाने के लिए सोचने का तरीका है!"
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>⚙ Remember: Engineers are problem-solvers who make the impossible possible! ⚙</p>
+            <p>इंजीनियर समस्या-समाधानकर्ता हैं जो असंभव को संभव बनाते हैं! | ఇంజినీర్లు అసాధ్యాన్ని సాధ్యం చేసే సమస్య-పరిష్కర్తలు!</p>
+            <p>🌟 The future belongs to young engineers like you! 🌟</p>
+        </div>
+    </div>
+</body>
+</html>

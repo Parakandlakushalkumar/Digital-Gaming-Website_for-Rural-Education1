@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Translation</title>
+<!-- ORIGINAL GAME CONTENT STARTS HERE -->
+<h1 class="text-2xl font-bold text-gray-800">Sound Waves Interactive Quiz</h1><div class="flex items-center gap-4">
+                            ${showResults ? `
+                                <div class="flex items-center gap-2 bg-blue-100 px-3 py-2 rounded-lg">
+                                    <div class="w-5 h-5 text-blue-600">🏆</div>
+                                    <span class="font-semibold text-blue-600">Score: ${score}%</span>` : ''}
+                            <button onclick="resetGame()" class="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                                <div class="w-4 h-4">🔄</div>
+                                Reset Quiz
+                            </button><!-- Wave Visualizer -->
+                    <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                        <h2 class="text-lg font-bold text-gray-800 mb-4">Interactive Wave Visualizer</h2>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <svg width="400" height="100" class="border rounded bg-white">
+                                    <path
+                                        d="${generateWavePath()}"
+                                        stroke="#3B82F6"
+                                        stroke-width="3"
+                                        fill="none"
+                                        class="${waveAnimation ? 'animate-pulse' : ''}"
+                                    />
+                                    <line x1="0" y1="50" x2="400" y2="50" stroke="#E5E7EB" stroke-width="1" />
+                                </svg><div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Frequency: ${frequency} Hz
+                                    </label>
+                                    <input
+                                        type="range"
+                                        min="100"
+                                        max="1000"
+                                        value="${frequency}"
+                                        onchange="frequency = parseInt(this.value); renderGame()"
+                                        class="w-full"
+                                    /><div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Amplitude: ${amplitude} dB
+                                    </label>
+                                    <input
+                                        type="range"
+                                        min="20"
+                                        max="100"
+                                        value="${amplitude}"
+                                        onchange="amplitude = parseInt(this.value); renderGame()"
+                                        class="w-full"
+                                    /><button
+                                    onclick="waveAnimation = !waveAnimation; renderGame()"
+                                    class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                                >
+                                    ${waveAnimation ? '⏸️' : '▶️'}
+                                    ${waveAnimation ? 'Pause' : 'Play'} Animation
+                                </button>${!showResults ? `
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-xl font-bold text-gray-800">
+                                Question ${currentQuestion + 1} of ${gameData.questions.length}
+                            </h2>
+                            <div class="bg-gray-200 rounded-full h-2 w-32">
+                                <div
+                                    class="bg-blue-600 h-2 rounded-full transition-all"
+                                    style="width: ${((currentQuestion + 1) / gameData.questions.length) * 100}%"
+                                ></div><div class="mb-6">
+                            <h3 class="text-lg font-medium text-gray-800 mb-4">
+                                ${currentQuestionData.question}
+                            </h3>
+                            <div class="space-y-3">
+                                ${currentQuestionData.options.map((option, index) => `
+                                    <button
+                                        onclick="handleAnswerSelect(${currentQuestionData.id}, ${index})"
+                                        class="w-full text-left p-4 rounded-lg border-2 transition-all ${
+                                            selectedAnswers[currentQuestionData.id] === index
+                                                ? 'border-blue-500 bg-blue-50 text-blue-800'
+                                                : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                                        }"
+                                    >
+                                        <span class="font-medium">${String.fromCharCode(65 + index)}. </span>
+                                        ${option}
+                                    </button>
+                                `).join('')}<div class="flex items-center justify-between">
+                            <button
+                                onclick="prevQuestion()"
+                                disabled="${currentQuestion === 0}"
+                                class="px-4 py-2 rounded-lg ${
+                                    currentQuestion === 0
+                                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                        : 'bg-gray-600 text-white hover:bg-gray-700'
+                                }"
+                            >
+                                Previous
+                            </button>
+                            <button
+                                onclick="nextQuestion()"
+                                disabled="${selectedAnswers[currentQuestionData.id] === undefined}"
+                                class="px-4 py-2 rounded-lg ${
+                                    selectedAnswers[currentQuestionData.id] === undefined
+                                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                        : currentQuestion === gameData.questions.length - 1
+                                        ? 'bg-green-600 text-white hover:bg-green-700'
+                                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                                }"
+                            >
+                                ${currentQuestion === gameData.questions.length - 1 ? 'Submit Quiz' : 'Next'}
+                            </button>` : `
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="text-center mb-6">
+                            <div class="w-16 h-16 text-yellow-500 mx-auto mb-4">🏆</div>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-2">Quiz Complete!</h2>
+                            <p class="text-lg text-gray-600">Your Score: ${score}%</p><div class="space-y-4">
+                            <h3 class="text-lg font-bold text-gray-800">Review Your Answers:</h3>
+                            ${gameData.questions.map((question, index) => {
+                                const userAnswer = selectedAnswers[question.id];
+                                const isCorrect = userAnswer === question.correct;
+                                
+                                return `
+                                    <div class="border rounded-lg p-4">
+                                        <p class="font-medium text-gray-800 mb-2">
+                                            ${index + 1}. ${question.question}
+                                        </p>
+                                        <p class="mb-2 ${isCorrect ? 'text-green-600' : 'text-red-600'}">
+                                            Your answer: ${question.options[userAnswer]} ${isCorrect ? '✓' : '✗'}
+                                        </p>
+                                        ${!isCorrect ? `
+                                            <p class="text-green-600 mb-2">
+                                                Correct answer: ${question.options[question.correct]}
+                                            </p>
+                                        ` : ''}
+                                        <p class="text-sm text-gray-600 italic">
+                                            ${question.explanation}
+                                        </p>`;
+                            }).join('')}`}
+            `;
+        }
+
+        // Initialize the game when the page loads
+        document.addEventListener('DOMContentLoaded', renderGame);
+    </script></html>

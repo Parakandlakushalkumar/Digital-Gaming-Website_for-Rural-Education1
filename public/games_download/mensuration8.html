@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mensuration Masters - Geometry Games</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #8b5cf6;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #06b6d4;
+            --light-bg: #f8fafc;
+            --dark-text: #1e293b;
+        }
+
+        body {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px 0;
+        }
+
+        .game-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .game-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .game-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .game-content {
+            padding: 20px;
+            min-height: 400px;
+            display: none;
+        }
+
+        .game-preview {
+            padding: 20px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .play-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .play-btn:hover {
+            background: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Click & Calculate Styles */
+        .question-display {
+            background: #f3f4f6;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.2rem;
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .option-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .option-btn.correct {
+            background: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+        }
+
+        .option-btn.incorrect {
+            background: var(--danger-color);
+            border-color: var(--danger-color);
+            color: white;
+        }
+
+        /* Fill the Box Styles */
+        .box-container {
+            width: 200px;
+            height: 200px;
+            background: #e5e7eb;
+            border: 3px solid #9ca3af;
+            border-radius: 15px;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            transition: all 0.5s ease;
+        }
+
+        .box-container.correct {
+            background: #d1fae5;
+            border-color: var(--success-color);
+            animation: pulse 0.5s ease;
+        }
+
+        .box-container.incorrect {
+            background: #fee2e2;
+            border-color: var(--danger-color);
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .answer-input {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            width: 200px;
+            text-align: center;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Progress Bar Game Styles */
+        .timer-display {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            color: var(--warning-color);
+        }
+
+        .progress-container {
+            background: #f3f4f6;
+            border-radius: 15px;
+            padding: 10px;
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            height: 30px;
+            background: #e5e7eb;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success-color), var(--info-color));
+            transition: width 0.5s ease;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Shape Unlock Styles */
+        .shape-container {
+            width: 300px;
+            height: 300px;
+            margin: 20px auto;
+            position: relative;
+            background: #f3f4f6;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .shape-piece {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: #e5e7eb;
+            border: 2px solid #9ca3af;
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        .shape-piece.revealed {
+            opacity: 1;
+            background: var(--success-color);
+            border-color: var(--success-color);
+            animation: revealPiece 0.5s ease;
+        }
+
+        @keyframes revealPiece {
+            0% { transform: scale(0) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+
+        /* Score Collector Styles */
+        .score-display {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            display: inline-block;
+            margin: 10px 0;
+            font-size: 1.2rem;
+        }
+
+        .question-counter {
+            background: var(--secondary-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin: 0 10px;
+        }
+
+        /* Common Styles */
+        .feedback {
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            animation: slideIn 0.5s ease;
+            font-weight: 500;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feedback.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .feedback.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .feedback.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+
+        .hint-box {
+            background: #fef3c7;
+            border-left: 4px solid var(--warning-color);
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .game-card {
+                margin-bottom: 20px;
+            }
+            
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .shape-container {
+                width: 250px;
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container game-container">
+        <h1 class="text-center text-white mb-5">
+            <i class="bi bi-calculator"></i> Mensuration Masters - Geometry Games
+        </h1>
+        
+        <div class="row g-4">
+            <!-- Game 1: Click & Calculate -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game1">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(1)" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <i class="bi bi-mouse game-icon"></i>
+                        <h3>Click & Calculate</h3>
+                        <p class="mb-0">Click the correct answer!</p>
+                    </div>
+                    <div class="game-preview" id="preview1">
+                        <p>Solve mensuration problems and click the correct answer from multiple choices.</p>
+                        <button class="play-btn" onclick="startGame(1)">Start Game</button>
+                    </div>
+                    <div class="game-content" id="content1">
+                        <div class="question-display" id="click-question">
+                            Find the volume of a cylinder with radius 4 cm and height 7 cm.
+                        </div>
+                        <div class="options-grid" id="click-options">
+                            <!-- Options will be generated dynamically -->
+                        </div>
+                        <div id="click-feedback"></div>
+                        <div class="text-center">
+                            <div class="score-display">Score: <span id="click-score">0</span></div>
+                            <div class="question-counter">Question <span id="click-counter">1</span>/10</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 2: Fill the Box -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game2">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(2)" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <i class="bi bi-box game-icon"></i>
+                        <h3>Fill the Box</h3>
+                        <p class="mb-0">Type the answer to fill the box!</p>
+                    </div>
+                    <div class="game-preview" id="preview2">
+                        <p>Type the correct answer to geometry problems. Correct answers turn the box green!</p>
+                        <button class="play-btn" onclick="startGame(2)">Start Game</button>
+                    </div>
+                    <div class="game-content" id="content2">
+                        <div class="box-container" id="fill-box">
+                            <i class="bi bi-question-circle"></i>
+                        </div>
+                        <div class="question-display" id="fill-question">
+                            Surface area of a cube with side 5 cm?
+                        </div>
+                        <div class="text-center">
+                            <input type="number" class="answer-input" id="fill-answer" placeholder="Answer">
+                            <button class="btn btn-game ms-2" onclick="checkFillAnswer()">Submit</button>
+                        </div>
+                        <div id="fill-feedback"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 3: Progress Bar Game -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game3">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(3)" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <i class="bi bi-speedometer2 game-icon"></i>
+                        <h3>Progress Bar Game</h3>
+                        <p class="mb-0">Fill the bar before time runs out!</p>
+                    </div>
+                    <div class="game-preview" id="preview3">
+                        <p>Solve geometry questions against the clock to fill the progress bar!</p>
+                        <button class="play-btn" onclick="startGame(3)">Start Game</button>
+                    </div>
+                    <div class="game-content" id="content3">
+                        <div class="timer-display" id="progress-timer">60</div>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progress-fill" style="width: 0%;">0%</div>
+                            </div>
+                        </div>
+                        <div class="question-display" id="progress-question">
+                            Find the perimeter of a rectangle with length 12 cm and width 8 cm.
+                        </div>
+                        <div class="text-center">
+                            <input type="number" class="answer-input" id="progress-answer" placeholder="Answer">
+                            <button class="btn btn-game ms-2" onclick="checkProgressAnswer()">Submit</button>
+                        </div>
+                        <div id="progress-feedback"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 4: Shape Unlock -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game4">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(4)" style="display: none;">
+                            <i class="bi bi-unlock game-icon"></i>
+                        </button>
+                        <i class="bi bi-shapes game-icon"></i>
+                        <h3>Shape Unlock</h3>
+                        <p class="mb-0">Solve to reveal the hidden shape!</p>
+                    </div>
+                    <div class="game-preview" id="preview4">
+                        <p>Solve mensuration questions to reveal pieces of a hidden shape!</p>
+                        <button class="play-btn" onclick="startGame(4)">Start Game</button>
+                    </div>
+                    <div class="game-content" id="content4">
+                        <div class="shape-container" id="shape-container">
+                            <!-- Shape pieces will be generated dynamically -->
+                        </div>
+                        <div class="question-display" id="shape-question">
+                            Find the area of a triangle with base 10 cm and height 6 cm.
+                        </div>
+                        <div class="text-center">
+                            <input type="number" class="answer-input" id="shape-answer" placeholder="Answer">
+                            <button class="btn btn-game ms-2" onclick="checkShapeAnswer()">Reveal</button>
+                        </div>
+                        <div id="shape-feedback"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 5: Score Collector -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game5">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(5)" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <i class="bi bi-star game-icon"></i>
+                        <h3>Score Collector</h3>
+                        <p class="mb-0">Collect points with correct answers!</p>
+                    </div>
+                    <div class="game-preview" id="preview5">
+                        <p>Answer geometry questions one by one to collect points. Hints available for wrong answers!</p>
+                        <button class="play-btn" onclick="startGame(5)">Start Game</button>
+                    </div>
+                    <div class="game-content" id="content5">
+                        <div class="question-display" id="score-question">
+                            Find the volume of a sphere with radius 3 cm.
+                        </div>
+                        <div class="text-center">
+                            <input type="number" class="answer-input" id="score-answer" placeholder="Answer">
+                            <button class="btn btn-game ms-2" onclick="checkScoreAnswer()">Submit</button>
+                        </div>
+                        <div id="score-feedback"></div>
+                        <div class="text-center">
+                            <div class="score-display">Score: <span id="score-collector">0</span></div>
+                            <div class="question-counter">Question <span id="score-counter">1</span>/10</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game Data
+        const clickQuestions = [
+            {
+                question: "Find the volume of a cylinder with radius 4 cm and height 7 cm.",
+                options: ["351.68 cm³", "123.45 cm³", "456.78 cm³", "789.01 cm³"],
+                correct: 0,
+                points: 10
+            },
+            {
+                question: "What is the area of a circle with radius 5 cm?",
+                options: ["78.5 cm²", "31.4 cm²", "15.7 cm²", "62.8 cm²"],
+                correct: 0,
+                points: 10
+            },
+            {
+                question: "Find the perimeter of a square with side 6 cm.",
+                options: ["24 cm", "36 cm", "12 cm", "18 cm"],
+                correct: 0,
+                points: 10
+            },
+            {
+                question: "What is the volume of a cube with edge 4 cm?",
+                options: ["64 cm³", "16 cm³", "96 cm³", "32 cm³"],
+                correct: 0,
+                points: 10
+            },
+            {
+                question: "Find the area of a rectangle with length 8 cm and width 5 cm.",
+                options: ["40 cm²", "26 cm²", "13 cm²", "80 cm²"],
+                correct: 0,
+                points: 10
+            },
+            {
+                question: "What is the circumference of a circle with diameter 10 cm?",
+                options: ["31.4 cm", "15.7 cm", "78.5 cm", "62.8 cm"],
+                correct: 0,
+                points: 10
+            },
+            {
+                question: "Find the surface area of a cube with edge 3 cm.",
+                options: ["54 cm²", "27 cm²", "9 cm²", "81 cm²"],
+                correct: 0,
+                points: 10
+            },
+            {
+                question: "What is the area of a triangle with base 8 cm and height 6 cm?",
+                options: ["24 cm²", "48 cm²", "12 cm²", "36 cm²"],
+                correct: 0,
+                points: 10
+            },
+            {
+                question: "Find the volume of a cone with radius 3 cm and height 8 cm.",
+                options: ["75.36 cm³", "150.72 cm³", "226.08 cm³", "301.44 cm³"],
+                correct: 0,
+                points: 10
+            },
+            {
+                question: "What is the perimeter of a rectangle with length 12 cm and width 7 cm?",
+                options: ["38 cm", "19 cm", "84 cm²", "26 cm"],
+                correct: 0,
+                points: 10
+            }
+        ];
+
+        const fillQuestions = [
+            {
+                question: "Surface area of a cube with side 5 cm?",
+                answer: 150,
+                hint: "Formula: 6 × side²"
+            },
+            {
+                question: "Volume of a sphere with radius 3 cm?",
+                answer: 113.04,
+                hint: "Formula: (4/3) × π × r³"
+            },
+            {
+                question: "Area of a circle with radius 7 cm?",
+                answer: 153.86,
+                hint: "Formula: π × r²"
+            },
+            {
+                question: "Perimeter of a rectangle with length 15 cm and width 10 cm?",
+                answer: 50,
+                hint: "Formula: 2 × (length + width)"
+            },
+            {
+                question: "Volume of a cylinder with radius 2 cm and height 10 cm?",
+                answer: 125.6,
+                hint: "Formula: π × r² × height"
+            },
+            {
+                question: "Area of a triangle with base 12 cm and height 9 cm?",
+                answer: 54,
+                hint: "Formula: (1/2) × base × height"
+            },
+            {
+                question: "Surface area of a cylinder with radius 3 cm and height 8 cm?",
+                answer: 207.24,
+                hint: "Formula: 2πr(h + r)"
+            },
+            {
+                question: "Volume of a cube with edge 6 cm?",
+                answer: 216,
+                hint: "Formula: side³"
+            },
+            {
+                question: "Circumference of a circle with radius 6 cm?",
+                answer: 37.68,
+                hint: "Formula: 2 × π × r"
+            },
+            {
+                question: "Area of a square with side 9 cm?",
+                answer: 81,
+                hint: "Formula: side²"
+            }
+        ];
+
+        const progressQuestions = [
+            {
+                question: "Find the perimeter of a rectangle with length 12 cm and width 8 cm.",
+                answer: 40
+            },
+            {
+                question: "What is the area of a circle with radius 4 cm?",
+                answer: 50.24
+            },
+            {
+                question: "Find the volume of a cube with edge 5 cm.",
+                answer: 125
+            },
+            {
+                question: "What is the surface area of a sphere with radius 3 cm?",
+                answer: 113.04
+            },
+            {
+                question: "Find the area of a triangle with base 10 cm and height 8 cm.",
+                answer: 40
+            },
+            {
+                question: "What is the volume of a cylinder with radius 3 cm and height 7 cm?",
+                answer: 197.82
+            },
+            {
+                question: "Find the perimeter of a square with side 9 cm.",
+                answer: 36
+            },
+            {
+                question: "What is the circumference of a circle with diameter 14 cm?",
+                answer: 43.96
+            },
+            {
+                question: "Find the surface area of a cube with edge 4 cm.",
+                answer: 96
+            },
+            {
+                question: "What is the area of a rectangle with length 15 cm and width 6 cm?",
+                answer: 90
+            }
+        ];
+
+        const shapeQuestions = [
+            {
+                question: "Find the area of a triangle with base 10 cm and height 6 cm.",
+                answer: 30
+            },
+            {
+                question: "What is the volume of a sphere with radius 4 cm?",
+                answer: 267.95
+            },
+            {
+                question: "Find the perimeter of a rectangle with length 14 cm and width 9 cm.",
+                answer: 46
+            },
+            {
+                question: "What is the area of a circle with radius 6 cm?",
+                answer: 113.04
+            },
+            {
+                question: "Find the volume of a cone with radius 5 cm and height 12 cm.",
+                answer: 314
+            },
+            {
+                question: "What is the surface area of a cylinder with radius 4 cm and height 10 cm?",
+                answer: 351.68
+            },
+            {
+                question: "Find the area of a square with side 11 cm.",
+                answer: 121
+            },
+            {
+                question: "What is the circumference of a circle with radius 8 cm?",
+                answer: 50.24
+            },
+            {
+                question: "Find the volume of a cube with edge 7 cm.",
+                answer: 343
+            },
+            {
+                question: "What is the area of a trapezoid with bases 8 cm and 12 cm, height 5 cm?",
+                answer: 50
+            },
+            {
+                question: "Find the perimeter of a triangle with sides 5 cm, 12 cm, 13 cm.",
+                answer: 30
+            },
+            {
+                question: "What is the volume of a rectangular prism with dimensions 6cm × 4cm × 5cm?",
+                answer: 120
+            }
+        ];
+
+        const scoreQuestions = [
+            {
+                question: "Find the volume of a sphere with radius 3 cm.",
+                answer: 113.04,
+                hint: "Use the formula: (4/3)πr³"
+            },
+            {
+                question: "What is the area of a circle with diameter 10 cm?",
+                answer: 78.5,
+                hint: "First find radius: r = d/2"
+            },
+            {
+                question: "Find the perimeter of a square with side 7 cm.",
+                answer: 28,
+                hint: "Perimeter = 4 × side"
+            },
+            {
+                question: "What is the surface area of a cube with edge 5 cm?",
+                answer: 150,
+                hint: "Surface area = 6 × side²"
+            },
+            {
+                question: "Find the volume of a cylinder with radius 4 cm and height 9 cm.",
+                answer: 452.16,
+                hint: "Volume = πr²h"
+            },
+            {
+                question: "What is the area of a rectangle with length 13 cm and width 8 cm?",
+                answer: 104,
+                hint: "Area = length × width"
+            },
+            {
+                question: "Find the circumference of a circle with radius 5 cm.",
+                answer: 31.4,
+                hint: "Circumference = 2πr"
+            },
+            {
+                question: "What is the volume of a cone with radius 6 cm and height 10 cm?",
+                answer: 376.8,
+                hint: "Volume = (1/3)πr²h"
+            },
+            {
+                question: "Find the area of a triangle with base 15 cm and height 10 cm.",
+                answer: 75,
+                hint: "Area = (1/2) × base × height"
+            },
+            {
+                question: "What is the perimeter of a rectangle with length 16 cm and width 9 cm?",
+                answer: 50,
+                hint: "Perimeter = 2(length + width)"
+            }
+        ];
+
+        // Game States
+        let currentClickQuestion = 0;
+        let clickScore = 0;
+        let currentFillQuestion = 0;
+        let currentProgressQuestion = 0;
+        let progressTimer = 60;
+        let progressInterval;
+        let progressFilled = 0;
+        let currentShapeQuestion = 0;
+        let shapeRevealed = 0;
+        let currentScoreQuestion = 0;
+        let scoreCollectorScore = 0;
+
+        // Initialize Games
+        function initGames() {
+            // Initialize shape pieces
+            generateShapePieces();
+        }
+
+        // Game Navigation
+        function startGame(gameNum) {
+            document.getElementById(`preview${gameNum}`).style.display = 'none';
+            document.getElementById(`content${gameNum}`).style.display = 'block';
+            document.querySelector(`#game${gameNum} .back-btn`).style.display = 'block';
+            
+            // Initialize specific game
+            switch(gameNum) {
+                case 1:
+                    initClickGame();
+                    break;
+                case 2:
+                    initFillGame();
+                    break;
+                case 3:
+                    initProgressGame();
+                    break;
+                case 4:
+                    initShapeGame();
+                    break;
+                case 5:
+                    initScoreGame();
+                    break;
+            }
+        }
+
+        function showPreview(gameNum) {
+            document.getElementById(`preview${gameNum}`).style.display = 'flex';
+            document.getElementById(`content${gameNum}`).style.display = 'none';
+            document.querySelector(`#game${gameNum} .back-btn`).style.display = 'none';
+            
+            // Clean up intervals
+            if (gameNum === 3 && progressInterval) {
+                clearInterval(progressInterval);
+            }
+        }
+
+        // Game 1: Click & Calculate
+        function initClickGame() {
+            currentClickQuestion = 0;
+            clickScore = 0;
+            updateClickScore();
+            loadClickQuestion();
+        }
+
+        function loadClickQuestion() {
+            if (currentClickQuestion >= clickQuestions.length) {
+                showFeedback('click-feedback', '🎉 Game Complete! Final Score: ' + clickScore, 'success');
+                return;
+            }
+            
+            const question = clickQuestions[currentClickQuestion];
+            document.getElementById('click-question').textContent = question.question;
+            document.getElementById('click-counter').textContent = currentClickQuestion + 1;
+            
+            const optionsContainer = document.getElementById('click-options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => checkClickAnswer(index);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkClickAnswer(selectedIndex) {
+            const question = clickQuestions[currentClickQuestion];
+            const options = document.querySelectorAll('#click-options .option-btn');
+            
+            options.forEach(btn => btn.disabled = true);
+            
+            if (selectedIndex === question.correct) {
+                options[selectedIndex].classList.add('correct');
+                showFeedback('click-feedback', '✅ Correct! +' + question.points + ' points', 'success');
+                clickScore += question.points;
+                updateClickScore();
+                
+                currentClickQuestion++;
+                setTimeout(() => {
+                    loadClickQuestion();
+                }, 1500);
+            } else {
+                options[selectedIndex].classList.add('incorrect');
+                options[question.correct].classList.add('correct');
+                showFeedback('click-feedback', '❌ Incorrect. The correct answer is: ' + question.options[question.correct], 'error');
+                
+                setTimeout(() => {
+                    currentClickQuestion++;
+                    loadClickQuestion();
+                }, 2500);
+            }
+        }
+
+        function updateClickScore() {
+            document.getElementById('click-score').textContent = clickScore;
+        }
+
+        // Game 2: Fill the Box
+        function initFillGame() {
+            currentFillQuestion = 0;
+            loadFillQuestion();
+        }
+
+        function loadFillQuestion() {
+            if (currentFillQuestion >= fillQuestions.length) {
+                showFeedback('fill-feedback', '🎉 All boxes filled! Well done!', 'success');
+                return;
+            }
+            
+            const question = fillQuestions[currentFillQuestion];
+            document.getElementById('fill-question').textContent = question.question;
+            document.getElementById('fill-answer').value = '';
+            
+            // Reset box
+            const box = document.getElementById('fill-box');
+            box.className = 'box-container';
+            box.innerHTML = '<i class="bi bi-question-circle"></i>';
+        }
+
+        function checkFillAnswer() {
+            const question = fillQuestions[currentFillQuestion];
+            const userAnswer = parseFloat(document.getElementById('fill-answer').value);
+            const box = document.getElementById('fill-box');
+            
+            if (Math.abs(userAnswer - question.answer) < 0.1) {
+                box.classList.add('correct');
+                box.innerHTML = '<i class="bi bi-check-circle"></i>';
+                showFeedback('fill-feedback', '✅ Correct! Box filled!', 'success');
+                
+                currentFillQuestion++;
+                setTimeout(() => {
+                    loadFillQuestion();
+                }, 1500);
+            } else {
+                box.classList.add('incorrect');
+                box.innerHTML = '<i class="bi bi-x-circle"></i>';
+                showFeedback('fill-feedback', '❌ Incorrect!', 'error');
+                
+                // Show hint
+                setTimeout(() => {
+                    const hintBox = document.createElement('div');
+                    hintBox.className = 'hint-box';
+                    hintBox.innerHTML = '<i class="bi bi-lightbulb"></i> Hint: ' + question.hint;
+                    document.getElementById('fill-feedback').appendChild(hintBox);
+                }, 500);
+                
+                setTimeout(() => {
+                    loadFillQuestion();
+                }, 3000);
+            }
+        }
+
+        // Game 3: Progress Bar Game
+        function initProgressGame() {
+            currentProgressQuestion = 0;
+            progressTimer = 60;
+            progressFilled = 0;
+            updateProgressTimer();
+            loadProgressQuestion();
+            startProgressTimer();
+        }
+
+        function startProgressTimer() {
+            progressInterval = setInterval(() => {
+                progressTimer--;
+                updateProgressTimer();
+                
+                if (progressTimer <= 0) {
+                    clearInterval(progressInterval);
+                    showFeedback('progress-feedback', '⏰ Time\'s up! You filled ' + Math.round(progressFilled) + '%', 'info');
+                }
+            }, 1000);
+        }
+
+        function updateProgressTimer() {
+            document.getElementById('progress-timer').textContent = progressTimer;
+        }
+
+        function loadProgressQuestion() {
+            if (currentProgressQuestion >= progressQuestions.length || progressTimer <= 0) {
+                return;
+            }
+            
+            const question = progressQuestions[currentProgressQuestion];
+            document.getElementById('progress-question').textContent = question.question;
+            document.getElementById('progress-answer').value = '';
+        }
+
+        function checkProgressAnswer() {
+            const question = progressQuestions[currentProgressQuestion];
+            const userAnswer = parseFloat(document.getElementById('progress-answer').value);
+            
+            if (Math.abs(userAnswer - question.answer) < 0.1) {
+                showFeedback('progress-feedback', '✅ Correct! Progress bar filled!', 'success');
+                
+                // Fill progress bar
+                progressFilled = Math.min(progressFilled + 10, 100);
+                const progressFill = document.getElementById('progress-fill');
+                progressFill.style.width = progressFilled + '%';
+                progressFill.textContent = Math.round(progressFilled) + '%';
+                
+                currentProgressQuestion++;
+                
+                if (progressFilled >= 100) {
+                    clearInterval(progressInterval);
+                    showFeedback('progress-feedback', '🎉 Progress bar full! You win!', 'success');
+                } else {
+                    setTimeout(() => {
+                        loadProgressQuestion();
+                    }, 1000);
+                }
+            } else {
+                showFeedback('progress-feedback', '❌ Incorrect. Try again!', 'error');
+            }
+        }
+
+        // Game 4: Shape Unlock
+        function generateShapePieces() {
+            const container = document.getElementById('shape-container');
+            container.innerHTML = '';
+            
+            // Create a 3x4 grid of pieces
+            for (let i = 0; i < 12; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'shape-piece';
+                piece.id = `shape-piece-${i}`;
+                
+                // Position pieces in a grid
+                const row = Math.floor(i / 4);
+                const col = i % 4;
+                piece.style.left = (col * 100) + 'px';
+                piece.style.top = (row * 100) + 'px';
+                
+                container.appendChild(piece);
+            }
+        }
+
+        function initShapeGame() {
+            currentShapeQuestion = 0;
+            shapeRevealed = 0;
+            loadShapeQuestion();
+        }
+
+        function loadShapeQuestion() {
+            if (currentShapeQuestion >= shapeQuestions.length) {
+                showFeedback('shape-feedback', '🎉 Shape completely revealed!', 'success');
+                return;
+            }
+            
+            const question = shapeQuestions[currentShapeQuestion];
+            document.getElementById('shape-question').textContent = question.question;
+            document.getElementById('shape-answer').value = '';
+        }
+
+        function checkShapeAnswer() {
+            const question = shapeQuestions[currentShapeQuestion];
+            const userAnswer = parseFloat(document.getElementById('shape-answer').value);
+            
+            if (Math.abs(userAnswer - question.answer) < 0.1) {
+                showFeedback('shape-feedback', '✅ Correct! Piece revealed!', 'success');
+                
+                // Reveal shape piece
+                const piece = document.getElementById(`shape-piece-${currentShapeQuestion}`);
+                piece.classList.add('revealed');
+                
+                shapeRevealed++;
+                currentShapeQuestion++;
+                
+                if (shapeRevealed === shapeQuestions.length) {
+                    setTimeout(() => {
+                        showFeedback('shape-feedback', '🎉 All pieces revealed! You win!', 'success');
+                    }, 1000);
+                } else {
+                    setTimeout(() => {
+                        loadShapeQuestion();
+                    }, 1000);
+                }
+            } else {
+                showFeedback('shape-feedback', '❌ Incorrect. Try again!', 'error');
+            }
+        }
+
+        // Game 5: Score Collector
+        function initScoreGame() {
+            currentScoreQuestion = 0;
+            scoreCollectorScore = 0;
+            updateScoreCollectorScore();
+            loadScoreQuestion();
+        }
+
+        function loadScoreQuestion() {
+            if (currentScoreQuestion >= scoreQuestions.length) {
+                showFeedback('score-feedback', '🎉 Game Complete! Final Score: ' + scoreCollectorScore, 'success');
+                return;
+            }
+            
+            const question = scoreQuestions[currentScoreQuestion];
+            document.getElementById('score-question').textContent = question.question;
+            document.getElementById('score-counter').textContent = currentScoreQuestion + 1;
+            document.getElementById('score-answer').value = '';
+        }
+
+        function checkScoreAnswer() {
+            const question = scoreQuestions[currentScoreQuestion];
+            const userAnswer = parseFloat(document.getElementById('score-answer').value);
+            
+            if (Math.abs(userAnswer - question.answer) < 0.1) {
+                showFeedback('score-feedback', '✅ Correct! +10 points', 'success');
+                scoreCollectorScore += 10;
+                updateScoreCollectorScore();
+                
+                currentScoreQuestion++;
+                setTimeout(() => {
+                    loadScoreQuestion();
+                }, 1000);
+            } else {
+                showFeedback('score-feedback', '❌ Incorrect!', 'error');
+                
+                // Show hint
+                setTimeout(() => {
+                    const hintBox = document.createElement('div');
+                    hintBox.className = 'hint-box';
+                    hintBox.innerHTML = '<i class="bi bi-lightbulb"></i> Hint: ' + question.hint;
+                    document.getElementById('score-feedback').appendChild(hintBox);
+                }, 500);
+            }
+        }
+
+        function updateScoreCollectorScore() {
+            document.getElementById('score-collector').textContent = scoreCollectorScore;
+        }
+
+        // Utility Functions
+        function showFeedback(elementId, message, type) {
+            const feedback = document.getElementById(elementId);
+            feedback.innerHTML = `<div class="feedback ${type}">${message}</div>`;
+            setTimeout(() => {
+                feedback.innerHTML = '';
+            }, 3000);
+        }
+
+        // Initialize all games on load
+        window.onload = initGames;
+    </script>
+</body>
+</html>

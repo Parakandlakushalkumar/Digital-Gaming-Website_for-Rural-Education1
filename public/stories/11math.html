@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grade 11 Mathematics Story</title>
+  <link rel="icon" href="/favicon.ico">
+  <meta name="robots" content="noindex">
+  <style>
+    body { font-family: 'Georgia', serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; color: #333; overflow-x: hidden; }
+    .container { max-width: 1000px; margin: 20px auto; background: rgba(255,255,255,0.95); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); padding: 24px; }
+    .title { font-size: 2rem; color: #4c51bf; margin-bottom: 8px; }
+    .subtitle { color: #555; margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="title">🏛 The Mathematical Quest</div>
+    <div class="subtitle">Grade 11 Mathematics Interactive Story</div>
+    <p>This page now renders inside a visible container. Navigation and chapter logic are wired below.</p>
+    <div id="chapter1" class="chapter active"></div>
+
+    <hr style="margin:24px 0; opacity:0.4;">
+    <h2 style="font-size:1.5rem; color:#2d3748; margin-bottom:8px;">📒 Syllabus & Quick Notes (Class 11 Maths)</h2>
+    <p style="color:#4a5568; margin-bottom:12px;">Concise pointers for revision. Expand each topic in your story as needed.</p>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px;">
+      <div style="background:#f7fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px;">
+        <h3 style="color:#4c51bf; margin-bottom:6px;">Sets, Relations & Functions</h3>
+        <ul style="margin-left:16px; line-height:1.6;">
+          <li>Operations on sets: ∪, ∩, ⧵, complement</li>
+          <li>Relation: subset of A×B; Function: every x∈A maps to unique y∈B</li>
+          <li>Types: one‑one, onto, bijection; domain, co‑domain, range</li>
+        </ul>
+      </div>
+      <div style="background:#f7fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px;">
+        <h3 style="color:#4c51bf; margin-bottom:6px;">Complex Numbers</h3>
+        <ul style="margin-left:16px; line-height:1.6;">
+          <li>z = a + bi, i² = −1; |z| = √(a²+b²), arg(z)</li>
+          <li>Conjugate: z̄ = a − bi; z·z̄ = |z|²</li>
+          <li>Algebra: addition, multiplication, polar form (r(cosθ+i sinθ))</li>
+        </ul>
+      </div>
+      <div style="background:#f7fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px;">
+        <h3 style="color:#4c51bf; margin-bottom:6px;">Sequences & Series</h3>
+        <ul style="margin-left:16px; line-height:1.6;">
+          <li>AP: aₙ = a₁+(n−1)d; Sₙ = n/2[2a₁+(n−1)d]</li>
+          <li>GP: aₙ = a₁·rⁿ⁻¹; Sₙ = a₁(1−rⁿ)/(1−r), |r|≠1; S∞ = a₁/(1−r)</li>
+        </ul>
+      </div>
+      <div style="background:#f7fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px;">
+        <h3 style="color:#4c51bf; margin-bottom:6px;">Binomial Theorem</h3>
+        <ul style="margin-left:16px; line-height:1.6;">
+          <li>(a+b)ⁿ = Σ C(n,k)aⁿ⁻ᵏ bᵏ</li>
+          <li>Middle term(s) and greatest term ideas</li>
+        </ul>
+      </div>
+      <div style="background:#f7fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px;">
+        <h3 style="color:#4c51bf; margin-bottom:6px;">Coordinate Geometry</h3>
+        <ul style="margin-left:16px; line-height:1.6;">
+          <li>Straight line: slope m, y=mx+c, point‑slope form</li>
+          <li>Conics: circle x²+y²=r²; parabola, ellipse, hyperbola (standard forms)</li>
+        </ul>
+      </div>
+      <div style="background:#f7fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px;">
+        <h3 style="color:#4c51bf; margin-bottom:6px;">Probability & Statistics</h3>
+        <ul style="margin-left:16px; line-height:1.6;">
+          <li>P(A)∈[0,1], P(A∪B)=P(A)+P(B)−P(A∩B)</li>
+          <li>Mean, median, mode; variance σ², standard deviation σ</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Reconstructed logic from user's script with template literal fixes
+    let currentChapter = 1;
+    const totalChapters = 8;
+
+    function updateChapter() {
+      for (let i = 1; i <= totalChapters; i++) {
+        const el = document.getElementById(`chapter${i}`);
+        if (el) el.classList.remove('active');
+      }
+      const active = document.getElementById(`chapter${currentChapter}`);
+      if (active) active.classList.add('active');
+
+      const prev = document.getElementById('prevBtn');
+      const next = document.getElementById('nextBtn');
+      if (prev) prev.disabled = (currentChapter === 1);
+      if (next) next.disabled = (currentChapter === totalChapters);
+
+      const progress = (currentChapter / totalChapters) * 100;
+      const bar = document.getElementById('progressBar');
+      if (bar) bar.style.width = progress + '%';
+
+      const dots = document.querySelectorAll('.indicator-dot');
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index + 1 === currentChapter);
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function nextChapter() { if (currentChapter < totalChapters) { currentChapter++; updateChapter(); } }
+    function previousChapter() { if (currentChapter > 1) { currentChapter--; updateChapter(); } }
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'ArrowLeft') previousChapter();
+      else if (event.key === 'ArrowRight') nextChapter();
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.indicator-dot').forEach((dot, index) => {
+        dot.addEventListener('click', () => { currentChapter = index + 1; updateChapter(); });
+      });
+      updateChapter();
+    });
+  </script>
+</body>
+</html>
+
+

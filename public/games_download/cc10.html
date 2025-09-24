@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Translation</title>
+<!-- ORIGINAL GAME CONTENT STARTS HERE -->
+<h1>🧠 Control & Coordination Simulator</h1>
+        <div class="game-info">
+            <span>Score: <span id="score">0</span></span>
+            <span>System: <span id="current-system">Nervous</span></span>
+            <span>Questions: <span id="correct-answers">0</span>/10</span><div class="neural-network" id="neuralNetwork">
+            <div class="brain" onclick="brainClicked()" title="Brain - Control Center">🧠</div>
+            
+            <!-- Sensory Neurons -->
+            <div class="neuron sensory-neuron" style="top: 50px; left: 50px;" onclick="neuronClicked('sensory')" title="Sensory Neuron">👁️</div>
+            <div class="neuron sensory-neuron" style="top: 50px; right: 50px;" onclick="neuronClicked('sensory')" title="Sensory Neuron">👂</div>
+            <div class="neuron sensory-neuron" style="bottom: 50px; left: 50px;" onclick="neuronClicked('sensory')" title="Sensory Neuron">✋</div>
+            <div class="neuron sensory-neuron" style="bottom: 50px; right: 50px;" onclick="neuronClicked('sensory')" title="Sensory Neuron">👃</div>
+            
+            <!-- Motor Neurons -->
+            <div class="neuron motor-neuron" style="top: 100px; left: 20px;" onclick="neuronClicked('motor')" title="Motor Neuron">💪</div>
+            <div class="neuron motor-neuron" style="top: 100px; right: 20px;" onclick="neuronClicked('motor')" title="Motor Neuron">🦵</div>
+            <div class="neuron motor-neuron" style="bottom: 100px; left: 20px;" onclick="neuronClicked('motor')" title="Motor Neuron">🫀</div>
+            <div class="neuron motor-neuron" style="bottom: 100px; right: 20px;" onclick="neuronClicked('motor')" title="Motor Neuron">🫁</div>
+            
+            <!-- Interneurons -->
+            <div class="neuron interneuron" style="top: 150px; left: 100px;" onclick="neuronClicked('interneuron')" title="Interneuron">🔗</div>
+            <div class="neuron interneuron" style="top: 150px; right: 100px;" onclick="neuronClicked('interneuron')" title="Interneuron">🔗</div>
+            
+            <!-- Neural Paths -->
+            <div class="neural-path" id="path1" style="top: 100px; left: 70px; width: 60px; transform: rotate(45deg);"></div>
+            <div class="neural-path" id="path2" style="top: 100px; right: 70px; width: 60px; transform: rotate(-45deg);"></div>
+            <div class="neural-path" id="path3" style="bottom: 100px; left: 70px; width: 60px; transform: rotate(-45deg);"></div>
+            <div class="neural-path" id="path4" style="bottom: 100px; right: 70px; width: 60px; transform: rotate(45deg);"></div><div class="control-panel">
+            <button class="control-btn" onclick="simulateReflex()">Test Reflex Arc</button>
+            <button class="control-btn" onclick="simulateVoluntary()">Voluntary Action</button>
+            <button class="control-btn" onclick="simulateHormone()">Hormone Release</button>
+            <button class="control-btn" onclick="simulateMemory()">Memory Formation</button><div class="reflex-test">
+            <h3>🦶 Reflex Test</h3>
+            <p>Click the area below to test your reflex response time!</p>
+            <div class="reflex-area" onclick="testReflex()" id="reflexArea">
+                TAP HERE<p id="reflexTime">Click to start reflex test</p><div class="hormone-info">
+            <h3>💊 Hormone System</h3>
+            <p>Click on hormones to learn about their functions:</p>
+            <div class="hormone" onclick="showHormoneInfo('insulin')">Insulin</div>
+            <div class="hormone" onclick="showHormoneInfo('adrenaline')">Adrenaline</div>
+            <div class="hormone" onclick="showHormoneInfo('thyroxine')">Thyroxine</div>
+            <div class="hormone" onclick="showHormoneInfo('growth')">Growth Hormone</div>
+            <div class="hormone" onclick="showHormoneInfo('testosterone')">Testosterone</div>
+            <div class="hormone" onclick="showHormoneInfo('estrogen')">Estrogen</div><div class="quiz-section" id="quizSection">
+            <div class="question" id="questionText">
+                What is the main function of the nervous system?<div class="options" id="optionsContainer">
+                <div class="option" onclick="selectOption(this, false)">Digest food</div>
+                <div class="option" onclick="selectOption(this, true)">Control and coordinate body activities</div>
+                <div class="option" onclick="selectOption(this, false)">Pump blood</div>
+                <div class="option" onclick="selectOption(this, false)">Filter waste</div><div class="controls">
+            <button class="btn btn-simulate" onclick="runSimulation()">Run Simulation</button>
+            <button class="btn btn-quiz" onclick="checkQuizAnswer()">Submit Answer</button>
+            <button class="btn btn-next" onclick="nextQuestion()">Next Question</button><div id="result" class="result" style="display: none;"></div><script>
+        const questions = [
+            {
+                question: "What is the main function of the nervous system?",
+                options: ["Digest food", "Control and coordinate body activities", "Pump blood", "Filter waste"],
+                correct: 1
+            },
+            {
+                question: "Which part of the brain controls balance and coordination?",
+                options: ["Cerebrum", "Cerebellum", "Medulla", "Hypothalamus"],
+                correct: 1
+            },
+            {
+                question: "What carries messages between the brain and body parts?",
+                options: ["Blood vessels", "Nerves", "Muscles", "Bones"],
+                correct: 1
+            },
+            {
+                question: "Which hormone is produced by the pancreas?",
+                options: ["Adrenaline", "Insulin", "Thyroxine", "Testosterone"],
+                correct: 1
+            },
+            {
+                question: "What is a reflex action?",
+                options: ["A voluntary movement", "An automatic response", "A learned behavior", "A conscious decision"],
+                correct: 1
+            },
+            {
+                question: "Which gland is known as the 'master gland'?",
+                options: ["Thyroid", "Pancreas", "Pituitary", "Adrenal"],
+                correct: 2
+            },
+            {
+                question: "What type of neuron carries signals from sense organs to the brain?",
+                options: ["Motor neuron", "Sensory neuron", "Interneuron", "Effector neuron"],
+                correct: 1
+            },
+            {
+                question: "Which hormone is responsible for the 'fight or flight' response?",
+                options: ["Insulin", "Adrenaline", "Growth hormone", "Estrogen"],
+                correct: 1
+            },
+            {
+                question: "What is the function of the spinal cord?",
+                options: ["Digest food", "Filter blood", "Transmit nerve signals", "Produce hormones"],
+                correct: 2
+            },
+            {
+                question: "Which part of the brain controls breathing and heart rate?",
+                options: ["Cerebrum", "Cerebellum", "Medulla", "Hypothalamus"],
+                correct: 2
+            }
+        ];
+        
+        const hormoneInfo = {
+            insulin: "Insulin: Regulates blood sugar levels by helping cells absorb glucose from the blood.",
+            adrenaline: "Adrenaline: Prepares the body for 'fight or flight' response, increases heart rate and energy.",
+            thyroxine: "Thyroxine: Controls metabolism and growth, produced by the thyroid gland.",
+            growth: "Growth Hormone: Stimulates growth and cell reproduction, produced by the pituitary gland.",
+            testosterone: "Testosterone: Male sex hormone that develops male characteristics and maintains muscle mass.",
+            estrogen: "Estrogen: Female sex hormone that develops female characteristics and regulates menstrual cycle."
+        };
+        
+        let currentQuestion = 0;
+        let score = 0;
+        let correctAnswers = 0;
+        let selectedOption = null;
+        let reflexStartTime = 0;
+        
+        function brainClicked() {
+            showInfo("Brain: The control center of the nervous system that processes information, makes decisions, and coordinates all body activities.");
+        }
+        
+        function neuronClicked(type) {
+            const neuronInfo = {
+                sensory: "Sensory Neuron: Carries information from sense organs (eyes, ears, skin) to the brain and spinal cord.",
+                motor: "Motor Neuron: Carries commands from the brain and spinal cord to muscles and glands.",
+                interneuron: "Interneuron: Connects sensory and motor neurons, processes information in the spinal cord and brain."
+            };
+            showInfo(neuronInfo[type]);
+        }
+        
+        function showInfo(message) {
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'result correct';
+            infoDiv.textContent = message;
+            infoDiv.style.position = 'fixed';
+            infoDiv.style.top = '20px';
+            infoDiv.style.right = '20px';
+            infoDiv.style.zIndex = '1000';
+            infoDiv.style.maxWidth = '300px';
+            document.body.appendChild(infoDiv);
+            
+            setTimeout(() => {
+                infoDiv.remove();
+            }, 3000);
+        }
+        
+        function simulateReflex() {
+            const btn = event.target;
+            btn.classList.add('active');
+            
+            // Activate neural paths
+            document.querySelectorAll('.neural-path').forEach(path => {
+                path.classList.add('active');
+            });
+            
+            // Create signal animation
+            createSignal(100, 100, 200, 200);
+            
+            setTimeout(() => {
+                btn.classList.remove('active');
+                document.querySelectorAll('.neural-path').forEach(path => {
+                    path.classList.remove('active');
+                });
+            }, 3000);
+        }
+        
+        function simulateVoluntary() {
+            const btn = event.target;
+            btn.classList.add('active');
+            
+            // Animate brain
+            document.querySelector('.brain').style.animation = 'pulse 0.5s ease-in-out 5';
+            
+            // Create multiple signals
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    createSignal(200, 200, Math.random() * 400, Math.random() * 400);
+                }, i * 500);
+            }
+            
+            setTimeout(() => {
+                btn.classList.remove('active');
+            }, 3000);
+        }
+        
+        function simulateHormone() {
+            const btn = event.target;
+            btn.classList.add('active');
+            
+            // Animate all neurons
+            document.querySelectorAll('.neuron').forEach(neuron => {
+                neuron.style.animation = 'pulse 0.3s ease-in-out 3';
+            });
+            
+            setTimeout(() => {
+                btn.classList.remove('active');
+            }, 2000);
+        }
+        
+        function simulateMemory() {
+            const btn = event.target;
+            btn.classList.add('active');
+            
+            // Animate brain with special effect
+            const brain = document.querySelector('.brain');
+            brain.style.background = 'linear-gradient(135deg, #ff6b6b, #4ecdc4)';
+            brain.style.animation = 'pulse 0.2s ease-in-out 10';
+            
+            setTimeout(() => {
+                brain.style.background = 'linear-gradient(135deg, #ffeaa7, #fab1a0)';
+                brain.style.animation = '';
+                btn.classList.remove('active');
+            }, 3000);
+        }
+        
+        function createSignal(startX, startY, endX, endY) {
+            const signal = document.createElement('div');
+            signal.className = 'signal active';
+            signal.style.left = startX + 'px';
+            signal.style.top = startY + 'px';
+            document.getElementById('neuralNetwork').appendChild(signal);
+            
+            // Animate signal movement
+            let progress = 0;
+            function animateSignal() {
+                progress += 0.02;
+                const x = startX + (endX - startX) * progress;
+                const y = startY + (endY - startY) * progress;
+                
+                signal.style.left = x + 'px';
+                signal.style.top = y + 'px';
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animateSignal);
+                } else {
+                    signal.remove();
+                }
+            }
+            animateSignal();
+        }
+        
+        function testReflex() {
+            const reflexArea = document.getElementById('reflexArea');
+            const timeDisplay = document.getElementById('reflexTime');
+            
+            if (reflexStartTime === 0) {
+                // Start the test
+                reflexArea.textContent = 'WAIT...';
+                reflexArea.style.background = 'linear-gradient(45deg, #f39c12, #e67e22)';
+                
+                // Random delay between 1-3 seconds
+                const delay = Math.random() * 2000 + 1000;
+                setTimeout(() => {
+                    reflexArea.textContent = 'CLICK NOW!';
+                    reflexArea.style.background = 'linear-gradient(45deg, #2ecc71, #27ae60)';
+                    reflexStartTime = Date.now();
+                }, delay);
+            } else {
+                // End the test
+                const reactionTime = Date.now() - reflexStartTime;
+                timeDisplay.textContent = `Reaction Time: ${reactionTime}ms`;
+                reflexArea.textContent = 'TAP HERE';
+                reflexArea.style.background = 'linear-gradient(45deg, #ff6b6b, #ff8e53)';
+                reflexStartTime = 0;
+                
+                // Add score based on reaction time
+                if (reactionTime < 300) {
+                    score += 20;
+                } else if (reactionTime < 500) {
+                    score += 15;
+                } else {
+                    score += 10;
+                }
+                updateDisplay();
+            }
+        }
+        
+        function showHormoneInfo(hormone) {
+            showInfo(hormoneInfo[hormone]);
+        }
+        
+        function loadQuestion() {
+            const question = questions[currentQuestion];
+            document.getElementById('questionText').textContent = question.question;
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => selectOption(optionDiv, index === question.correct);
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            selectedOption = null;
+        }
+        
+        function selectOption(element, isCorrect) {
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedOption = { element, isCorrect };
+        }
+        
+        function checkQuizAnswer() {
+            if (!selectedOption) return;
+            
+            const resultDiv = document.getElementById('result');
+            
+            document.querySelectorAll('.option').forEach((opt, index) => {
+                const question = questions[currentQuestion];
+                if (index === question.correct) {
+                    opt.classList.add('correct');
+                } else if (opt.classList.contains('selected') && !selectedOption.isCorrect) {
+                    opt.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedOption.isCorrect) {
+                score += 10;
+                correctAnswers++;
+                resultDiv.textContent = '🎉 Correct! Well done!';
+                resultDiv.className = 'result correct';
+            } else {
+                resultDiv.textContent = '❌ Incorrect. The correct answer is highlighted in green.';
+                resultDiv.className = 'result incorrect';
+            }
+            
+            resultDiv.style.display = 'block';
+            updateDisplay();
+        }
+        
+        function nextQuestion() {
+            currentQuestion = (currentQuestion + 1) % questions.length;
+            loadQuestion();
+            document.getElementById('result').style.display = 'none';
+        }
+        
+        function runSimulation() {
+            // Run a comprehensive simulation
+            simulateReflex();
+            setTimeout(() => simulateVoluntary(), 1000);
+            setTimeout(() => simulateHormone(), 2000);
+            setTimeout(() => simulateMemory(), 3000);
+        }
+        
+        function updateDisplay() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('correct-answers').textContent = correctAnswers;
+        }
+        
+        // Initialize game
+        loadQuestion();
+        updateDisplay();
+    </script></html>

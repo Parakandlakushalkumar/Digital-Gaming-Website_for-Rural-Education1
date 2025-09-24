@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Games Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+        }
+
+        /* Main Menu Styles */
+        .main-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .game-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .game-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .game-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        /* Game Container Styles */
+        .game-container {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            animation: slideIn 0.5s ease-in;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .game-title {
+            font-size: 28px;
+            color: #333;
+        }
+
+        .score {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .back-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+
+        /* Balloon Pop Game Styles */
+        .balloon-area {
+            position: relative;
+            height: 400px;
+            background: linear-gradient(to bottom, #87CEEB, #98FB98);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .question {
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .balloon {
+            position: absolute;
+            width: 80px;
+            height: 100px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .balloon:hover {
+            transform: scale(1.1);
+        }
+
+        .balloon-body {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            position: relative;
+        }
+
+        .balloon-string {
+            width: 2px;
+            height: 20px;
+            background: #333;
+            margin: 0 auto;
+        }
+
+        /* Memory Game Styles */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .memory-card {
+            aspect-ratio: 1;
+            background: #667eea;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+            position: relative;
+        }
+
+        .memory-card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .memory-card.matched {
+            background: #4CAF50;
+            pointer-events: none;
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            background: white;
+            color: #333;
+            font-size: 20px;
+        }
+
+        /* Number Line Game Styles - FIXED */
+        .number-line-container {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .number-line {
+            position: relative;
+            height: 120px;
+            margin: 40px 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .line {
+            position: absolute;
+            top: 50%;
+            left: 5%;
+            right: 5%;
+            height: 4px;
+            background: #333;
+            transform: translateY(-50%);
+        }
+
+        .tick {
+            position: absolute;
+            top: 40%;
+            width: 2px;
+            height: 20%;
+            background: #333;
+        }
+
+        .tick-label {
+            position: absolute;
+            bottom: 10px;
+            transform: translateX(-50%);
+            font-size: 16px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .draggable-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            margin: 8px;
+            border-radius: 12px;
+            cursor: move;
+            transition: all 0.3s ease;
+            user-select: none;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .draggable-number:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .draggable-number.dragging {
+            opacity: 0.7;
+            transform: scale(1.1);
+        }
+
+        .drop-zone {
+            position: absolute;
+            top: 20px;
+            width: 50px;
+            height: 50px;
+            border: 3px dashed #667eea;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            background: rgba(102, 126, 234, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .drop-zone:hover {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #764ba2;
+        }
+
+        .drop-zone.drag-over {
+            background: rgba(102, 126, 234, 0.3);
+            border-color: #764ba2;
+            transform: translateX(-50%) scale(1.2);
+        }
+
+        .drop-zone.filled {
+            background: #4CAF50;
+            border-color: #4CAF50;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .placed-number {
+            position: absolute;
+            top: 25px;
+            transform: translateX(-50%);
+            background: #4CAF50;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        /* True/False Game Styles */
+        .quiz-container {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .quiz-question {
+            font-size: 32px;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .quiz-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .quiz-btn {
+            padding: 15px 40px;
+            font-size: 24px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .true-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .false-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .quiz-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        /* Race Game Styles */
+        .race-track {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .track {
+            position: relative;
+            height: 100px;
+            background: #ddd;
+            border-radius: 50px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .track-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: repeating-linear-gradient(
+                90deg,
+                #fff,
+                #fff 20px,
+                #999 20px,
+                #999 40px
+            );
+            transform: translateY(-50%);
+        }
+
+        .car {
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%);
+            font-size: 40px;
+            transition: left 0.5s ease;
+        }
+
+        .race-question {
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .race-input {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .race-input input {
+            padding: 10px 20px;
+            font-size: 20px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            width: 150px;
+            text-align: center;
+        }
+
+        .race-input button {
+            padding: 10px 30px;
+            font-size: 18px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .race-input button:hover {
+            background: #764ba2;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5); }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        .feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 40px;
+            border-radius: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            z-index: 1000;
+            animation: feedbackPop 1s ease-out forwards;
+        }
+
+        .feedback.correct {
+            background: #4CAF50;
+        }
+
+        .feedback.incorrect {
+            background: #f44336;
+        }
+
+        @keyframes feedbackPop {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Main Menu -->
+        <div id="mainMenu" class="main-menu">
+            <div class="game-card" onclick="showGame('balloonPop')">
+                <div class="game-icon">🎈</div>
+                <h3>Integer Balloon Pop</h3>
+                <p>Pop balloons with the correct answers to math problems!</p>
+            </div>
+            <div class="game-card" onclick="showGame('memoryMatch')">
+                <div class="game-icon">🃏</div>
+                <h3>Rational Number Match</h3>
+                <p>Match equivalent numbers in this memory card game!</p>
+            </div>
+            <div class="game-card" onclick="showGame('numberLine')">
+                <div class="game-icon">📏</div>
+                <h3>Number Line Drag & Drop</h3>
+                <p>Drag numbers to their correct positions on the number line!</p>
+            </div>
+            <div class="game-card" onclick="showGame('trueFalse')">
+                <div class="game-icon">✅❌</div>
+                <h3>True or False Quiz</h3>
+                <p>Test your knowledge with quick true or false questions!</p>
+            </div>
+            <div class="game-card" onclick="showGame('raceGame')">
+                <div class="game-icon">🏎️</div>
+                <h3>Integer & Fraction Race</h3>
+                <p>Race to the finish line by solving math problems!</p>
+            </div>
+        </div>
+
+        <!-- Balloon Pop Game -->
+        <div id="balloonPop" class="game-container">
+            <div class="game-header">
+                <h2 class="game-title">Integer Balloon Pop</h2>
+                <div class="score">Score: <span id="balloonScore">0</span></div>
+                <button class="back-btn" onclick="showMainMenu()">Back to Menu</button>
+            </div>
+            <div class="question" id="balloonQuestion">Pop the balloon that equals -3 + 2</div>
+            <div class="balloon-area" id="balloonArea"></div>
+            <button onclick="generateBalloons()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer;">New Round</button>
+        </div>
+
+        <!-- Memory Match Game -->
+        <div id="memoryMatch" class="game-container">
+            <div class="game-header">
+                <h2 class="game-title">Rational Number Match</h2>
+                <div class="score">Score: <span id="memoryScore">0</span></div>
+                <button class="back-btn" onclick="showMainMenu()">Back to Menu</button>
+            </div>
+            <div class="memory-grid" id="memoryGrid"></div>
+            <button onclick="initMemoryGame()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer; margin-top: 20px;">New Game</button>
+        </div>
+
+        <!-- Number Line Game - FIXED -->
+        <div id="numberLine" class="game-container">
+            <div class="game-header">
+                <h2 class="game-title">Number Line Drag & Drop</h2>
+                <div class="score">Score: <span id="lineScore">0</span></div>
+                <button class="back-btn" onclick="showMainMenu()">Back to Menu</button>
+            </div>
+            <div class="number-line-container">
+                <div class="number-line" id="numberLineDisplay"></div>
+            </div>
+            <div id="draggableNumbers" style="text-align: center; margin-bottom: 20px;"></div>
+            <button onclick="initNumberLine()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer;">New Round</button>
+        </div>
+
+        <!-- True/False Game -->
+        <div id="trueFalse" class="game-container">
+            <div class="game-header">
+                <h2 class="game-title">True or False Quiz</h2>
+                <div class="score">Score: <span id="quizScore">0</span></div>
+                <button class="back-btn" onclick="showMainMenu()">Back to Menu</button>
+            </div>
+            <div class="quiz-container">
+                <div class="quiz-question" id="quizQuestion">-3 < -5</div>
+                <div class="quiz-buttons">
+                    <button class="quiz-btn true-btn" onclick="checkAnswer(true)">✅ True</button>
+                    <button class="quiz-btn false-btn" onclick="checkAnswer(false)">❌ False</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Race Game -->
+        <div id="raceGame" class="game-container">
+            <div class="game-header">
+                <h2 class="game-title">Integer & Fraction Race</h2>
+                <div class="score">Position: <span id="racePosition">0</span>%</div>
+                <button class="back-btn" onclick="showMainMenu()">Back to Menu</button>
+            </div>
+            <div class="race-track">
+                <div class="track">
+                    <div class="track-line"></div>
+                    <div class="car" id="raceCar">🏎️</div>
+                </div>
+            </div>
+            <div class="race-question" id="raceQuestion">-2 + 5/2 = ?</div>
+            <div class="race-input">
+                <input type="text" id="raceAnswer" placeholder="Your answer">
+                <button onclick="checkRaceAnswer()">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state variables
+        let currentGame = '';
+        let scores = {
+            balloon: 0,
+            memory: 0,
+            line: 0,
+            quiz: 0,
+            race: 0
+        };
+
+        // Show main menu
+        function showMainMenu() {
+            document.querySelectorAll('.game-container').forEach(container => {
+                container.style.display = 'none';
+            });
+            document.getElementById('mainMenu').style.display = 'grid';
+            currentGame = '';
+        }
+
+        // Show specific game
+        function showGame(gameName) {
+            document.getElementById('mainMenu').style.display = 'none';
+            document.querySelectorAll('.game-container').forEach(container => {
+                container.style.display = 'none';
+            });
+            document.getElementById(gameName).style.display = 'block';
+            currentGame = gameName;
+            
+            // Initialize game
+            switch(gameName) {
+                case 'balloonPop':
+                    generateBalloons();
+                    break;
+                case 'memoryMatch':
+                    initMemoryGame();
+                    break;
+                case 'numberLine':
+                    initNumberLine();
+                    break;
+                case 'trueFalse':
+                    generateQuizQuestion();
+                    break;
+                case 'raceGame':
+                    initRaceGame();
+                    break;
+            }
+        }
+
+        // Feedback function
+        function showFeedback(correct) {
+            const feedback = document.createElement('div');
+            feedback.className = `feedback ${correct ? 'correct' : 'incorrect'}`;
+            feedback.textContent = correct ? 'Correct! 🎉' : 'Try Again! 💪';
+            document.body.appendChild(feedback);
+            setTimeout(() => feedback.remove(), 1000);
+        }
+
+        // Balloon Pop Game
+        let currentBalloonAnswer = 0;
+
+        function generateBalloons() {
+            const area = document.getElementById('balloonArea');
+            area.innerHTML = '';
+            
+            // Generate question
+            const operations = [
+                {text: '-3 + 2', answer: -1},
+                {text: '5 - 7', answer: -2},
+                {text: '-4 + 6', answer: 2},
+                {text: '3 - 5', answer: -2},
+                {text: '-2 + 4', answer: 2},
+                {text: '1/2 + 1/2', answer: 1},
+                {text: '3/4 - 1/4', answer: 0.5},
+                {text: '-1/2 + 1', answer: 0.5}
+            ];
+            
+            const question = operations[Math.floor(Math.random() * operations.length)];
+            currentBalloonAnswer = question.answer;
+            document.getElementById('balloonQuestion').textContent = `Pop the balloon that equals ${question.text}`;
+            
+            // Generate balloons
+            const answers = [question.answer];
+            while (answers.length < 6) {
+                const randomAnswer = Math.floor(Math.random() * 10) - 5;
+                if (!answers.includes(randomAnswer)) {
+                    answers.push(randomAnswer);
+                }
+            }
+            
+            // Shuffle answers
+            answers.sort(() => Math.random() - 0.5);
+            
+            // Create balloons
+            answers.forEach((answer, index) => {
+                const balloon = document.createElement('div');
+                balloon.className = 'balloon';
+                balloon.style.left = `${(index + 1) * 15}%`;
+                balloon.style.top = `${Math.random() * 60 + 20}%`;
+                balloon.style.animationDelay = `${index * 0.2}s`;
+                
+                const balloonBody = document.createElement('div');
+                balloonBody.className = 'balloon-body';
+                balloonBody.style.background = `hsl(${index * 60}, 70%, 60%)`;
+                balloonBody.textContent = answer;
+                
+                const balloonString = document.createElement('div');
+                balloonString.className = 'balloon-string';
+                
+                balloon.appendChild(balloonBody);
+                balloon.appendChild(balloonString);
+                
+                balloon.onclick = () => popBalloon(balloon, answer);
+                area.appendChild(balloon);
+            });
+        }
+
+        function popBalloon(balloon, answer) {
+            if (answer === currentBalloonAnswer) {
+                balloon.style.animation = 'pop 0.5s ease-out forwards';
+                scores.balloon++;
+                document.getElementById('balloonScore').textContent = scores.balloon;
+                showFeedback(true);
+                setTimeout(() => generateBalloons(), 1000);
+            } else {
+                balloon.style.animation = 'shake 0.5s ease-out';
+                showFeedback(false);
+            }
+        }
+
+        // Memory Match Game
+        let memoryCards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+
+        function initMemoryGame() {
+            const grid = document.getElementById('memoryGrid');
+            grid.innerHTML = '';
+            memoryCards = [];
+            flippedCards = [];
+            matchedPairs = 0;
+            
+            // Create card pairs
+            const pairs = [
+                {front: '3/4', back: '0.75'},
+                {front: '1/2', back: '0.5'},
+                {front: '2/3', back: '0.666...'},
+                {front: '1/4', back: '0.25'},
+                {front: '-2', back: '-2/1'},
+                {front: '5', back: '5/1'},
+                {front: '-1/2', back: '-0.5'},
+                {front: '3/2', back: '1.5'}
+            ];
+            
+            // Create cards
+            const allCards = [...pairs, ...pairs];
+            allCards.sort(() => Math.random() - 0.5);
+            
+            allCards.forEach((pair, index) => {
+                const card = document.createElement('div');
+                card.className = 'memory-card';
+                card.dataset.value = pair.back;
+                
+                const cardFront = document.createElement('div');
+                cardFront.className = 'card-front';
+                cardFront.textContent = '?';
+                
+                const cardBack = document.createElement('div');
+                cardBack.className = 'card-back';
+                cardBack.textContent = pair.front;
+                
+                card.appendChild(cardFront);
+                card.appendChild(cardBack);
+                
+                card.onclick = () => flipCard(card);
+                grid.appendChild(card);
+                memoryCards.push(card);
+            });
+        }
+
+        function flipCard(card) {
+            if (flippedCards.length >= 2 || card.classList.contains('flipped') || card.classList.contains('matched')) {
+                return;
+            }
+            
+            card.classList.add('flipped');
+            flippedCards.push(card);
+            
+            if (flippedCards.length === 2) {
+                setTimeout(checkMemoryMatch, 1000);
+            }
+        }
+
+        function checkMemoryMatch() {
+            const [card1, card2] = flippedCards;
+            
+            if (card1.dataset.value === card2.dataset.value) {
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                matchedPairs++;
+                scores.memory += 10;
+                document.getElementById('memoryScore').textContent = scores.memory;
+                showFeedback(true);
+                
+                if (matchedPairs === 8) {
+                    setTimeout(() => {
+                        alert('Congratulations! You matched all pairs!');
+                        initMemoryGame();
+                    }, 500);
+                }
+            } else {
+                card1.classList.remove('flipped');
+                card2.classList.remove('flipped');
+                showFeedback(false);
+            }
+            
+            flippedCards = [];
+        }
+
+        // Number Line Game - FIXED
+        let draggableNumbers = [];
+        let currentNumbers = [];
+
+        function initNumberLine() {
+            const lineDisplay = document.getElementById('numberLineDisplay');
+            const numbersContainer = document.getElementById('draggableNumbers');
+            lineDisplay.innerHTML = '';
+            numbersContainer.innerHTML = '';
+            
+            // Create number line
+            const line = document.createElement('div');
+            line.className = 'line';
+            lineDisplay.appendChild(line);
+            
+            // Create ticks and labels from -5 to 5
+            for (let i = -5; i <= 5; i++) {
+                const tick = document.createElement('div');
+                tick.className = 'tick';
+                // Position: 5% margin on each side, so 90% usable space
+                tick.style.left = `${5 + ((i + 5) / 10) * 90}%`;
+                lineDisplay.appendChild(tick);
+                
+                const label = document.createElement('div');
+                label.className = 'tick-label';
+                label.textContent = i;
+                label.style.left = `${5 + ((i + 5) / 10) * 90}%`;
+                lineDisplay.appendChild(label);
+            }
+            
+            // Generate random numbers to place
+            currentNumbers = [-3.5, -2, -0.5, 0.25, 0.75, 1.5, 2.5, 4];
+            currentNumbers.sort(() => Math.random() - 0.5);
+            
+            currentNumbers.forEach(num => {
+                const draggable = document.createElement('div');
+                draggable.className = 'draggable-number';
+                draggable.textContent = num;
+                draggable.draggable = true;
+                draggable.dataset.value = num;
+                
+                draggable.ondragstart = (e) => {
+                    e.dataTransfer.setData('text/plain', num);
+                    draggable.classList.add('dragging');
+                };
+                
+                draggable.ondragend = () => {
+                    draggable.classList.remove('dragging');
+                };
+                
+                numbersContainer.appendChild(draggable);
+            });
+            
+            // Create drop zones for each number
+            currentNumbers.forEach(num => {
+                const dropZone = document.createElement('div');
+                dropZone.className = 'drop-zone';
+                dropZone.dataset.value = num;
+                // Calculate position: 5% margin + ((num + 5) / 10) * 90%
+                dropZone.style.left = `${5 + ((num + 5) / 10) * 90}%`;
+                
+                dropZone.ondragover = (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('drag-over');
+                };
+                
+                dropZone.ondragleave = () => {
+                    dropZone.classList.remove('drag-over');
+                };
+                
+                dropZone.ondrop = (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('drag-over');
+                    
+                    const value = parseFloat(e.dataTransfer.getData('text/plain'));
+                    const zoneValue = parseFloat(dropZone.dataset.value);
+                    
+                    if (Math.abs(value - zoneValue) < 0.01) {
+                        // Correct placement
+                        dropZone.classList.add('filled');
+                        dropZone.textContent = value;
+                        
+                        // Remove draggable number
+                        const draggable = document.querySelector(`.draggable-number[data-value="${value}"]`);
+                        if (draggable) {
+                            draggable.remove();
+                        }
+                        
+                        scores.line += 10;
+                        document.getElementById('lineScore').textContent = scores.line;
+                        showFeedback(true);
+                        
+                        // Check if all numbers are placed
+                        if (document.querySelectorAll('.draggable-number').length === 0) {
+                            setTimeout(() => {
+                                alert('Great job! All numbers placed correctly!');
+                                initNumberLine();
+                            }, 500);
+                        }
+                    } else {
+                        showFeedback(false);
+                    }
+                };
+                
+                lineDisplay.appendChild(dropZone);
+            });
+        }
+
+        // True/False Quiz Game
+        let currentQuizAnswer = false;
+
+        function generateQuizQuestion() {
+            const questions = [
+                {text: '-3 < -5', answer: false},
+                {text: '2/3 = 0.67', answer: true},
+                {text: '-4 > -2', answer: false},
+                {text: '1/2 = 0.5', answer: true},
+                {text: '-1 < 0', answer: true},
+                {text: '3/4 > 1/2', answer: true},
+                {text: '-5/2 = -2.5', answer: true},
+                {text: '0.25 < 1/4', answer: false}
+            ];
+            
+            const question = questions[Math.floor(Math.random() * questions.length)];
+            currentQuizAnswer = question.answer;
+            document.getElementById('quizQuestion').textContent = question.text;
+        }
+
+        function checkAnswer(answer) {
+            if (answer === currentQuizAnswer) {
+                scores.quiz += 5;
+                document.getElementById('quizScore').textContent = scores.quiz;
+                showFeedback(true);
+            } else {
+                showFeedback(false);
+            }
+            setTimeout(() => generateQuizQuestion(), 1000);
+        }
+
+        // Race Game
+        let racePosition = 0;
+        let currentRaceAnswer = 0;
+
+        function initRaceGame() {
+            racePosition = 0;
+            updateRacePosition();
+            generateRaceQuestion();
+        }
+
+        function generateRaceQuestion() {
+            const questions = [
+                {text: '-2 + 5/2 = ?', answer: 0.5},
+                {text: '3 - 7/2 = ?', answer: -0.5},
+                {text: '-1/2 + 3 = ?', answer: 2.5},
+                {text: '5/2 - 2 = ?', answer: 0.5},
+                {text: '-3 + 4/2 = ?', answer: -1},
+                {text: '2/3 + 1/3 = ?', answer: 1},
+                {text: '-1/2 - 1/2 = ?', answer: -1},
+                {text: '3/4 + 1/2 = ?', answer: 1.25}
+            ];
+            
+            const question = questions[Math.floor(Math.random() * questions.length)];
+            currentRaceAnswer = question.answer;
+            document.getElementById('raceQuestion').textContent = question.text;
+            document.getElementById('raceAnswer').value = '';
+        }
+
+        function checkRaceAnswer() {
+            const userAnswer = parseFloat(document.getElementById('raceAnswer').value);
+            
+            if (Math.abs(userAnswer - currentRaceAnswer) < 0.01) {
+                racePosition += 10;
+                showFeedback(true);
+                
+                if (racePosition >= 100) {
+                    racePosition = 100;
+                    setTimeout(() => {
+                        alert('Congratulations! You won the race! 🏆');
+                        initRaceGame();
+                    }, 500);
+                } else {
+                    generateRaceQuestion();
+                }
+            } else {
+                racePosition = Math.max(0, racePosition - 5);
+                showFeedback(false);
+            }
+            
+            updateRacePosition();
+        }
+
+        function updateRacePosition() {
+            document.getElementById('raceCar').style.left = `${20 + (racePosition * 0.6)}%`;
+            document.getElementById('racePosition').textContent = racePosition;
+        }
+
+        // Add shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Allow Enter key for race game
+        document.getElementById('raceAnswer').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkRaceAnswer();
+            }
+        });
+    </script>
+</body>
+</html>

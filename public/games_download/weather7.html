@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather & Climate Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            min-height: 100vh;
+        }
+        
+        .game-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(116, 185, 255, 0.4);
+        }
+        
+        .weather-region {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .weather-region:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+        
+        .weather-region.sunny {
+            background: linear-gradient(135deg, #fdcb6e, #e17055);
+        }
+        
+        .weather-region.rainy {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+        }
+        
+        .weather-region.cloudy {
+            background: linear-gradient(135deg, #b2bec3, #636e72);
+        }
+        
+        .weather-region.stormy {
+            background: linear-gradient(135deg, #2d3436, #636e72);
+        }
+        
+        .rain-animation {
+            position: absolute;
+            width: 2px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.6);
+            animation: rain 1s linear infinite;
+        }
+        
+        @keyframes rain {
+            0% { transform: translateY(-20px); opacity: 1; }
+            100% { transform: translateY(100px); opacity: 0; }
+        }
+        
+        .cloud-animation {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.7;
+            animation: float 20s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(30px); }
+        }
+        
+        .character {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            transition: all 0.5s ease;
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .track {
+            height: 80px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .track::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: white;
+            transform: translateY(-50%);
+        }
+        
+        .soil-sample {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            cursor: move;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .soil-sample:hover {
+            transform: scale(1.1);
+        }
+        
+        .soil-category {
+            min-height: 120px;
+            border: 3px dashed #cbd5e0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .soil-category.drag-over {
+            border-color: #00b894;
+            background-color: rgba(0, 184, 148, 0.1);
+        }
+        
+        .plant-growth {
+            animation: grow 1s ease-out;
+        }
+        
+        @keyframes grow {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .weather-puzzle {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .farm-plot {
+            width: 150px;
+            height: 150px;
+            background: #8b6914;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .crop {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 60px;
+            transition: all 0.5s ease;
+        }
+        
+        .crop.growing {
+            animation: cropGrow 2s ease-out;
+        }
+        
+        @keyframes cropGrow {
+            0% { transform: translateX(-50%) scale(0) translateY(50px); opacity: 0; }
+            50% { transform: translateX(-50%) scale(1.2) translateY(0); opacity: 1; }
+            100% { transform: translateX(-50%) scale(1) translateY(0); opacity: 1; }
+        }
+        
+        .crop.failed {
+            animation: cropFail 1s ease-out;
+        }
+        
+        @keyframes cropFail {
+            0% { transform: translateX(-50%) scale(1) rotate(0deg); }
+            50% { transform: translateX(-50%) scale(0.8) rotate(-10deg); }
+            100% { transform: translateX(-50%) scale(0.6) rotate(-20deg); opacity: 0.5; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .climate-zone {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .climate-zone:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .draggable {
+            cursor: move;
+        }
+        
+        .dragging {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-5xl font-bold text-white text-center mb-8">Weather & Climate Explorer</h1>
+        
+        <!-- Game Selection Menu -->
+        <div id="gameMenu" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div class="game-card p-6 text-center cursor-pointer" onclick="startGame('weatherMap')">
+                <div class="text-6xl mb-4">🌦️</div>
+                <h2 class="text-2xl font-bold mb-2">Weather Map Explorer</h2>
+                <p class="text-gray-600">Identify weather types on an interactive map!</p>
+            </div>
+            
+            <div class="game-card p-6 text-center cursor-pointer" onclick="startGame('climateRace')">
+                <div class="text-6xl mb-4">🏁</div>
+                <h2 class="text-2xl font-bold mb-2">Climate Zone Quiz Race</h2>
+                <p class="text-gray-600">Race through climate zone questions!</p>
+            </div>
+            
+            <div class="game-card p-6 text-center cursor-pointer" onclick="startGame('soilCollector')">
+                <div class="text-6xl mb-4">🌱</div>
+                <h2 class="text-2xl font-bold mb-2">Soil Type Collector</h2>
+                <p class="text-gray-600">Sort soil samples and watch plants grow!</p>
+            </div>
+            
+            <div class="game-card p-6 text-center cursor-pointer" onclick="startGame('weatherPuzzle')">
+                <div class="text-6xl mb-4">🧩</div>
+                <h2 class="text-2xl font-bold mb-2">Weather Puzzle Adventure</h2>
+                <p class="text-gray-600">Predict weather from conditions!</p>
+            </div>
+            
+            <div class="game-card p-6 text-center cursor-pointer" onclick="startGame('farmingSim')">
+                <div class="text-6xl mb-4">🚜</div>
+                <h2 class="text-2xl font-bold mb-2">Farming Simulation</h2>
+                <p class="text-gray-600">Grow crops based on soil and climate!</p>
+            </div>
+        </div>
+        
+        <!-- Game Container -->
+        <div id="gameContainer" class="hidden">
+            <div class="game-card p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <button class="btn-primary" onclick="backToMenu()">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Menu
+                    </button>
+                    <div class="flex items-center gap-4">
+                        <span class="text-lg font-semibold">Level: <span id="currentLevel">1</span>/5</span>
+                        <span class="text-lg font-semibold">Score: <span id="score">0</span></span>
+                    </div>
+                </div>
+                
+                <div id="gameContent" class="min-h-[500px]">
+                    <!-- Game content will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentGame = null;
+        let currentLevel = 1;
+        let score = 0;
+        let gameData = {};
+        
+        // Game data for each game
+        const games = {
+            weatherMap: {
+                name: "Weather Map Explorer",
+                levels: [
+                    {
+                        regions: [
+                            {id: 1, weather: 'sunny', x: 50, y: 50},
+                            {id: 2, weather: 'rainy', x: 200, y: 50},
+                            {id: 3, weather: 'cloudy', x: 350, y: 50},
+                            {id: 4, weather: 'stormy', x: 50, y: 200}
+                        ]
+                    },
+                    {
+                        regions: [
+                            {id: 1, weather: 'cloudy', x: 50, y: 50},
+                            {id: 2, weather: 'sunny', x: 200, y: 50},
+                            {id: 3, weather: 'rainy', x: 350, y: 50},
+                            {id: 4, weather: 'stormy', x: 200, y: 200},
+                            {id: 5, weather: 'sunny', x: 50, y: 350}
+                        ]
+                    },
+                    {
+                        regions: [
+                            {id: 1, weather: 'stormy', x: 50, y: 50},
+                            {id: 2, weather: 'rainy', x: 200, y: 50},
+                            {id: 3, weather: 'cloudy', x: 350, y: 50},
+                            {id: 4, weather: 'sunny', x: 50, y: 200},
+                            {id: 5, weather: 'rainy', x: 200, y: 200},
+                            {id: 6, weather: 'cloudy', x: 350, y: 200}
+                        ]
+                    },
+                    {
+                        regions: [
+                            {id: 1, weather: 'sunny', x: 50, y: 50},
+                            {id: 2, weather: 'cloudy', x: 150, y: 50},
+                            {id: 3, weather: 'rainy', x: 250, y: 50},
+                            {id: 4, weather: 'stormy', x: 350, y: 50},
+                            {id: 5, weather: 'rainy', x: 50, y: 150},
+                            {id: 6, weather: 'sunny', x: 150, y: 150},
+                            {id: 7, weather: 'cloudy', x: 250, y: 150}
+                        ]
+                    },
+                    {
+                        regions: [
+                            {id: 1, weather: 'stormy', x: 50, y: 50},
+                            {id: 2, weather: 'rainy', x: 150, y: 50},
+                            {id: 3, weather: 'cloudy', x: 250, y: 50},
+                            {id: 4, weather: 'sunny', x: 350, y: 50},
+                            {id: 5, weather: 'sunny', x: 50, y: 150},
+                            {id: 6, weather: 'cloudy', x: 150, y: 150},
+                            {id: 7, weather: 'rainy', x: 250, y: 150},
+                            {id: 8, weather: 'stormy', x: 350, y: 150}
+                        ]
+                    }
+                ]
+            },
+            climateRace: {
+                name: "Climate Zone Quiz Race",
+                levels: [
+                    {
+                        question: "Which zone has heavy rainfall all year?",
+                        options: ["Tropical Rainforest", "Desert", "Tundra", "Temperate"],
+                        correct: "Tropical Rainforest"
+                    },
+                    {
+                        question: "Which climate zone is the coldest?",
+                        options: ["Temperate", "Desert", "Tundra", "Tropical"],
+                        correct: "Tundra"
+                    },
+                    {
+                        question: "Where would you find cacti naturally?",
+                        options: ["Rainforest", "Desert", "Tundra", "Grassland"],
+                        correct: "Desert"
+                    },
+                    {
+                        question: "Which zone has four distinct seasons?",
+                        options: ["Tropical", "Desert", "Temperate", "Polar"],
+                        correct: "Temperate"
+                    },
+                    {
+                        question: "Which climate zone is found near the equator?",
+                        options: ["Polar", "Temperate", "Tropical", "Subarctic"],
+                        correct: "Tropical"
+                    }
+                ]
+            },
+            soilCollector: {
+                name: "Soil Type Collector",
+                levels: [
+                    {
+                        samples: [
+                            {id: 1, type: 'clay', icon: '🟫'},
+                            {id: 2, type: 'sandy', icon: '🏖️'},
+                            {id: 3, type: 'loamy', icon: '🟤'},
+                            {id: 4, type: 'peaty', icon: '🪴'}
+                        ]
+                    },
+                    {
+                        samples: [
+                            {id: 1, type: 'sandy', icon: '🏖️'},
+                            {id: 2, type: 'clay', icon: '🟫'},
+                            {id: 3, type: 'peaty', icon: '🪴'},
+                            {id: 4, type: 'loamy', icon: '🟤'}
+                        ]
+                    },
+                    {
+                        samples: [
+                            {id: 1, type: 'loamy', icon: '🟤'},
+                            {id: 2, type: 'sandy', icon: '🏖️'},
+                            {id: 3, type: 'clay', icon: '🟫'},
+                            {id: 4, type: 'peaty', icon: '🪴'}
+                        ]
+                    },
+                    {
+                        samples: [
+                            {id: 1, type: 'peaty', icon: '🪴'},
+                            {id: 2, type: 'loamy', icon: '🟤'},
+                            {id: 3, type: 'sandy', icon: '🏖️'},
+                            {id: 4, type: 'clay', icon: '🟫'}
+                        ]
+                    },
+                    {
+                        samples: [
+                            {id: 1, type: 'clay', icon: '🟫'},
+                            {id: 2, type: 'peaty', icon: '🪴'},
+                            {id: 3, type: 'loamy', icon: '🟤'},
+                            {id: 4, type: 'sandy', icon: '🏖️'}
+                        ]
+                    }
+                ]
+            },
+            weatherPuzzle: {
+                name: "Weather Puzzle Adventure",
+                levels: [
+                    {
+                        conditions: {temperature: "High", rainfall: "None", humidity: "Low"},
+                        options: ["Sunny", "Rainy", "Cloudy", "Stormy"],
+                        correct: "Sunny"
+                    },
+                    {
+                        conditions: {temperature: "Low", rainfall: "Heavy", humidity: "High"},
+                        options: ["Sunny", "Rainy", "Cloudy", "Stormy"],
+                        correct: "Stormy"
+                    },
+                    {
+                        conditions: {temperature: "Medium", rainfall: "Light", humidity: "Medium"},
+                        options: ["Sunny", "Rainy", "Cloudy", "Stormy"],
+                        correct: "Cloudy"
+                    },
+                    {
+                        conditions: {temperature: "Medium", rainfall: "Moderate", humidity: "High"},
+                        options: ["Sunny", "Rainy", "Cloudy", "Stormy"],
+                        correct: "Rainy"
+                    },
+                    {
+                        conditions: {temperature: "High", rainfall: "Heavy", humidity: "Very High"},
+                        options: ["Sunny", "Rainy", "Cloudy", "Stormy"],
+                        correct: "Stormy"
+                    }
+                ]
+            },
+            farmingSim: {
+                name: "Farming Simulation",
+                levels: [
+                    {
+                        soil: "Sandy",
+                        climate: "Arid",
+                        crops: ["Cactus", "Rice", "Wheat", "Corn"],
+                        correct: "Cactus"
+                    },
+                    {
+                        soil: "Clay",
+                        climate: "Temperate",
+                        crops: ["Cactus", "Rice", "Wheat", "Banana"],
+                        correct: "Wheat"
+                    },
+                    {
+                        soil: "Loamy",
+                        climate: "Tropical",
+                        crops: ["Cactus", "Rice", "Wheat", "Banana"],
+                        correct: "Banana"
+                    },
+                    {
+                        soil: "Peaty",
+                        climate: "Wet",
+                        crops: ["Cactus", "Rice", "Wheat", "Blueberry"],
+                        correct: "Blueberry"
+                    },
+                    {
+                        soil: "Loamy",
+                        climate: "Temperate",
+                        crops: ["Cactus", "Rice", "Wheat", "Tomato"],
+                        correct: "Tomato"
+                    }
+                ]
+            }
+        };
+        
+        function startGame(gameName) {
+            currentGame = gameName;
+            currentLevel = 1;
+            score = 0;
+            gameData = {...games[gameName]};
+            
+            document.getElementById('gameMenu').classList.add('hidden');
+            document.getElementById('gameContainer').classList.remove('hidden');
+            
+            updateScore();
+            loadLevel();
+        }
+        
+        function backToMenu() {
+            document.getElementById('gameMenu').classList.remove('hidden');
+            document.getElementById('gameContainer').classList.add('hidden');
+            currentGame = null;
+        }
+        
+        function updateScore() {
+            document.getElementById('currentLevel').textContent = currentLevel;
+            document.getElementById('score').textContent = score;
+        }
+        
+        function loadLevel() {
+            const gameContent = document.getElementById('gameContent');
+            gameContent.innerHTML = '';
+            gameContent.classList.add('fade-in');
+            
+            switch(currentGame) {
+                case 'weatherMap':
+                    loadWeatherMapLevel();
+                    break;
+                case 'climateRace':
+                    loadClimateRaceLevel();
+                    break;
+                case 'soilCollector':
+                    loadSoilCollectorLevel();
+                    break;
+                case 'weatherPuzzle':
+                    loadWeatherPuzzleLevel();
+                    break;
+                case 'farmingSim':
+                    loadFarmingSimLevel();
+                    break;
+            }
+        }
+        
+        function loadWeatherMapLevel() {
+            const level = gameData.levels[currentLevel - 1];
+            const gameContent = document.getElementById('gameContent');
+            
+            gameContent.innerHTML = `
+                <div class="relative bg-blue-50 rounded-lg p-4 h-96">
+                    <h3 class="text-2xl font-bold mb-4 text-center">Identify the Weather Types</h3>
+                    <div class="relative h-80 bg-gradient-to-b from-blue-200 to-green-200 rounded-lg overflow-hidden">
+                        ${level.regions.map(region => `
+                            <div class="weather-region absolute rounded-lg flex items-center justify-center text-4xl"
+                                 style="left: ${region.x}px; top: ${region.y}px; width: 120px; height: 120px;"
+                                 onclick="selectRegion(${region.id}, '${region.weather}')"
+                                 id="region${region.id}">
+                                ${region.weather === 'sunny' ? '☀️' : 
+                                  region.weather === 'rainy' ? '🌧️' : 
+                                  region.weather === 'cloudy' ? '☁️' : '⛈️'}
+                            </div>
+                        `).join('')}
+                        
+                        <!-- Cloud animations -->
+                        <div class="cloud-animation" style="width: 60px; height: 30px; top: 20px; left: 100px;"></div>
+                        <div class="cloud-animation" style="width: 80px; height: 40px; top: 60px; left: 300px; animation-delay: 5s;"></div>
+                    </div>
+                    
+                    <div class="mt-4 flex justify-center gap-4">
+                        <button class="btn-primary" onclick="checkWeatherAnswer('sunny')">☀️ Sunny</button>
+                        <button class="btn-primary" onclick="checkWeatherAnswer('rainy')">🌧️ Rainy</button>
+                        <button class="btn-primary" onclick="checkWeatherAnswer('cloudy')">☁️ Cloudy</button>
+                        <button class="btn-primary" onclick="checkWeatherAnswer('stormy')">⛈️ Stormy</button>
+                    </div>
+                    
+                    <div id="weatherHint" class="mt-4 text-center font-semibold"></div>
+                </div>
+            `;
+            
+            gameData.selectedRegion = null;
+            gameData.correctRegions = 0;
+            gameData.totalRegions = level.regions.length;
+        }
+        
+        function selectRegion(regionId, weather) {
+            // Remove previous selection
+            document.querySelectorAll('.weather-region').forEach(r => r.classList.remove('ring-4', 'ring-yellow-400'));
+            
+            // Highlight selected region
+            document.getElementById(`region${regionId}`).classList.add('ring-4', 'ring-yellow-400');
+            
+            gameData.selectedRegion = {id: regionId, weather: weather};
+            
+            // Add rain animation for rainy regions
+            if (weather === 'rainy') {
+                const region = document.getElementById(`region${regionId}`);
+                for (let i = 0; i < 5; i++) {
+                    const rain = document.createElement('div');
+                    rain.className = 'rain-animation';
+                    rain.style.left = Math.random() * 100 + 'px';
+                    rain.style.animationDelay = Math.random() * 1 + 's';
+                    region.appendChild(rain);
+                }
+            }
+        }
+        
+        function checkWeatherAnswer(answer) {
+            if (!gameData.selectedRegion) {
+                document.getElementById('weatherHint').textContent = 'Please select a region first!';
+                document.getElementById('weatherHint').className = 'mt-4 text-center font-semibold text-red-600';
+                return;
+            }
+            
+            const region = document.getElementById(`region${gameData.selectedRegion.id}`);
+            const hint = document.getElementById('weatherHint');
+            
+            if (answer === gameData.selectedRegion.weather) {
+                score += 10;
+                updateScore();
+                gameData.correctRegions++;
+                
+                region.classList.add('opacity-50');
+                region.onclick = null;
+                
+                hint.textContent = 'Correct! Well done!';
+                hint.className = 'mt-4 text-center font-semibold text-green-600';
+                
+                if (gameData.correctRegions === gameData.totalRegions) {
+                    setTimeout(() => {
+                        if (currentLevel < 5) {
+                            currentLevel++;
+                            loadLevel();
+                        } else {
+                            showGameComplete();
+                        }
+                    }, 1500);
+                }
+            } else {
+                hint.textContent = 'Try again! Look at the weather symbols.';
+                hint.className = 'mt-4 text-center font-semibold text-red-600';
+            }
+            
+            gameData.selectedRegion = null;
+            document.querySelectorAll('.weather-region').forEach(r => r.classList.remove('ring-4', 'ring-yellow-400'));
+        }
+        
+        function loadClimateRaceLevel() {
+            const level = gameData.levels[currentLevel - 1];
+            const gameContent = document.getElementById('gameContent');
+            
+            gameContent.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4">Question ${currentLevel}</h3>
+                        <p class="text-lg mb-6">${level.question}</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            ${level.options.map(option => `
+                                <button class="btn-primary" onclick="checkClimateAnswer('${option}')">${option}</button>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <div class="bg-green-100 rounded-lg p-4 h-64 relative overflow-hidden">
+                            <div class="character" id="raceCharacter">🏃</div>
+                            <div class="absolute right-4 top-1/2 transform -translate-y-1/2 text-4xl">🏁</div>
+                            <div class="track absolute bottom-4 left-4 right-4"></div>
+                        </div>
+                        <div class="mt-4 bg-gray-50 rounded-lg p-4">
+                            <h4 class="font-bold mb-2">Climate Zones:</h4>
+                            <div class="climate-zone">
+                                <strong>Tropical Rainforest:</strong> Hot and wet all year
+                            </div>
+                            <div class="climate-zone">
+                                <strong>Desert:</strong> Very dry, little rainfall
+                            </div>
+                            <div class="climate-zone">
+                                <strong>Tundra:</strong> Cold, treeless region
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function checkClimateAnswer(answer) {
+            const level = gameData.levels[currentLevel - 1];
+            const character = document.getElementById('raceCharacter');
+            
+            if (answer === level.correct) {
+                score += 10;
+                updateScore();
+                
+                // Move character forward
+                const currentLeft = parseInt(character.style.left) || 20;
+                character.style.left = Math.min(currentLeft + 80, 320) + 'px';
+                
+                setTimeout(() => {
+                    if (currentLevel < 5) {
+                        currentLevel++;
+                        loadLevel();
+                    } else {
+                        showGameComplete();
+                    }
+                }, 1000);
+            } else {
+                // Wrong answer - shake animation
+                character.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    character.style.animation = '';
+                }, 500);
+            }
+        }
+        
+        function loadSoilCollectorLevel() {
+            const level = gameData.levels[currentLevel - 1];
+            const gameContent = document.getElementById('gameContent');
+            
+            gameContent.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 text-center">Soil Samples</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            ${level.samples.map(sample => `
+                                <div class="soil-sample bg-amber-100 draggable" 
+                                     draggable="true" 
+                                     data-soil="${sample.type}"
+                                     id="soil${sample.id}">
+                                    ${sample.icon}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 text-center">Categories</h3>
+                        <div class="space-y-4">
+                            <div class="soil-category" data-category="clay">
+                                <div class="text-2xl mb-2">🟫</div>
+                                <div class="font-semibold">Clay</div>
+                                <div class="text-sm text-gray-600">Holds water well</div>
+                            </div>
+                            <div class="soil-category" data-category="sandy">
+                                <div class="text-2xl mb-2">🏖️</div>
+                                <div class="font-semibold">Sandy</div>
+                                <div class="text-sm text-gray-600">Drains quickly</div>
+                            </div>
+                            <div class="soil-category" data-category="loamy">
+                                <div class="text-2xl mb-2">🟤</div>
+                                <div class="font-semibold">Loamy</div>
+                                <div class="text-sm text-gray-600">Best for plants</div>
+                            </div>
+                            <div class="soil-category" data-category="peaty">
+                                <div class="text-2xl mb-2">🪴</div>
+                                <div class="font-semibold">Peaty</div>
+                                <div class="text-sm text-gray-600">Acidic, organic</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="soilResult" class="mt-4 text-center font-semibold"></div>
+            `;
+            
+            setupSoilCollector();
+        }
+        
+        function setupSoilCollector() {
+            const soils = document.querySelectorAll('.soil-sample');
+            const categories = document.querySelectorAll('.soil-category');
+            let correctPlacements = 0;
+            const totalSoils = soils.length;
+            
+            soils.forEach(soil => {
+                soil.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.effectAllowed = 'move';
+                    soil.classList.add('dragging');
+                    e.dataTransfer.setData('soilType', soil.dataset.soil);
+                    e.dataTransfer.setData('soilId', soil.id);
+                });
+                
+                soil.addEventListener('dragend', () => {
+                    soil.classList.remove('dragging');
+                });
+            });
+            
+            categories.forEach(category => {
+                category.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    category.classList.add('drag-over');
+                });
+                
+                category.addEventListener('dragleave', () => {
+                    category.classList.remove('drag-over');
+                });
+                
+                category.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    category.classList.remove('drag-over');
+                    
+                    const soilType = e.dataTransfer.getData('soilType');
+                    const soilId = e.dataTransfer.getData('soilId');
+                    const categoryType = category.dataset.category;
+                    const soil = document.getElementById(soilId);
+                    const result = document.getElementById('soilResult');
+                    
+                    if (soilType === categoryType) {
+                        category.appendChild(soil);
+                        soil.classList.remove('draggable');
+                        soil.draggable = false;
+                        soil.classList.add('plant-growth');
+                        
+                        // Add plant animation
+                        const plant = document.createElement('div');
+                        plant.className = 'text-4xl mt-2';
+                        plant.textContent = '🌱';
+                        category.appendChild(plant);
+                        
+                        correctPlacements++;
+                        score += 5;
+                        updateScore();
+                        
+                        result.textContent = 'Correct! Plants love this soil!';
+                        result.className = 'mt-4 text-center font-semibold text-green-600';
+                        
+                        if (correctPlacements === totalSoils) {
+                            setTimeout(() => {
+                                if (currentLevel < 5) {
+                                    currentLevel++;
+                                    loadLevel();
+                                } else {
+                                    showGameComplete();
+                                }
+                            }, 1500);
+                        }
+                    } else {
+                        result.textContent = 'Try again! This soil belongs elsewhere.';
+                        result.className = 'mt-4 text-center font-semibold text-red-600';
+                    }
+                });
+            });
+        }
+        
+        function loadWeatherPuzzleLevel() {
+            const level = gameData.levels[currentLevel - 1];
+            const gameContent = document.getElementById('gameContent');
+            
+            gameContent.innerHTML = `
+                <div class="weather-puzzle max-w-2xl mx-auto">
+                    <h3 class="text-2xl font-bold mb-6 text-center">Predict the Weather</h3>
+                    
+                    <div class="bg-blue-50 rounded-lg p-6 mb-6">
+                        <h4 class="text-lg font-semibold mb-4">Weather Conditions:</h4>
+                        <div class="grid grid-cols-3 gap-4 text-center">
+                            <div class="bg-white rounded-lg p-4">
+                                <div class="text-3xl mb-2">🌡️</div>
+                                <div class="font-semibold">Temperature</div>
+                                <div>${level.conditions.temperature}</div>
+                            </div>
+                            <div class="bg-white rounded-lg p-4">
+                                <div class="text-3xl mb-2">💧</div>
+                                <div class="font-semibold">Rainfall</div>
+                                <div>${level.conditions.rainfall}</div>
+                            </div>
+                            <div class="bg-white rounded-lg p-4">
+                                <div class="text-3xl mb-2">💨</div>
+                                <div class="font-semibold">Humidity</div>
+                                <div>${level.conditions.humidity}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mb-6">
+                        <p class="text-lg font-semibold mb-4">What weather will occur?</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            ${level.options.map(option => `
+                                <button class="btn-primary text-lg py-3" onclick="checkPuzzleAnswer('${option}')">
+                                    ${option === 'Sunny' ? '☀️' : 
+                                      option === 'Rainy' ? '🌧️' : 
+                                      option === 'Cloudy' ? '☁️' : '⛈️'} ${option}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div id="puzzleResult" class="text-center font-semibold"></div>
+                </div>
+            `;
+        }
+        
+        function checkPuzzleAnswer(answer) {
+            const level = gameData.levels[currentLevel - 1];
+            const result = document.getElementById('puzzleResult');
+            
+            if (answer === level.correct) {
+                score += 15;
+                updateScore();
+                
+                result.textContent = 'Excellent! Your prediction was correct!';
+                result.className = 'text-center font-semibold text-green-600';
+                
+                setTimeout(() => {
+                    if (currentLevel < 5) {
+                        currentLevel++;
+                        loadLevel();
+                    } else {
+                        showGameComplete();
+                    }
+                }, 1500);
+            } else {
+                result.textContent = 'Not quite. Consider how temperature, rainfall, and humidity interact.';
+                result.className = 'text-center font-semibold text-red-600';
+            }
+        }
+        
+        function loadFarmingSimLevel() {
+            const level = gameData.levels[currentLevel - 1];
+            const gameContent = document.getElementById('gameContent');
+            
+            gameContent.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4">Your Farm</h3>
+                        <div class="bg-green-50 rounded-lg p-6">
+                            <div class="mb-4">
+                                <span class="font-semibold">Soil Type:</span> ${level.soil}
+                            </div>
+                            <div class="mb-4">
+                                <span class="font-semibold">Climate:</span> ${level.climate}
+                            </div>
+                            <div class="farm-plot mx-auto">
+                                <div class="crop" id="farmCrop">🌱</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4">Choose a Crop</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            ${level.crops.map(crop => `
+                                <button class="btn-primary text-lg py-3" onclick="plantCrop('${crop}')">
+                                    ${crop === 'Cactus' ? '🌵' : 
+                                      crop === 'Rice' ? '🌾' : 
+                                      crop === 'Wheat' ? '🌾' : 
+                                      crop === 'Corn' ? '🌽' : 
+                                      crop === 'Banana' ? '🍌' : 
+                                      crop === 'Blueberry' ? '🫐' : '🍅'} ${crop}
+                                </button>
+                            `).join('')}
+                        </div>
+                        <div id="farmResult" class="mt-4 text-center font-semibold"></div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function plantCrop(crop) {
+            const level = gameData.levels[currentLevel - 1];
+            const farmCrop = document.getElementById('farmCrop');
+            const result = document.getElementById('farmResult');
+            
+            // Set crop icon
+            const cropIcons = {
+                'Cactus': '🌵',
+                'Rice': '🌾',
+                'Wheat': '🌾',
+                'Corn': '🌽',
+                'Banana': '🍌',
+                'Blueberry': '🫐',
+                'Tomato': '🍅'
+            };
+            
+            farmCrop.textContent = cropIcons[crop];
+            
+            if (crop === level.correct) {
+                farmCrop.classList.add('growing');
+                score += 20;
+                updateScore();
+                
+                result.textContent = 'Perfect! Your crop is thriving!';
+                result.className = 'mt-4 text-center font-semibold text-green-600';
+                
+                setTimeout(() => {
+                    if (currentLevel < 5) {
+                        currentLevel++;
+                        loadLevel();
+                    } else {
+                        showGameComplete();
+                    }
+                }, 2000);
+            } else {
+                farmCrop.classList.add('failed');
+                
+                result.textContent = 'Oh no! This crop doesn\'t suit the soil and climate.';
+                result.className = 'mt-4 text-center font-semibold text-red-600';
+                
+                setTimeout(() => {
+                    farmCrop.classList.remove('failed');
+                    farmCrop.textContent = '🌱';
+                }, 1000);
+            }
+        }
+        
+        function showGameComplete() {
+            const gameContent = document.getElementById('gameContent');
+            gameContent.innerHTML = `
+                <div class="text-center py-12">
+                    <div class="text-8xl mb-6">🎉</div>
+                    <h2 class="text-4xl font-bold mb-4">Congratulations!</h2>
+                    <p class="text-2xl mb-6">You completed all levels of ${gameData.name}!</p>
+                    <p class="text-xl mb-8">Final Score: ${score}</p>
+                    <button class="btn-primary text-xl px-8 py-4" onclick="backToMenu()">Back to Menu</button>
+                </div>
+            `;
+        }
+        
+        // Add shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

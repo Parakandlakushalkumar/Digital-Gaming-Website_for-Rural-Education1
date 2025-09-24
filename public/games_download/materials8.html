@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Materials Science Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            min-height: 100vh;
+        }
+        
+        .game-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(22, 163, 74, 0.4);
+        }
+        
+        .material-item {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            cursor: move;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .material-item:hover {
+            transform: scale(1.1);
+        }
+        
+        .category-box {
+            min-height: 150px;
+            border: 3px dashed #cbd5e0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        .category-box.drag-over {
+            border-color: #16a34a;
+            background-color: rgba(22, 163, 74, 0.1);
+        }
+        
+        .property-card {
+            width: 120px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: move;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .property-card:hover {
+            transform: scale(1.05);
+        }
+        
+        .material-card {
+            width: 120px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .material-card.matched {
+            border: 3px solid #16a34a;
+            background-color: rgba(22, 163, 74, 0.1);
+        }
+        
+        .character {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            transition: all 0.5s ease;
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .track {
+            height: 80px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .track::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: white;
+            transform: translateY(-50%);
+        }
+        
+        .treasure-coin {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .treasure-coin:hover {
+            transform: scale(1.1);
+        }
+        
+        .treasure-coin.collected {
+            opacity: 0.5;
+            transform: scale(0.8);
+        }
+        
+        .treasure-item {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .treasure-item.collected {
+            opacity: 0.5;
+            transform: scale(0.8);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .draggable {
+            cursor: move;
+        }
+        
+        .dragging {
+            opacity: 0.5;
+        }
+        
+        .hidden-image {
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+        
+        .hidden-image.revealed {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-5xl font-bold text-white text-center mb-8">Materials Science Explorer</h1>
+        
+        <!-- Game Selection Menu -->
+        <div id="gameMenu" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div class="game-card p-6 text-center cursor-pointer" onclick="startGame('materialQuiz')">
+                <div class="text-6xl mb-4">🖱️</div>
+                <h2 class="text-2xl font-bold mb-2">Material Quiz Click</h2>
+                <p class="text-gray-600">Test your knowledge of materials!</p>
+            </div>
+            
+            <div class="game-card p-6 text-center cursor-pointer" onclick="startGame('dragSort')">
+                <div class="text-6xl mb-4">🔗</div>
+                <h2 class="text-2xl font-bold mb-2">Drag & Drop Sorting</h2>
+                <p class="text-gray-600">Sort materials into categories!</p>
+            </div>
+            
+            <div class="game-card p-6 text-center cursor-pointer" onclick="startGame('materialMatch')">
+                <div class="text-6xl mb-4">🧩</div>
+                <h2 class="text-2xl font-bold mb-2">Material Match Puzzle</h2>
+                <p class="text-gray-600">Match properties to materials!</p>
+            </div>
+            
+            <div class="game-card p-6 text-center cursor-pointer" onclick="startGame('materialRace')">
+                <div class="text-6xl mb-4">🏁</div>
+                <h2 class="text-2xl font-bold mb-2">Material Race Game</h2>
+                <p class="text-gray-600">Race through material questions!</p>
+            </div>
+            
+            <div class="game-card p-6 text-center cursor-pointer" onclick="startGame('treasureGame')">
+                <div class="text-6xl mb-4">💰</div>
+                <h2 class="text-2xl font-bold mb-2">Treasure Collection Game</h2>
+                <p class="text-gray-600">Collect treasures with correct answers!</p>
+            </div>
+        </div>
+        
+        <!-- Game Container -->
+        <div id="gameContainer" class="hidden">
+            <div class="game-card p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <button class="btn-primary" onclick="backToMenu()">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Menu
+                    </button>
+                    <div class="flex items-center gap-4">
+                        <span class="text-lg font-semibold">Level: <span id="currentLevel">1</span>/5</span>
+                        <span class="text-lg font-semibold">Score: <span id="score">0</span></span>
+                    </div>
+                </div>
+                
+                <div id="gameContent" class="min-h-[500px]">
+                    <!-- Game content will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentGame = null;
+        let currentLevel = 1;
+        let score = 0;
+        let gameData = {};
+        let currentQuestionIndex = 0;
+        
+        // Game data for each game
+        const games = {
+            materialQuiz: {
+                name: "Material Quiz Click",
+                levels: [
+                    {
+                        questions: [
+                            { 
+                                question: "Which of these is a non-metal?",
+                                options: ["Iron", "Sulfur", "Copper", "Aluminum"],
+                                correct: "Sulfur",
+                                hint: "Non-metals are poor conductors of heat and electricity."
+                            },
+                            { 
+                                question: "Which material is used for making electrical wires?",
+                                options: ["Wood", "Plastic", "Copper", "Rubber"],
+                                correct: "Copper",
+                                hint: "Think about materials that conduct electricity well."
+                            },
+                            { 
+                                question: "Which of these is a renewable material?",
+                                options: ["Plastic", "Steel", "Wood", "Aluminum"],
+                                correct: "Wood",
+                                hint: "Renewable materials can be replenished naturally."
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "Which material is the hardest natural substance?",
+                                options: ["Gold", "Iron", "Diamond", "Silver"],
+                                correct: "Diamond",
+                                hint: "This material is a form of carbon."
+                            },
+                            { 
+                                question: "Which material is liquid at room temperature?",
+                                options: ["Iron", "Mercury", "Aluminum", "Copper"],
+                                correct: "Mercury",
+                                hint: "This metal is used in thermometers."
+                            },
+                            { 
+                                question: "Which material is used for making magnets?",
+                                options: ["Copper", "Aluminum", "Iron", "Gold"],
+                                correct: "Iron",
+                                hint: "This material is ferromagnetic."
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "Which material is the best conductor of electricity?",
+                                options: ["Iron", "Silver", "Copper", "Gold"],
+                                correct: "Silver",
+                                hint: "This precious metal has the highest electrical conductivity."
+                            },
+                            { 
+                                question: "Which material is used for making airplane bodies?",
+                                options: ["Iron", "Lead", "Aluminum", "Gold"],
+                                correct: "Aluminum",
+                                hint: "This material is lightweight and strong."
+                            },
+                            { 
+                                question: "Which material is used for making pencils?",
+                                options: ["Lead", "Graphite", "Iron", "Silver"],
+                                correct: "Graphite",
+                                hint: "This material is a form of carbon."
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "Which material is used for making glass?",
+                                options: ["Sand", "Clay", "Iron", "Wood"],
+                                correct: "Sand",
+                                hint: "This material is melted at high temperatures."
+                            },
+                            { 
+                                question: "Which material is used for making batteries?",
+                                options: ["Iron", "Lithium", "Gold", "Silver"],
+                                correct: "Lithium",
+                                hint: "This is a lightweight metal used in rechargeable batteries."
+                            },
+                            { 
+                                question: "Which material is used for making bridges?",
+                                options: ["Wood", "Plastic", "Steel", "Glass"],
+                                correct: "Steel",
+                                hint: "This material is strong and durable."
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "Which material is used for making waterproof clothing?",
+                                options: ["Cotton", "Wool", "Nylon", "Silk"],
+                                correct: "Nylon",
+                                hint: "This synthetic material is water-resistant."
+                            },
+                            { 
+                                question: "Which material is used for making artificial joints?",
+                                options: ["Iron", "Titanium", "Aluminum", "Copper"],
+                                correct: "Titanium",
+                                hint: "This material is biocompatible and strong."
+                            },
+                            { 
+                                question: "Which material is used for making solar panels?",
+                                options: ["Iron", "Silicon", "Gold", "Copper"],
+                                correct: "Silicon",
+                                hint: "This semiconductor material converts sunlight to electricity."
+                            }
+                        ]
+                    }
+                ]
+            },
+            dragSort: {
+                name: "Drag & Drop Sorting",
+                levels: [
+                    {
+                        items: [
+                            {name: "Iron", type: "metal", icon: "🔩"},
+                            {name: "Sulfur", type: "non-metal", icon: "💛"},
+                            {name: "Coal", type: "fuel", icon: "⚫"},
+                            {name: "Petrol", type: "fuel", icon: "⛽"}
+                        ],
+                        categories: ["Metals", "Non-metals", "Fuels"]
+                    },
+                    {
+                        items: [
+                            {name: "Copper", type: "metal", icon: "🟤"},
+                            {name: "Oxygen", type: "non-metal", icon: "💨"},
+                            {name: "Natural Gas", type: "fuel", icon: "🔥"},
+                            {name: "Gold", type: "metal", icon: "🟡"}
+                        ],
+                        categories: ["Metals", "Non-metals", "Fuels"]
+                    },
+                    {
+                        items: [
+                            {name: "Aluminum", type: "metal", icon: "⚪"},
+                            {name: "Carbon", type: "non-metal", icon: "⚫"},
+                            {name: "Diesel", type: "fuel", icon: "🛢️"},
+                            {name: "Nitrogen", type: "non-metal", icon: "🔵"},
+                            {name: "Silver", type: "metal", icon: "⬜"}
+                        ],
+                        categories: ["Metals", "Non-metals", "Fuels"]
+                    },
+                    {
+                        items: [
+                            {name: "Zinc", type: "metal", icon: "🔘"},
+                            {name: "Hydrogen", type: "non-metal", icon: "⚪"},
+                            {name: "Propane", type: "fuel", icon: "🔥"},
+                            {name: "Helium", type: "non-metal", icon: "🎈"},
+                            {name: "Platinum", type: "metal", icon: "⬜"},
+                            {name: "Chlorine", type: "non-metal", icon: "🟢"}
+                        ],
+                        categories: ["Metals", "Non-metals", "Fuels"]
+                    },
+                    {
+                        items: [
+                            {name: "Titanium", type: "metal", icon: "⬜"},
+                            {name: "Phosphorus", type: "non-metal", icon: "🔴"},
+                            {name: "Coal", type: "fuel", icon: "⚫"},
+                            {name: "Oxygen", type: "non-metal", icon: "💨"},
+                            {name: "Nickel", type: "metal", icon: "⬜"},
+                            {name: "Sulfur", type: "non-metal", icon: "💛"},
+                            {name: "Kerosene", type: "fuel", icon: "🛢️"}
+                        ],
+                        categories: ["Metals", "Non-metals", "Fuels"]
+                    }
+                ]
+            },
+            materialMatch: {
+                name: "Material Match Puzzle",
+                levels: [
+                    {
+                        properties: [
+                            {name: "Good conductor", type: "metal"},
+                            {name: "Poor conductor", type: "non-metal"},
+                            {name: "Burns to produce energy", type: "fuel"},
+                            {name: "Malleable and ductile", type: "metal"}
+                        ],
+                        materials: ["Metal", "Non-metal", "Fuel"]
+                    },
+                    {
+                        properties: [
+                            {name: "Shiny and lustrous", type: "metal"},
+                            {name: "Dull appearance", type: "non-metal"},
+                            {name: "High energy density", type: "fuel"},
+                            {name: "Sonorous", type: "metal"}
+                        ],
+                        materials: ["Metal", "Non-metal", "Fuel"]
+                    },
+                    {
+                        properties: [
+                            {name: "High melting point", type: "metal"},
+                            {name: "Low melting point", type: "non-metal"},
+                            {name: "Fossil fuel", type: "fuel"},
+                            {name: "Forms positive ions", type: "metal"}
+                        ],
+                        materials: ["Metal", "Non-metal", "Fuel"]
+                    },
+                    {
+                        properties: [
+                            {name: "Used in electrical wiring", type: "metal"},
+                            {name: "Used as insulators", type: "non-metal"},
+                            {name: "Renewable energy source", type: "fuel"},
+                            {name: "High tensile strength", type: "metal"}
+                        ],
+                        materials: ["Metal", "Non-metal", "Fuel"]
+                    },
+                    {
+                        properties: [
+                            {name: "Good reflector of light", type: "metal"},
+                            {name: "Brittle", type: "non-metal"},
+                            {name: "Used in vehicles", type: "fuel"},
+                            {name: "Corrosion resistant", type: "metal"}
+                        ],
+                        materials: ["Metal", "Non-metal", "Fuel"]
+                    }
+                ]
+            },
+            materialRace: {
+                name: "Material Race Game",
+                levels: [
+                    {
+                        questions: [
+                            { 
+                                question: "Which fuel is liquid at room temperature?",
+                                options: ["Coal", "Petrol", "Wood", "Natural Gas"],
+                                correct: "Petrol"
+                            },
+                            { 
+                                question: "Which metal is the most abundant in Earth's crust?",
+                                options: ["Iron", "Aluminum", "Copper", "Gold"],
+                                correct: "Aluminum"
+                            },
+                            { 
+                                question: "Which non-metal is essential for breathing?",
+                                options: ["Nitrogen", "Carbon", "Oxygen", "Hydrogen"],
+                                correct: "Oxygen"
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "Which material is used for making aircraft bodies?",
+                                options: ["Iron", "Steel", "Aluminum", "Copper"],
+                                correct: "Aluminum"
+                            },
+                            { 
+                                question: "Which fuel is known as 'black gold'?",
+                                options: ["Coal", "Petrol", "Natural Gas", "Diesel"],
+                                correct: "Petrol"
+                            },
+                            { 
+                                question: "Which non-metal is used in fertilizers?",
+                                options: ["Oxygen", "Nitrogen", "Carbon", "Sulfur"],
+                                correct: "Nitrogen"
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "Which metal is used in thermometers?",
+                                options: ["Iron", "Mercury", "Aluminum", "Copper"],
+                                correct: "Mercury"
+                            },
+                            { 
+                                question: "Which fuel is cleanest burning?",
+                                options: ["Coal", "Petrol", "Natural Gas", "Wood"],
+                                correct: "Natural Gas"
+                            },
+                            { 
+                                question: "Which non-metal is used in water purification?",
+                                options: ["Oxygen", "Chlorine", "Nitrogen", "Carbon"],
+                                correct: "Chlorine"
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "Which metal is used in batteries?",
+                                options: ["Iron", "Lithium", "Aluminum", "Copper"],
+                                correct: "Lithium"
+                            },
+                            { 
+                                question: "Which fuel is renewable?",
+                                options: ["Coal", "Petrol", "Natural Gas", "Biofuel"],
+                                correct: "Biofuel"
+                            },
+                            { 
+                                question: "Which non-metal is used in making glass?",
+                                options: ["Oxygen", "Silicon", "Nitrogen", "Carbon"],
+                                correct: "Silicon"
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "Which metal is used in artificial joints?",
+                                options: ["Iron", "Titanium", "Aluminum", "Copper"],
+                                correct: "Titanium"
+                            },
+                            { 
+                                question: "Which fuel is used in rockets?",
+                                options: ["Petrol", "Diesel", "Kerosene", "Liquid Hydrogen"],
+                                correct: "Liquid Hydrogen"
+                            },
+                            { 
+                                question: "Which non-metal is used in semiconductors?",
+                                options: ["Oxygen", "Silicon", "Nitrogen", "Carbon"],
+                                correct: "Silicon"
+                            }
+                        ]
+                    }
+                ]
+            },
+            treasureGame: {
+                name: "Treasure Collection Game",
+                levels: [
+                    {
+                        treasures: [
+                            {type: "coin", icon: "💰"},
+                            {type: "gem", icon: "💎"},
+                            {type: "coin", icon: "💰"}
+                        ],
+                        questions: [
+                            { 
+                                question: "Which material is used for making electrical wires?",
+                                answer: "Metal",
+                                hint: "Think about materials that conduct electricity well."
+                            },
+                            { 
+                                question: "Which material burns to produce energy?",
+                                answer: "Fuel",
+                                hint: "These materials are sources of energy."
+                            },
+                            { 
+                                question: "Which material is a poor conductor of electricity?",
+                                answer: "Non-metal",
+                                hint: "These materials don't conduct electricity well."
+                            }
+                        ]
+                    },
+                    {
+                        treasures: [
+                            {type: "gem", icon: "💎"},
+                            {type: "coin", icon: "💰"},
+                            {type: "artifact", icon: "🏺"}
+                        ],
+                        questions: [
+                            { 
+                                question: "Which material is the hardest natural substance?",
+                                answer: "Diamond",
+                                hint: "This material is a form of carbon."
+                            },
+                            { 
+                                question: "Which material is used in thermometers?",
+                                answer: "Mercury",
+                                hint: "This metal is liquid at room temperature."
+                            },
+                            { 
+                                question: "Which material is used for making glass?",
+                                answer: "Sand",
+                                hint: "This material is melted at high temperatures."
+                            }
+                        ]
+                    },
+                    {
+                        treasures: [
+                            {type: "coin", icon: "💰"},
+                            {type: "gem", icon: "💎"},
+                            {type: "coin", icon: "💰"},
+                            {type: "artifact", icon: "🏺"}
+                        ],
+                        questions: [
+                            { 
+                                question: "Which material is used for making magnets?",
+                                answer: "Iron",
+                                hint: "This material is ferromagnetic."
+                            },
+                            { 
+                                question: "Which material is used in rechargeable batteries?",
+                                answer: "Lithium",
+                                hint: "This is a lightweight metal."
+                            },
+                            { 
+                                question: "Which material is used for making pencils?",
+                                answer: "Graphite",
+                                hint: "This material is a form of carbon."
+                            },
+                            { 
+                                question: "Which material is used for making airplane bodies?",
+                                answer: "Aluminum",
+                                hint: "This material is lightweight and strong."
+                            }
+                        ]
+                    },
+                    {
+                        treasures: [
+                            {type: "gem", icon: "💎"},
+                            {type: "coin", icon: "💰"},
+                            {type: "artifact", icon: "🏺"},
+                            {type: "gem", icon: "💎"},
+                            {type: "coin", icon: "💰"}
+                        ],
+                        questions: [
+                            { 
+                                question: "Which material is the best conductor of electricity?",
+                                answer: "Silver",
+                                hint: "This precious metal has the highest conductivity."
+                            },
+                            { 
+                                question: "Which material is used for making bridges?",
+                                answer: "Steel",
+                                hint: "This material is strong and durable."
+                            },
+                            { 
+                                question: "Which material is used for making waterproof clothing?",
+                                answer: "Nylon",
+                                hint: "This synthetic material is water-resistant."
+                            },
+                            { 
+                                question: "Which material is used for making artificial joints?",
+                                answer: "Titanium",
+                                hint: "This material is biocompatible."
+                            },
+                            { 
+                                question: "Which material is used for making solar panels?",
+                                answer: "Silicon",
+                                hint: "This semiconductor converts sunlight to electricity."
+                            }
+                        ]
+                    },
+                    {
+                        treasures: [
+                            {type: "coin", icon: "💰"},
+                            {type: "gem", icon: "💎"},
+                            {type: "artifact", icon: "🏺"},
+                            {type: "coin", icon: "💰"},
+                            {type: "gem", icon: "💎"},
+                            {type: "artifact", icon: "🏺"}
+                        ],
+                        questions: [
+                            { 
+                                question: "Which material is used for making magnets?",
+                                answer: "Iron",
+                                hint: "This material is ferromagnetic."
+                            },
+                            { 
+                                question: "Which material is used in thermometers?",
+                                answer: "Mercury",
+                                hint: "This metal is liquid at room temperature."
+                            },
+                            { 
+                                question: "Which material is used for making glass?",
+                                answer: "Sand",
+                                hint: "This material is melted at high temperatures."
+                            },
+                            { 
+                                question: "Which material is used in rechargeable batteries?",
+                                answer: "Lithium",
+                                hint: "This is a lightweight metal."
+                            },
+                            { 
+                                question: "Which material is used for making pencils?",
+                                answer: "Graphite",
+                                hint: "This material is a form of carbon."
+                            },
+                            { 
+                                question: "Which material is used for making airplane bodies?",
+                                answer: "Aluminum",
+                                hint: "This material is lightweight and strong."
+                            }
+                        ]
+                    }
+                ]
+            }
+        };
+        
+        function startGame(gameName) {
+            currentGame = gameName;
+            currentLevel = 1;
+            score = 0;
+            gameData = {...games[gameName]};
+            currentQuestionIndex = 0;
+            
+            document.getElementById('gameMenu').classList.add('hidden');
+            document.getElementById('gameContainer').classList.remove('hidden');
+            
+            updateScore();
+            loadLevel();
+        }
+        
+        function backToMenu() {
+            document.getElementById('gameMenu').classList.remove('hidden');
+            document.getElementById('gameContainer').classList.add('hidden');
+            currentGame = null;
+        }
+        
+        function updateScore() {
+            document.getElementById('currentLevel').textContent = currentLevel;
+            document.getElementById('score').textContent = score;
+        }
+        
+        function loadLevel() {
+            const gameContent = document.getElementById('gameContent');
+            gameContent.innerHTML = '';
+            gameContent.classList.add('fade-in');
+            
+            switch(currentGame) {
+                case 'materialQuiz':
+                    loadMaterialQuizLevel();
+                    break;
+                case 'dragSort':
+                    loadDragSortLevel();
+                    break;
+                case 'materialMatch':
+                    loadMaterialMatchLevel();
+                    break;
+                case 'materialRace':
+                    loadMaterialRaceLevel();
+                    break;
+                case 'treasureGame':
+                    loadTreasureGameLevel();
+                    break;
+            }
+        }
+        
+        function loadMaterialQuizLevel() {
+            const level = gameData.levels[currentLevel - 1];
+            const question = level.questions[currentQuestionIndex];
+            const gameContent = document.getElementById('gameContent');
+            
+            gameContent.innerHTML = `
+                <div class="max-w-2xl mx-auto">
+                    <h3 class="text-2xl font-bold mb-4 text-center">Question ${currentQuestionIndex + 1}</h3>
+                    <p class="text-lg mb-6 text-center">${question.question}</p>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        ${question.options.map(option => `
+                            <button class="btn-primary" onclick="checkMaterialQuizAnswer('${option}')">${option}</button>
+                        `).join('')}
+                    </div>
+                    
+                    <div id="quizResult" class="mt-6 text-center font-semibold"></div>
+                </div>
+            `;
+        }
+        
+        function checkMaterialQuizAnswer(answer) {
+            const level = gameData.levels[currentLevel - 1];
+            const question = level.questions[currentQuestionIndex];
+            const result = document.getElementById('quizResult');
+            
+            if (answer === question.correct) {
+                score += 10;
+                updateScore();
+                
+                result.textContent = 'Correct! Well done!';
+                result.className = 'mt-6 text-center font-semibold text-green-600';
+                
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    if (currentQuestionIndex < level.questions.length) {
+                        loadMaterialQuizLevel();
+                    } else {
+                        currentQuestionIndex = 0;
+                        if (currentLevel < 5) {
+                            currentLevel++;
+                            loadLevel();
+                        } else {
+                            showGameComplete();
+                        }
+                    }
+                }, 1500);
+            } else {
+                result.textContent = `Try again! ${question.hint}`;
+                result.className = 'mt-6 text-center font-semibold text-red-600';
+            }
+        }
+        
+        function loadDragSortLevel() {
+            const level = gameData.levels[currentLevel - 1];
+            const gameContent = document.getElementById('gameContent');
+            
+            gameContent.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 text-center">Materials</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            ${level.items.map(item => `
+                                <div class="material-item draggable" 
+                                     draggable="true" 
+                                     data-type="${item.type}"
+                                     data-name="${item.name}"
+                                     id="item-${item.name}">
+                                    ${item.icon}
+                                    <div class="text-xs mt-1">${item.name}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 text-center">Categories</h3>
+                        <div class="space-y-4">
+                            ${level.categories.map(category => `
+                                <div class="category-box" data-category="${category.toLowerCase()}">
+                                    <div class="text-xl font-bold">${category}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="sortResult" class="mt-6 text-center font-semibold"></div>
+            `;
+            
+            setupDragSort();
+        }
+        
+        function setupDragSort() {
+            const items = document.querySelectorAll('.material-item');
+            const categories = document.querySelectorAll('.category-box');
+            let correctPlacements = 0;
+            const totalItems = items.length;
+            
+            items.forEach(item => {
+                item.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.effectAllowed = 'move';
+                    item.classList.add('dragging');
+                    e.dataTransfer.setData('itemType', item.dataset.type);
+                    e.dataTransfer.setData('itemName', item.dataset.name);
+                });
+                
+                item.addEventListener('dragend', () => {
+                    item.classList.remove('dragging');
+                });
+            });
+            
+            categories.forEach(category => {
+                category.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    category.classList.add('drag-over');
+                });
+                
+                category.addEventListener('dragleave', () => {
+                    category.classList.remove('drag-over');
+                });
+                
+                category.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    category.classList.remove('drag-over');
+                    
+                    const itemType = e.dataTransfer.getData('itemType');
+                    const itemName = e.dataTransfer.getData('itemName');
+                    const categoryType = category.dataset.category;
+                    const item = document.getElementById(`item-${itemName}`);
+                    const result = document.getElementById('sortResult');
+                    
+                    if (itemType === categoryType) {
+                        category.appendChild(item);
+                        item.classList.remove('draggable');
+                        item.draggable = false;
+                        
+                        correctPlacements++;
+                        score += 5;
+                        updateScore();
+                        
+                        result.textContent = 'Correct placement!';
+                        result.className = 'mt-6 text-center font-semibold text-green-600';
+                        
+                        if (correctPlacements === totalItems) {
+                            setTimeout(() => {
+                                if (currentLevel < 5) {
+                                    currentLevel++;
+                                    loadLevel();
+                                } else {
+                                    showGameComplete();
+                                }
+                            }, 1500);
+                        }
+                    } else {
+                        result.textContent = 'Try again! This item belongs elsewhere.';
+                        result.className = 'mt-6 text-center font-semibold text-red-600';
+                    }
+                });
+            });
+        }
+        
+        function loadMaterialMatchLevel() {
+            const level = gameData.levels[currentLevel - 1];
+            const gameContent = document.getElementById('gameContent');
+            
+            gameContent.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 text-center">Properties</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            ${level.properties.map(prop => `
+                                <div class="property-card draggable" 
+                                     draggable="true" 
+                                     data-type="${prop.type}"
+                                     id="prop-${prop.name.replace(/\s+/g, '-')}">
+                                    ${prop.name}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 text-center">Materials</h3>
+                        <div class="grid grid-cols-3 gap-4">
+                            ${level.materials.map(material => `
+                                <div class="material-card" 
+                                     data-material="${material.toLowerCase()}"
+                                     id="mat-${material.toLowerCase()}">
+                                    ${material}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 text-center">
+                    <button class="btn-primary" onclick="checkMaterialMatch()">Check Matches</button>
+                </div>
+                
+                <div id="matchResult" class="mt-4 text-center font-semibold"></div>
+                
+                <div class="mt-6 flex justify-center">
+                    <div class="hidden-image" id="hiddenImage">
+                        <img src="https://picsum.photos/seed/materials/300/200.jpg" alt="Hidden Image" class="rounded-lg">
+                    </div>
+                </div>
+            `;
+            
+            setupMaterialMatch();
+        }
+        
+        function setupMaterialMatch() {
+            const properties = document.querySelectorAll('.property-card');
+            const materials = document.querySelectorAll('.material-card');
+            const gameArea = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2');
+            
+            properties.forEach(prop => {
+                let isDragging = false;
+                let startX, startY, initialX, initialY;
+                
+                prop.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    initialX = prop.offsetLeft;
+                    initialY = prop.offsetTop;
+                    prop.style.position = 'absolute';
+                    prop.style.zIndex = 1000;
+                    prop.style.left = initialX + 'px';
+                    prop.style.top = initialY + 'px';
+                });
+                
+                document.addEventListener('mousemove', (e) => {
+                    if (!isDragging) return;
+                    
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+                    
+                    prop.style.left = (initialX + dx) + 'px';
+                    prop.style.top = (initialY + dy) + 'px';
+                });
+                
+                document.addEventListener('mouseup', () => {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    prop.style.zIndex = '';
+                    
+                    // Check if dropped on a material
+                    const propRect = prop.getBoundingClientRect();
+                    materials.forEach(mat => {
+                        const matRect = mat.getBoundingClientRect();
+                        
+                        if (propRect.left < matRect.right &&
+                            propRect.right > matRect.left &&
+                            propRect.top < matRect.bottom &&
+                            propRect.bottom > matRect.top) {
+                            
+                            // Snap to material
+                            const matCenterX = matRect.left + matRect.width / 2;
+                            const matCenterY = matRect.top + matRect.height / 2;
+                            
+                            prop.style.position = 'relative';
+                            prop.style.left = '0';
+                            prop.style.top = '0';
+                            
+                            mat.appendChild(prop);
+                        }
+                    });
+                });
+            });
+        }
+        
+        function checkMaterialMatch() {
+            const level = gameData.levels[currentLevel - 1];
+            const materials = document.querySelectorAll('.material-card');
+            const result = document.getElementById('matchResult');
+            const hiddenImage = document.getElementById('hiddenImage');
+            
+            let allCorrect = true;
+            
+            materials.forEach(mat => {
+                const materialType = mat.dataset.material;
+                const properties = mat.querySelectorAll('.property-card');
+                
+                let hasCorrectProperty = false;
+                properties.forEach(prop => {
+                    if (prop.dataset.type === materialType) {
+                        hasCorrectProperty = true;
+                        prop.classList.add('matched');
+                    } else {
+                        allCorrect = false;
+                    }
+                });
+                
+                if (hasCorrectProperty && properties.length > 0) {
+                    mat.classList.add('matched');
+                } else if (properties.length === 0) {
+                    allCorrect = false;
+                }
+            });
+            
+            if (allCorrect) {
+                score += 15;
+                updateScore();
+                
+                result.textContent = 'All matches correct! Image revealed!';
+                result.className = 'mt-4 text-center font-semibold text-green-600';
+                
+                hiddenImage.classList.add('revealed');
+                
+                setTimeout(() => {
+                    if (currentLevel < 5) {
+                        currentLevel++;
+                        loadLevel();
+                    } else {
+                        showGameComplete();
+                    }
+                }, 2000);
+            } else {
+                result.textContent = 'Some matches are incorrect. Try again!';
+                result.className = 'mt-4 text-center font-semibold text-red-600';
+            }
+        }
+        
+        function loadMaterialRaceLevel() {
+            const level = gameData.levels[currentLevel - 1];
+            const question = level.questions[currentQuestionIndex];
+            const gameContent = document.getElementById('gameContent');
+            
+            gameContent.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4">Question ${currentQuestionIndex + 1}</h3>
+                        <p class="text-lg mb-6">${question.question}</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            ${question.options.map(option => `
+                                <button class="btn-primary" onclick="checkMaterialRaceAnswer('${option}')">${option}</button>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <div class="bg-green-100 rounded-lg p-4 h-64 relative overflow-hidden">
+                            <div class="character" id="raceCharacter">🏃</div>
+                            <div class="absolute right-4 top-1/2 transform -translate-y-1/2 text-4xl">🏁</div>
+                            <div class="track absolute bottom-4 left-4 right-4"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function checkMaterialRaceAnswer(answer) {
+            const level = gameData.levels[currentLevel - 1];
+            const question = level.questions[currentQuestionIndex];
+            const character = document.getElementById('raceCharacter');
+            
+            if (answer === question.correct) {
+                score += 10;
+                updateScore();
+                
+                // Move character forward
+                const currentLeft = parseInt(character.style.left) || 20;
+                character.style.left = Math.min(currentLeft + 80, 320) + 'px';
+                
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    if (currentQuestionIndex < level.questions.length) {
+                        loadMaterialRaceLevel();
+                    } else {
+                        currentQuestionIndex = 0;
+                        if (currentLevel < 5) {
+                            currentLevel++;
+                            loadLevel();
+                        } else {
+                            showGameComplete();
+                        }
+                    }
+                }, 1000);
+            } else {
+                // Wrong answer - shake animation
+                character.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    character.style.animation = '';
+                }, 500);
+            }
+        }
+        
+        function loadTreasureGameLevel() {
+            const level = gameData.levels[currentLevel - 1];
+            const gameContent = document.getElementById('gameContent');
+            
+            gameContent.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 text-center">Treasures to Collect</h3>
+                        <div class="flex justify-center flex-wrap gap-4">
+                            ${level.treasures.map((treasure, index) => `
+                                <div class="treasure-${treasure.type}" id="treasure-${index}">
+                                    ${treasure.type === 'coin' ? 
+                                        `<div class="treasure-coin">${treasure.icon}</div>` :
+                                        `<div class="treasure-item">${treasure.icon}</div>`
+                                    }
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 text-center">Question ${currentQuestionIndex + 1}</h3>
+                        <p class="text-lg mb-6">${level.questions[currentQuestionIndex].question}</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <button class="btn-primary" onclick="checkTreasureAnswer('Metal')">Metal</button>
+                            <button class="btn-primary" onclick="checkTreasureAnswer('Non-metal')">Non-metal</button>
+                            <button class="btn-primary" onclick="checkTreasureAnswer('Fuel')">Fuel</button>
+                            <button class="btn-primary" onclick="checkTreasureAnswer('Diamond')">Diamond</button>
+                            <button class="btn-primary" onclick="checkTreasureAnswer('Mercury')">Mercury</button>
+                            <button class="btn-primary" onclick="checkTreasureAnswer('Sand')">Sand</button>
+                            <button class="btn-primary" onclick="checkTreasureAnswer('Iron')">Iron</button>
+                            <button class="btn-primary" onclick="checkTreasureAnswer('Lithium')">Lithium</button>
+                            <button class="btn-primary" onclick="checkTreasureAnswer('Graphite')">Graphite</button>
+                            <button class="btn-primary" onclick="checkTreasureAnswer('Aluminum')">Aluminum</button>
+                            <button class="btn-primary" onclick="checkTreasureAnswer('Steel')">Steel</button>
+                            <button class="btn-primary" onclick="checkTreasureAnswer('Nylon')">Nylon</button>
+                            <button class="btn-primary" onclick="checkTreasureAnswer('Titanium')">Titanium</button>
+                            <button class="btn-primary" onclick="checkTreasureAnswer('Silicon')">Silicon</button>
+                            <button class="btn-primary" onclick="checkTreasureAnswer('Silver')">Silver</button>
+                        </div>
+                        
+                        <div id="treasureResult" class="mt-4 text-center font-semibold"></div>
+                        <div id="treasureHint" class="mt-2 text-center text-sm text-gray-600"></div>
+                    </div>
+                </div>
+            `;
+            
+            gameData.collectedTreasures = 0;
+        }
+        
+        function checkTreasureAnswer(answer) {
+            const level = gameData.levels[currentLevel - 1];
+            const question = level.questions[currentQuestionIndex];
+            const result = document.getElementById('treasureResult');
+            const hint = document.getElementById('treasureHint');
+            
+            if (answer === question.answer) {
+                score += 10;
+                updateScore();
+                
+                // Collect treasure
+                const treasureIndex = gameData.collectedTreasures;
+                const treasureElement = document.getElementById(`treasure-${treasureIndex}`);
+                const treasureItem = treasureElement.querySelector('.treasure-coin, .treasure-item');
+                
+                treasureItem.classList.add('collected');
+                gameData.collectedTreasures++;
+                
+                result.textContent = 'Correct! Treasure collected!';
+                result.className = 'mt-4 text-center font-semibold text-green-600';
+                
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    if (currentQuestionIndex < level.questions.length) {
+                        loadTreasureGameLevel();
+                    } else {
+                        currentQuestionIndex = 0;
+                        if (currentLevel < 5) {
+                            currentLevel++;
+                            loadLevel();
+                        } else {
+                            showGameComplete();
+                        }
+                    }
+                }, 1500);
+            } else {
+                result.textContent = 'Try again!';
+                result.className = 'mt-4 text-center font-semibold text-red-600';
+                hint.textContent = question.hint;
+            }
+        }
+        
+        function showGameComplete() {
+            const gameContent = document.getElementById('gameContent');
+            gameContent.innerHTML = `
+                <div class="text-center py-12">
+                    <div class="text-8xl mb-6">🎉</div>
+                    <h2 class="text-4xl font-bold mb-4">Congratulations!</h2>
+                    <p class="text-2xl mb-6">You completed all levels of ${gameData.name}!</p>
+                    <p class="text-xl mb-8">Final Score: ${score}</p>
+                    <button class="btn-primary text-xl px-8 py-4" onclick="backToMenu()">Back to Menu</button>
+                </div>
+            `;
+        }
+        
+        // Add shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

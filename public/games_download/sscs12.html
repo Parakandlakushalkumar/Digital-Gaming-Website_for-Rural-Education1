@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Translation</title>
+<!-- ORIGINAL GAME CONTENT STARTS HERE -->
+<h1>🧪 Chemistry Treasure Hunt 🧪</h1>
+        <div class="treasure-count">
+            <span class="treasure-icon">💎</span>
+            <span>Treasures Found: <span id="score">0</span>/10</span><div id="game-area">
+            <div class="question-container">
+                <div class="question" id="question"></div>
+                <div class="options" id="options"></div>
+                <div class="result" id="result"></div>
+                <button class="next-btn" id="next-btn" onclick="nextQuestion()" style="display: none;">Next Treasure Hunt</button><script>
+        const questions = [
+            {
+                question: "Which type of solid has the highest melting point?",
+                options: ["Ionic solids", "Molecular solids", "Metallic solids", "Covalent network solids"],
+                correct: 3,
+                explanation: "Covalent network solids have the highest melting points due to strong covalent bonds throughout the structure."
+            },
+            {
+                question: "What happens to the rate of reaction when temperature increases?",
+                options: ["Decreases", "Remains constant", "Increases", "Becomes zero"],
+                correct: 2,
+                explanation: "Higher temperature increases molecular kinetic energy, leading to more frequent and energetic collisions."
+            },
+            {
+                question: "Which factor does NOT affect the solubility of a gas in liquid?",
+                options: ["Temperature", "Pressure", "Nature of solute", "Volume of container"],
+                correct: 3,
+                explanation: "Gas solubility depends on temperature, pressure, and the nature of gas and solvent, but not container volume."
+            },
+            {
+                question: "What is the unit of rate constant for a first-order reaction?",
+                options: ["mol L⁻¹ s⁻¹", "s⁻¹", "mol⁻¹ L s⁻¹", "mol² L⁻² s⁻¹"],
+                correct: 1,
+                explanation: "For first-order reactions, rate = k[A], so k has units of s⁻¹."
+            },
+            {
+                question: "Which type of crystal defect involves missing atoms?",
+                options: ["Interstitial defect", "Vacancy defect", "Substitutional defect", "Frenkel defect"],
+                correct: 1,
+                explanation: "Vacancy defects occur when atoms are missing from their lattice positions."
+            },
+            {
+                question: "Henry's law is applicable to which type of solutions?",
+                options: ["Concentrated solutions", "Dilute solutions", "Saturated solutions", "Supersaturated solutions"],
+                correct: 1,
+                explanation: "Henry's law applies to dilute solutions where gas-liquid interactions are minimal."
+            },
+            {
+                question: "What is the order of reaction if doubling the concentration quadruples the rate?",
+                options: ["Zero order", "First order", "Second order", "Third order"],
+                correct: 2,
+                explanation: "If rate ∝ [concentration]², then doubling concentration increases rate by 2² = 4 times."
+            },
+            {
+                question: "Which colligative property is used to determine molecular mass of polymers?",
+                options: ["Boiling point elevation", "Freezing point depression", "Osmotic pressure", "Vapor pressure lowering"],
+                correct: 2,
+                explanation: "Osmotic pressure is most suitable for large molecules like polymers due to its high sensitivity."
+            },
+            {
+                question: "What type of solid is graphite?",
+                options: ["Ionic solid", "Molecular solid", "Metallic solid", "Covalent network solid"],
+                correct: 3,
+                explanation: "Graphite is a covalent network solid with layered structure and delocalized electrons."
+            },
+            {
+                question: "Which factor increases the rate of a chemical reaction?",
+                options: ["Lower temperature", "Smaller surface area", "Presence of catalyst", "Lower concentration"],
+                correct: 2,
+                explanation: "Catalysts provide alternative reaction pathways with lower activation energy, increasing reaction rate."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question').textContent = q.question;
+            
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            
+            q.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => selectAnswer(index);
+                optionsDiv.appendChild(btn);
+            });
+            
+            document.getElementById('result').textContent = '';
+            document.getElementById('next-btn').style.display = 'none';
+            answered = false;
+        }
+
+        function selectAnswer(selected) {
+            if (answered) return;
+            
+            answered = true;
+            const q = questions[currentQuestion];
+            const options = document.querySelectorAll('.option-btn');
+            
+            options.forEach((btn, index) => {
+                if (index === q.correct) {
+                    btn.classList.add('correct');
+                } else if (index === selected && index !== q.correct) {
+                    btn.classList.add('incorrect');
+                }
+                btn.onclick = null;
+            });
+            
+            const resultDiv = document.getElementById('result');
+            if (selected === q.correct) {
+                score++;
+                resultDiv.innerHTML = `<span style="color: #56ab2f;">🎉 Correct! Treasure found! 🎉</span><br>${q.explanation}`;
+                document.getElementById('score').textContent = score;
+            } else {
+                resultDiv.innerHTML = `<span style="color: #ff416c;">❌ Incorrect!</span><br>${q.explanation}`;
+            }
+            
+            if (currentQuestion < questions.length - 1) {
+                document.getElementById('next-btn').style.display = 'inline-block';
+            } else {
+                setTimeout(showFinalScore, 2000);
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            loadQuestion();
+        }
+
+        function showFinalScore() {
+            const gameArea = document.getElementById('game-area');
+            let message, celebration;
+            
+            if (score === questions.length) {
+                message = "🏆 Perfect Score! You're a Chemistry Master! 🏆";
+                celebration = "🎊";
+            } else if (score >= questions.length * 0.8) {
+                message = "🌟 Excellent! Great knowledge of Chemistry! 🌟";
+                celebration = "⭐";
+            } else if (score >= questions.length * 0.6) {
+                message = "👍 Good job! Keep studying Chemistry! 👍";
+                celebration = "📚";
+            } else {
+                message = "📖 Keep learning! Chemistry is fascinating! 📖";
+                celebration = "💪";
+            }
+            
+            gameArea.innerHTML = `
+                <div class="final-score">
+                    <div class="celebration">${celebration}</div>
+                    <h2>${message}</h2>
+                    <p style="font-size: 1.5rem; margin: 1rem 0;">Final Score: ${score}/${questions.length} treasures</p>
+                    <p style="margin: 1rem 0;">You've completed your journey through Solid State, Solutions, and Chemical Kinetics!</p>
+                    <button class="restart-btn" onclick="restartGame()">Start New Adventure</button>`;
+        }
+
+        function restartGame() {
+            currentQuestion = 0;
+            score = 0;
+            document.getElementById('score').textContent = '0';
+            document.getElementById('game-area').innerHTML = `
+                <div class="question-container">
+                    <div class="question" id="question"></div>
+                    <div class="options" id="options"></div>
+                    <div class="result" id="result"></div>
+                    <button class="next-btn" id="next-btn" onclick="nextQuestion()" style="display: none;">Next Treasure Hunt</button>`;
+            loadQuestion();
+        }
+
+        // Initialize the game
+        loadQuestion();
+    </script></html>

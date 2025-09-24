@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Material Science Games - Fixed Drag & Drop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      background: linear-gradient(120deg, #f9f8fd 0%, #d0f4de 100%);
+      font-family: 'Comic Sans MS', 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 980px;
+      margin: 40px auto;
+      background: rgba(255,255,254,0.98);
+      border-radius: 28px;
+      box-shadow: 0 6px 36px rgba(20,80,80,.12);
+      padding: 32px;
+    }
+    h1 {
+      color: #2E86AB;
+      text-align: center;
+      font-size: 2.8em;
+      margin-top: 0;
+      margin-bottom: 28px;
+      letter-spacing: 2px;
+      text-shadow: 2px 2px #BCECE0;
+    }
+    .cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 29px;
+      justify-content: center;
+    }
+    .card {
+      width: 184px;
+      height: 210px;
+      background: linear-gradient(112deg, #fbc4ab 0%, #a8dadc 100%);
+      border-radius: 20px;
+      box-shadow: 0 7px 18px rgba(40,78,100,0.18);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      text-align: center;
+      font-size: 1.16em;
+      position: relative;
+      overflow: hidden;
+      font-weight: 700;
+      transition: transform .21s, box-shadow .19s;
+      animation: cardPop 0.7s;
+    }
+    .card:hover {
+      transform: scale(1.09) rotate(-2deg);
+      box-shadow: 0 18px 42px rgba(60,20,90,.15);
+    }
+    .card span {
+      font-size: 2.4em;
+      margin-bottom: 17px;
+      animation: emojiBounce 1.1s infinite alternate;
+    }
+    @keyframes emojiBounce {
+      0% { transform: translateY(0);}
+      100% { transform: translateY(-9px);}
+    }
+    .card small {
+      font-size: 1.01em;
+      color: #1b4965;
+      font-weight: bold;
+    }
+    .game {
+      display: none;
+      padding: 17px 7px 17px 7px;
+      min-height: 340px;
+      position: relative;
+      animation: fadeIn .73s;
+    }
+    .game.active { display: block; animation: fadeIn .73s;}
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(.97);}
+      to { opacity: 1; transform: scale(1);}
+    }
+    .backbtn {
+      position: absolute;
+      top: 22px;
+      right: 28px;
+      background: #f9c4ab;
+      color: #218380;
+      border: none;
+      border-radius: 100px;
+      padding: 10px 24px;
+      font-size: 1.06em;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    .backbtn:hover { background: #a8dadc; color: #272343;}
+    .game h2 { margin-top: 18px; color: #2E86AB; }
+    .score { font-size: 1.17em; color: #3567b1; margin-top:15px; font-weight: bold;}
+    .question { font-size: 1.23em; color: #395b64; margin-top: 15px;}
+    .feedback {
+      font-size: 1.16em;
+      margin-top: 16px;
+      color: #9c528b;
+      min-height: 30px;
+      font-weight: bold;
+      text-shadow: 1px 2px #fffbe6;
+    }
+    .options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 19px;
+      margin: 18px 0;
+      justify-content: center;
+    }
+    .dragcard {
+      background: #f8edeb;
+      border: 2px solid #bcd4c2;
+      border-radius: 14px;
+      padding: 12px 18px;
+      font-size: 1.09em;
+      font-weight: bold;
+      cursor: grab;
+      display: inline-block;
+      margin: 2px;
+      min-width: 92px;
+      transition: background .17s;
+    }
+    .dragcard.dragging { opacity: 0.7; background: #a8dadc;}
+    .dropbox {
+      background: #fff8f0;
+      border: 2px dashed #32c5d2;
+      border-radius: 17px;
+      min-width: 130px;
+      min-height: 55px;
+      font-size: 1.09em;
+      color: #277da1;
+      margin: 9px 18px 22px 18px;
+      padding: 8px;
+      text-align: center;
+      font-weight: bold;
+    }
+    table.data-table { border-collapse: collapse; margin: 12px auto; font-size: 1.13em;}
+    table.data-table th, table.data-table td {
+      border: 2px solid #e8b4bc;
+      padding: 7px 18px;
+      text-align: center;
+      border-radius: 10px;
+      background: #dbe9f6;
+    }
+    table.data-table th {
+      background: #ffe9a0;
+      color: #264653;
+      font-weight: bold;
+      font-size: 1.09em;
+    }
+    table.data-table td {
+      background: #ffe9a0;
+      color: #2d6da1;
+    }
+    .quiz-btn {
+      background: #2E86AB;
+      color: #fff;
+      border: none;
+      border-radius: 16px;
+      padding: 11px 33px;
+      font-size: 1.13em;
+      font-weight: 700;
+      margin: 14px 0 7px 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,.09);
+      transition: background .17s;
+      letter-spacing: 1px;
+      cursor: pointer;
+    }
+    .quiz-btn:hover { background: #ebb3a9;}
+    .race-track {
+      width: 99%; min-height:40px; background:#f8edeb; border-radius:9px; position:relative; margin:0 auto 17px auto;
+    }
+    .runner {
+      position: absolute; left:0; top:0; font-size:2.3em;
+      transition: left 0.35s ease;
+    }
+    input[type="text"], input[type="number"] {
+      font-size:1.17em; border-radius:9px; border:2px solid #bcd4c2;
+      padding:7px;width:110px;margin-right:10px;
+    }
+    @media (max-width:700px) { .cards{flex-direction:column;align-items:center;} .card{width:97vw;} }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Material Science Games</h1>
+    <!-- MENU -->
+    <div id="cardMenu" class="cards">
+      <div class="card" onclick="showGame(0)">
+        <span>🔹🔸</span>
+        <div>Material Match<br><small>Match materials to their properties</small></div>
+      </div>
+      <div class="card" onclick="showGame(1)">
+        <span>📦</span>
+        <div>Grouping Guru<br><small>Classify materials</small></div>
+      </div>
+      <div class="card" onclick="showGame(2)">
+        <span>🔍</span>
+        <div>Change Detective<br><small>Physical/Chemical change</small></div>
+      </div>
+      <div class="card" onclick="showGame(3)">
+        <span>🧪</span>
+        <div>Properties Explorer<br><small>Test material properties</small></div>
+      </div>
+      <div class="card" onclick="showGame(4)">
+        <span>🚀</span>
+        <div>Material Race<br><small>Quick sort & race!</small></div>
+      </div>
+    </div>
+    <!-- Material Match Game -->
+    <div id="game0" class="game">
+      <button class="backbtn" onclick="backToMenu()">← Back</button>
+      <h2>Material Match 🔹🔸</h2>
+      <div class="score" id="score0"></div>
+      <div class="options" id="materials0"></div>
+      <div style="display:flex;justify-content:center;flex-wrap:wrap;">
+        <div class="dropbox" id="property-hard">Hard</div>
+        <div class="dropbox" id="property-soft">Soft</div>
+        <div class="dropbox" id="property-transparent">Transparent</div>
+        <div class="dropbox" id="property-flexible">Flexible</div>
+      </div>
+      <div class="feedback" id="feedback0"></div>
+    </div>
+    <!-- Grouping Guru -->
+    <div id="game1" class="game">
+      <button class="backbtn" onclick="backToMenu()">← Back</button>
+      <h2>Grouping Guru 📦</h2>
+      <div class="score" id="score1"></div>
+      <div class="options" id="materials1"></div>
+      <div style="display:flex;justify-content:center;flex-wrap:wrap;">
+        <div class="dropbox" id="group-metal">Metal</div>
+        <div class="dropbox" id="group-nonmetal">Non-Metal</div>
+        <div class="dropbox" id="group-liquid">Liquid</div>
+        <div class="dropbox" id="group-solid">Solid</div>
+        <div class="dropbox" id="group-natural">Natural</div>
+        <div class="dropbox" id="group-synthetic">Synthetic</div>
+      </div>
+      <div class="feedback" id="feedback1"></div>
+    </div>
+    <!-- Change Detective -->
+    <div id="game2" class="game">
+      <button class="backbtn" onclick="backToMenu()">← Back</button>
+      <h2>Change Detective 🔍</h2>
+      <div class="score" id="score2"></div>
+      <div class="question" id="question2"></div>
+      <div style="text-align:center;">
+        <button class="quiz-btn" onclick="detectiveAnswer('Physical')">Physical</button>
+        <button class="quiz-btn" onclick="detectiveAnswer('Chemical')">Chemical</button>
+      </div>
+      <div class="feedback" id="feedback2"></div>
+    </div>
+    <!-- Properties Explorer -->
+    <div id="game3" class="game">
+      <button class="backbtn" onclick="backToMenu()">← Back</button>
+      <h2>Properties Explorer 🧪</h2>
+      <div class="score" id="score3"></div>
+      <div class="question" id="question3"></div>
+      <div class="options" id="properties3"></div>
+      <div class="feedback" id="feedback3"></div>
+    </div>
+    <!-- Material Race -->
+    <div id="game4" class="game">
+      <button class="backbtn" onclick="backToMenu()">← Back</button>
+      <h2>Material Race 🚀</h2>
+      <div class="score" id="score4"></div>
+      <div class="race-track" style="height:40px;position:relative;">
+        <div class="runner" id="runner4" style="top:4px;">🏃‍♂️</div>
+      </div>
+      <div class="question" id="question4"></div>
+      <input type="text" id="answer4" autocomplete="off" />
+      <button class="quiz-btn" onclick="raceAnswer()">Go!</button>
+      <div class="feedback" id="feedback4"></div>
+    </div>
+  </div>
+  <script>
+    let gameStates = [
+      {score:0}, {score:0}, {score:0}, {score:0}, {score:0}
+    ];
+
+    function showGame(idx){
+      document.getElementById('cardMenu').style.display='none';
+      for(let i=0; i<5; i++)
+        document.getElementById('game'+i).classList.remove('active');
+      document.getElementById('game'+idx).classList.add('active');
+      startGame(idx);
+    }
+
+    function backToMenu(){
+      for(let i=0; i<5; i++)
+        document.getElementById('game'+i).classList.remove('active');
+      document.getElementById('cardMenu').style.display='flex';
+    }
+
+    // --------- MATERIAL MATCH ----------
+    function startGame(idx){
+      if(idx===0){
+        gameStates[0].score=gameStates[0].score||0;
+        document.getElementById('score0').textContent = 'Score: '+gameStates[0].score;
+        document.getElementById('feedback0').textContent = '';
+        // Materials data for match
+        let materials=[
+          {name:'Glass',property:'transparent'},
+          {name:'Rubber',property:'flexible'},
+          {name:'Stone',property:'hard'},
+          {name:'Cotton',property:'soft'}
+        ].sort(()=>Math.random()-0.5);
+
+        gameStates[0].itemsPlaced = 0;
+        let mDiv=document.getElementById('materials0');
+        mDiv.innerHTML='';
+
+        // Clear dropboxes
+        ['hard','soft','transparent','flexible'].forEach(p=>{
+          let box=document.getElementById('property-'+p);
+          box.innerHTML=p.charAt(0).toUpperCase()+p.slice(1);
+        });
+
+        materials.forEach((mat,i)=>{
+          let d=document.createElement('div');
+          d.className="dragcard"; d.textContent=mat.name; d.draggable=true;
+          d.dataset.prop=mat.property; d.id='mat0-'+i;
+          d.addEventListener('dragstart',function(e){
+            e.dataTransfer.setData('text', d.id);
+            d.classList.add('dragging');
+          });
+          d.addEventListener('dragend',()=>d.classList.remove('dragging'));
+          mDiv.appendChild(d);
+        });
+
+        // Setup drop targets with updated logic:
+        ['hard','soft','transparent','flexible'].forEach(p=>{
+          let box=document.getElementById('property-'+p);
+          box.ondragover=function(e){
+            e.preventDefault();
+            // Accept drop only if no child present
+            if (!box.querySelector('.dragcard')) e.dataTransfer.dropEffect = "move";
+          };
+          box.ondrop=function(e){
+            e.preventDefault();
+            let id = e.dataTransfer.getData('text');
+            let drag = document.getElementById(id);
+            // Check dragged belongs here, and not already placed
+            if(!drag || drag.parentNode.id !== 'materials0') return;
+            if(!box.querySelector('.dragcard')){
+              if(drag.dataset.prop === p){
+                box.appendChild(drag);
+                drag.draggable = false; // lock draggable
+                drag.style.opacity = 0.65;
+                document.getElementById('feedback0').textContent = `Great! ${drag.textContent} matched ${p}.`;
+                gameStates[0].itemsPlaced++;
+                if(gameStates[0].itemsPlaced === 4){
+                  setTimeout(()=>{
+                    document.getElementById('feedback0').textContent='🎉 All matched! Next round coming up!';
+                    gameStates[0].score += 4;
+                    document.getElementById('score0').textContent = 'Score: ' + gameStates[0].score;
+                    startGame(0);
+                  }, 800);
+                }
+              } else {
+                document.getElementById('feedback0').textContent=`Nope! ${drag.textContent} is not ${p}. Try again.`;
+              }
+            }
+          };
+        });
+      }
+      
+      // --------- GROUPING GURU ----------
+      else if(idx===1){
+        gameStates[1].score=gameStates[1].score||0;
+        document.getElementById('score1').textContent = 'Score: '+gameStates[1].score;
+        document.getElementById('feedback1').textContent = '';
+        let materials=[
+          {name:'Iron',group:'metal'},
+          {name:'Water',group:'liquid'},
+          {name:'Wood',group:'solid'},
+          {name:'Plastic',group:'synthetic'},
+          {name:'Salt',group:'natural'},
+          {name:'Oxygen',group:'nonmetal'}
+        ].sort(()=>Math.random()-0.5);
+
+        gameStates[1].itemsPlaced = 0;
+        let mDiv=document.getElementById('materials1');
+        mDiv.innerHTML='';
+
+        // Clear dropboxes before new round
+        ['metal','nonmetal','liquid','solid','natural','synthetic'].forEach(g=>{
+          let box=document.getElementById('group-'+g);
+          box.innerHTML=g.charAt(0).toUpperCase()+g.slice(1);
+        });
+
+        materials.forEach((mat,i)=>{
+          let d=document.createElement('div');
+          d.className="dragcard"; d.textContent=mat.name; d.draggable=true;
+          d.dataset.group=mat.group; d.id='mat1-'+i;
+          d.addEventListener('dragstart',function(e){
+            e.dataTransfer.setData('text', d.id);
+            d.classList.add('dragging');
+          });
+          d.addEventListener('dragend',()=>d.classList.remove('dragging'));
+          mDiv.appendChild(d);
+        });
+        
+        ['metal','nonmetal','liquid','solid','natural','synthetic'].forEach(g=>{
+          let box=document.getElementById('group-'+g);
+          box.ondragover = function(e){
+            e.preventDefault();
+            e.dataTransfer.dropEffect = "move";
+          };
+          box.ondrop = function(e){
+            e.preventDefault();
+            let id = e.dataTransfer.getData('text');
+            let drag = document.getElementById(id);
+            if(!drag || drag.parentNode.id !== 'materials1') return;
+            if(drag.dataset.group === g){
+              box.appendChild(drag);
+              drag.draggable = false;
+              drag.style.opacity = 0.65;
+              document.getElementById('feedback1').textContent = `Awesome! ${drag.textContent} grouped in ${g}.`;
+              gameStates[1].itemsPlaced++;
+              if(gameStates[1].itemsPlaced === 6){
+                setTimeout(() => {
+                  document.getElementById('feedback1').textContent = '🎉 All grouped! Next round coming up!';
+                  gameStates[1].score += 6;
+                  document.getElementById('score1').textContent = 'Score: ' + gameStates[1].score;
+                  startGame(1);
+                }, 800);
+              }
+            } else {
+              document.getElementById('feedback1').textContent = `Try again. ${drag.textContent} doesn't belong to ${g}`;
+            }
+          };
+        });
+      }
+
+      // ------ Other games keep original logic (Change Detective, Properties Explorer, Material Race) ------
+
+      else if(idx===2){
+        gameStates[2].score=gameStates[2].score||0;
+        document.getElementById('score2').textContent = 'Score: '+gameStates[2].score;
+        document.getElementById('feedback2').textContent = '';
+        let scenarios=[
+          {text:'Ice melting',answer:'Physical'},
+          {text:'Rusting of iron',answer:'Chemical'},
+          {text:'Paper tearing',answer:'Physical'},
+          {text:'Burning wood',answer:'Chemical'},
+          {text:'Bending copper wire',answer:'Physical'},
+          {text:'Milk turning sour',answer:'Chemical'}
+        ];
+        let q=scenarios[Math.floor(Math.random()*scenarios.length)];
+        gameStates[2].question=q.text;
+        gameStates[2].answer=q.answer;
+        document.getElementById('question2').textContent="Scenario: "+q.text;
+      }
+      else if(idx===3){
+        gameStates[3].score=gameStates[3].score||0;
+        document.getElementById('score3').textContent = 'Score: '+gameStates[3].score;
+        document.getElementById('feedback3').textContent = '';
+        let mats=[
+          {name:'Salt',props:['soluble','hard']},
+          {name:'Iron',props:['magnetic','hard']},
+          {name:'Glass',props:['transparent','hard']},
+          {name:'Rubber',props:['flexible','soft']}
+        ], testProps=['Soluble','Magnetic','Transparent','Hard','Flexible','Soft'];
+        let mat=mats[Math.floor(Math.random()*mats.length)];
+        gameStates[3].mat=mat;
+        document.getElementById('question3').textContent=`Test: What property does '${mat.name}' have?`;
+        let pDiv=document.getElementById('properties3'); pDiv.innerHTML='';
+        testProps.forEach((p,i)=>{
+          let btn=document.createElement('button');
+          btn.className='quiz-btn'; btn.textContent=p;
+          btn.onclick=function(){
+            let pL=p.toLowerCase();
+            if(mat.props.includes(pL)){
+              document.getElementById('feedback3').innerHTML=`✨ Magic! '${mat.name}' is indeed ${pL}.`;
+              gameStates[3].score++;
+              document.getElementById('score3').textContent = 'Score: '+gameStates[3].score;
+              setTimeout(startGame,1150,3);
+            }else{
+              document.getElementById('feedback3').textContent="No magic... Try another property!";
+            }
+          };
+          pDiv.appendChild(btn);
+        });
+      }
+      else if(idx===4){
+        gameStates[4].score=gameStates[4].score||0;
+        document.getElementById('score4').textContent = 'Score: '+gameStates[4].score;
+        document.getElementById('feedback4').textContent = '';
+        document.getElementById('answer4').value='';
+        let mats=[
+          {name:'Glass',expect:'transparent'},
+          {name:'Iron',expect:'metal'},
+          {name:'Cotton',expect:'soft'},
+          {name:'Water',expect:'liquid'},
+          {name:'Plastic',expect:'synthetic'},
+          {name:'Stone',expect:'hard'}
+        ];
+        let mat = mats[Math.floor(Math.random()*mats.length)];
+        gameStates[4].mat=mat;
+        document.getElementById('question4').textContent=`Sort: Type the property or group for '${mat.name}' and press Go!`;
+        moveRunner(gameStates[4].score);
+      }
+    }
+
+    function detectiveAnswer(ans){
+      if(ans === gameStates[2].answer){
+        document.getElementById('feedback2').textContent = "🎉 Correct! That's a " + ans + " change!";
+        gameStates[2].score++;
+        document.getElementById('score2').textContent = "Score: "+gameStates[2].score;
+        setTimeout(()=>startGame(2),900);
+      } else {
+        document.getElementById('feedback2').textContent = "Try again! Is it physical or chemical?";
+      }
+    }
+
+    function raceAnswer(){
+      let user = document.getElementById('answer4').value.trim().toLowerCase();
+      let correct = gameStates[4].mat.expect;
+      if(user===correct){
+        document.getElementById('feedback4').textContent = "🚀 Zoom! Correct sort!";
+        gameStates[4].score++;
+        document.getElementById('score4').textContent = "Score: "+gameStates[4].score;
+        moveRunner(gameStates[4].score);
+        setTimeout(()=>startGame(4),800);
+      }else{
+        document.getElementById('feedback4').textContent = "⏳ Slowdown! Try the right property or group.";
+        moveRunner(gameStates[4].score);
+      }
+    }
+
+    function moveRunner(score){
+      let runner=document.getElementById('runner4');
+      let track=document.querySelector('.race-track');
+      let max=track.offsetWidth-36;
+      let pos=Math.min(max,score*60);
+      runner.style.left=pos+'px';
+    }
+
+    document.addEventListener('DOMContentLoaded',()=>{});
+  </script>
+</body>
+</html>

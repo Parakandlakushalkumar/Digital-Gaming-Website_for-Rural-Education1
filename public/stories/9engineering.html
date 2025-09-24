@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Technology Stories - Grade 9</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; background: rgba(255,255,255,0.95); border-radius: 20px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.1); backdrop-filter: blur(10px); }
+    .header { text-align: center; margin-bottom: 40px; }
+    .header h1 { color: #2d3748; font-size: 2.5rem; margin-bottom: 10px; background: linear-gradient(45deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .language-selector { margin: 20px 0; text-align: center; }
+    .lang-btn { background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; padding: 12px 24px; margin: 0 10px; border-radius: 25px; cursor: pointer; font-weight: bold; transition: all 0.3s ease; font-size: 1rem; }
+    .lang-btn:hover, .lang-btn.active { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4); }
+    .topics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 30px; }
+    .topic-card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); transition: all 0.4s ease; cursor: pointer; position: relative; overflow: hidden; border: 3px solid transparent; }
+    .topic-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(45deg, #667eea, #764ba2); }
+    .topic-card:hover { transform: translateY(-15px) scale(1.02); box-shadow: 0 25px 60px rgba(0,0,0,0.2); }
+    .topic-icon { width: 100px; height: 100px; margin: 0 auto 25px; background: linear-gradient(45deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: white; box-shadow: 0 10px 30px rgba(102,126,234,0.3); }
+    .topic-title { font-size: 1.6rem; color: #2d3748; margin-bottom: 20px; text-align: center; font-weight: bold; }
+    .topic-preview { color: #718096; text-align: center; line-height: 1.7; font-size: 1.1rem; }
+    .story-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; overflow-y: auto; backdrop-filter: blur(5px); }
+    .story-content { background: white; margin: 30px auto; padding: 40px; border-radius: 20px; max-width: 1000px; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+    .close-btn { position: absolute; right: 20px; top: 20px; background: #e53e3e; color: white; border: none; border-radius: 50%; width: 45px; height: 45px; cursor: pointer; font-size: 1.3rem; transition: all 0.3s ease; }
+    .close-btn:hover { background: #c53030; transform: scale(1.1); }
+    .story-title { color: #2d3748; font-size: 2.2rem; margin-bottom: 25px; text-align: center; background: linear-gradient(45deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .story-text { line-height: 1.8; color: #4a5568; font-size: 1.1rem; margin-bottom: 30px; }
+    .interactive-element { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 20px; border-radius: 15px; margin: 25px 0; text-align: center; cursor: pointer; transition: all 0.3s ease; font-weight: bold; font-size: 1.1rem; box-shadow: 0 10px 30px rgba(240, 147, 251, 0.3); }
+    .interactive-element:hover { transform: scale(1.05); box-shadow: 0 15px 40px rgba(240,147,251,0.5); }
+    .visual-demo { background: linear-gradient(135deg, #f7fafc, #edf2f7); border: 3px dashed #cbd5e0; border-radius: 15px; padding: 30px; margin: 25px 0; text-align: center; min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.1rem; color: #4a5568; position: relative; overflow: hidden; }
+    .visual-demo::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(102,126,234,0.1), transparent); animation: pulse 3s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1.2); opacity: 0.2; } }
+    .hidden { display: none; }
+  </style>
+  <link rel="icon" href="/favicon.ico">
+  <meta name="robots" content="noindex">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🚀 Interactive Technology Stories</h1>
+      <p>Explore the Future Through Engaging Adventures</p>
+    </div>
+
+    <div class="language-selector">
+      <button class="lang-btn active" data-lang="en" onclick="setLanguage('en', event)">English</button>
+      <button class="lang-btn" data-lang="hi" onclick="setLanguage('hi', event)">हिंदी</button>
+      <button class="lang-btn" data-lang="te" onclick="setLanguage('te', event)">తెలుగు</button>
+    </div>
+
+    <div class="topics-grid">
+      <div class="topic-card" onclick="openStory('robotics')">
+        <div class="topic-icon">🤖</div>
+        <div class="topic-title" data-en="Robotics Basics" data-hi="रोबोटिक्स की मूल बातें" data-te="రోబోటిక్స్ బేసిక్స్">Robotics Basics</div>
+        <div class="topic-preview" data-en="Meet Robbie and discover how robots think, move, and help humans" data-hi="रॉबी से मिलें और जानें कि रोबोट कैसे सोचते, चलते और इंसानों की मदद करते हैं" data-te="రాబీని కలుసుకోండి మరియు రోబోట్లు ఎలా ఆలోచిస్తాయి, కదులుతాయి మరియు మానవులకు సహాయం చేస్తాయో తెలుసుకోండి">Meet Robbie and discover how robots think, move, and help humans</div>
+      </div>
+      <div class="topic-card" onclick="openStory('energy')">
+        <div class="topic-icon">🌞</div>
+        <div class="topic-title" data-en="Sustainable Energy" data-hi="स्थायी ऊर्जा" data-te="స్థిరమైన శక్తి">Sustainable Energy</div>
+        <div class="topic-preview" data-en="Join Captain Solar on a quest to power the world with clean energy" data-hi="स्वच्छ ऊर्जा से दुनिया को शक्ति देने के लिए कैप्टन सोलर के साथ जुड़ें" data-te="స్వచ్ఛమైన శక్తితో ప్రపంచాన్ని శక్తివంతం చేయడానికి కెప్టెన్ సోలార్‌తో చేరండి">Join Captain Solar on a quest to power the world with clean energy</div>
+      </div>
+      <div class="topic-card" onclick="openStory('transport')">
+        <div class="topic-icon">🚀</div>
+        <div class="topic-title" data-en="Transport Systems" data-hi="परिवहन प्रणाली" data-te="రవాణా వ్యవస్థలు">Transport Systems</div>
+        <div class="topic-preview" data-en="Travel through time with Transport Tim to see how we move people and goods" data-hi="ट्रांसपोर्ट टिम के साथ समय की यात्रा करें और देखें कि हम लोगों और सामानों को कैसे ले जाते हैं" data-te="మనం ప్రజలను మరియు వస్తువులను ఎలా తరలిస్తామో చూడటానికి ట్రాన్స్‌పోర్ట్ టిమ్‌తో కాలంలో ప్రయాణించండి">Travel through time with Transport Tim to see how we move people and goods</div>
+      </div>
+      <div class="topic-card" onclick="openStory('design')">
+        <div class="topic-icon">💡</div>
+        <div class="topic-title" data-en="Design Thinking" data-hi="डिज़ाइन थिंकिंग" data-te="డిజైన్ థింకింగ్">Design Thinking</div>
+        <div class="topic-preview" data-en="Follow Designer Dina as she solves problems using creative thinking methods" data-hi="डिज़ाइनर दीना का अनुसरण करें जो रचनात्मक सोच विधियों से समस्याओं को हल करती है" data-te="సృజనాత్మక ఆలోచనా పద్ధతులను ఉపయోగించి సమస్యలను పరిష్కరించే డిజైనర్ దీనాను అనుసరించండి">Follow Designer Dina as she solves problems using creative thinking methods</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="story-modal" class="story-modal">
+    <div class="story-content">
+      <button class="close-btn" onclick="closeStory()">&times;</button>
+      <div id="story-container"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentLanguage = 'en';
+
+    const stories = {/* content to mirror the user's provided 9th ET content (EN/HI/TE) */};
+
+    function setLanguage(lang, ev) {
+      currentLanguage = lang;
+      document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.querySelector(`.lang-btn[data-lang="${lang}"]`);
+      (activeBtn || ev?.currentTarget)?.classList.add('active');
+      document.querySelectorAll('[data-en]').forEach(element => {
+        const value = element.getAttribute(`data-${lang}`);
+        if (value) element.textContent = value;
+      });
+    }
+
+    function openStory(topic) {
+      const modal = document.getElementById('story-modal');
+      const container = document.getElementById('story-container');
+      if (stories[topic] && stories[topic][currentLanguage]) {
+        const story = stories[topic][currentLanguage];
+        container.innerHTML = `
+          <h2 class="story-title">${story.title}</h2>
+          <div class="story-text">${story.content}</div>
+        `;
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeStory() { document.getElementById('story-modal').style.display = 'none'; document.body.style.overflow = 'auto'; }
+
+    // Robotics helpers
+    function explainSensors() { document.getElementById('sensors-demo')?.classList.remove('hidden'); }
+    function showRobotBrain() { document.getElementById('robot-brain')?.classList.remove('hidden'); }
+    function showRobotJobs() { document.getElementById('robot-jobs')?.classList.remove('hidden'); }
+    function buildRobot() { document.getElementById('build-robot')?.classList.remove('hidden'); }
+    // Energy helpers
+    function showEnergyTypes() { document.getElementById('energy-types')?.classList.remove('hidden'); }
+    function solarPowerDemo() { document.getElementById('solar-demo')?.classList.remove('hidden'); }
+    function compareEnergy() { document.getElementById('energy-compare')?.classList.remove('hidden'); }
+    function energyFuture() { document.getElementById('future-energy')?.classList.remove('hidden'); }
+    function explainSolar() { alert('☀ Solar panels convert sunlight into electricity using photovoltaic cells!'); }
+    function explainWind() { alert('💨 Wind turbines use moving air to spin generators and create clean electricity!'); }
+    function explainHydro() { alert('💧 Hydroelectric dams use flowing water to turn turbines and generate power!'); }
+    // Transport helpers
+    function showTransportHistory() { document.getElementById('transport-history')?.classList.remove('hidden'); }
+    function explainTransportSystems() { document.getElementById('transport-systems')?.classList.remove('hidden'); }
+    function showFutureTransport() { document.getElementById('future-transport')?.classList.remove('hidden'); }
+    function solveTransportProblems() { document.getElementById('transport-problems')?.classList.remove('hidden'); }
+    // Design helpers
+    function showDesignProcess() { document.getElementById('design-process-demo')?.classList.remove('hidden'); }
+    function realWorldExample() { document.getElementById('real-example')?.classList.remove('hidden'); }
+    function designThinkingTools() { document.getElementById('design-tools')?.classList.remove('hidden'); }
+    function designThinkingEverywhere() { document.getElementById('design-everywhere')?.classList.remove('hidden'); }
+    function becomeDesigner() { document.getElementById('become-designer')?.classList.remove('hidden'); }
+
+    window.onclick = function(e) { const modal = document.getElementById('story-modal'); if (e.target === modal) closeStory(); };
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeStory(); });
+  </script>
+</body>
+</html>
+
+

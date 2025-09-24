@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Translation</title>
+<!-- ORIGINAL GAME CONTENT STARTS HERE -->
+<h1>⚡ Metals & Non-Metals Lab</h1>
+        <div class="game-info">
+            <span>Score: <span id="score">0</span></span>
+            <span>Round: <span id="round">1</span></span>
+            <span>Accuracy: <span id="accuracy">0</span>%</span><div class="classification-area">
+            <div class="drop-zone metals" data-type="metal">
+                <h3>🥇 Metals</h3>
+                <p>Shiny, conductive, malleable</p>
+                <div class="dropped-elements" id="metals-zone"></div><div class="drop-zone nonmetals" data-type="nonmetal">
+                <h3>💎 Non-Metals</h3>
+                <p>Dull, insulators, brittle</p>
+                <div class="dropped-elements" id="nonmetals-zone"></div><div class="drop-zone metalloids" data-type="metalloid">
+                <h3>⚡ Metalloids</h3>
+                <p>Mixed properties</p>
+                <div class="dropped-elements" id="metalloids-zone"></div><div class="elements-container" id="elementsContainer">
+            <!-- Elements will be dynamically added here --><div class="properties-panel" id="propertiesPanel" style="display: none;">
+            <h3>🔬 Element Properties Test</h3>
+            <div id="propertyTests"></div><div class="controls">
+            <button class="btn btn-check" onclick="checkClassification()">Check Classification</button>
+            <button class="btn btn-reset" onclick="resetRound()">Reset</button>
+            <button class="btn btn-next" onclick="nextRound()">Next Round</button><div id="result" class="result" style="display: none;"></div>
+        <div id="feedback" class="feedback" style="display: none;"></div><script>
+        const elements = [
+            { symbol: 'Fe', name: 'Iron', type: 'metal', properties: { lustrous: true, conductive: true, malleable: true, brittle: false } },
+            { symbol: 'Cu', name: 'Copper', type: 'metal', properties: { lustrous: true, conductive: true, malleable: true, brittle: false } },
+            { symbol: 'Al', name: 'Aluminum', type: 'metal', properties: { lustrous: true, conductive: true, malleable: true, brittle: false } },
+            { symbol: 'O', name: 'Oxygen', type: 'nonmetal', properties: { lustrous: false, conductive: false, malleable: false, brittle: true } },
+            { symbol: 'C', name: 'Carbon', type: 'nonmetal', properties: { lustrous: false, conductive: false, malleable: false, brittle: true } },
+            { symbol: 'S', name: 'Sulfur', type: 'nonmetal', properties: { lustrous: false, conductive: false, malleable: false, brittle: true } },
+            { symbol: 'Si', name: 'Silicon', type: 'metalloid', properties: { lustrous: true, conductive: 'partial', malleable: false, brittle: true } },
+            { symbol: 'B', name: 'Boron', type: 'metalloid', properties: { lustrous: true, conductive: 'partial', malleable: false, brittle: true } },
+            { symbol: 'Ge', name: 'Germanium', type: 'metalloid', properties: { lustrous: true, conductive: 'partial', malleable: false, brittle: true } },
+            { symbol: 'Na', name: 'Sodium', type: 'metal', properties: { lustrous: true, conductive: true, malleable: true, brittle: false } },
+            { symbol: 'Cl', name: 'Chlorine', type: 'nonmetal', properties: { lustrous: false, conductive: false, malleable: false, brittle: true } },
+            { symbol: 'As', name: 'Arsenic', type: 'metalloid', properties: { lustrous: true, conductive: 'partial', malleable: false, brittle: true } }
+        ];
+        
+        let currentRound = 1;
+        let score = 0;
+        let totalAttempts = 0;
+        let correctAttempts = 0;
+        let currentElements = [];
+        let draggedElement = null;
+        let classifications = { metal: [], nonmetal: [], metalloid: [] };
+        
+        function getRandomElements(count = 6) {
+            const shuffled = [...elements].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count);
+        }
+        
+        function createElementHTML(element) {
+            return `
+                <div class="element" draggable="true" data-element="${element.symbol}">
+                    <div class="element-symbol">${element.symbol}</div>
+                    <div class="element-name">${element.name}</div>`;
+        }
+        
+        function setupRound() {
+            currentElements = getRandomElements(6);
+            const container = document.getElementById('elementsContainer');
+            container.innerHTML = currentElements.map(createElementHTML).join('');
+            
+            // Clear drop zones
+            document.querySelectorAll('.dropped-elements').forEach(zone => {
+                zone.innerHTML = '';
+            });
+            
+            classifications = { metal: [], nonmetal: [], metalloid: [] };
+            
+            // Add drag and drop event listeners
+            addDragListeners();
+            
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('propertiesPanel').style.display = 'none';
+        }
+        
+        function addDragListeners() {
+            // Element drag events
+            document.querySelectorAll('.element').forEach(element => {
+                element.addEventListener('dragstart', handleDragStart);
+                element.addEventListener('dragend', handleDragEnd);
+            });
+            
+            // Drop zone events
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('drop', handleDrop);
+                zone.addEventListener('dragenter', handleDragEnter);
+                zone.addEventListener('dragleave', handleDragLeave);
+            });
+        }
+        
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', e.target.outerHTML);
+        }
+        
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+        
+        function handleDragEnter(e) {
+            if (e.target.classList.contains('drop-zone')) {
+                e.target.classList.add('drag-over');
+            }
+        }
+        
+        function handleDragLeave(e) {
+            if (e.target.classList.contains('drop-zone')) {
+                e.target.classList.remove('drag-over');
+            }
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            const dropZone = e.target.closest('.drop-zone');
+            if (!dropZone || !draggedElement) return;
+            
+            dropZone.classList.remove('drag-over');
+            
+            const elementSymbol = draggedElement.dataset.element;
+            const zoneType = dropZone.dataset.type;
+            
+            // Move element to drop zone
+            const droppedZone = dropZone.querySelector('.dropped-elements');
+            droppedZone.appendChild(draggedElement);
+            
+            // Update classifications
+            const element = currentElements.find(el => el.symbol === elementSymbol);
+            if (element) {
+                // Remove from other classifications
+                Object.keys(classifications).forEach(type => {
+                    classifications[type] = classifications[type].filter(el => el.symbol !== elementSymbol);
+                });
+                
+                // Add to current classification
+                classifications[zoneType].push(element);
+            }
+            
+            draggedElement = null;
+        }
+        
+        function showElementProperties(element) {
+            const panel = document.getElementById('propertiesPanel');
+            const testsDiv = document.getElementById('propertyTests');
+            
+            const tests = [
+                { property: 'Lustrous (Shiny)', value: element.properties.lustrous },
+                { property: 'Electrical Conductor', value: element.properties.conductive },
+                { property: 'Malleable (Bendable)', value: element.properties.malleable },
+                { property: 'Brittle (Breaks easily)', value: element.properties.brittle }
+            ];
+            
+            testsDiv.innerHTML = tests.map(test => {
+                let resultClass, resultText;
+                if (test.value === true) {
+                    resultClass = 'positive';
+                    resultText = 'Yes';
+                } else if (test.value === false) {
+                    resultClass = 'negative';
+                    resultText = 'No';
+                } else if (test.value === 'partial') {
+                    resultClass = 'partial';
+                    resultText = 'Partially';
+                }
+                
+                return `
+                    <div class="property-test">
+                        <span>${test.property}:</span>
+                        <span class="test-result ${resultClass}">${resultText}</span>`;
+            }).join('');
+            
+            panel.style.display = 'block';
+        }
+        
+        function checkClassification() {
+            totalAttempts++;
+            let correct = 0;
+            let total = 0;
+            let feedback = [];
+            
+            Object.keys(classifications).forEach(type => {
+                classifications[type].forEach(element => {
+                    total++;
+                    if (element.type === type) {
+                        correct++;
+                    } else {
+                        feedback.push(`${element.symbol} (${element.name}) should be in ${element.type}s, not ${type}s`);
+                    }
+                });
+            });
+            
+            const resultDiv = document.getElementById('result');
+            const feedbackDiv = document.getElementById('feedback');
+            
+            if (correct === total && total === currentElements.length) {
+                correctAttempts++;
+                score += 20 + (currentRound * 5);
+                resultDiv.textContent = '🎉 Perfect classification! All elements correctly sorted!';
+                resultDiv.className = 'result correct';
+                
+                // Show properties for educational value
+                feedbackDiv.innerHTML = `
+                    <h4>🔬 Element Properties:</h4>
+                    ${currentElements.map(el => `
+                        <strong>${el.symbol} (${el.name})</strong> - ${el.type.charAt(0).toUpperCase() + el.type.slice(1)}:<br>
+                        ${el.type === 'metal' ? 'Conducts electricity, malleable, lustrous' : 
+                          el.type === 'nonmetal' ? 'Insulator, brittle, dull' : 
+                          'Mixed properties, semiconductor'}
+                    `).join('<br><br>')}
+                `;
+            } else {
+                resultDiv.textContent = `Partially correct: ${correct}/${total} elements in right categories`;
+                resultDiv.className = 'result incorrect';
+                
+                if (feedback.length > 0) {
+                    feedbackDiv.innerHTML = `<h4>❌ Corrections needed:</h4>${feedback.join('<br>')}`;
+                }
+            }
+            
+            resultDiv.style.display = 'block';
+            feedbackDiv.style.display = 'block';
+            updateDisplay();
+        }
+        
+        function resetRound() {
+            setupRound();
+        }
+        
+        function nextRound() {
+            currentRound++;
+            setupRound();
+        }
+        
+        function updateDisplay() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('round').textContent = currentRound;
+            document.getElementById('accuracy').textContent = totalAttempts > 0 ? 
+                Math.round((correctAttempts / totalAttempts) * 100) : 0;
+        }
+        
+        // Initialize game
+        setupRound();
+        updateDisplay();
+        
+        // Add click event for showing properties
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.element')) {
+                const elementSymbol = e.target.closest('.element').dataset.element;
+                const element = currentElements.find(el => el.symbol === elementSymbol);
+                if (element) {
+                    showElementProperties(element);
+                }
+            }
+        });
+    </script></html>

@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fun Equation Games</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(-45deg, #92f2fc, #fccfd0, #f7f49c, #a0e3aa);
+      background-size: 400% 400%;
+      animation: gradientBG 16s ease infinite;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      overflow-x: hidden;
+    }
+    @keyframes gradientBG {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.6rem;
+      letter-spacing: .03em;
+      color: #384853;
+      margin: 40px 0 30px;
+      text-shadow: 0 2px 12px #fff8;
+    }
+    .cards-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      margin: 20px auto 60px auto;
+      max-width: 900px;
+    }
+    .game-card {
+      width: 210px;
+      height: 340px;
+      background: linear-gradient(135deg,#fff9f9 80%,#e7eaf2 100%);
+      border-radius: 25px;
+      box-shadow: 0 8px 28px #b5eae5c9, 0 2px 8px #dee8cb5c;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      animation: floatCard 3s ease-in-out infinite;
+    }
+    .game-card:hover {
+      transform: scale(1.095) rotate(-2deg) translateY(-4px);
+      box-shadow: 0 16px 34px #b5eae5da, 0 2px 20px #fafecb69;
+      z-index: 2;
+      background: linear-gradient(135deg,#e9fcf6 60%,#fffadc 130%);
+    }
+    @keyframes floatCard {
+      0%,100% {transform: translateY(0);}
+      50% {transform: translateY(-14px);}
+    }
+    .card-icon {
+      font-size: 60px;
+      margin-top: 42px;
+      margin-bottom: 12px;
+      animation: iconPop 1.4s cubic-bezier(.47,1.64,.41,.8) infinite alternate;
+      filter: drop-shadow(0 1px 15px #f3c8f9) drop-shadow(0 2px 5px #fff7);
+    }
+    @keyframes iconPop {
+      from {transform: scale(1.02);}
+      to {transform: scale(1.15);}
+    }
+    .game-title {
+      font-weight: 700;
+      font-size: 1.25rem;
+      text-align: center;
+      color: #363f4b;
+      margin-bottom: 6px;
+      letter-spacing: .04em;
+    }
+    .game-desc {
+      font-size: 1rem;
+      color: #456062;
+      text-align: center;
+      margin: 0 18px;
+      margin-bottom: 0;
+      line-height: 1.35;
+    }
+    .modal-bg {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(44, 73, 101, 0.28);
+      animation: fadeIn .42s;
+      justify-content: center;
+      align-items: center;
+      transition: background 0.2s;
+    }
+    .modal-content {
+      background: linear-gradient(120deg,#fffafc 80%,#daf0ec 100%);
+      border-radius: 28px;
+      padding: 36px 18px 38px 18px;
+      min-width: 320px;
+      min-height: 320px;
+      max-width: 96vw;
+      max-height: 96vh;
+      overflow-y: auto;
+      box-shadow: 0 4px 44px #93e2e2bb;
+      position: relative;
+      animation: popScale .3s ease;
+    }
+    @keyframes popScale {
+      0% { transform: scale(.85);}
+      100% { transform: scale(1);}
+    }
+    @keyframes fadeIn {
+      from {background: rgba(44,73,101,0);}
+      to {background: rgba(44,73,101,0.28);}
+    }
+    .close-modal {
+      position: absolute;
+      top: 12px; right: 18px;
+      font-size: 2em;
+      background: none;
+      border:none;
+      cursor:pointer;
+      color: #6fb38a;
+      opacity: 0.82;
+      transition: color .2s;
+      z-index: 30;
+      box-shadow:none;
+    }
+    .close-modal:hover {
+      color: #ff8585;
+      background: none;
+    }
+    @media (max-width: 768px) {
+      .cards-container { gap: 1.1rem;}
+      .game-card { width: 175px; height: 260px; }
+      .modal-content { min-width: 94vw;}
+    }
+    /* Balloon styles */
+    .balloon-row {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      padding-top:16px;
+      gap: 36px;
+      min-height: 150px;
+      position:relative;
+    }
+    .balloon {
+      position: static;
+      cursor: pointer;
+      z-index: 1;
+      width: 58px;
+      height: 94px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform .12s;
+      animation: balloonFloat 2.7s ease-in-out infinite alternate;
+    }
+    @keyframes balloonFloat {
+      0% { transform: translateY(0);}
+      100% { transform: translateY(-22px);}
+    }
+    .bal-body {
+      background: radial-gradient(circle at 50% 32%, #fd6e9e 76%, #c93df7 100%);
+      width: 58px; height: 70px;
+      border-radius: 50px 50px 35px 35px / 45px 45px 50px 50px;
+      box-shadow: 0 12px 18px #e186ff4c, 0 3px 21px #ffb7e868;
+      display: flex; justify-content: center; align-items: center;
+      font-size: 1.45em; font-weight: bold; color: #fff; user-select: none;
+      border: 2px solid #fff3;
+      margin-bottom: -2px;
+      transition: box-shadow .18s, background .16s, border .18s;
+    }
+    .balloon:hover .bal-body, .balloon:active .bal-body {
+      background: radial-gradient(circle at 60% 36%, #fd8eaf 76%, #cd93ff 100%);
+      box-shadow: 0 12px 30px #b7edfc95;
+      border: 2px solid #ffe9a7;
+    }
+    .bal-tail {
+      margin: -1px auto 0 auto;
+      width: 10px; height: 24px;
+      border-radius: 10px 10px 4px 4px/30px 30px 12px 12px;
+      background: linear-gradient(#ffe1e6, #cc97ce, #fff0);
+    }
+    .balloon.pop .bal-body {
+      animation: popFlash .38s cubic-bezier(.7,.1,.9,1.3) both;
+      background: linear-gradient(112deg,#fcef81 60%,#fe9c9c 160%);
+      box-shadow: 0 0 36px #ffe181a0, 0 0 32px #d19bff77;
+      border:2px solid #fffad2;
+    }
+    @keyframes popFlash {
+      0% {transform: scale(1);}
+      20% {transform: scale(1.25);}
+      50% {transform: scale(.97);}
+      80% {transform: scale(1.04);}
+      100%{transform: scale(0);}
+    }
+    .balloonResult {
+      margin-top:26px; font-weight:700; font-size:1.18em; text-align:center;
+      min-height:30px;
+    }
+    /* Match cards style */
+    .match-card {
+      width: 94px; height: 68px;
+      background: linear-gradient(150deg,#f7eec8 60%,#bffffa 100%);
+      border-radius: 13px;
+      box-shadow: 0 4px 17px #c1cab9ab,0 0px 15px #ffeebe4a;
+      display: inline-block;
+      position: relative;
+      margin: 6px;
+      text-align: center;
+      font-size: 1.13em;
+      vertical-align: top;
+      cursor: pointer;
+      transition: transform 0.13s;
+      perspective: 600px;
+      overflow: hidden;
+      font-family: inherit;
+    }
+    .match-card.flipped .front {
+        transform: rotateY(180deg);
+    }
+    .match-card.flipped .back {
+        transform: rotateY(0deg);
+    }
+    .match-card .front, .match-card .back {
+        width: 100%; height: 100%;
+        position: absolute; top: 0; left: 0;
+        backface-visibility: hidden;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 13px;
+    }
+    .match-card .front {
+        background: linear-gradient(135deg,#45cad1 65%,#afd8ff 120%);
+        color: #fff; font-size:1.13em;
+        font-weight:700; letter-spacing:1.8px;
+        transform: rotateY(0deg);
+        transition: transform 0.28s cubic-bezier(.9,.1,.5,1.12);
+        box-shadow: 0 1px 16px #b7edfc99;
+    }
+    .match-card .back {
+        background: #fffbe6;
+        color: #484e60;
+        transform: rotateY(180deg);
+        transition: transform 0.28s cubic-bezier(.9,.1,.5,1.1);
+        font-weight:700;
+        box-shadow: 0 0 14px #ffeac9ad;
+    }
+    .match-card.flipped {box-shadow:0 4px 21px #eaf8c8cc;}
+    .matchResult {
+      margin-top:14px;font-size:1.15em;font-weight:600;min-height:34px;
+    }
+    /* Race game styling */
+    .raceOpt {
+      margin: 0 6px 0 6px;
+      padding: 8px 18px;
+      font-size: 1.15em;
+      font-weight: 700;
+      border-radius: 7px;
+      border: none;
+      background: linear-gradient(90deg,#eae7fa 60%,#f8a6c1 120%);
+      color: #424482;
+      box-shadow: 0 2px 12px #fdb7e431;
+      cursor: pointer;
+      transition: background .18s, color .15s;
+      outline: none;
+    }
+    .raceOpt:hover {
+      background: linear-gradient(90deg,#cdfde7 80%,#fd99d6 160%);
+      color:#18a07d;
+    }
+    #car {
+      filter: drop-shadow(0 2px 16px #efe0fd);
+      transition: left .5s cubic-bezier(.96,.01,1,.98);
+    }
+    .raceMsg {
+      margin-top:13px;font-size:1.18em;min-height:30px;font-weight:600;text-align:center;
+    }
+    /* Escape game styling */
+    #escCode {
+      font-size:1.45em;
+      letter-spacing:1.3em;
+      color: #59597d;
+      margin-bottom:16px;
+      text-shadow: 0 2px 11px #c8ffc7a7;
+    }
+    #escQs input[type="number"] {
+      width:60px;
+      height:1.8em;
+      font-size:1.07em;
+      border-radius:6px;
+      border:1.2px solid #e8eee9;
+      background:#f7faff;
+      padding-left:7px;
+      margin-right:4px;
+      outline:none;
+      transition: border .18s;
+    }
+    #escQs input:focus {
+      border: 1.5px solid #aecefa;
+      background: #f0f4fe;
+    }
+    #escQs button {
+      background: linear-gradient(90deg,#f8fdc7 80%,#f5cdfc 160%);
+      color:#265a36;
+      font-size:1.08em;
+      font-weight:600;
+      border-radius:6px;
+      border:none;
+      box-shadow: 0 0 8px #b7edfc52;
+      cursor:pointer;
+      padding: 4px 15px;
+      transition: background .18s, color .19s;
+      outline: none;
+      margin-left:3px;
+    }
+    #escQs button:hover {
+      background: linear-gradient(90deg,#ffe969 90%,#e1aaed 160%);
+      color:#169c56;
+    }
+    #escQs span {
+      margin-left:12px;
+      font-size:1.2em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Play Equation Games!</h1>
+  <div class="cards-container">
+    <div class="game-card" onclick="openGame(0)">
+      <div class="card-icon">🎈</div>
+      <span class="game-title">Equation Balloon Pop</span>
+      <span class="game-desc">Pop the balloon with the right value of x!</span>
+    </div>
+    <div class="game-card" onclick="openGame(1)">
+      <div class="card-icon">🃏</div>
+      <span class="game-title">Equation Match Cards</span>
+      <span class="game-desc">Flip and match equations with their solutions.</span>
+    </div>
+    <div class="game-card" onclick="openGame(2)">
+      <div class="card-icon">🚗</div>
+      <span class="game-title">Solve & Run (Car Race)</span>
+      <span class="game-desc">Every equation solved makes your car race faster!</span>
+    </div>
+    <div class="game-card" onclick="openGame(3)">
+      <div class="card-icon">🔐</div>
+      <span class="game-title">Escape the Room – Equation Lock</span>
+      <span class="game-desc">Solve for x to unlock the door and escape!</span>
+    </div>
+  </div>
+
+  <div class="modal-bg" id="gameModal">
+    <div class="modal-content" id="modalContent">
+      <button class="close-modal" onclick="closeModal()">&times;</button>
+    </div>
+  </div>
+
+  <script>
+    function rnd(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+    function shuffle(arr){
+      for(let i=arr.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[arr[i], arr[j]]=[arr[j], arr[i]];}
+      return arr;
+    }
+    function openGame(idx){
+      const modal = document.getElementById("gameModal");
+      const content = document.getElementById("modalContent");
+      if(idx===0) balloonGame.start(content);
+      if(idx===1) matchGame.start(content);
+      if(idx===2) raceGame.start(content);
+      if(idx===3) escapeGame.start(content);
+      modal.style.display = "flex";
+    }
+    function closeModal(){
+      document.getElementById("gameModal").style.display = "none";
+    }
+    window.onclick = function(event){
+      const mod = document.getElementById("gameModal");
+      if(event.target === mod) closeModal();
+    };
+
+    // Game 1: Balloon Pop (fixed layout, more styling)
+    const balloonGame = {
+      questions: [
+        {q:"2x + 3 = 11", x:4},
+        {q:"x + 2 = 9", x:7},
+        {q:"3x = 21", x:7},
+        {q:"5x – 5 = 15", x:4},
+        {q:"x/2 + 3 = 7", x:8},
+        {q:"4x - 6 = 10", x:4},
+        {q:"x - 6 = 5", x:11},
+        {q:"2x - 4 = 6", x:5},
+        {q:"x/4 = 3", x:12}
+      ],
+      idx: 0, order: [],
+      start(cont){
+        this.order = shuffle([...Array(this.questions.length).keys()]);
+        this.idx=0;
+        this.renderQuestion(cont);
+      },
+      renderQuestion(cont){
+        if(this.idx >= this.order.length){
+          cont.innerHTML = `<button class="close-modal" onclick="closeModal()">&times;</button>
+            <div style="min-height:200px;text-align:center;padding-top:60px;
+            font-size:2em;color:#019a7b;text-shadow:0 2px 20px #fcef81;">
+              All balloons popped! 🎉</div>`;
+          return;
+        }
+        let k = this.order[this.idx];
+        let sel = this.questions[k];
+        let options = [sel.x];
+        while(options.length<4){
+          let v = sel.x + (Math.floor(Math.random()*7)-3);
+          if(v!==sel.x && !options.includes(v) && v>=-5 && v<=20) options.push(v);
+        }
+        options=shuffle(options);
+
+        // Layout: balloons are spaced evenly in a flex row (avoid overlap)
+        let balloons=options.map((ev,i)=>`
+          <div class='balloon' data-val="${ev}" style="animation-delay:${i*.25}s">
+            <div class="bal-body">${ev}</div>
+            <div class="bal-tail"></div>
+          </div>
+        `).join('');
+        cont.innerHTML =
+        `<button class="close-modal" onclick="closeModal()">&times;</button>
+        <div style="min-height:375px;position:relative">
+          <h2 style="text-align:center; margin:0 0 10px; font-size:1.5em; font-weight:800; color:#a44c82;
+          text-shadow:0 2px 12px #e2e2ff;">
+            Pop the balloon with the right value of x!
+            <span style="float:right;font-size:.7em;color:#709eaf;">(${this.idx+1}/${this.order.length})</span>
+          </h2>
+          <div style="text-align:center;font-size:1.3em; margin:10px 0 18px">
+            <b style="color:#a43c6e; background:linear-gradient(90deg,#faedf8,#faffdd);padding:6px 18px;border-radius:16px;font-size:1.07em;">
+              ${sel.q}
+            </b>
+          </div>
+          <div class="balloon-row">
+            ${balloons}
+          </div>
+          <div class="balloonResult" id="balloonResult"></div>
+        </div>`;
+        setTimeout(()=>this.setupHandlers(sel.x,cont),60);
+      },
+      setupHandlers(answer,cont){
+        document.querySelectorAll('.balloon').forEach(balloon=>{
+          balloon.onclick=()=>{
+            if(balloon.classList.contains('pop')) return;
+            let val = Number(balloon.getAttribute('data-val'));
+            balloon.classList.add('pop');
+            if(val===answer){
+              document.getElementById("balloonResult").innerHTML =
+                "<span style='color: #0dac80; background:#f4fff5a2; border-radius:7px; padding:6px 14px; box-shadow:0 2px 8px #adffd996;'>Correct! 🎉</span>";
+              setTimeout(()=>{this.idx++; this.renderQuestion(cont);},740);
+            }else{
+              document.getElementById("balloonResult").innerHTML =
+                "<span style='color: #ca2e63; background:#ffe9eba2; border-radius:7px; padding:6px 14px; box-shadow:0 1px 6px #fdc7db7;'>Try again!</span>";
+              setTimeout(()=>balloon.classList.remove('pop'), 500);
+            }
+          };
+        });
+      }
+    };
+
+    // Game 2: Equation Match Cards (5 sets per play)
+    const matchGame = {
+      allSets: [
+        [
+          {eq:'3x = 12',ans:4},
+          {eq:'x + 8 = 11',ans:3},
+          {eq:'2x + 4 = 14',ans:5},
+          {eq:'x/2 = 6',ans:12},
+          {eq:'5x – 5 = 15',ans:4}
+        ],
+        [
+          {eq:'x – 4 = 2',ans:6},
+          {eq:'2x = 18',ans:9},
+          {eq:'x/3 + 2 = 6',ans:12},
+          {eq:'7x = 35',ans:5},
+          {eq:'x + 10 = 25',ans:15}
+        ],
+        [
+          {eq:'x/4 + 9 = 12',ans:12},
+          {eq:'2x – 2 = 10',ans:6},
+          {eq:'4x = 20',ans:5},
+          {eq:'x – 8 = 1',ans:9},
+          {eq:'6x = 18',ans:3}
+        ]
+      ],
+      idx: 0, currSet: [],
+      start(cont){
+        this.currSet = shuffle(rnd(this.allSets));
+        this.renderRound(cont);
+      },
+      renderRound(cont){
+        let items = this.currSet;
+        let cards=[...items.map(it=>({type:'eq',label:it.eq,ans:it.ans})),...items.map(it=>({type:'ans',label:'x = '+it.ans,ans:it.ans}))];
+        cards=shuffle(cards);
+        matchGame.flips=[]; matchGame.flipVals=[]; matchGame.flipTypes=[]; matchGame.matchCount=0; matchGame.cards = cards;
+        cont.innerHTML = `
+          <button class="close-modal" onclick="closeModal()">&times;</button>
+          <div style="min-height:315px; text-align:center;">
+            <h2 style="margin-bottom:2px;font-size:1.32em;font-weight:800;color:#3a4c63;letter-spacing:.02em;text-shadow:0 1px 16px #f5e9ff8a;">
+              Match equations with answers!
+            </h2>
+            <div id="matchBoard" style="display: flex; flex-wrap: wrap; justify-content:center;gap:17px;max-width:430px;margin:0 auto;margin-top:18px;">
+              ${cards.map((c,i)=>`<div class="match-card" data-idx="${i}"><span class="front"></span><span class="back">${c.label}</span></div>`).join('')}
+            </div>
+            <div class="matchResult" id="matchResult"></div>
+          </div>
+        `;
+        setTimeout(()=>this.setupHandlers(cont),60);
+      },
+      setupHandlers(cont){
+        document.querySelectorAll('.match-card').forEach(card=>{
+          card.onclick=function(){
+            let i = Number(this.getAttribute('data-idx'));
+            if(this.classList.contains('flipped')||matchGame.flips.includes(i)||matchGame.flips.length>=2) return;
+            this.classList.add('flipped');
+            matchGame.flips.push(i);
+            matchGame.flipVals.push(matchGame.cards[i].ans);
+            matchGame.flipTypes.push(matchGame.cards[i].type);
+            if(matchGame.flips.length==2){
+              setTimeout(()=>{
+                let c0=document.querySelectorAll('.match-card')[matchGame.flips[0]];
+                let c1=document.querySelectorAll('.match-card')[matchGame.flips[1]];
+                if(matchGame.flipVals[0]===matchGame.flipVals[1]&&matchGame.flipTypes[0]!=matchGame.flipTypes[1]){
+                  c0.style.visibility='hidden';
+                  c1.style.visibility='hidden';
+                  matchGame.matchCount++;
+                  if(matchGame.matchCount===5){
+                    document.getElementById("matchResult").innerHTML =
+                      `<span style='color:#23ba7a;background:linear-gradient(90deg,#edffda,#c4ffe2);padding:6px 13px;border-radius:7px;box-shadow:0 2px 10px #adffd9;'>All pairs found! 🎉</span>`;
+                    setTimeout(()=>matchGame.start(document.getElementById("modalContent")),1400);
+                  }
+                }
+                else{
+                  c0.classList.remove('flipped');
+                  c1.classList.remove('flipped');
+                  document.getElementById("matchResult").innerHTML =
+                    `<span style='color:#ca2e63; background:#ffe9eba2; border-radius:5px; padding:2px 11px;'>Try again!</span>`;
+                }
+                matchGame.flips=[]; matchGame.flipVals=[]; matchGame.flipTypes=[];
+              },700);
+            }
+          }
+        });
+      }
+    };
+
+    // Game 3: Solve & Run (car race, 5 equations per game)
+    const raceGame = {
+      questions: [
+        {q:'5x – 2 = 8', x:2},
+        {q:'3x = 12', x:4},
+        {q:'x + 6 = 13', x:7},
+        {q:'2x + 4 = 18', x:7},
+        {q:'4x – 8 = 16', x:6},
+        {q:'x – 4 = 8', x:12},
+        {q:'2x = 20', x:10},
+        {q:'x/3 + 2 = 3', x:3},
+        {q:'x - 9 = 0', x:9},
+        {q:'6x = 36', x:6}
+      ],
+      idx:0, order:[], carPos:0, required:5,
+      start(cont){
+        this.order = shuffle([...Array(this.questions.length).keys()]).slice(0,this.required);
+        this.idx=0; this.carPos=0;
+        this.renderQuestion(cont);
+      },
+      renderQuestion(cont){
+        if(this.idx >= this.order.length){
+          cont.innerHTML = `<button class="close-modal" onclick="closeModal()">&times;</button>
+            <div style="min-height:200px;text-align:center;padding-top:60px;font-size:2em;color:#019a7b;
+            text-shadow:0 2px 15px #dcffd7b2;"><span style="font-size:2.1em;">🏁🚗</span><br>
+            You finished the race! <br> <span style="color:#9a4ffa;">Well done! 🎉</span></div>`;
+          return;
+        }
+        let k = this.order[this.idx];
+        let lq = this.questions[k];
+        this.ans = lq.x; this.carPos = this.carPos || 0;
+        let options = shuffle([lq.x, lq.x+1, lq.x-1]);
+        cont.innerHTML = `
+          <button class="close-modal" onclick="closeModal()">&times;</button>
+          <div style="min-height:320px">
+            <h2 style="text-align:center;margin-bottom:2px;font-size:1.38em;font-weight:900;color:#274382;text-shadow:0 2px 12px #d4defe;">
+              Solve and Race! <span style="float:right;font-size:.7em;color:#709eaf;">(${this.idx+1}/${this.order.length})</span>
+            </h2>
+            <div style="margin:0 auto 4px auto;text-align:center;font-weight:700;font-size:1.24em;color:#a3354a;
+            letter-spacing:.01em; background:linear-gradient(90deg,#faedf8,#faffdd);padding:8px 18px;border-radius:16px;">
+              ${lq.q}
+            </div>
+            <div style="text-align:center;margin-top:14px">
+              ${options.map(v=>`<button class='raceOpt' data-val="${v}">x = ${v}</button>`).join('')}
+            </div>
+            <div id="raceTrack" style="margin:24px 0 0 0; height:44px; background:#f4f4f4; border-radius:20px; overflow:hidden; position:relative;box-shadow:0 2px 12px #f3f4fcc6;">
+              <div id="car" style="width:44px; height:37px; position:absolute; left:${this.carPos}px; top:2px;transition:left .5s cubic-bezier(.96,.01,1,.98); font-size:34px;">🚗</div>
+            </div>
+            <div class="raceMsg" id="raceMsg"></div>
+          </div>
+        `;
+        setTimeout(()=>this.setupHandlers(cont),60);
+      },
+      setupHandlers(cont){
+        document.querySelectorAll('.raceOpt').forEach(btn=>{
+          btn.onclick=()=>{
+            let v = Number(btn.getAttribute('data-val'));
+            if(v===this.ans){
+              this.carPos += 80;
+              document.getElementById("car").style.left = this.carPos+"px";
+              document.getElementById("raceMsg").innerHTML =
+                "<span style='color: #088e38; background:#f4fff5a2; border-radius:7px; padding:6px 14px;'>Speed Boost! 🎉</span>";
+              setTimeout(()=>{this.idx++;this.renderQuestion(cont);},840);
+            } else {
+              this.carPos = Math.max(0,this.carPos-30);
+              document.getElementById("car").style.left = this.carPos+"px";
+              document.getElementById("raceMsg").innerHTML =
+                "<span style='color: #ca2e63; background:#ffe9eba2; border-radius:7px; padding:6px 14px;'>Slowdown! Try again.</span>";
+            }
+          }
+        });
+      }
+    };
+
+    // Game 4: Escape the Room (classic, solves all in order)
+    const escapeGame = {
+      questions: [
+        {q:'x + 2 = 7', x:5},{q:'3x = 12', x:4},{q:'2x + 4 = 18', x:7},
+        {q:'x/2 = 6', x:12},{q:'5x – 10 = 20', x:6}
+      ],
+      idx: 0, code: [],
+      start(cont){
+        this.idx = 0;
+        this.code = Array(this.questions.length).fill('_');
+        this.solved = Array(this.questions.length).fill(false);
+        this.render(cont);
+      },
+      render(cont){
+        if(this.solved && this.solved.every(x=>x)){
+          cont.innerHTML = `<button class="close-modal" onclick="closeModal()">&times;</button>
+              <div style="min-height:200px;text-align:center;padding-top:60px;font-size:2em;color:#019a7b;
+              text-shadow:0 2px 11px #c8ffc7a7;">
+              Code <span style="color:#e2449f;font-weight:800;">${this.code.join("")}</span> entered!<br>
+              <span style="font-size:2em;color:#9a4ffa;">You escaped! 🔐🎉</span></div>`;
+          return;
+        }
+        cont.innerHTML = `
+        <button class="close-modal" onclick="closeModal()">&times;</button>
+        <div style="min-height:316px">
+          <h2 style="text-align:center; margin:0;font-weight:900;color:#234672;
+          text-shadow:0 2px 11px #e4eaff9c;font-size:1.39em;">
+            Escape Equation Room!</h2>
+          <div style="text-align:center;font-size:1em;;margin:6px 0 16px 0;">Solve each equation to reveal a digit of your escape code.</div>
+          <div id="escCode">${this.code.join(' ')}</div>
+          <div id="escQs">
+            ${this.questions.map((row,i)=>`
+              <div style="margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid #e3ecec;">
+                <span style="display:inline-block;min-width:140px;">${row.q}</span>
+                <input type="number" style="width:60px;height:1.8em;font-size:1em;" id="escIn${i}" ${this.solved[i] ? "disabled" : ""}/>
+                <button data-idx="${i}" ${this.solved[i] ? "disabled":""}>Check</button>
+                <span id="chk${i}" style="margin-left:8px;">${this.solved[i] ? "✔️":""}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        `;
+        setTimeout(()=>this.setupHandlers(cont),40);
+      },
+      setupHandlers(cont){
+        document.querySelectorAll('#escQs button').forEach(btn=>{
+          btn.onclick=()=>{
+            let idx=Number(btn.getAttribute('data-idx'));
+            if(this.solved[idx]) return;
+            let ans=this.questions[idx].x;
+            let inp = document.getElementById('escIn'+idx);
+            let val = parseInt(inp.value,10);
+            if(val===ans){
+              this.code[idx] = ans+'';
+              document.getElementById('chk'+idx).innerHTML =
+                "<span style='color:#177a4d;border-radius:7px;'>✔️</span>";
+              this.solved[idx]=true;
+              this.render(cont);
+            } else {
+              document.getElementById('chk'+idx).innerHTML =
+                "<span style='color:#b9233d;'>✖️</span>";
+            }
+            document.getElementById('escCode').innerText = this.code.join(' ');
+          }
+        });
+      }
+    };
+  </script>
+</body>
+</html>

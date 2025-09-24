@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Working Translation Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .translate-icon {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 10000;
+            width: 40px;
+            height: 40px;
+            background: #4285f4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .translate-dropdown {
+            position: fixed;
+            top: 60px;
+            right: 15px;
+            z-index: 9999;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            border: 1px solid #ddd;
+            min-width: 220px;
+            display: none;
+        }
+        
+        .language-select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            background: white;
+        }
+        
+        .goog-te-banner-frame { display: none !important; }
+        body { top: 0 !important; }
+        .goog-te-gadget { font-family: inherit !important; }
+        .goog-te-combo { 
+            width: 100% !important; 
+            padding: 8px !important;
+            font-size: 14px !important;
+            border: 1px solid #ccc !important;
+            border-radius: 4px !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Translation Widget -->
+    <div id="translate-icon" class="translate-icon" onclick="toggleTranslate()">
+        <span style="font-size: 18px; color: white;">🌐</span>
+    </div>
+    
+    <div id="translate-dropdown" class="translate-dropdown">
+        <div style="margin-bottom: 10px; font-weight: bold; font-size: 14px;">
+            Choose Language:
+        </div>
+        
+        <!-- Manual Language Selector -->
+        <select id="language-select" class="language-select" onchange="translatePage(this.value)">
+            <option value="">Select Language</option>
+            <option value="hi">Hindi (हिंदी)</option>
+            <option value="bn">Bengali (বাংলা)</option>
+            <option value="te">Telugu (తెలుగు)</option>
+            <option value="ta">Tamil (தமிழ்)</option>
+            <option value="gu">Gujarati (ગુજરાતી)</option>
+            <option value="kn">Kannada (ಕನ್ನಡ)</option>
+            <option value="ml">Malayalam (മലയാളം)</option>
+            <option value="mr">Marathi (मराठी)</option>
+            <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
+            <option value="ur">Urdu (اردو)</option>
+            <option value="es">Spanish (Español)</option>
+            <option value="fr">French (Français)</option>
+            <option value="de">German (Deutsch)</option>
+            <option value="it">Italian (Italiano)</option>
+            <option value="pt">Portuguese (Português)</option>
+            <option value="ru">Russian (Русский)</option>
+            <option value="ja">Japanese (日本語)</option>
+            <option value="ko">Korean (한국어)</option>
+            <option value="zh">Chinese (中文)</option>
+            <option value="ar">Arabic (العربية)</option>
+            <option value="en">English (Reset)</option>
+        </select>
+        
+        <div style="margin-top: 10px; font-size: 11px; color: #666;">
+            Powered by Google Translate
+        </div>
+    </div>
+
+    <!-- Page Content -->
+    <h1>Translation Test - Working Version</h1>
+    <p>This page tests the translation functionality.</p>
+    <p>Click the blue globe icon to see language options.</p>
+    <p>Select any language to translate this content.</p>
+    <p>The translation should work immediately!</p>
+
+    <script type="text/javascript">
+        let translateOpen = false;
+        
+        function toggleTranslate() {
+            const dropdown = document.getElementById('translate-dropdown');
+            translateOpen = !translateOpen;
+            dropdown.style.display = translateOpen ? 'block' : 'none';
+        }
+        
+        function translatePage(langCode) {
+            if (!langCode) return;
+            
+            // Use Google Translate URL method
+            if (langCode === 'en') {
+                // Reset to original
+                window.location.href = window.location.pathname;
+            } else {
+                // Translate using Google Translate
+                const googleTranslateUrl = `https://translate.google.com/translate?sl=en&tl=${langCode}&u=${encodeURIComponent(window.location.href)}`;
+                window.open(googleTranslateUrl, '_blank');
+            }
+        }
+        
+        // Alternative: Use Google Translate Widget
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,hi,bn,te,ta,gu,kn,ml,mr,pa,ur,es,fr,de,it,pt,ru,ja,ko,zh,ar',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element_hidden');
+        }
+        
+        // Close when clicking outside
+        document.addEventListener('click', function(e) {
+            const icon = document.getElementById('translate-icon');
+            const dropdown = document.getElementById('translate-dropdown');
+            
+            if (translateOpen && !icon.contains(e.target) && !dropdown.contains(e.target)) {
+                translateOpen = false;
+                dropdown.style.display = 'none';
+            }
+        });
+    </script>
+    
+    <!-- Hidden Google Translate Element -->
+    <div id="google_translate_element_hidden" style="display: none;"></div>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Energy Sources Treasure Hunt ⚡🌍</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #e0f7fa, #f1f8e9);
+      color: #333;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      color: #1565c0;
+    }
+    .score-box {
+      text-align: center;
+      background: #fff;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .card {
+      background: #fff;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      margin-top: 20px;
+    }
+    .story {
+      background: #e3f2fd;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+    button.option {
+      display: block;
+      width: 100%;
+      margin: 8px 0;
+      padding: 12px;
+      font-size: 1rem;
+      text-align: left;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #f9f9f9;
+      transition: 0.2s;
+    }
+    button.option:hover {
+      background: #bbdefb;
+      border-color: #64b5f6;
+    }
+    .result {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .correct {
+      color: green;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    .wrong {
+      color: red;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    .explanation {
+      background: #fff8e1;
+      padding: 10px;
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+    .next-btn, .restart-btn {
+      background: #1565c0;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-top: 15px;
+    }
+    .next-btn:hover, .restart-btn:hover {
+      background: #0d47a1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>⚡ Energy Sources Treasure Hunt 🌍</h1>
+    <div class="score-box">
+      <div id="score">Score: 0/100</div>
+      <div id="stage">Stage 1 of 5</div>
+    </div>
+    <div id="game"></div>
+  </div>
+
+  <script>
+    const stages = [
+      {
+        title: "🌞 The Solar Village",
+        story: "You arrive at a village powered entirely by the sun! The villagers explain they capture sunlight using special panels.",
+        question: "Solar panels convert sunlight into electricity. This is an example of:",
+        options: [
+          { text: "Renewable Energy", correct: true },
+          { text: "Fossil Fuel", correct: false },
+          { text: "Nuclear Energy", correct: false }
+        ],
+        explanation: "Solar energy is renewable because the sun provides unlimited energy!"
+      },
+      {
+        title: "🌬️ Windy Mountain Peak",
+        story: "At the mountain top, giant wind turbines spin gracefully. The wind makes them turn, generating power.",
+        question: "Wind turbines work by:",
+        options: [
+          { text: "Burning wind to create heat", correct: false },
+          { text: "Converting spinning motion to electricity", correct: true },
+          { text: "Storing wind in containers", correct: false }
+        ],
+        explanation: "Wind turbines convert spinning motion into electrical energy!"
+      },
+      {
+        title: "💧 The Hydroelectric Dam",
+        story: "You discover a massive dam where rushing water flows through turbines generating clean electricity.",
+        question: "Hydroelectric power uses:",
+        options: [
+          { text: "Moving water to spin turbines", correct: true },
+          { text: "Heating water to create steam", correct: false },
+          { text: "Storing water in batteries", correct: false }
+        ],
+        explanation: "The kinetic energy of flowing water spins turbines to generate electricity."
+      },
+      {
+        title: "🏭 The Power Plant",
+        story: "You find a coal power plant. Workers explain they burn coal to heat water, creating steam that turns generators.",
+        question: "Coal is considered a:",
+        options: [
+          { text: "Renewable resource", correct: false },
+          { text: "Fossil fuel", correct: true },
+          { text: "Unlimited energy source", correct: false }
+        ],
+        explanation: "Coal is a fossil fuel formed over millions of years - once we use it up, it’s gone!"
+      },
+      {
+        title: "☢️ Nuclear Research Facility",
+        story: "Scientists show how splitting atoms releases enormous energy to power cities.",
+        question: "Nuclear energy is created by:",
+        options: [
+          { text: "Splitting atoms apart", correct: true },
+          { text: "Combining different chemicals", correct: false },
+          { text: "Heating uranium in ovens", correct: false }
+        ],
+        explanation: "Nuclear fission splits uranium atoms, releasing huge amounts of energy!"
+      }
+    ];
+
+    let currentStage = 0;
+    let score = 0;
+
+    const gameDiv = document.getElementById("game");
+    const scoreDiv = document.getElementById("score");
+    const stageDiv = document.getElementById("stage");
+
+    function renderStage() {
+      const stage = stages[currentStage];
+      stageDiv.textContent = `Stage ${currentStage+1} of ${stages.length}`;
+      scoreDiv.textContent = `Score: ${score}/${stages.length*20}`;
+
+      gameDiv.innerHTML = `
+        <div class="card">
+          <h2>${stage.title}</h2>
+          <div class="story">${stage.story}</div>
+          <h3>${stage.question}</h3>
+          <div id="options"></div>
+          <div id="result"></div>
+        </div>
+      `;
+
+      const optionsDiv = document.getElementById("options");
+      stage.options.forEach((opt, i) => {
+        const btn = document.createElement("button");
+        btn.className = "option";
+        btn.textContent = opt.text;
+        btn.onclick = () => handleAnswer(opt.correct, stage.explanation);
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function handleAnswer(correct, explanation) {
+      const resultDiv = document.getElementById("result");
+      if (correct) {
+        resultDiv.innerHTML = `<div class="result"><div class="correct">✅ Correct!</div></div>`;
+        score += 20;
+      } else {
+        resultDiv.innerHTML = `<div class="result"><div class="wrong">❌ Wrong!</div></div>`;
+      }
+      resultDiv.innerHTML += `<div class="explanation">${explanation}</div>`;
+
+      if (currentStage < stages.length - 1) {
+        const nextBtn = document.createElement("button");
+        nextBtn.textContent = "➡️ Next Location";
+        nextBtn.className = "next-btn";
+        nextBtn.onclick = () => {
+          currentStage++;
+          renderStage();
+        };
+        resultDiv.appendChild(nextBtn);
+      } else {
+        const restartBtn = document.createElement("button");
+        restartBtn.textContent = "🔄 Play Again";
+        restartBtn.className = "restart-btn";
+        restartBtn.onclick = () => {
+          currentStage = 0;
+          score = 0;
+          renderStage();
+        };
+        resultDiv.appendChild(restartBtn);
+
+        resultDiv.innerHTML += `
+          <div class="card">
+            <h3>🏆 Treasure Hunt Complete!</h3>
+            <p>Final Score: ${score}/100</p>
+            <ul style="text-align:left">
+              <li>🌞 Solar and wind are renewable</li>
+              <li>💧 Hydroelectric uses flowing water</li>
+              <li>🏭 Coal is a fossil fuel</li>
+              <li>☢️ Nuclear energy comes from splitting atoms</li>
+            </ul>
+          </div>
+        `;
+      }
+
+      // Disable further option clicks
+      document.querySelectorAll("button.option").forEach(btn => btn.disabled = true);
+    }
+
+    renderStage();
+  </script>
+</body>
+</html>

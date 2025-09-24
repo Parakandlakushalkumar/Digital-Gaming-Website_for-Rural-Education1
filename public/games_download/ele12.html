@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Translation</title>
+<!-- ORIGINAL GAME CONTENT STARTS HERE -->
+<h1>⚡ Electrical Circuit Puzzle ⚡</h1>
+        
+        <div class="score-panel">
+            <div>🔋 Matches: <span id="matches">0</span>/8</div>
+            <div>⏱️ Time: <span id="timer">00:00</span></div>
+            <div>🔄 Attempts: <span id="attempts">0</span></div><div class="game-info">
+            <p>Match electrical components with their functions! Click cards to reveal and find matching pairs.</p><div class="circuit-grid" id="gameGrid"></div>
+
+        <div id="completion" style="display: none;">
+            <div class="completion-message">
+                <h2>🎉 Circuit Complete! 🎉</h2>
+                <p>Congratulations! You've mastered electrical technology!</p>
+                <p>Time: <span id="finalTime"></span> | Attempts: <span id="finalAttempts"></span></p><div class="controls">
+            <button class="btn" onclick="restartGame()">🔄 New Circuit</button>
+            <button class="btn" onclick="showHint()">💡 Hint</button><script>
+        const puzzlePairs = [
+            {
+                card1: { icon: "🔋", text: "Battery" },
+                card2: { icon: "⚡", text: "Power Source" }
+            },
+            {
+                card1: { icon: "💡", text: "Light Bulb" },
+                card2: { icon: "🌟", text: "Load Device" }
+            },
+            {
+                card1: { icon: "🔌", text: "Switch" },
+                card2: { icon: "⏯️", text: "Control Device" }
+            },
+            {
+                card1: { icon: "🔧", text: "Resistor" },
+                card2: { icon: "📉", text: "Current Limiter" }
+            },
+            {
+                card1: { icon: "⚙️", text: "Motor" },
+                card2: { icon: "🔄", text: "Mechanical Work" }
+            },
+            {
+                card1: { icon: "📊", text: "Voltmeter" },
+                card2: { icon: "📏", text: "Voltage Measure" }
+            },
+            {
+                card1: { icon: "🔗", text: "Wire" },
+                card2: { icon: "➡️", text: "Current Path" }
+            },
+            {
+                card1: { icon: "⚡", text: "AC Current" },
+                card2: { icon: "〰️", text: "Alternating Flow" }
+            }
+        ];
+
+        let gameCards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let attempts = 0;
+        let startTime = Date.now();
+        let gameTimer;
+
+        function initializeGame() {
+            // Create card array from pairs
+            gameCards = [];
+            puzzlePairs.forEach(pair => {
+                gameCards.push({...pair.card1, pairId: pair.card1.text});
+                gameCards.push({...pair.card2, pairId: pair.card1.text});
+            });
+            
+            // Shuffle cards
+            gameCards = shuffleArray(gameCards);
+            
+            renderGame();
+            startTimer();
+        }
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function renderGame() {
+            const grid = document.getElementById('gameGrid');
+            grid.innerHTML = '';
+            
+            gameCards.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'puzzle-piece';
+                cardElement.dataset.index = index;
+                cardElement.innerHTML = `
+                    <div class="piece-icon">❓</div>
+                    <div class="piece-content">Click to reveal</div>
+                `;
+                cardElement.onclick = () => flipCard(index);
+                grid.appendChild(cardElement);
+            });
+        }
+
+        function flipCard(index) {
+            const cardElement = document.querySelector(`[data-index="${index}"]`);
+            if (cardElement.classList.contains('flipped') || 
+                cardElement.classList.contains('matched') || 
+                flippedCards.length >= 2) {
+                return;
+            }
+
+            // Flip the card
+            cardElement.classList.add('flipped');
+            const card = gameCards[index];
+            cardElement.innerHTML = `
+                <div class="piece-icon">${card.icon}</div>
+                <div class="piece-content">${card.text}</div>
+            `;
+
+            flippedCards.push({index, card});
+
+            if (flippedCards.length === 2) {
+                attempts++;
+                document.getElementById('attempts').textContent = attempts;
+                setTimeout(checkMatch, 1000);
+            }
+        }
+
+        function checkMatch() {
+            const [first, second] = flippedCards;
+            const firstElement = document.querySelector(`[data-index="${first.index}"]`);
+            const secondElement = document.querySelector(`[data-index="${second.index}"]`);
+
+            if (first.card.pairId === second.card.pairId) {
+                // Match found
+                firstElement.classList.remove('flipped');
+                firstElement.classList.add('matched');
+                secondElement.classList.remove('flipped');
+                secondElement.classList.add('matched');
+                
+                matchedPairs++;
+                document.getElementById('matches').textContent = matchedPairs;
+                
+                if (matchedPairs === puzzlePairs.length) {
+                    endGame();
+                }
+            } else {
+                // No match - flip back
+                firstElement.classList.remove('flipped');
+                secondElement.classList.remove('flipped');
+                firstElement.innerHTML = `
+                    <div class="piece-icon">❓</div>
+                    <div class="piece-content">Click to reveal</div>
+                `;
+                secondElement.innerHTML = `
+                    <div class="piece-icon">❓</div>
+                    <div class="piece-content">Click to reveal</div>
+                `;
+            }
+
+            flippedCards = [];
+        }
+
+        function startTimer() {
+            gameTimer = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('timer').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function endGame() {
+            clearInterval(gameTimer);
+            const finalTime = document.getElementById('timer').textContent;
+            document.getElementById('finalTime').textContent = finalTime;
+            document.getElementById('finalAttempts').textContent = attempts;
+            document.getElementById('completion').style.display = 'block';
+            
+            // Add electric sparks effect
+            createSparks();
+        }
+
+        function createSparks() {
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => {
+                    const spark = document.createElement('div');
+                    spark.className = 'electric-spark';
+                    spark.style.left = Math.random() * 100 + '%';
+                    spark.style.top = Math.random() * 100 + '%';
+                    document.querySelector('.game-container').appendChild(spark);
+                    
+                    setTimeout(() => spark.remove(), 2000);
+                }, i * 200);
+            }
+        }
+
+        function restartGame() {
+            clearInterval(gameTimer);
+            matchedPairs = 0;
+            attempts = 0;
+            flippedCards = [];
+            startTime = Date.now();
+            document.getElementById('matches').textContent = '0';
+            document.getElementById('attempts').textContent = '0';
+            document.getElementById('completion').style.display = 'none';
+            initializeGame();
+        }
+
+        function showHint() {
+            const unmatchedCards = document.querySelectorAll('.puzzle-piece:not(.matched)');
+            if (unmatchedCards.length > 0) {
+                const randomCard = unmatchedCards[Math.floor(Math.random() * unmatchedCards.length)];
+                randomCard.style.border = '3px solid #FFD700';
+                randomCard.style.boxShadow = '0 0 20px rgba(255, 215, 0, 0.8)';
+                setTimeout(() => {
+                    randomCard.style.border = '2px solid #357abd';
+                    randomCard.style.boxShadow = '0 4px 15px rgba(74, 144, 226, 0.3)';
+                }, 2000);
+            }
+        }
+
+        // Initialize game on load
+        initializeGame();
+    </script></html>

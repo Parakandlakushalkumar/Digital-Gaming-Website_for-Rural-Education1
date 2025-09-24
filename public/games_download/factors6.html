@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Games Collection - Factors & Multiples</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .game-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--card-color);
+        }
+
+        .game-card.factor::before { --card-color: linear-gradient(90deg, #ff6b6b, #ee5a24); }
+        .game-card.multiple::before { --card-color: linear-gradient(90deg, #4ecdc4, #44a08d); }
+        .game-card.prime::before { --card-color: linear-gradient(90deg, #f7b731, #f0932b); }
+        .game-card.quest::before { --card-color: linear-gradient(90deg, #a55eea, #8b5cf6); }
+
+        .game-icon {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 25px;
+            background: var(--card-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 45px;
+            color: white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .game-title {
+            font-size: 1.6rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 12px;
+            color: #333;
+        }
+
+        .game-description {
+            text-align: center;
+            color: #666;
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        .game-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.92);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-out;
+            backdrop-filter: blur(5px);
+        }
+
+        .game-content {
+            position: relative;
+            width: 90%;
+            max-width: 950px;
+            height: 90vh;
+            margin: 5vh auto;
+            background: white;
+            border-radius: 25px;
+            overflow: hidden;
+            animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 45px;
+            height: 45px;
+            background: #ff6b6b;
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .close-btn:hover {
+            transform: rotate(90deg) scale(1.1);
+            background: #ee5a24;
+        }
+
+        .instructions-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4);
+        }
+
+        .instructions-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(78, 205, 196, 0.6);
+        }
+
+        .game-area {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .instructions-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.92);
+            z-index: 2000;
+            animation: fadeIn 0.3s ease-out;
+            backdrop-filter: blur(5px);
+        }
+
+        .instructions-content {
+            position: relative;
+            width: 85%;
+            max-width: 650px;
+            margin: 10vh auto;
+            background: white;
+            border-radius: 25px;
+            padding: 45px;
+            animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+        }
+
+        .instructions-content h2 {
+            color: #333;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 2rem;
+        }
+
+        .instructions-content ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .instructions-content li {
+            margin-bottom: 18px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            border-left: 5px solid #4ecdc4;
+            transition: all 0.3s ease;
+        }
+
+        .instructions-content li:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .instructions-content li strong {
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        /* Factor Frenzy Styles */
+        .factor-game {
+            background: linear-gradient(135deg, #ff9a9e, #fecfef, #fecfef);
+        }
+
+        .target-display {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 25px 45px;
+            border-radius: 20px;
+            font-size: 2.2rem;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border: 3px solid #ff6b6b;
+        }
+
+        .factor-grid {
+            position: absolute;
+            top: 180px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: grid;
+            grid-template-columns: repeat(6, 85px);
+            gap: 15px;
+        }
+
+        .factor-tile {
+            width: 85px;
+            height: 85px;
+            background: white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 2px solid transparent;
+        }
+
+        .factor-tile:hover {
+            transform: scale(1.15) rotate(5deg);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            border-color: #ff6b6b;
+        }
+
+        .factor-tile.locked {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            cursor: not-allowed;
+            animation: shake 0.6s;
+            transform: scale(0.95);
+        }
+
+        .factor-tile.correct {
+            background: linear-gradient(135deg, #26de81, #20bf6b);
+            color: white;
+            animation: pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.4) rotate(10deg); }
+            100% { transform: scale(0) rotate(360deg); opacity: 0; }
+        }
+
+        /* Multiple Dash Styles */
+        .multiple-game {
+            background: linear-gradient(135deg, #56ab2f, #a8e063);
+        }
+
+        .runner-track {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(to bottom, #2d3436, #636e72);
+            border-top: 5px solid #dfe6e9;
+        }
+
+        .runner-character {
+            position: absolute;
+            bottom: 50px;
+            left: 100px;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 35px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            border: 3px solid white;
+        }
+
+        .number-token {
+            position: absolute;
+            width: 55px;
+            height: 55px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            animation: moveLeft linear;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border: 3px solid #4ecdc4;
+            transition: all 0.3s ease;
+        }
+
+        .number-token:hover {
+            transform: scale(1.2);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+
+        @keyframes moveLeft {
+            from { right: -55px; }
+            to { right: 100%; }
+        }
+
+        .base-display {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 18px 35px;
+            border-radius: 18px;
+            font-size: 1.6rem;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border: 3px solid #4ecdc4;
+        }
+
+        .score-display {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            background: white;
+            padding: 18px 35px;
+            border-radius: 18px;
+            font-size: 1.6rem;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border: 3px solid #f7b731;
+        }
+
+        /* Prime Defender Styles */
+        .prime-game {
+            background: linear-gradient(135deg, #8b4513, #d2691e, #daa520);
+        }
+
+        .castle {
+            position: absolute;
+            bottom: 0;
+            right: 50px;
+            width: 170px;
+            height: 220px;
+            background: linear-gradient(135deg, #654321, #8b4513);
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 70px;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
+            border: 4px solid #d4af37;
+        }
+
+        .enemy {
+            position: absolute;
+            bottom: 0;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 35px;
+            animation: moveRight linear;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+            border: 3px solid #2d3436;
+        }
+
+        @keyframes moveRight {
+            from { left: -70px; }
+            to { left: 100%; }
+        }
+
+        .tower {
+            position: absolute;
+            width: 70px;
+            height: 90px;
+            background: linear-gradient(135deg, #4a4a4a, #2d3436);
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 35px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            border: 3px solid #d4af37;
+        }
+
+        .prime-question {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 25px 45px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            border: 3px solid #f7b731;
+        }
+
+        .prime-question h3 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .prime-question p {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #f7b731;
+            margin-bottom: 20px;
+        }
+
+        .prime-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .prime-btn {
+            padding: 12px 30px;
+            font-size: 1.3rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .prime-btn.yes {
+            background: linear-gradient(135deg, #26de81, #20bf6b);
+            color: white;
+        }
+
+        .prime-btn.no {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+
+        .prime-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        /* Factor Quest Styles */
+        .quest-game {
+            background: linear-gradient(135deg, #2c3e50, #34495e, #2c3e50);
+        }
+
+        .dungeon-room {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 650px;
+            height: 430px;
+            background: radial-gradient(ellipse at center, #1a1a1a, #0d0d0d);
+            border-radius: 25px;
+            border: 8px solid #8b4513;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.8), 0 0 30px rgba(139, 69, 19, 0.6);
+        }
+
+        .door {
+            position: absolute;
+            width: 110px;
+            height: 160px;
+            background: linear-gradient(135deg, #654321, #8b4513);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 45px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            border: 3px solid #d4af37;
+        }
+
+        .door:hover {
+            transform: scale(1.08) rotate(2deg);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.6);
+        }
+
+        .door.locked {
+            background: linear-gradient(135deg, #8b4513, #654321);
+        }
+
+        .door.open {
+            background: linear-gradient(135deg, #26de81, #20bf6b);
+            animation: doorOpen 0.6s ease-out;
+        }
+
+        @keyframes doorOpen {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(90deg); opacity: 0.7; }
+        }
+
+        .quest-puzzle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 35px;
+            border-radius: 25px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            display: none;
+            border: 3px solid #a55eea;
+        }
+
+        .quest-puzzle h3 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .quest-puzzle p {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #a55eea;
+            margin-bottom: 25px;
+        }
+
+        .factor-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-top: 25px;
+        }
+
+        .factor-option {
+            padding: 18px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 2px solid transparent;
+        }
+
+        .factor-option:hover {
+            background: linear-gradient(135deg, #e9ecef, #dee2e6);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            border-color: #a55eea;
+        }
+
+        .factor-option.correct {
+            background: linear-gradient(135deg, #26de81, #20bf6b);
+            color: white;
+            animation: correctPulse 0.6s ease-out;
+        }
+
+        .factor-option.wrong {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            animation: shake 0.6s;
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: scale(0.8) translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-12px); }
+            75% { transform: translateX(12px); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .games-grid {
+                grid-template-columns: 1fr;
+                gap: 25px;
+            }
+            
+            .game-content {
+                width: 95%;
+                height: 95vh;
+                margin: 2.5vh auto;
+            }
+            
+            .instructions-content {
+                width: 95%;
+                padding: 25px;
+            }
+            
+            .factor-grid {
+                grid-template-columns: repeat(4, 70px);
+                gap: 10px;
+            }
+            
+            .factor-tile {
+                width: 70px;
+                height: 70px;
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Math Games Collection - Factors & Multiples 🎮</h1>
+        
+        <div class="games-grid">
+            <div class="game-card factor" onclick="openGame('factor')">
+                <div class="game-icon" style="background: linear-gradient(90deg, #ff6b6b, #ee5a24);">
+                    🍭
+                </div>
+                <h2 class="game-title">Factor Frenzy</h2>
+                <p class="game-description">Match factors of the target number in this colorful puzzle grid!</p>
+            </div>
+
+            <div class="game-card multiple" onclick="openGame('multiple')">
+                <div class="game-icon" style="background: linear-gradient(90deg, #4ecdc4, #44a08d);">
+                    🏃‍♂️
+                </div>
+                <h2 class="game-title">Multiple Dash</h2>
+                <p class="game-description">Collect multiples in this endless runner adventure!</p>
+            </div>
+
+            <div class="game-card prime" onclick="openGame('prime')">
+                <div class="game-icon" style="background: linear-gradient(90deg, #f7b731, #f0932b);">
+                    🏰
+                </div>
+                <h2 class="game-title">Prime Defender</h2>
+                <p class="game-description">Defend your castle by identifying prime numbers!</p>
+            </div>
+
+            <div class="game-card quest" onclick="openGame('quest')">
+                <div class="game-icon" style="background: linear-gradient(90deg, #a55eea, #8b5cf6);">
+                    🧙‍♂️
+                </div>
+                <h2 class="game-title">Factor Quest</h2>
+                <p class="game-description">Solve factor riddles to unlock treasure doors!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Factor Frenzy Modal -->
+    <div id="factor-modal" class="game-modal">
+        <div class="game-content">
+            <button class="close-btn" onclick="closeGame('factor')">×</button>
+            <button class="instructions-btn" onclick="showInstructions('factor')">📖 Instructions</button>
+            <div class="game-area factor-game" id="factor-game">
+                <div class="target-display" id="factor-target">Target: 24</div>
+                <div class="factor-grid" id="factor-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Multiple Dash Modal -->
+    <div id="multiple-modal" class="game-modal">
+        <div class="game-content">
+            <button class="close-btn" onclick="closeGame('multiple')">×</button>
+            <button class="instructions-btn" onclick="showInstructions('multiple')">📖 Instructions</button>
+            <div class="game-area multiple-game" id="multiple-game">
+                <div class="base-display" id="multiple-base">Multiples of: 7</div>
+                <div class="score-display" id="multiple-score">Score: 0</div>
+                <div class="runner-track"></div>
+                <div class="runner-character" id="runner-character">🏃‍♂️</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prime Defender Modal -->
+    <div id="prime-modal" class="game-modal">
+        <div class="game-content">
+            <button class="close-btn" onclick="closeGame('prime')">×</button>
+            <button class="instructions-btn" onclick="showInstructions('prime')">📖 Instructions</button>
+            <div class="game-area prime-game" id="prime-game">
+                <div class="prime-question">
+                    <h3>Is this number prime?</h3>
+                    <p id="prime-number">11</p>
+                    <div class="prime-buttons">
+                        <button class="prime-btn yes" onclick="checkPrime(true)">Yes</button>
+                        <button class="prime-btn no" onclick="checkPrime(false)">No</button>
+                    </div>
+                </div>
+                <div class="castle">🏰</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Factor Quest Modal -->
+    <div id="quest-modal" class="game-modal">
+        <div class="game-content">
+            <button class="close-btn" onclick="closeGame('quest')">×</button>
+            <button class="instructions-btn" onclick="showInstructions('quest')">📖 Instructions</button>
+            <div class="game-area quest-game" id="quest-game">
+                <div class="dungeon-room">
+                    <div class="door locked" style="top: 50px; left: 50px;" onclick="openDoor(1)">🚪</div>
+                    <div class="door locked" style="top: 50px; right: 50px;" onclick="openDoor(2)">🚪</div>
+                    <div class="door locked" style="bottom: 50px; left: 200px;" onclick="openDoor(3)">🚪</div>
+                    <div class="door locked" style="bottom: 50px; right: 200px;" onclick="openDoor(4)">🚪</div>
+                </div>
+                <div class="quest-puzzle" id="quest-puzzle">
+                    <h3>Choose the factors of:</h3>
+                    <p id="quest-number">36</p>
+                    <div class="factor-options" id="factor-options"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instructions Modals -->
+    <div id="factor-instructions" class="instructions-modal">
+        <div class="instructions-content">
+            <h2>🍭 Factor Frenzy Instructions</h2>
+            <ul>
+                <li><strong>Objective:</strong> Find all factors of the target number</li>
+                <li><strong>How to Play:</strong> Click on numbers that divide the target evenly</li>
+                <li><strong>Correct Match:</strong> The tile turns green and disappears</li>
+                <li><strong>Wrong Match:</strong> The tile turns red and locks temporarily</li>
+                <li><strong>Win Condition:</strong> Remove all factor tiles from the grid</li>
+                <li><strong>Tip:</strong> A factor divides the target number with no remainder</li>
+            </ul>
+            <button class="submit-btn" onclick="closeInstructions('factor')" style="margin-top: 25px; width: 100%; padding: 15px; background: linear-gradient(135deg, #4ecdc4, #44a08d); color: white; border: none; border-radius: 12px; font-size: 1.2rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4); transition: all 0.3s ease;">Got it!</button>
+        </div>
+    </div>
+
+    <div id="multiple-instructions" class="instructions-modal">
+        <div class="instructions-content">
+            <h2>🏃‍♂️ Multiple Dash Instructions</h2>
+            <ul>
+                <li><strong>Objective:</strong> Collect multiples of the base number</li>
+                <li><strong>How to Play:</strong> Click on number tokens as they appear</li>
+                <li><strong>Correct Collection:</strong> +10 points for each multiple</li>
+                <li><strong>Wrong Collection:</strong> -5 points for non-multiples</li>
+                <li><strong>Challenge:</strong> Tokens appear randomly and move quickly</li>
+                <li><strong>Tip:</strong> A multiple is the base number multiplied by any whole number</li>
+            </ul>
+            <button class="submit-btn" onclick="closeInstructions('multiple')" style="margin-top: 25px; width: 100%; padding: 15px; background: linear-gradient(135deg, #4ecdc4, #44a08d); color: white; border: none; border-radius: 12px; font-size: 1.2rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4); transition: all 0.3s ease;">Got it!</button>
+        </div>
+    </div>
+
+    <div id="prime-instructions" class="instructions-modal">
+        <div class="instructions-content">
+            <h2>🏰 Prime Defender Instructions</h2>
+            <ul>
+                <li><strong>Objective:</strong> Defend your castle from monsters</li>
+                <li><strong>How to Play:</strong> Answer if the shown number is prime</li>
+                <li><strong>Prime Number:</strong> A number greater than 1 with no divisors other than 1 and itself</li>
+                <li><strong>Correct Answer:</strong> Destroys the nearest monster</li>
+                <li><strong>Wrong Answer:</strong> Monsters move faster toward your castle</li>
+                <li><strong>Game Over:</strong> If a monster reaches your castle</li>
+            </ul>
+            <button class="submit-btn" onclick="closeInstructions('prime')" style="margin-top: 25px; width: 100%; padding: 15px; background: linear-gradient(135deg, #4ecdc4, #44a08d); color: white; border: none; border-radius: 12px; font-size: 1.2rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4); transition: all 0.3s ease;">Got it!</button>
+        </div>
+    </div>
+
+    <div id="quest-instructions" class="instructions-modal">
+        <div class="instructions-content">
+            <h2>🧙‍♂️ Factor Quest Instructions</h2>
+            <ul>
+                <li><strong>Objective:</strong> Unlock all treasure doors</li>
+                <li><strong>How to Play:</strong> Click on doors to solve factor puzzles</li>
+                <li><strong>Puzzle:</strong> Choose all factors of the given number from the options</li>
+                <li><strong>Correct Choice:</strong> Option turns green, door opens with treasure</li>
+                <li><strong>Wrong Choice:</strong> Option turns red, try again</li>
+                <li><strong>Victory:</strong> Unlock all 4 doors to complete the quest</li>
+            </ul>
+            <button class="submit-btn" onclick="closeInstructions('quest')" style="margin-top: 25px; width: 100%; padding: 15px; background: linear-gradient(135deg, #4ecdc4, #44a08d); color: white; border: none; border-radius: 12px; font-size: 1.2rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4); transition: all 0.3s ease;">Got it!</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state variables
+        let currentGame = '';
+        let factorTarget = 24;
+        let multipleBase = 7;
+        let multipleScore = 0;
+        let primeNumber = 11;
+        let questNumber = 36;
+
+        // Open game function
+        function openGame(gameType) {
+            currentGame = gameType;
+            document.getElementById(`${gameType}-modal`).style.display = 'block';
+            initializeGame(gameType);
+        }
+
+        // Close game function
+        function closeGame(gameType) {
+            document.getElementById(`${gameType}-modal`).style.display = 'none';
+            resetGame(gameType);
+        }
+
+        // Show instructions
+        function showInstructions(gameType) {
+            document.getElementById(`${gameType}-instructions`).style.display = 'block';
+        }
+
+        // Close instructions
+        function closeInstructions(gameType) {
+            document.getElementById(`${gameType}-instructions`).style.display = 'none';
+        }
+
+        // Initialize games
+        function initializeGame(gameType) {
+            switch(gameType) {
+                case 'factor':
+                    initFactorFrenzy();
+                    break;
+                case 'multiple':
+                    initMultipleDash();
+                    break;
+                case 'prime':
+                    initPrimeDefender();
+                    break;
+                case 'quest':
+                    initFactorQuest();
+                    break;
+            }
+        }
+
+        // Reset games
+        function resetGame(gameType) {
+            switch(gameType) {
+                case 'factor':
+                    document.getElementById('factor-grid').innerHTML = '';
+                    break;
+                case 'multiple':
+                    multipleScore = 0;
+                    document.getElementById('multiple-score').textContent = 'Score: 0';
+                    break;
+                case 'prime':
+                    // Reset prime game
+                    break;
+                case 'quest':
+                    // Reset quest game
+                    break;
+            }
+        }
+
+        // Factor Frenzy Game
+        function initFactorFrenzy() {
+            factorTarget = Math.floor(Math.random() * 20) + 10;
+            document.getElementById('factor-target').textContent = `Target: ${factorTarget}`;
+            
+            const grid = document.getElementById('factor-grid');
+            grid.innerHTML = '';
+            
+            // Generate numbers including factors and non-factors
+            const numbers = [];
+            const factors = getFactors(factorTarget);
+            
+            // Add factors
+            factors.forEach(f => numbers.push(f));
+            
+            // Add non-factors
+            while (numbers.length < 24) {
+                const num = Math.floor(Math.random() * 30) + 1;
+                if (!factors.includes(num) && !numbers.includes(num)) {
+                    numbers.push(num);
+                }
+            }
+            
+            // Shuffle numbers
+            numbers.sort(() => Math.random() - 0.5);
+            
+            // Create tiles
+            numbers.forEach(num => {
+                const tile = document.createElement('div');
+                tile.className = 'factor-tile';
+                tile.textContent = num;
+                tile.onclick = () => checkFactor(tile, num);
+                grid.appendChild(tile);
+            });
+        }
+
+        function getFactors(n) {
+            const factors = [];
+            for (let i = 1; i <= n; i++) {
+                if (n % i === 0) {
+                    factors.push(i);
+                }
+            }
+            return factors;
+        }
+
+        function checkFactor(tile, num) {
+            if (tile.classList.contains('locked') || tile.classList.contains('correct')) return;
+            
+            if (factorTarget % num === 0) {
+                tile.classList.add('correct');
+                setTimeout(() => tile.remove(), 600);
+                
+                // Check if all factors are found
+                const remaining = document.querySelectorAll('.factor-tile:not(.correct):not(.locked)');
+                const allFactorsFound = Array.from(remaining).every(t => 
+                    factorTarget % parseInt(t.textContent) !== 0
+                );
+                
+                if (allFactorsFound) {
+                    setTimeout(() => {
+                        alert('Congratulations! You found all factors!');
+                        initFactorFrenzy();
+                    }, 700);
+                }
+            } else {
+                tile.classList.add('locked');
+                setTimeout(() => tile.classList.remove('locked'), 1000);
+            }
+        }
+
+        // Multiple Dash Game
+        function initMultipleDash() {
+            multipleBase = Math.floor(Math.random() * 9) + 2;
+            document.getElementById('multiple-base').textContent = `Multiples of: ${multipleBase}`;
+            multipleScore = 0;
+            document.getElementById('multiple-score').textContent = 'Score: 0';
+            
+            // Start spawning tokens
+            spawnToken();
+            setInterval(() => {
+                if (document.getElementById('multiple-modal').style.display === 'block') {
+                    spawnToken();
+                }
+            }, 2000);
+        }
+
+        function spawnToken() {
+            const gameArea = document.getElementById('multiple-game');
+            const token = document.createElement('div');
+            token.className = 'number-token';
+            
+            const isMultiple = Math.random() > 0.4;
+            const value = isMultiple ? 
+                multipleBase * (Math.floor(Math.random() * 10) + 1) : 
+                Math.floor(Math.random() * 50) + 1;
+            
+            token.textContent = value;
+            token.style.top = Math.random() * 150 + 50 + 'px';
+            token.style.animationDuration = (Math.random() * 2 + 3) + 's';
+            
+            token.onclick = () => {
+                if (value % multipleBase === 0) {
+                    multipleScore += 10;
+                    document.getElementById('multiple-score').textContent = `Score: ${multipleScore}`;
+                    token.style.background = '#26de81';
+                    token.style.transform = 'scale(1.5)';
+                    setTimeout(() => token.remove(), 300);
+                } else {
+                    multipleScore = Math.max(0, multipleScore - 5);
+                    document.getElementById('multiple-score').textContent = `Score: ${multipleScore}`;
+                    token.style.background = '#ff6b6b';
+                    token.style.transform = 'scale(0.8)';
+                    setTimeout(() => token.remove(), 300);
+                }
+            };
+            
+            gameArea.appendChild(token);
+            
+            setTimeout(() => {
+                if (token.parentNode) {
+                    token.remove();
+                }
+            }, 5000);
+        }
+
+        // Prime Defender Game
+        function initPrimeDefender() {
+            generatePrimeQuestion();
+            spawnEnemy();
+            setInterval(() => {
+                if (document.getElementById('prime-modal').style.display === 'block') {
+                    spawnEnemy();
+                }
+            }, 3000);
+        }
+
+        function generatePrimeQuestion() {
+            primeNumber = Math.floor(Math.random() * 30) + 2;
+            document.getElementById('prime-number').textContent = primeNumber;
+        }
+
+        function isPrime(n) {
+            if (n < 2) return false;
+            for (let i = 2; i <= Math.sqrt(n); i++) {
+                if (n % i === 0) return false;
+            }
+            return true;
+        }
+
+        function checkPrime(answer) {
+            if (answer === isPrime(primeNumber)) {
+                // Correct - shoot enemy
+                const enemies = document.querySelectorAll('.enemy');
+                if (enemies.length > 0) {
+                    enemies[0].style.background = '#26de81';
+                    enemies[0].style.transform = 'scale(1.5)';
+                    setTimeout(() => enemies[0].remove(), 300);
+                }
+            } else {
+                // Wrong - enemy advances
+                const enemies = document.querySelectorAll('.enemy');
+                if (enemies.length > 0) {
+                    enemies[0].style.animationDuration = '1s';
+                    enemies[0].style.background = '#ff6b6b';
+                }
+            }
+            generatePrimeQuestion();
+        }
+
+        function spawnEnemy() {
+            const gameArea = document.getElementById('prime-game');
+            const enemy = document.createElement('div');
+            enemy.className = 'enemy';
+            enemy.textContent = '👹';
+            enemy.style.bottom = Math.random() * 100 + 50 + 'px';
+            enemy.style.animationDuration = (Math.random() * 3 + 5) + 's';
+            
+            gameArea.appendChild(enemy);
+            
+            setTimeout(() => {
+                if (enemy.parentNode) {
+                    enemy.remove();
+                    // Check if enemy reached castle
+                    if (parseInt(enemy.style.left) > window.innerWidth - 200) {
+                        alert('Game Over! The enemy reached your castle!');
+                        closeGame('prime');
+                    }
+                }
+            }, 8000);
+        }
+
+        // Factor Quest Game
+        function initFactorQuest() {
+            // Reset doors
+            document.querySelectorAll('.door').forEach(door => {
+                door.classList.remove('open');
+                door.classList.add('locked');
+                door.textContent = '🚪';
+            });
+        }
+
+        function openDoor(doorNum) {
+            const door = document.querySelectorAll('.door')[doorNum - 1];
+            if (door.classList.contains('open')) return;
+            
+            questNumber = Math.floor(Math.random() * 20) + 10;
+            document.getElementById('quest-number').textContent = questNumber;
+            
+            const puzzle = document.getElementById('quest-puzzle');
+            puzzle.style.display = 'block';
+            
+            const options = document.getElementById('factor-options');
+            options.innerHTML = '';
+            
+            const factors = getFactors(questNumber);
+            const allOptions = [];
+            
+            // Add correct factors
+            factors.slice(0, 3).forEach(f => allOptions.push({value: f, correct: true}));
+            
+            // Add wrong options
+            while (allOptions.length < 6) {
+                const num = Math.floor(Math.random() * 30) + 1;
+                if (!factors.includes(num) && !allOptions.find(o => o.value === num)) {
+                    allOptions.push({value: num, correct: false});
+                }
+            }
+            
+            // Shuffle options
+            allOptions.sort(() => Math.random() - 0.5);
+            
+            allOptions.forEach(option => {
+                const div = document.createElement('div');
+                div.className = 'factor-option';
+                div.textContent = option.value;
+                div.onclick = () => checkFactorOption(div, option.correct, door);
+                options.appendChild(div);
+            });
+        }
+
+        function checkFactorOption(element, correct, door) {
+            if (element.classList.contains('correct') || element.classList.contains('wrong')) return;
+            
+            if (correct) {
+                element.classList.add('correct');
+                door.classList.remove('locked');
+                door.classList.add('open');
+                door.textContent = '💎';
+                
+                setTimeout(() => {
+                    document.getElementById('quest-puzzle').style.display = 'none';
+                    
+                    // Check if all doors are open
+                    const allOpen = Array.from(document.querySelectorAll('.door')).every(d => 
+                        d.classList.contains('open')
+                    );
+                    
+                    if (allOpen) {
+                        setTimeout(() => {
+                            alert('Congratulations! You unlocked all treasures!');
+                            closeGame('quest');
+                        }, 500);
+                    }
+                }, 1000);
+            } else {
+                element.classList.add('wrong');
+                setTimeout(() => element.classList.remove('wrong'), 1000);
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('game-modal')) {
+                event.target.style.display = 'none';
+                resetGame(currentGame);
+            }
+            if (event.target.classList.contains('instructions-modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

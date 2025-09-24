@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fun Data Games</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #fff4e6 0%, #c1f7f6 100%);
+      font-family: 'Comic Sans MS', 'Segoe UI', Arial, Verdana, sans-serif;
+    }
+    .container {
+      max-width: 850px;
+      margin: 35px auto;
+      background: rgba(255,255,254,0.97);
+      border-radius: 22px;
+      box-shadow: 0 10px 32px rgba(25,80,130, 0.13);
+      padding: 28px;
+      min-height: 470px;
+    }
+    h1 {
+      color: #F76D6D;
+      text-align: center;
+      font-size: 2.7em;
+      margin-bottom: 22px;
+      letter-spacing: 2px;
+      text-shadow: 2px 2px #ffd6a0;
+    }
+    .cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 35px;
+      justify-content: center;
+    }
+    .card {
+      width: 210px;
+      height: 225px;
+      background: linear-gradient(120deg, #b2f7ef 0%, #ffb4a2 100%);
+      border-radius: 22px;
+      box-shadow: 0 10px 25px rgba(80,30,100,0.13);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      text-align: center;
+      transition: transform .18s, box-shadow .18s;
+      font-size: 1.18em;
+      position: relative;
+      overflow: hidden;
+      animation: cardPop 0.7s;
+    }
+    @keyframes cardPop {
+      0% { transform: scale(0.85);}
+      80% {transform: scale(1.06);}
+      100% {transform: scale(1);}
+    }
+    .card:hover {
+      transform: scale(1.093) rotate(-1.3deg);
+      box-shadow: 0 18px 42px rgba(60,20,90,.15);
+    }
+    .card span {
+      font-size: 2.6em;
+      margin-bottom: 18px;
+      animation: emojiBounce 1s infinite alternate;
+    }
+    @keyframes emojiBounce {
+      0% { transform: translateY(0);}
+      100% { transform: translateY(-8px);}
+    }
+    .card small {
+      font-size: 1.03em;
+      color: #6a0d89;
+      font-weight: bold;
+    }
+    .game {
+      display: none;
+      padding: 18px 7px 15px 7px;
+      min-height: 350px;
+      position: relative;
+      animation: fadeIn .75s;
+    }
+    .game.active {
+      display: block;
+      animation: fadeIn .72s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.97);}
+      to { opacity: 1; transform: scale(1);}
+    }
+    .backbtn {
+      position: absolute;
+      top: 18px;
+      right: 28px;
+      background: #ffd6a0;
+      color: #673ab7;
+      border: none;
+      border-radius: 100px;
+      padding: 9px 23px;
+      font-size: 1.05em;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 2;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.09);
+      transition: background .14s;
+    }
+    .backbtn:hover { background: #ffb4a2; color: #272343;}
+    .game h2 { margin-top: 16px; color: #F76D6D; }
+    .question, .score {
+      font-size: 1.31em;
+      margin-top: 15px;
+      margin-bottom: 9px;
+      color: #19507c;
+      font-weight: 600;
+    }
+    input[type="number"], input[type="text"] {
+      font-size: 1.33em;
+      border-radius: 10px;
+      border: 2px solid #a0c4ff;
+      padding: 9px;
+      width: 90px;
+      margin-right: 10px;
+      margin-top: 6px;
+    }
+    .btn {
+      background: #F76D6D;
+      color: #fff;
+      border: none;
+      padding: 13px 28px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-size: 1.12em;
+      font-weight: 700;
+      margin: 12px 0 7px 0;
+      box-shadow: 0 2px 12px rgba(0,0,0,.07);
+      transition: background .19s;
+      letter-spacing: 1px;
+    }
+    .btn:hover { background: #64dfdf; }
+    .feedback {
+      font-size: 1.23em;
+      margin-top: 16px;
+      color: #ea638c;
+      min-height: 30px;
+      font-weight: bold;
+      text-shadow: 1px 2px #fffbe6;
+      letter-spacing: 1.2px;
+    }
+    .score { color: #376191; font-weight: bold; }
+    table.data-table { border-collapse: collapse; margin: 15px auto; font-size: 1.18em;}
+    table.data-table th, table.data-table td {
+      border: 2px solid #f6c1c7;
+      padding: 7px 18px;
+      text-align: center;
+      border-radius: 9px;
+      background: #d5f3fc;
+    }
+    table.data-table th {
+      background: #ffe9a0;
+      color: #4b204c;
+      font-weight: bold;
+      font-size: 1.14em;
+    }
+    table.data-table td {
+      background: #ffe9a0;
+      color: #2d6da1;
+    }
+    .chart-area {
+      margin: 24px auto 11px;
+      text-align: center;
+    }
+    #pieLegend {font-size: 1.12em; margin-top:8px;}
+    @media (max-width: 670px) {
+      .cards {flex-direction: column; align-items: center;}
+      .card {width: 96vw;}
+    }
+    @media (max-width: 460px) {
+      .container {padding: 8px;}
+      h1 {font-size: 1.48em;}
+      .card {width: 99vw; height: 138px;}
+      .game {padding: 8px 2vw;}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Fun Data Games</h1>
+    <!-- CARD MENU -->
+    <div id="cardMenu" class="cards">
+      <div class="card" onclick="showGame(0)">
+        <span>🏞️</span>
+        <div>Average Adventure<br><small>Calculate the Mean</small></div>
+      </div>
+      <div class="card" onclick="showGame(1)">
+        <span>🕵️‍♂️</span>
+        <div>Data Detective<br><small>Find Hidden Answers</small></div>
+      </div>
+      <div class="card" onclick="showGame(2)">
+        <span>📊</span>
+        <div>Chart Builder<br><small>Make Awesome Charts</small></div>
+      </div>
+    </div>
+    <!-- GAME SCREENS -->
+    <!-- Average Adventure -->
+    <div id="game0" class="game">
+      <button class="backbtn" onclick="backToMenu()">← Back</button>
+      <h2>Average Adventure 🏞️</h2>
+      <div class="score" id="score0"></div>
+      <div class="question" id="question0"></div>
+      <div id="locationTable"></div>
+      <input type="number" id="ans0">
+      <button class="btn" onclick="checkAnswer(0)">Collect!</button>
+      <div class="feedback" id="feedback0"></div>
+    </div>
+    <!-- Data Detective -->
+    <div id="game1" class="game">
+      <button class="backbtn" onclick="backToMenu()">← Back</button>
+      <h2>Data Detective 🕵️‍♂️</h2>
+      <div class="score" id="score1"></div>
+      <div id="detectTable"></div>
+      <div class="question" id="question1"></div>
+      <input type="text" id="ans1">
+      <button class="btn" onclick="checkAnswer(1)">Solve!</button>
+      <div class="feedback" id="feedback1"></div>
+    </div>
+    <!-- Chart Builder -->
+    <div id="game2" class="game">
+      <button class="backbtn" onclick="backToMenu()">← Back</button>
+      <h2>Chart Builder 📊</h2>
+      <div class="score" id="score2"></div>
+      <div id="chartData"></div>
+      <div class="chart-area">
+        <canvas id="userChart" width="260" height="180"></canvas>
+        <div id="pieLegend"></div>
+      </div>
+      <div>
+        <label style="font-size:1.1em;color:#e63946;">Chart Type:
+          <select id="chartType" onchange="drawUserChart()">
+            <option value="bar">Bar</option>
+            <option value="pie">Pie</option>
+          </select>
+        </label>
+      </div>
+      <button class="btn" onclick="checkAnswer(2)">Check Chart!</button>
+      <div class="feedback" id="feedback2"></div>
+    </div>
+  </div>
+  <script>
+    let gameStates = [
+      {score:0, nums:[], location:''},
+      {score:0, table:[], question:'', answer:''},
+      {score:0, data:[], chartType:'bar'}
+    ];
+    function showGame(idx){
+      document.getElementById('cardMenu').style.display='none';
+      for(let i=0;i<3;i++)document.getElementById('game'+i).classList.remove('active');
+      document.getElementById('game'+idx).classList.add('active');
+      startGame(idx);
+    }
+    function backToMenu(){
+      for(let i=0;i<3;i++)document.getElementById('game'+i).classList.remove('active');
+      document.getElementById('cardMenu').style.display='flex';
+    }
+    function startGame(idx){
+      if(idx===0){ // Average Adventure
+        gameStates[0].score = gameStates[0].score||0;
+        document.getElementById('score0').textContent = 'Score: '+gameStates[0].score;
+        document.getElementById('feedback0').textContent = '';
+        document.getElementById('ans0').value = '';
+        let location = ["Forest","River","Mountain","Beach"][randInt(0,3)];
+        let nums = [randInt(2,17),randInt(8,33),randInt(6,28),randInt(7,35)];
+        nums=nums.slice(0,randInt(2,4));
+        gameStates[0].location=location;
+        gameStates[0].nums=nums;
+        document.getElementById('question0').textContent = `At the ${location}, collect all items. What's their average value?`;
+        let tableHtml='<table class="data-table"><tr><th>Item</th><th>Value</th></tr>';
+        nums.forEach((n,i)=>tableHtml+=`<tr><td>Item ${i+1}</td><td>${n}</td></tr>`);
+        tableHtml+='</table>';
+        document.getElementById('locationTable').innerHTML=tableHtml;
+      }
+      else if(idx===1){ // Data Detective
+        gameStates[1].score = gameStates[1].score||0;
+        document.getElementById('score1').textContent = 'Score: '+gameStates[1].score;
+        document.getElementById('feedback1').textContent = '';
+        document.getElementById('ans1').value = '';
+        let fruits = ['Apple','Orange','Banana','Peach','Grape'];
+        let data = fruits.map(f=>({fruit:f, sold:randInt(10,75)}));
+        gameStates[1].table = data;
+        let tableHtml='<table class="data-table"><tr><th>Fruit</th><th>Sold</th></tr>';
+        data.forEach(d=>tableHtml+=`<tr><td>${d.fruit}</td><td>${d.sold}</td></tr>`);
+        tableHtml+='</table>';
+        document.getElementById('detectTable').innerHTML = tableHtml;
+        let idxq=randInt(0,1);
+        let question = idxq===0 ? "Which fruit was sold the most?" : "Which fruit was sold the least?";
+        let answer = idxq===0
+          ? data.reduce((a,b)=>a.sold>=b.sold?a:b).fruit
+          : data.reduce((a,b)=>a.sold<=b.sold?a:b).fruit;
+        gameStates[1].question=question;
+        gameStates[1].answer=answer;
+        document.getElementById('question1').textContent=question;
+      }
+      else if(idx===2){ // Chart Builder
+        gameStates[2].score = gameStates[2].score||0;
+        document.getElementById('score2').textContent = 'Score: '+gameStates[2].score;
+        document.getElementById('feedback2').textContent = '';
+        let labels=['A','B','C','D'];
+        let values=[randInt(9,70),randInt(13,65),randInt(7,52),randInt(12,66)];
+        gameStates[2].data = labels.map((l,i)=>({label:l, value:values[i]}));
+        let html = '<table class="data-table"><tr><th>Category</th><th>Value</th></tr>';
+        labels.forEach((l,i)=>html+=`<tr><td>${l}</td><td><input type="number" min="0" id="chartD${i}" value="${values[i]}"></td></tr>`);
+        html+='</table>';
+        document.getElementById('chartData').innerHTML=html;
+        document.getElementById('chartType').value='bar';
+        drawUserChart();
+      }
+    }
+    function checkAnswer(idx){
+      if(idx===0){
+        let vals=gameStates[0].nums;
+        let user = parseFloat(document.getElementById('ans0').value);
+        if(isNaN(user)){
+          document.getElementById('feedback0').textContent = "🧮 Enter a number!";
+        }
+        else{
+          let avg = Math.round(vals.reduce((a,b)=>a+b,0)/vals.length*100)/100;
+          if(user===avg){
+            document.getElementById('feedback0').textContent = "🎉 That's amazing! Go to next adventure!";
+            gameStates[0].score++;
+            document.getElementById('score0').textContent = "Score: "+gameStates[0].score;
+            setTimeout(()=>startGame(0),1100);
+          } else {
+            document.getElementById('feedback0').textContent = `Hint: Add up the numbers and divide by ${vals.length}. Try again!`;
+          }
+        }
+      } else if(idx===1){
+        let ans = document.getElementById('ans1').value.trim();
+        if(ans.toLowerCase()===gameStates[1].answer.toLowerCase()){
+          document.getElementById('feedback1').textContent = "🔎 Correct! Clue found!";
+          gameStates[1].score++;
+          document.getElementById('score1').textContent = "Score: "+gameStates[1].score;
+          setTimeout(()=>startGame(1),1100);
+        } else {
+          document.getElementById('feedback1').textContent = `Hint: Check the table and compare the numbers again.`;
+        }
+      } else if(idx===2){ // Chart Builder
+        let uservals=[];
+        for(let i=0;i<4;i++){
+          let v=parseInt(document.getElementById('chartD'+i).value);
+          if(isNaN(v)||v<0){
+            document.getElementById('feedback2').textContent="🏗️ Enter valid values for all categories!";
+            return;
+          }
+          uservals.push(v);
+        }
+        let t=gameStates[2].data.map(d=>d.value);
+        let match = uservals.join(',')===t.join(',');
+        if(match){
+          document.getElementById('feedback2').textContent="🌈 Beautiful chart! Data matches perfectly!";
+          gameStates[2].score++;
+          document.getElementById('score2').textContent = "Score: "+gameStates[2].score;
+        }else{
+          document.getElementById('feedback2').textContent="Chart and values don't match the table. Try again!";
+        }
+        drawUserChart();
+      }
+    }
+    function drawUserChart(){
+      let labels=['A','B','C','D'];
+      let vals=[];
+      for(let i=0;i<4;i++)vals.push(parseInt(document.getElementById('chartD'+i).value)||0);
+      let type=document.getElementById('chartType').value;
+      let canvas=document.getElementById('userChart');
+      let ctx=canvas.getContext('2d'), w=canvas.width, h=canvas.height;
+      ctx.clearRect(0,0,w,h);
+      let colors=['#ffbe0b','#8338ec','#3a86ff','#ea638c'];
+      if(type=='bar'){
+        let mx=Math.max(...vals,10), bw=(w-34)/labels.length;
+        vals.forEach((v,i)=>{
+          ctx.fillStyle=colors[i%colors.length];
+          let bh = v/mx*(h-44);
+          ctx.fillRect(15+i*bw,h-bh-15,bw-10,bh);
+          ctx.fillStyle='#222'; ctx.font='16px Comic Sans MS';
+          ctx.fillText(labels[i],15+i*bw,h-3);
+          ctx.fillText(v,15+i*bw+12,h-bh-22);
+        });
+        document.getElementById('pieLegend').textContent='';
+      }else{
+        let total=vals.reduce((a,b)=>a+b,0),start=0;
+        labels.forEach((lab,i)=>{
+          ctx.fillStyle=colors[i%colors.length];
+          let ang=vals[i]/(total||1)*2*Math.PI;
+          ctx.beginPath();ctx.moveTo(w/2,h/2);
+          ctx.arc(w/2,h/2,h/2-21,start,start+ang);
+          ctx.closePath();ctx.fill();start+=ang;
+        });
+        let legend='';
+        labels.forEach((lab,i)=>{
+          legend+=`<span style="color:${colors[i]};font-weight:bold;">${lab}</span> `;
+        });
+        document.getElementById('pieLegend').innerHTML='Pie chart legend: '+legend;
+      }
+    }
+    function randInt(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+    document.addEventListener('DOMContentLoaded',function(){});
+  </script>
+</body>
+</html>

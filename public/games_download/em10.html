@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Translation</title>
+<!-- ORIGINAL GAME CONTENT STARTS HERE -->
+<h1>⚡ Electricity & Magnetism Simulator</h1>
+        <div class="game-info">
+            <span>Score: <span id="score">0</span></span>
+            <span>Voltage: <span id="voltage">6V</span></span>
+            <span>Questions: <span id="correct-answers">0</span>/10</span><div class="circuit-area" id="circuitArea">
+            <div class="battery" id="battery" style="left: 50px; top: 100px;" onclick="batteryClicked()" title="Battery - Click to toggle">6V</div>
+            <div class="resistor" id="resistor" style="left: 150px; top: 100px;" onclick="resistorClicked()" title="Resistor - Click to change value">10Ω</div>
+            <div class="bulb" id="bulb" style="left: 250px; top: 100px;" onclick="bulbClicked()" title="Light Bulb - Click to toggle">💡</div>
+            <div class="magnet north" id="magnet" style="left: 100px; top: 250px;" onclick="magnetClicked()" title="Magnet - Click to flip poles">N</div>
+            <div class="magnetic-field" id="magneticField"></div>
+            
+            <!-- Wires -->
+            <div class="wire" style="left: 90px; top: 120px; width: 60px; height: 4px;" onclick="wireClicked(this)"></div>
+            <div class="wire" style="left: 210px; top: 120px; width: 40px; height: 4px;" onclick="wireClicked(this)"></div>
+            <div class="wire" style="left: 120px; top: 100px; width: 4px; height: 20px;" onclick="wireClicked(this)"></div>
+            <div class="wire" style="left: 120px; top: 120px; width: 4px; height: 20px;" onclick="wireClicked(this)"></div><div class="control-panel">
+            <button class="control-btn" onclick="startCircuit()">Circuit Analysis</button>
+            <button class="control-btn" onclick="startMagnetism()">Magnetic Fields</button>
+            <button class="control-btn" onclick="startElectromagnetic()">Electromagnetic Induction</button>
+            <button class="control-btn" onclick="startOhmsLaw()">Ohm's Law</button><div class="circuit-controls">
+            <h3>🔧 Circuit Controls</h3>
+            <div class="voltage-control">
+                <label>Voltage:</label>
+                <input type="range" class="voltage-slider" id="voltageSlider" min="0" max="12" value="6" oninput="updateVoltage(this.value)">
+                <span id="voltageValue">6V</span><div style="display: flex; gap: 10px; margin: 15px 0;">
+                <button class="experiment-btn" onclick="toggleCircuit()">Toggle Circuit</button>
+                <button class="experiment-btn" onclick="resetCircuit()">Reset</button>
+                <button class="experiment-btn" onclick="addComponent()">Add Component</button><div class="circuit-diagram">
+            <h3>🔌 Circuit Symbols</h3>
+            <p>Click on symbols to learn about them:</p>
+            <div class="circuit-symbol" onclick="showSymbolInfo('battery')">Battery</div>
+            <div class="circuit-symbol" onclick="showSymbolInfo('resistor')">Resistor</div>
+            <div class="circuit-symbol" onclick="showSymbolInfo('bulb')">Light Bulb</div>
+            <div class="circuit-symbol" onclick="showSymbolInfo('switch')">Switch</div>
+            <div class="circuit-symbol" onclick="showSymbolInfo('capacitor')">Capacitor</div>
+            <div class="circuit-symbol" onclick="showSymbolInfo('inductor')">Inductor</div><div class="info-panel" id="infoPanel">
+            <h3>⚡ Electricity & Magnetism</h3>
+            <p><strong>Current:</strong> Flow of electric charge through a conductor.</p>
+            <p><strong>Voltage:</strong> Electrical potential difference that drives current.</p>
+            <p><strong>Resistance:</strong> Opposition to the flow of electric current.</p>
+            <p><strong>Magnetic Field:</strong> Region around a magnet where magnetic forces act.</p><div class="quiz-section" id="quizSection">
+            <div class="question" id="questionText">
+                What is the unit of electric current?<div class="options" id="optionsContainer">
+                <div class="option" onclick="selectOption(this, false)">Volt</div>
+                <div class="option" onclick="selectOption(this, true)">Ampere</div>
+                <div class="option" onclick="selectOption(this, false)">Ohm</div>
+                <div class="option" onclick="selectOption(this, false)">Watt</div><div class="controls">
+            <button class="btn btn-simulate" onclick="runSimulation()">Run Simulation</button>
+            <button class="btn btn-quiz" onclick="checkQuizAnswer()">Submit Answer</button>
+            <button class="btn btn-next" onclick="nextQuestion()">Next Question</button><div id="result" class="result" style="display: none;"></div><script>
+        const questions = [
+            {
+                question: "What is the unit of electric current?",
+                options: ["Volt", "Ampere", "Ohm", "Watt"],
+                correct: 1
+            },
+            {
+                question: "What is Ohm's Law?",
+                options: ["V = I × R", "I = V × R", "R = V × I", "P = V × I"],
+                correct: 0
+            },
+            {
+                question: "What happens when like magnetic poles are brought together?",
+                options: ["They attract", "They repel", "They cancel out", "They merge"],
+                correct: 1
+            },
+            {
+                question: "What is the unit of resistance?",
+                options: ["Volt", "Ampere", "Ohm", "Watt"],
+                correct: 2
+            },
+            {
+                question: "What is electromagnetic induction?",
+                options: ["Creating electricity from magnetism", "Creating magnetism from electricity", "Both A and B", "Neither A nor B"],
+                correct: 2
+            },
+            {
+                question: "What is the direction of magnetic field lines around a current-carrying wire?",
+                options: ["Clockwise", "Counter-clockwise", "Radial", "Depends on current direction"],
+                correct: 3
+            },
+            {
+                question: "What is the unit of voltage?",
+                options: ["Ampere", "Ohm", "Volt", "Watt"],
+                correct: 2
+            },
+            {
+                question: "What happens to resistance when temperature increases?",
+                options: ["Increases", "Decreases", "Stays the same", "Depends on material"],
+                correct: 3
+            },
+            {
+                question: "What is the relationship between current and voltage in a resistor?",
+                options: ["Directly proportional", "Inversely proportional", "No relationship", "Exponential"],
+                correct: 0
+            },
+            {
+                question: "What is the unit of power?",
+                options: ["Volt", "Ampere", "Ohm", "Watt"],
+                correct: 3
+            }
+        ];
+        
+        const symbolInfo = {
+            battery: "Battery: Provides electrical energy by converting chemical energy. Symbol: + and - terminals.",
+            resistor: "Resistor: Limits current flow and converts electrical energy to heat. Symbol: Zigzag line.",
+            bulb: "Light Bulb: Converts electrical energy to light and heat. Symbol: Circle with X inside.",
+            switch: "Switch: Controls current flow by opening or closing the circuit. Symbol: Line with gap.",
+            capacitor: "Capacitor: Stores electrical energy in an electric field. Symbol: Two parallel lines.",
+            inductor: "Inductor: Stores electrical energy in a magnetic field. Symbol: Coil of wire."
+        };
+        
+        let currentQuestion = 0;
+        let score = 0;
+        let correctAnswers = 0;
+        let selectedOption = null;
+        let currentVoltage = 6;
+        let circuitActive = false;
+        
+        function batteryClicked() {
+            const battery = document.getElementById('battery');
+            battery.classList.toggle('active');
+            
+            if (battery.classList.contains('active')) {
+                activateCircuit();
+            } else {
+                deactivateCircuit();
+            }
+        }
+        
+        function resistorClicked() {
+            const resistor = document.getElementById('resistor');
+            const currentValue = resistor.textContent;
+            const values = ['10Ω', '20Ω', '50Ω', '100Ω'];
+            const currentIndex = values.indexOf(currentValue);
+            const nextIndex = (currentIndex + 1) % values.length;
+            resistor.textContent = values[nextIndex];
+            
+            showInfo(`Resistor value changed to ${values[nextIndex]}`);
+        }
+        
+        function bulbClicked() {
+            const bulb = document.getElementById('bulb');
+            bulb.classList.toggle('lit');
+            
+            if (bulb.classList.contains('lit')) {
+                showInfo("Light bulb is ON - current is flowing through the circuit");
+            } else {
+                showInfo("Light bulb is OFF - no current flow");
+            }
+        }
+        
+        function magnetClicked() {
+            const magnet = document.getElementById('magnet');
+            const isNorth = magnet.classList.contains('north');
+            
+            if (isNorth) {
+                magnet.classList.remove('north');
+                magnet.classList.add('south');
+                magnet.textContent = 'S';
+            } else {
+                magnet.classList.remove('south');
+                magnet.classList.add('north');
+                magnet.textContent = 'N';
+            }
+            
+            showInfo(`Magnet pole flipped to ${isNorth ? 'South' : 'North'}`);
+        }
+        
+        function wireClicked(wire) {
+            wire.classList.toggle('active');
+            
+            if (wire.classList.contains('active')) {
+                showInfo("Wire is conducting current - electrons are flowing");
+            } else {
+                showInfo("Wire is not conducting - circuit is open");
+            }
+        }
+        
+        function updateVoltage(value) {
+            currentVoltage = parseInt(value);
+            document.getElementById('voltageValue').textContent = value + 'V';
+            document.getElementById('battery').textContent = value + 'V';
+            
+            // Update circuit behavior based on voltage
+            if (currentVoltage > 0) {
+                activateCircuit();
+            } else {
+                deactivateCircuit();
+            }
+        }
+        
+        function activateCircuit() {
+            circuitActive = true;
+            document.getElementById('battery').classList.add('active');
+            document.getElementById('bulb').classList.add('lit');
+            document.querySelectorAll('.wire').forEach(wire => wire.classList.add('active'));
+            
+            showInfo(`Circuit activated with ${currentVoltage}V - current is flowing`);
+        }
+        
+        function deactivateCircuit() {
+            circuitActive = false;
+            document.getElementById('battery').classList.remove('active');
+            document.getElementById('bulb').classList.remove('lit');
+            document.querySelectorAll('.wire').forEach(wire => wire.classList.remove('active'));
+            
+            showInfo("Circuit deactivated - no current flow");
+        }
+        
+        function startCircuit() {
+            document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            activateCircuit();
+            showInfo("Circuit Analysis: Analyzing current flow, voltage drops, and power consumption");
+        }
+        
+        function startMagnetism() {
+            document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Activate magnetic field
+            document.getElementById('magneticField').classList.add('active');
+            document.getElementById('magneticField').style.left = '50px';
+            document.getElementById('magneticField').style.top = '200px';
+            
+            showInfo("Magnetic Fields: Visualizing magnetic field lines around the magnet");
+        }
+        
+        function startElectromagnetic() {
+            document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Simulate electromagnetic induction
+            activateCircuit();
+            document.getElementById('magneticField').classList.add('active');
+            
+            showInfo("Electromagnetic Induction: Moving magnet near wire creates electric current");
+        }
+        
+        function startOhmsLaw() {
+            document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            activateCircuit();
+            const current = currentVoltage / 10; // Assuming 10Ω resistor
+            showInfo(`Ohm's Law: V = I × R, so I = ${currentVoltage}V ÷ 10Ω = ${current}A`);
+        }
+        
+        function toggleCircuit() {
+            if (circuitActive) {
+                deactivateCircuit();
+            } else {
+                activateCircuit();
+            }
+        }
+        
+        function resetCircuit() {
+            deactivateCircuit();
+            document.getElementById('voltageSlider').value = 6;
+            updateVoltage(6);
+            document.getElementById('resistor').textContent = '10Ω';
+            document.getElementById('magnet').className = 'magnet north';
+            document.getElementById('magnet').textContent = 'N';
+        }
+        
+        function addComponent() {
+            showInfo("New component added to circuit - circuit behavior may change");
+        }
+        
+        function showSymbolInfo(symbol) {
+            showInfo(symbolInfo[symbol]);
+        }
+        
+        function showInfo(message) {
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'result correct';
+            infoDiv.textContent = message;
+            infoDiv.style.position = 'fixed';
+            infoDiv.style.top = '20px';
+            infoDiv.style.right = '20px';
+            infoDiv.style.zIndex = '1000';
+            infoDiv.style.maxWidth = '300px';
+            document.body.appendChild(infoDiv);
+            
+            setTimeout(() => {
+                infoDiv.remove();
+            }, 3000);
+        }
+        
+        function loadQuestion() {
+            const question = questions[currentQuestion];
+            document.getElementById('questionText').textContent = question.question;
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => selectOption(optionDiv, index === question.correct);
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            selectedOption = null;
+        }
+        
+        function selectOption(element, isCorrect) {
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedOption = { element, isCorrect };
+        }
+        
+        function checkQuizAnswer() {
+            if (!selectedOption) return;
+            
+            const resultDiv = document.getElementById('result');
+            
+            document.querySelectorAll('.option').forEach((opt, index) => {
+                const question = questions[currentQuestion];
+                if (index === question.correct) {
+                    opt.classList.add('correct');
+                } else if (opt.classList.contains('selected') && !selectedOption.isCorrect) {
+                    opt.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedOption.isCorrect) {
+                score += 10;
+                correctAnswers++;
+                resultDiv.textContent = '🎉 Correct! Well done!';
+                resultDiv.className = 'result correct';
+            } else {
+                resultDiv.textContent = '❌ Incorrect. The correct answer is highlighted in green.';
+                resultDiv.className = 'result incorrect';
+            }
+            
+            resultDiv.style.display = 'block';
+            updateDisplay();
+        }
+        
+        function nextQuestion() {
+            currentQuestion = (currentQuestion + 1) % questions.length;
+            loadQuestion();
+            document.getElementById('result').style.display = 'none';
+        }
+        
+        function runSimulation() {
+            // Run a comprehensive electricity and magnetism simulation
+            startCircuit();
+            setTimeout(() => startMagnetism(), 2000);
+            setTimeout(() => startElectromagnetic(), 4000);
+            setTimeout(() => startOhmsLaw(), 6000);
+        }
+        
+        function updateDisplay() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('correct-answers').textContent = correctAnswers;
+        }
+        
+        // Initialize game
+        loadQuestion();
+        updateDisplay();
+        startCircuit();
+    </script></html>

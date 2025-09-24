@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ratio & Proportion Games Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .main-title {
+            font-size: 3rem;
+            color: #fbbf24;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: #e5e7eb;
+            margin-bottom: 20px;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .game-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.15), rgba(255,255,255,0.1));
+            border-radius: 20px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s;
+            opacity: 0;
+        }
+
+        .game-card:hover::before {
+            animation: shimmer 0.6s ease-in-out;
+            opacity: 1;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .game-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .game-title {
+            font-size: 1.8rem;
+            color: #fbbf24;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .game-theme {
+            font-size: 1rem;
+            color: #d1d5db;
+            margin-bottom: 15px;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .game-description {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #e5e7eb;
+            margin-bottom: 15px;
+        }
+
+        .learning-focus {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        .focus-title {
+            font-size: 0.9rem;
+            color: #22c55e;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .focus-text {
+            font-size: 0.85rem;
+            color: #dcfce7;
+        }
+
+        .fun-twist {
+            background: rgba(168, 85, 247, 0.2);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .twist-title {
+            font-size: 0.9rem;
+            color: #a855f7;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .twist-text {
+            font-size: 0.85rem;
+            color: #f3e8ff;
+        }
+
+        .play-button {
+            background: linear-gradient(45deg, #f59e0b, #d97706);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .play-button:hover {
+            background: linear-gradient(45deg, #d97706, #b45309);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .game-container {
+            display: none;
+            background: rgba(0,0,0,0.95);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .game-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #ef4444;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .close-button:hover {
+            background: #dc2626;
+        }
+
+        /* Game-specific styles */
+        .potion-game {
+            background: linear-gradient(135deg, #1e1b4b, #581c87);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .cauldron {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(145deg, #374151, #1f2937);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            margin: 20px auto;
+            position: relative;
+            border: 5px solid #6b7280;
+        }
+
+        .potion-bottles {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .bottle {
+            width: 60px;
+            height: 100px;
+            border-radius: 30px 30px 10px 10px;
+            border: 3px solid #374151;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        .bottle:hover {
+            transform: scale(1.1);
+        }
+
+        .red-bottle { background: linear-gradient(180deg, #ef4444, #dc2626); }
+        .blue-bottle { background: linear-gradient(180deg, #3b82f6, #2563eb); }
+        .green-bottle { background: linear-gradient(180deg, #10b981, #059669); }
+        .yellow-bottle { background: linear-gradient(180deg, #f59e0b, #d97706); }
+
+        .counter {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: white;
+            color: black;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .recipe-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            color: #fbbf24;
+            font-size: 1rem;
+            animation: twinkle 2s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .explosion {
+            animation: explode 0.5s ease-out;
+        }
+
+        @keyframes explode {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); background-color: #ef4444; }
+            100% { transform: scale(1); }
+        }
+
+        .glow {
+            animation: glow 1s ease-in-out;
+            box-shadow: 0 0 30px #22c55e;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 10px #22c55e; }
+            50% { box-shadow: 0 0 30px #22c55e, 0 0 50px #22c55e; }
+        }
+
+        .racing-game, .pizza-game, .castle-game, .circus-game {
+            background: rgba(15, 23, 42, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            min-height: 600px;
+        }
+
+        .car {
+            width: 80px;
+            height: 40px;
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+            border-radius: 10px;
+            position: relative;
+            margin: 20px auto;
+            transition: transform 0.5s ease;
+        }
+
+        .pizza-slice {
+            width: 0;
+            height: 0;
+            border-left: 30px solid transparent;
+            border-right: 30px solid transparent;
+            border-bottom: 50px solid #f59e0b;
+            margin: 10px;
+            display: inline-block;
+        }
+
+        .castle {
+            display: inline-block;
+            margin: 20px;
+        }
+
+        .castle-wall {
+            width: 60px;
+            height: 80px;
+            background: #6b7280;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .seesaw {
+            width: 300px;
+            height: 10px;
+            background: #8b5cf6;
+            margin: 50px auto;
+            position: relative;
+            transform-origin: center;
+            transition: transform 0.5s ease;
+        }
+
+        .performer {
+            position: absolute;
+            top: -30px;
+            font-size: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-title {
+                font-size: 2rem;
+            }
+            
+            .game-content {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1 class="main-title">🎮 Ratio & Proportion Games 🎮</h1>
+            <p class="subtitle">Learn math through magical adventures and exciting challenges!</p>
+        </div>
+
+        <div class="games-grid" id="gamesGrid">
+            <!-- Potion Mixer Card -->
+            <div class="game-card" onclick="openGame('potion')">
+                <div class="game-icon">🧪</div>
+                <h3 class="game-title">Potion Mixer</h3>
+                <p class="game-theme">Magical lab where kids mix potions in the right ratio</p>
+                <p class="game-description">Players are given recipes like "2 parts red potion : 3 parts blue potion." They must pour the correct quantities into a cauldron. If the ratio is correct, the potion glows and creates magical creatures. Wrong ratios make the cauldron explode with funny animations.</p>
+                <div class="learning-focus">
+                    <div class="focus-title">🎯 Learning Focus:</div>
+                    <div class="focus-text">Understanding ratios by mixing ingredients proportionally</div>
+                </div>
+                <div class="fun-twist">
+                    <div class="twist-title">✨ Fun Twist:</div>
+                    <div class="twist-text">Unlock new magical potions and pets as levels increase</div>
+                </div>
+                <button class="play-button">Play Now!</button>
+            </div>
+
+            <!-- Proportion Rally Card -->
+            <div class="game-card" onclick="openGame('racing')">
+                <div class="game-icon">🏎️</div>
+                <h3 class="game-title">Proportion Rally</h3>
+                <p class="game-theme">A racing track powered by math!</p>
+                <p class="game-description">Cars move based on proportion challenges. Example: "If 2 liters of fuel runs 10 km, how far will 6 liters go?" Correct answers fuel the car to move faster. Wrong answers slow it down.</p>
+                <div class="learning-focus">
+                    <div class="focus-title">🎯 Learning Focus:</div>
+                    <div class="focus-text">Solving proportion problems in real-life contexts</div>
+                </div>
+                <div class="fun-twist">
+                    <div class="twist-title">✨ Fun Twist:</div>
+                    <div class="twist-text">Different cars (sports, monster trucks, hover cars) unlock as rewards</div>
+                </div>
+                <button class="play-button">Play Now!</button>
+            </div>
+
+            <!-- Pizza Party Card -->
+            <div class="game-card" onclick="openGame('pizza')">
+                <div class="game-icon">🍕</div>
+                <h3 class="game-title">Pizza Party</h3>
+                <p class="game-theme">Kids share pizzas, cakes, and burgers fairly at a party</p>
+                <p class="game-description">A group of kids wants food in a ratio (e.g., 2:3:5 slices). Players must divide food items into correct proportions. If done wrong, some kids get more/less and leave unhappy.</p>
+                <div class="learning-focus">
+                    <div class="focus-title">🎯 Learning Focus:</div>
+                    <div class="focus-text">Ratio in fair sharing and division</div>
+                </div>
+                <div class="fun-twist">
+                    <div class="twist-title">✨ Fun Twist:</div>
+                    <div class="twist-text">Unlock new party themes (birthday, picnic, carnival) as levels progress</div>
+                </div>
+                <button class="play-button">Play Now!</button>
+            </div>
+
+            <!-- Castle Builders Card -->
+            <div class="game-card" onclick="openGame('castle')">
+                <div class="game-icon">🏰</div>
+                <h3 class="game-title">Castle Builders</h3>
+                <p class="game-theme">Building castles with stone, wood, and gold in set ratios</p>
+                <p class="game-description">To build walls, towers, or bridges, players need resources in fixed ratios (e.g., 4 stones : 2 wood : 1 gold). Players must collect or trade items in the right proportion. Wrong ratios mean weak walls that collapse when enemies attack.</p>
+                <div class="learning-focus">
+                    <div class="focus-title">🎯 Learning Focus:</div>
+                    <div class="focus-text">Ratios in resource distribution</div>
+                </div>
+                <div class="fun-twist">
+                    <div class="twist-title">✨ Fun Twist:</div>
+                    <div class="twist-text">Kids can design their own castles as they advance</div>
+                </div>
+                <button class="play-button">Play Now!</button>
+            </div>
+
+            <!-- Circus Balance Card -->
+            <div class="game-card" onclick="openGame('circus')">
+                <div class="game-icon">🎭</div>
+                <h3 class="game-title">Circus Balance</h3>
+                <p class="game-theme">A circus with performers balancing on seesaws</p>
+                <p class="game-description">Performers of different weights must sit in ratio (e.g., 2 clowns : 1 elephant). Kids must drag characters to the correct sides to keep the seesaw balanced. If the proportion is wrong, the seesaw tips and the act fails.</p>
+                <div class="learning-focus">
+                    <div class="focus-title">🎯 Learning Focus:</div>
+                    <div class="focus-text">Ratios as balancing acts (real-world proportion)</div>
+                </div>
+                <div class="fun-twist">
+                    <div class="twist-title">✨ Fun Twist:</div>
+                    <div class="twist-text">Unlock new circus acts (jugglers, acrobats, lions) with each level</div>
+                </div>
+                <button class="play-button">Play Now!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Containers -->
+    <!-- Potion Mixer Game -->
+    <div class="game-container" id="potionGame">
+        <button class="close-button" onclick="closeGame()">×</button>
+        <div class="game-content">
+            <div class="potion-game">
+                <h2 style="color: #fbbf24; margin-bottom: 20px;">🧪 Potion Mixer 🧪</h2>
+                
+                <div class="recipe-card">
+                    <h3 style="color: #22c55e;">Current Recipe:</h3>
+                    <p id="currentRecipe" style="font-size: 1.2rem; margin: 10px 0;">2 Red : 3 Blue = Fire Dragon 🐉</p>
+                    <p style="color: #d1d5db;">Click bottles to add ingredients!</p>
+                </div>
+
+                <div class="cauldron" id="cauldron">
+                    <div id="cauldronContents" style="text-align: center; padding-top: 80px; font-size: 1.5rem;"></div>
+                </div>
+
+                <div class="potion-bottles">
+                    <div class="bottle red-bottle" onclick="addIngredient('red')">
+                        <div class="counter" id="redCounter">0</div>
+                    </div>
+                    <div class="bottle blue-bottle" onclick="addIngredient('blue')">
+                        <div class="counter" id="blueCounter">0</div>
+                    </div>
+                    <div class="bottle green-bottle" onclick="addIngredient('green')">
+                        <div class="counter" id="greenCounter">0</div>
+                    </div>
+                    <div class="bottle yellow-bottle" onclick="addIngredient('yellow')">
+                        <div class="counter" id="yellowCounter">0</div>
+                    </div>
+                </div>
+
+                <div style="margin: 20px 0;">
+                    <button onclick="mixPotion()" style="background: #22c55e; border: none; padding: 15px 30px; border-radius: 25px; color: white; font-size: 1.1rem; cursor: pointer; margin-right: 10px;">Mix Potion!</button>
+                    <button onclick="resetPotion()" style="background: #ef4444; border: none; padding: 15px 30px; border-radius: 25px; color: white; font-size: 1.1rem; cursor: pointer;">Reset</button>
+                </div>
+
+                <div id="potionResult" style="font-size: 1.5rem; margin: 20px 0; min-height: 50px;"></div>
+                
+                <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin-top: 20px;">
+                    <p><strong>Level:</strong> <span id="potionLevel">1</span> | <strong>Score:</strong> <span id="potionScore">0</span></p>
+                    <p style="margin-top: 10px;"><strong>Unlocked Creatures:</strong> <span id="unlockedCreatures">🐉</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Racing Game -->
+    <div class="game-container" id="racingGame">
+        <button class="close-button" onclick="closeGame()">×</button>
+        <div class="game-content">
+            <div class="racing-game">
+                <h2 style="color: #fbbf24; margin-bottom: 20px;">🏎️ Proportion Rally 🏎️</h2>
+                
+                <div class="recipe-card">
+                    <h3 style="color: #22c55e;">Racing Challenge:</h3>
+                    <p id="racingQuestion" style="font-size: 1.1rem; margin: 10px 0;">If 2 liters of fuel runs 10 km, how far will 6 liters go?</p>
+                    <input type="number" id="racingAnswer" placeholder="Enter your answer" style="padding: 10px; border: none; border-radius: 10px; margin: 10px; font-size: 1rem;">
+                    <button onclick="checkRacingAnswer()" style="background: #22c55e; border: none; padding: 10px 20px; border-radius: 10px; color: white; cursor: pointer;">Go!</button>
+                </div>
+
+                <div style="background: rgba(0,0,0,0.3); height: 200px; border-radius: 15px; position: relative; margin: 30px 0; overflow: hidden;">
+                    <div style="position: absolute; top: 50%; left: 10px; transform: translateY(-50%); font-size: 2rem;">🏁</div>
+                    <div class="car" id="racingCar" style="position: absolute; top: 50%; left: 50px; transform: translateY(-50%);">🏎️</div>
+                    <div style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); font-size: 2rem;">🏆</div>
+                </div>
+
+                <div id="racingResult" style="font-size: 1.2rem; margin: 20px 0; min-height: 50px;"></div>
+                
+                <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;">
+                    <p><strong>Level:</strong> <span id="racingLevel">1</span> | <strong>Distance:</strong> <span id="racingDistance">0</span>km | <strong>Car:</strong> <span id="currentCar">🏎️ Sports Car</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pizza Game -->
+    <div class="game-container" id="pizzaGame">
+        <button class="close-button" onclick="closeGame()">×</button>
+        <div class="game-content">
+            <div class="pizza-game">
+                <h2 style="color: #fbbf24; margin-bottom: 20px;">🍕 Pizza Party 🍕</h2>
+                
+                <div class="recipe-card">
+                    <h3 style="color: #22c55e;">Party Challenge:</h3>
+                    <p id="pizzaChallenge" style="font-size: 1.1rem; margin: 10px 0;">Share 12 pizza slices among 3 kids in ratio 2:3:1</p>
+                    <p style="color: #d1d5db;">How many slices should each kid get?</p>
+                </div>
+
+                <div style="display: flex; justify-content: space-around; margin: 30px 0;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">👦</div>
+                        <p>Kid 1</p>
+                        <input type="number" id="kid1Slices" placeholder="Slices" style="width: 80px; padding: 5px; border: none; border-radius: 5px; margin: 5px;">
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">👧</div>
+                        <p>Kid 2</p>
+                        <input type="number" id="kid2Slices" placeholder="Slices" style="width: 80px; padding: 5px; border: none; border-radius: 5px; margin: 5px;">
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">👦</div>
+                        <p>Kid 3</p>
+                        <input type="number" id="kid3Slices" placeholder="Slices" style="width: 80px; padding: 5px; border: none; border-radius: 5px; margin: 5px;">
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin: 20px 0;">
+                    <div id="pizzaDisplay"></div>
+                </div>
+
+                <button onclick="checkPizzaSharing()" style="background: #22c55e; border: none; padding: 15px 30px; border-radius: 25px; color: white; font-size: 1.1rem; cursor: pointer;">Share Pizza!</button>
+
+                <div id="pizzaResult" style="font-size: 1.2rem; margin: 20px 0; min-height: 50px;"></div>
+                
+                <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;">
+                    <p><strong>Level:</strong> <span id="pizzaLevel">1</span> | <strong>Happy Kids:</strong> <span id="happyKids">0</span> | <strong>Theme:</strong> <span id="partyTheme">🎂 Birthday</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Castle Game -->
+    <div class="game-container" id="castleGame">
+        <button class="close-button" onclick="closeGame()">×</button>
+        <div class="game-content">
+            <div class="castle-game">
+                <h2 style="color: #fbbf24; margin-bottom: 20px;">🏰 Castle Builders 🏰</h2>
+                
+                <div class="recipe-card">
+                    <h3 style="color: #22c55e;">Building Challenge:</h3>
+                    <p id="castleChallenge" style="font-size: 1.1rem; margin: 10px 0;">Build a wall with ratio 4 Stones : 2 Wood : 1 Gold</p>
+                    <p style="color: #d1d5db;">Collect the right materials!</p>
+                </div>
+
+                <div style="display: flex; justify-content: space-around; margin: 30px 0;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">🪨</div>
+                        <p>Stones: <span id="stoneCount">0</span></p>
+                        <button onclick="addResource('stone')" style="background: #6b7280; border: none; padding: 8px 15px; border-radius: 10px; color: white; cursor: pointer;">Collect</button>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">🪵</div>
+                        <p>Wood: <span id="woodCount">0</span></p>
+                        <button onclick="addResource('wood')" style="background: #92400e; border: none; padding: 8px 15px; border-radius: 10px; color: white; cursor: pointer;">Collect</button>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">🪙</div>
+                        <p>Gold: <span id="goldCount">0</span></p>
+                        <button onclick="addResource('gold')" style="background: #f59e0b; border: none; padding: 8px 15px; border-radius: 10px; color: white; cursor: pointer;">Collect</button>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin: 30px 0;">
+                    <div class="castle" id="castleDisplay">
+                        <div style="font-size: 4rem;">🏗️</div>
+                        <p>Castle Under Construction</p>
+                    </div>
+                </div>
+
+                <button onclick="buildCastle()" style="background: #22c55e; border: none; padding: 15px 30px; border-radius: 25px; color: white; font-size: 1.1rem; cursor: pointer; margin-right: 10px;">Build!</button>
+                <button onclick="resetResources()" style="background: #ef4444; border: none; padding: 15px 30px; border-radius: 25px; color: white; font-size: 1.1rem; cursor: pointer;">Reset</button>
+
+                <div id="castleResult" style="font-size: 1.2rem; margin: 20px 0; min-height: 50px;"></div>
+                
+                <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;">
+                    <p><strong>Level:</strong> <span id="castleLevel">1</span> | <strong>Castles Built:</strong> <span id="castlesBuilt">0</span> | <strong>Structure:</strong> <span id="currentStructure">🏗️ Wall</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Circus Game -->
+    <div class="game-container" id="circusGame">
+        <button class="close-button" onclick="closeGame()">×</button>
+        <div class="game-content">
+            <div class="circus-game">
+                <h2 style="color: #fbbf24; margin-bottom: 20px;">🎭 Circus Balance 🎭</h2>
+                
+                <div class="recipe-card">
+                    <h3 style="color: #22c55e;">Balance Challenge:</h3>
+                    <p id="circusChallenge" style="font-size: 1.1rem; margin: 10px 0;">Balance 2 Clowns : 1 Elephant on the seesaw</p>
+                    <p style="color: #d1d5db;">Drag performers to balance the seesaw!</p>
+                </div>
+
+                <div style="text-align: center; margin: 30px 0;">
+                    <div style="margin-bottom: 30px;">
+                        <span style="font-size: 3rem; margin: 0 20px; cursor: pointer;" draggable="true" ondragstart="drag(event)" id="clown1">🤡</span>
+                        <span style="font-size: 3rem; margin: 0 20px; cursor: pointer;" draggable="true" ondragstart="drag(event)" id="clown2">🤡</span>
+                        <span style="font-size: 3rem; margin: 0 20px; cursor: pointer;" draggable="true" ondragstart="drag(event)" id="elephant">🐘</span>
+                        <span style="font-size: 3rem; margin: 0 20px; cursor: pointer;" draggable="true" ondragstart="drag(event)" id="lion">🦁</span>
+                    </div>
+                    
+                    <div class="seesaw" id="seesaw">
+                        <div style="position: absolute; left: -20px; top: -40px; width: 40px; height: 40px; background: #8b5cf6; border-radius: 50%;"></div>
+                        <div id="leftSide" ondrop="drop(event)" ondragover="allowDrop(event)" style="position: absolute; left: 50px; top: -30px; width: 80px; height: 20px; background: rgba(255,255,255,0.2); border-radius: 10px; text-align: center;"></div>
+                        <div id="rightSide" ondrop="drop(event)" ondragover="allowDrop(event)" style="position: absolute; right: 50px; top: -30px; width: 80px; height: 20px; background: rgba(255,255,255,0.2); border-radius: 10px; text-align: center;"></div>
+                    </div>
+                    
+                    <div style="margin-top: 80px;">
+                        <div style="font-size: 2rem;">🎪</div>
+                        <p>Big Top Circus</p>
+                    </div>
+                </div>
+
+                <button onclick="checkBalance()" style="background: #22c55e; border: none; padding: 15px 30px; border-radius: 25px; color: white; font-size: 1.1rem; cursor: pointer; margin-right: 10px;">Check Balance!</button>
+                <button onclick="resetCircus()" style="background: #ef4444; border: none; padding: 15px 30px; border-radius: 25px; color: white; font-size: 1.1rem; cursor: pointer;">Reset</button>
+
+                <div id="circusResult" style="font-size: 1.2rem; margin: 20px 0; min-height: 50px;"></div>
+                
+                <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;">
+                    <p><strong>Level:</strong> <span id="circusLevel">1</span> | <strong>Perfect Shows:</strong> <span id="perfectShows">0</span> | <strong>Act:</strong> <span id="currentAct">🤡 Clown Balance</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create twinkling stars background
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.textContent = '⭐';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 2 + 's';
+                star.style.fontSize = (Math.random() * 0.5 + 0.5) + 'rem';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Game state variables
+        let gameStates = {
+            potion: {
+                level: 1,
+                score: 0,
+                red: 0,
+                blue: 0,
+                green: 0,
+                yellow: 0,
+                recipes: [
+                    { red: 2, blue: 3, green: 0, yellow: 0, creature: '🐉', name: 'Fire Dragon' },
+                    { red: 1, blue: 2, green: 1, yellow: 0, creature: '🦄', name: 'Unicorn' },
+                    { red: 3, blue: 1, green: 2, yellow: 1, creature: '🧚‍♀️', name: 'Fairy' },
+                    { red: 2, blue: 2, green: 3, yellow: 2, creature: '🐸', name: 'Magic Frog' }
+                ],
+                unlocked: ['🐉']
+            },
+            racing: {
+                level: 1,
+                distance: 0,
+                car: '🏎️ Sports Car',
+                questions: [
+                    { question: 'If 2 liters of fuel runs 10 km, how far will 6 liters go?', answer: 30 },
+                    { question: 'If 3 hours = 180 km, how far in 5 hours?', answer: 300 },
+                    { question: 'If 4 tires cost $200, how much for 6 tires?', answer: 300 }
+                ]
+            },
+            pizza: {
+                level: 1,
+                happyKids: 0,
+                theme: '🎂 Birthday',
+                challenges: [
+                    { slices: 12, ratio: [2, 3, 1], answer: [4, 6, 2] },
+                    { slices: 15, ratio: [1, 2, 2], answer: [3, 6, 6] },
+                    { slices: 18, ratio: [2, 1, 3], answer: [6, 3, 9] }
+                ]
+            },
+            castle: {
+                level: 1,
+                built: 0,
+                structure: '🏗️ Wall',
+                stone: 0,
+                wood: 0,
+                gold: 0,
+                recipes: [
+                    { stone: 4, wood: 2, gold: 1, structure: '🏗️ Wall' },
+                    { stone: 6, wood: 3, gold: 2, structure: '🗼 Tower' },
+                    { stone: 8, wood: 4, gold: 3, structure: '🏰 Castle' }
+                ]
+            },
+            circus: {
+                level: 1,
+                shows: 0,
+                act: '🤡 Clown Balance',
+                leftSide: [],
+                rightSide: [],
+                challenges: [
+                    { left: ['🤡', '🤡'], right: ['🐘'], balanced: true },
+                    { left: ['🦁'], right: ['🤡', '🤡'], balanced: false },
+                    { left: ['🐘'], right: ['🦁', '🤡'], balanced: true }
+                ]
+            }
+        };
+
+        // Initialize
+        createStars();
+        updatePotionDisplay();
+        updateRacingDisplay();
+        updatePizzaDisplay();
+        updateCastleDisplay();
+        updateCircusDisplay();
+
+        function openGame(gameType) {
+            document.getElementById(gameType + 'Game').style.display = 'block';
+        }
+
+        function closeGame() {
+            document.querySelectorAll('.game-container').forEach(container => {
+                container.style.display = 'none';
+            });
+        }
+
+        // Potion Mixer Game Functions
+        function addIngredient(color) {
+            gameStates.potion[color]++;
+            document.getElementById(color + 'Counter').textContent = gameStates.potion[color];
+            updateCauldronDisplay();
+        }
+
+        function updateCauldronDisplay() {
+            const contents = document.getElementById('cauldronContents');
+            const total = gameStates.potion.red + gameStates.potion.blue + gameStates.potion.green + gameStates.potion.yellow;
+            if (total > 0) {
+                contents.innerHTML = `R:${gameStates.potion.red} B:${gameStates.potion.blue} G:${gameStates.potion.green} Y:${gameStates.potion.yellow}`;
+            } else {
+                contents.innerHTML = 'Empty';
+            }
+        }
+
+        function mixPotion() {
+            const current = gameStates.potion.recipes[gameStates.potion.level - 1];
+            const cauldron = document.getElementById('cauldron');
+            const result = document.getElementById('potionResult');
+            
+            if (gameStates.potion.red === current.red && 
+                gameStates.potion.blue === current.blue && 
+                gameStates.potion.green === current.green && 
+                gameStates.potion.yellow === current.yellow) {
+                
+                // Success!
+                cauldron.classList.add('glow');
+                result.innerHTML = `✨ Success! You created a ${current.creature} ${current.name}! ✨`;
+                gameStates.potion.score += 100;
+                gameStates.potion.unlocked.push(current.creature);
+                
+                setTimeout(() => {
+                    cauldron.classList.remove('glow');
+                    nextPotionLevel();
+                }, 2000);
+            } else {
+                // Explosion!
+                cauldron.classList.add('explosion');
+                result.innerHTML = `💥 BOOM! Wrong ratio! Try again! 💥`;
+                
+                setTimeout(() => {
+                    cauldron.classList.remove('explosion');
+                }, 500);
+            }
+            
+            updatePotionDisplay();
+        }
+
+        function resetPotion() {
+            gameStates.potion.red = 0;
+            gameStates.potion.blue = 0;
+            gameStates.potion.green = 0;
+            gameStates.potion.yellow = 0;
+            updatePotionDisplay();
+            updateCauldronDisplay();
+            document.getElementById('potionResult').innerHTML = '';
+        }
+
+        function nextPotionLevel() {
+            if (gameStates.potion.level < gameStates.potion.recipes.length) {
+                gameStates.potion.level++;
+                resetPotion();
+            }
+        }
+
+        function updatePotionDisplay() {
+            const current = gameStates.potion.recipes[gameStates.potion.level - 1];
+            document.getElementById('currentRecipe').innerHTML = 
+                `${current.red} Red : ${current.blue} Blue` + 
+                (current.green > 0 ? ` : ${current.green} Green` : '') +
+                (current.yellow > 0 ? ` : ${current.yellow} Yellow` : '') +
+                ` = ${current.name} ${current.creature}`;
+            
+            document.getElementById('redCounter').textContent = gameStates.potion.red;
+            document.getElementById('blueCounter').textContent = gameStates.potion.blue;
+            document.getElementById('greenCounter').textContent = gameStates.potion.green;
+            document.getElementById('yellowCounter').textContent = gameStates.potion.yellow;
+            document.getElementById('potionLevel').textContent = gameStates.potion.level;
+            document.getElementById('potionScore').textContent = gameStates.potion.score;
+            document.getElementById('unlockedCreatures').textContent = gameStates.potion.unlocked.join(' ');
+        }
+
+        // Racing Game Functions
+        function updateRacingDisplay() {
+            const current = gameStates.racing.questions[gameStates.racing.level - 1] || gameStates.racing.questions[0];
+            document.getElementById('racingQuestion').textContent = current.question;
+            document.getElementById('racingLevel').textContent = gameStates.racing.level;
+            document.getElementById('racingDistance').textContent = gameStates.racing.distance;
+            document.getElementById('currentCar').textContent = gameStates.racing.car;
+        }
+
+        function checkRacingAnswer() {
+            const answer = parseInt(document.getElementById('racingAnswer').value);
+            const current = gameStates.racing.questions[(gameStates.racing.level - 1) % gameStates.racing.questions.length];
+            const car = document.getElementById('racingCar');
+            const result = document.getElementById('racingResult');
+            
+            if (answer === current.answer) {
+                result.innerHTML = `🏁 Correct! Your car speeds forward! 🏁`;
+                gameStates.racing.distance += 50;
+                car.style.transform = `translateY(-50%) translateX(${Math.min(gameStates.racing.distance * 2, 400)}px)`;
+                gameStates.racing.level++;
+                
+                // Unlock new cars
+                if (gameStates.racing.distance >= 200 && gameStates.racing.car === '🏎️ Sports Car') {
+                    gameStates.racing.car = '🚛 Monster Truck';
+                } else if (gameStates.racing.distance >= 400) {
+                    gameStates.racing.car = '🛸 Hover Car';
+                }
+            } else {
+                result.innerHTML = `🐌 Wrong answer! Your car slows down. The correct answer was ${current.answer}`;
+            }
+            
+            document.getElementById('racingAnswer').value = '';
+            setTimeout(updateRacingDisplay, 1000);
+        }
+
+        // Pizza Game Functions
+        function updatePizzaDisplay() {
+            const current = gameStates.pizza.challenges[gameStates.pizza.level - 1] || gameStates.pizza.challenges[0];
+            document.getElementById('pizzaChallenge').innerHTML = 
+                `Share ${current.slices} pizza slices among 3 kids in ratio ${current.ratio.join(':')}`;
+            
+            document.getElementById('pizzaLevel').textContent = gameStates.pizza.level;
+            document.getElementById('happyKids').textContent = gameStates.pizza.happyKids;
+            document.getElementById('partyTheme').textContent = gameStates.pizza.theme;
+            
+            // Display pizza
+            let pizzaHtml = '';
+            for (let i = 0; i < current.slices; i++) {
+                pizzaHtml += '<div class="pizza-slice"></div>';
+            }
+            document.getElementById('pizzaDisplay').innerHTML = pizzaHtml;
+        }
+
+        function checkPizzaSharing() {
+            const kid1 = parseInt(document.getElementById('kid1Slices').value) || 0;
+            const kid2 = parseInt(document.getElementById('kid2Slices').value) || 0;
+            const kid3 = parseInt(document.getElementById('kid3Slices').value) || 0;
+            
+            const current = gameStates.pizza.challenges[gameStates.pizza.level - 1] || gameStates.pizza.challenges[0];
+            const result = document.getElementById('pizzaResult');
+            
+            if (kid1 === current.answer[0] && kid2 === current.answer[1] && kid3 === current.answer[2]) {
+                result.innerHTML = `🎉 Perfect sharing! All kids are happy! 🎉`;
+                gameStates.pizza.happyKids += 3;
+                gameStates.pizza.level++;
+                
+                // Update theme
+                if (gameStates.pizza.level === 2) gameStates.pizza.theme = '🧺 Picnic';
+                else if (gameStates.pizza.level === 3) gameStates.pizza.theme = '🎪 Carnival';
+                
+                setTimeout(() => {
+                    document.getElementById('kid1Slices').value = '';
+                    document.getElementById('kid2Slices').value = '';
+                    document.getElementById('kid3Slices').value = '';
+                    updatePizzaDisplay();
+                }, 2000);
+            } else {
+                result.innerHTML = `😢 Some kids are unhappy! Try again. Correct answer: ${current.answer.join(', ')} slices`;
+            }
+        }
+
+        // Castle Game Functions
+        function updateCastleDisplay() {
+            document.getElementById('stoneCount').textContent = gameStates.castle.stone;
+            document.getElementById('woodCount').textContent = gameStates.castle.wood;
+            document.getElementById('goldCount').textContent = gameStates.castle.gold;
+            document.getElementById('castleLevel').textContent = gameStates.castle.level;
+            document.getElementById('castlesBuilt').textContent = gameStates.castle.built;
+            document.getElementById('currentStructure').textContent = gameStates.castle.structure;
+        }
+
+        function addResource(type) {
+            gameStates.castle[type]++;
+            updateCastleDisplay();
+        }
+
+        function buildCastle() {
+            const current = gameStates.castle.recipes[gameStates.castle.level - 1] || gameStates.castle.recipes[0];
+            const result = document.getElementById('castleResult');
+            const display = document.getElementById('castleDisplay');
+            
+            if (gameStates.castle.stone === current.stone && 
+                gameStates.castle.wood === current.wood && 
+                gameStates.castle.gold === current.gold) {
+                
+                result.innerHTML = `🏰 Excellent! You built a strong ${current.structure}! 🏰`;
+                gameStates.castle.built++;
+                gameStates.castle.level++;
+                
+                display.innerHTML = `<div style="font-size: 4rem;">${current.structure}</div><p>Construction Complete!</p>`;
+                
+                setTimeout(() => {
+                    resetResources();
+                    display.innerHTML = `<div style="font-size: 4rem;">🏗️</div><p>Ready for next build</p>`;
+                }, 3000);
+            } else {
+                result.innerHTML = `⚠️ Wrong ratio! The structure collapsed! Need ${current.stone} stone, ${current.wood} wood, ${current.gold} gold`;
+            }
+        }
+
+        function resetResources() {
+            gameStates.castle.stone = 0;
+            gameStates.castle.wood = 0;
+            gameStates.castle.gold = 0;
+            updateCastleDisplay();
+            document.getElementById('castleResult').innerHTML = '';
+        }
+
+        // Circus Game Functions
+        function updateCircusDisplay() {
+            const current = gameStates.circus.challenges[gameStates.circus.level - 1] || gameStates.circus.challenges[0];
+            document.getElementById('circusChallenge').innerHTML = `Balance ${current.left.join(' ')} : ${current.right.join(' ')} on the seesaw`;
+            document.getElementById('circusLevel').textContent = gameStates.circus.level;
+            document.getElementById('perfectShows').textContent = gameStates.circus.shows;
+            document.getElementById('currentAct').textContent = gameStates.circus.act;
+        }
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            const data = ev.dataTransfer.getData("text");
+            const performer = document.getElementById(data).textContent;
+            
+            if (ev.target.id === 'leftSide') {
+                ev.target.innerHTML += performer;
+                gameStates.circus.leftSide.push(performer);
+            } else if (ev.target.id === 'rightSide') {
+                ev.target.innerHTML += performer;
+                gameStates.circus.rightSide.push(performer);
+            }
+        }
+
+        function checkBalance() {
+            const leftWeight = calculateWeight(gameStates.circus.leftSide);
+            const rightWeight = calculateWeight(gameStates.circus.rightSide);
+            const seesaw = document.getElementById('seesaw');
+            const result = document.getElementById('circusResult');
+            
+            if (Math.abs(leftWeight - rightWeight) <= 1) {
+                result.innerHTML = `🎪 Perfect balance! The crowd goes wild! 🎪`;
+                gameStates.circus.shows++;
+                gameStates.circus.level++;
+                seesaw.style.transform = 'rotate(0deg)';
+                
+                if (gameStates.circus.level === 2) gameStates.circus.act = '🎭 Juggler Act';
+                else if (gameStates.circus.level === 3) gameStates.circus.act = '🦁 Lion Tamer';
+            } else if (leftWeight > rightWeight) {
+                result.innerHTML = `⚖️ Seesaw tips left! Adjust the balance!`;
+                seesaw.style.transform = 'rotate(-15deg)';
+            } else {
+                result.innerHTML = `⚖️ Seesaw tips right! Adjust the balance!`;
+                seesaw.style.transform = 'rotate(15deg)';
+            }
+            
+            updateCircusDisplay();
+        }
+
+        function calculateWeight(performers) {
+            let weight = 0;
+            performers.forEach(performer => {
+                if (performer === '🤡') weight += 1;
+                else if (performer === '🦁') weight += 2;
+                else if (performer === '🐘') weight += 3;
+            });
+            return weight;
+        }
+
+        function resetCircus() {
+            gameStates.circus.leftSide = [];
+            gameStates.circus.rightSide = [];
+            document.getElementById('leftSide').innerHTML = '';
+            document.getElementById('rightSide').innerHTML = '';
+            document.getElementById('seesaw').style.transform = 'rotate(0deg)';
+            document.getElementById('circusResult').innerHTML = '';
+        }
+
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects to game cards
+            const cards = document.querySelectorAll('.game-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px) scale(1.02)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

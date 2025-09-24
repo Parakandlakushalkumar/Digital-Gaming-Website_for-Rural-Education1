@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Math Games Playground</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', Verdana, Geneva, Tahoma, sans-serif;
+      background: linear-gradient(120deg, #ede574 0%, #ffc3a0 100%);
+      margin: 0;
+      min-height: 100vh;
+    }
+    .container {
+      margin: 40px auto;
+      max-width: 960px;
+      padding: 32px;
+      background: rgba(255,255,255,0.93);
+      border-radius: 18px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.13);
+      min-height: 400px;
+    }
+    h1 {
+      text-align: center;
+      color: #ee6c4d;
+      margin-bottom: 24px;
+      font-size: 2.7em;
+      letter-spacing: 3px;
+      text-shadow: 2px 2px #f4e4ba;
+    }
+    .cards {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 32px;
+      margin-top: 16px;
+    }
+    .card {
+      width: 180px;
+      height: 220px;
+      background: linear-gradient(135deg, #9de8fd 0%, #94fa92 53%, #f099f8 100%);
+      border-radius: 18px;
+      box-shadow: 0 8px 12px rgba(100,100,100,.16);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: transform .21s;
+      position: relative;
+      overflow: hidden;
+    }
+    .card:hover {
+      transform: scale(1.05) rotate(-2deg);
+      box-shadow: 0 20px 32px rgba(70,70,70,.12);
+    }
+    .card span {
+      font-size: 2.1em;
+      margin-bottom: 18px;
+    }
+    .card p {
+      text-align: center;
+      margin: 0;
+      color: #33658a;
+      font-weight: 600;
+      padding: 0 12px;
+      font-size: 1.1em;
+    }
+    .game {
+      display: none;
+      padding: 18px;
+      min-height: 340px;
+    }
+    .game.active {
+      display: block;
+      animation: fadeIn .75s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(.96);}
+      to { opacity: 1; transform: scale(1);}
+    }
+    .question {
+      font-size: 1.25em;
+      margin-top: 18px;
+      margin-bottom: 7px;
+      color: #593c52;
+    }
+    input[type="number"], input[type="text"] {
+      font-size: 1.2em;
+      border-radius: 7px;
+      border: 1px solid #bdbdbd;
+      padding: 8px;
+      width: 70px;
+      margin-right: 10px;
+      margin-top: 6px;
+    }
+    .btn {
+      background: #ee6c4d;
+      color: #fff;
+      border: none;
+      padding: 9px 21px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.13em;
+      font-weight: bold;
+      margin: 12px 0 5px 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,.09);
+      transition: background .18s;
+    }
+    .btn:hover, .btn:focus {
+      background: #3a86ff;
+    }
+    .feedback {
+      font-size: 1.22em;
+      margin-top: 15px;
+      min-height: 30px;
+      font-weight: bold;
+      color: #d72638;
+      text-shadow: 1px 1px #fff;
+    }
+    .score {
+      margin-top: 11px;
+      font-size: 1.12em;
+      color: #33658a;
+      font-weight: bold;
+    }
+    .backbtn {
+      position: absolute;
+      top: 17px;
+      right: 21px;
+      background: #fad4d4;
+      color: #4b2e83;
+      border: none;
+      border-radius: 100px;
+      padding: 7px 20px;
+      font-size: 0.98em;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0,0,0,.08);
+    }
+    .backbtn:hover {
+      background: #ee6c4d;
+      color: #fff;
+    }
+    @media (max-width: 790px) {
+      .cards {flex-direction: column; align-items: center;}
+      .card {width: 75vw; height: 155px;}
+    }
+    @media (max-width: 520px) {
+      .container {padding: 11px;}
+      h1 {font-size: 1.6em;}
+      .card {width: 92vw;}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Math Games Playground</h1>
+    <!-- Card Menu -->
+    <div id="cardMenu" class="cards">
+      <div class="card" onclick="showGame(0)">
+        <span>🏃‍♂️</span>
+        <p>Rectangle Runner<br><small>Perimeter Quiz</small></p>
+      </div>
+      <div class="card" onclick="showGame(1)">
+        <span>🌿</span>
+        <p>Area Explorer<br><small>Treasure Adventure</small></p>
+      </div>
+      <div class="card" onclick="showGame(2)">
+        <span>🧱</span>
+        <p>Volume Builder<br><small>3D Puzzle</small></p>
+      </div>
+      <div class="card" onclick="showGame(3)">
+        <span>💧</span>
+        <p>Water Tank Challenge<br><small>Real-life Volume</small></p>
+      </div>
+      <div class="card" onclick="showGame(4)">
+        <span>🚗</span>
+        <p>Perimeter Racer<br><small>Polygon Racing</small></p>
+      </div>
+    </div>
+    <!-- Game Screens -->
+    <!-- Rectangle Runner -->
+    <div id="game0" class="game">
+      <button class="backbtn" onclick="backToMenu()">← Back</button>
+      <h2>Rectangle Runner 🏃‍♂️</h2>
+      <div class="score" id="score0"></div>
+      <div class="question" id="question0"></div>
+      <input type="number" id="ans0">
+      <button class="btn" onclick="checkAnswer(0)">Run!</button>
+      <div class="feedback" id="feedback0"></div>
+    </div>
+    <!-- Area Explorer -->
+    <div id="game1" class="game">
+      <button class="backbtn" onclick="backToMenu()">← Back</button>
+      <h2>Area Explorer 🌿</h2>
+      <div class="score" id="score1"></div>
+      <div class="question" id="question1"></div>
+      <input type="number" id="ans1">
+      <button class="btn" onclick="checkAnswer(1)">Uncover Treasure!</button>
+      <div class="feedback" id="feedback1"></div>
+    </div>
+    <!-- Volume Builder -->
+    <div id="game2" class="game">
+      <button class="backbtn" onclick="backToMenu()">← Back</button>
+      <h2>Volume Builder 🧱</h2>
+      <div class="score" id="score2"></div>
+      <div class="question" id="question2"></div>
+      <input type="number" id="ans2">
+      <button class="btn" onclick="checkAnswer(2)">Add Block!</button>
+      <div class="feedback" id="feedback2"></div>
+    </div>
+    <!-- Water Tank Challenge -->
+    <div id="game3" class="game">
+      <button class="backbtn" onclick="backToMenu()">← Back</button>
+      <h2>Water Tank Challenge 💧</h2>
+      <div class="score" id="score3"></div>
+      <div class="question" id="question3"></div>
+      <input type="number" id="ans3">
+      <button class="btn" onclick="checkAnswer(3)">Fill Tank!</button>
+      <div class="feedback" id="feedback3"></div>
+    </div>
+    <!-- Perimeter Racer -->
+    <div id="game4" class="game">
+      <button class="backbtn" onclick="backToMenu()">← Back</button>
+      <h2>Perimeter Racer 🚗</h2>
+      <div class="score" id="score4"></div>
+      <div class="question" id="question4"></div>
+      <input type="number" id="ans4">
+      <button class="btn" onclick="checkAnswer(4)">Race!</button>
+      <div class="feedback" id="feedback4"></div>
+    </div>
+  </div>
+  <script>
+    // Game logic for 5 games - each has its own state
+    let gameStates = [
+      {score: 0, width: 0, height: 0},
+      {score: 0, width: 0, height: 0},
+      {score: 0, l: 0, w: 0, h: 0},
+      {score: 0, l: 0, w: 0, h: 0},
+      {score: 0, sides: [], shape: '',}
+    ];
+    // Shapes for game 5
+    const racerShapes = ['square', 'rectangle', 'triangle'];
+
+    // Show game; hide menu and other games
+    function showGame(idx) {
+      document.getElementById('cardMenu').style.display = 'none';
+      for (let i = 0; i < 5; i++) {
+        document.getElementById('game'+i).classList.remove('active');
+      }
+      document.getElementById('game'+idx).classList.add('active');
+      startGame(idx);
+    }
+    // Back to menu
+    function backToMenu() {
+      for (let i = 0; i < 5; i++) {
+        document.getElementById('game'+i).classList.remove('active');
+      }
+      document.getElementById('cardMenu').style.display = 'flex';
+    }
+    // Start a game with a random question
+    function startGame(idx){
+      gameStates[idx].score = (gameStates[idx].score||0);
+      document.getElementById('score'+idx).textContent = 'Score: ' + gameStates[idx].score;
+      document.getElementById('feedback'+idx).textContent = '';
+      document.getElementById('ans'+idx).value = '';
+      if(idx === 0){
+        // Rectangle Runner
+        let w = randInt(4,30), h = randInt(3,16);
+        gameStates[0].width = w; gameStates[0].height = h;
+        document.getElementById('question0').textContent = `Rectangle: width = ${w}, height = ${h}. Calculate the perimeter!`;
+      }
+      else if(idx === 1){
+        // Area Explorer
+        let shapeType = Math.random() < 0.5 ? 'rectangle' : 'square';
+        if(shapeType === 'square'){
+          let s = randInt(2,20);
+          gameStates[1].width = s;
+          gameStates[1].height = s;
+          document.getElementById('question1').textContent = `Square area: side = ${s}. What's the area?`;
+        } else {
+          let w = randInt(2,20), h = randInt(2,24);
+          gameStates[1].width = w;
+          gameStates[1].height = h;
+          document.getElementById('question1').textContent = `Rectangle area: width = ${w}, height = ${h}. What's the area?`;
+        }
+      }
+      else if(idx === 2){
+        // Volume Builder
+        let l = randInt(2,12), w = randInt(2,12), h = randInt(2,12);
+        gameStates[2].l = l; gameStates[2].w = w; gameStates[2].h = h;
+        let isCube = (l===w && w===h);
+        document.getElementById('question2').textContent = isCube
+          ? `Build a cube: side = ${l}. What's its volume?`
+          : `Build a cuboid: L=${l}, W=${w}, H=${h}. What's its volume?`;
+      }
+      else if(idx === 3){
+        // Water Tank Challenge
+        let l = randInt(10, 80), w = randInt(10, 60), h = randInt(20,120);
+        gameStates[3].l = l; gameStates[3].w = w; gameStates[3].h = h;
+        document.getElementById('question3').textContent = `Tank size: ${l}m x ${w}m x ${h}m. Type volume in m³ to fill!`;
+      }
+      else if(idx === 4){
+        // Perimeter Racer
+        let shape = racerShapes[randInt(0,2)];
+        gameStates[4].shape = shape;
+        if(shape === 'square'){
+          let s = randInt(3,20);
+          gameStates[4].sides = [s,s,s,s];
+          document.getElementById('question4').textContent = `Square: side = ${s}. Compute perimeter!`;
+        } else if (shape === 'rectangle'){
+          let w = randInt(5,25), h = randInt(2,18);
+          gameStates[4].sides = [w,h,w,h];
+          document.getElementById('question4').textContent = `Rectangle: width = ${w}, height = ${h}. Compute perimeter!`;
+        } else {
+          // Triangle with random sides
+          let a = randInt(3,15), b = randInt(3,16), c = randInt(3,16);
+          gameStates[4].sides = [a,b,c];
+          document.getElementById('question4').textContent = `Triangle sides: ${a}, ${b}, ${c}. Compute perimeter!`;
+        }
+      }
+    }
+    // Check answer and give feedback
+    function checkAnswer(idx){
+      let userAns = parseFloat(document.getElementById('ans'+idx).value);
+      if(isNaN(userAns)) {
+        document.getElementById('feedback'+idx).textContent = "❓ Please enter a number.";
+        return;
+      }
+      if(idx === 0){
+        let {width:w,height:h}=gameStates[0], correct=2*(w+h);
+        if(userAns===correct){
+          goodJob(idx, "Runner speeds ahead!");
+        } else {
+          document.getElementById('feedback0').textContent="Wrong. Perimeter = 2×(width+height). Try again!";
+        }
+      }
+      else if(idx === 1){
+        let {width:w,height:h}=gameStates[1], correct=w*h;
+        if(userAns===correct){
+          goodJob(idx, "🎉 Treasure found!");
+        } else {
+          document.getElementById('feedback1').textContent="Oops! Area = width×height. Try again!";
+        }
+      }
+      else if(idx === 2){
+        let {l,w,h}=gameStates[2], correct=l*w*h;
+        if(userAns===correct){
+          goodJob(idx, "Block added!");
+        } else {
+          document.getElementById('feedback2').textContent="Wrong! Volume=L×W×H. Try again!";
+        }
+      }
+      else if(idx === 3){
+        let {l,w,h}=gameStates[3], correct=l*w*h;
+        if(userAns===correct){
+          goodJob(idx, "Water rises in the tank!");
+        } else {
+          document.getElementById('feedback3').textContent="Leak! Volume=L×W×H. Try again!";
+        }
+      }
+      else if(idx === 4){
+        let {shape,sides}=gameStates[4];
+        let correct=(shape==="triangle"? sides[0]+sides[1]+sides[2]:sides.reduce((a,b)=>a+b));
+        if(userAns===correct){
+          goodJob(idx, "Vroom! Car speeds up!");
+        } else {
+          document.getElementById('feedback4').textContent="Wrong! Add all sides for perimeter.";
+        }
+      }
+    }
+    function goodJob(idx, msg){
+      gameStates[idx].score += 1;
+      document.getElementById('feedback'+idx).textContent = msg + ' Next question...';
+      setTimeout(()=>startGame(idx), 1350);
+      document.getElementById('ans'+idx).value = '';
+      document.getElementById('score'+idx).textContent = 'Score: ' + gameStates[idx].score;
+    }
+    function randInt(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+  </script>
+</body>
+</html>

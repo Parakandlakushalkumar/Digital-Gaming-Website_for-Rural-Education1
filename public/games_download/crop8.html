@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Crop Quiz & Farm Games</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    background: linear-gradient(135deg, #eaf6ea 95%, #c7dec9 125%);
+    min-height: 100vh;
+    user-select:none;
+    color: #2e5333;
+  }
+  h1 {
+    text-align: center;
+    font-weight: 900;
+    font-size: 2.5em;
+    margin: 48px 0 32px;
+    color: #2a4e25;
+    text-shadow: 0 1px 7px #a6c59a;
+  }
+  .cards-container {
+    max-width: 1200px;
+    margin: 0 auto 60px;
+    display: flex;
+    gap: 1.8rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 0 16px;
+  }
+  .game-card {
+    background: #def1dc;
+    border-radius: 24px;
+    width: 220px;
+    height: 345px;
+    box-shadow: 0 6px 22px #769a6c99;
+    cursor: pointer;
+    padding: 42px 24px 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.22s ease;
+  }
+  .game-card:hover {
+    background: #c2dfbf;
+    transform: scale(1.07) translateY(-9px);
+    box-shadow: 0 14px 40px #517b3aab;
+    z-index: 10;
+  }
+  .card-icon {
+    font-size: 58px;
+    margin-bottom: 20px;
+    user-select:none;
+  }
+  .game-title {
+    font-weight: 900;
+    font-size: 1.28rem;
+    color: #265226;
+    margin-bottom: 8px;
+    user-select:none;
+    text-align: center;
+  }
+  .game-desc {
+    font-size: 1.04rem;
+    color: #3f6d40;
+    user-select:none;
+    text-align: center;
+  }
+  /* Modal */
+  .modal-bg {
+    display: none;
+    position: fixed;
+    left: 0; top: 0; width: 100vw; height: 100vh;
+    background: rgba(30, 60, 20, 0.15);
+    backdrop-filter: blur(7px);
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+  }
+  .modal-content {
+    background: #f3f9f1dd;
+    border-radius: 26px;
+    max-width: 700px;
+    width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 0 46px #79a366cc;
+    position: relative;
+    padding: 32px 28px 38px;
+    font-size: 1rem;
+    user-select:none;
+  }
+  .close-modal {
+    position: absolute;
+    top: 18px; right: 20px;
+    font-size: 2.2em;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #2e5d29bb;
+    transition: color 0.2s ease;
+    padding: 0 8px 5px 0;
+    user-select:none;
+    outline:none;
+  }
+  .close-modal:hover { color: #ba4646; }
+  h2 {
+    font-weight: 900;
+    font-size: 1.52em;
+    color: #2a5120;
+    margin-top: 0;
+    user-select:none;
+  }
+
+  /* Shared MCQ styles */
+  .question-container {
+    margin-top: 16px;
+    background: #d5e8d4aa;
+    border-radius: 16px;
+    border: 2px solid #7ea368;
+    padding: 16px 22px 20px;
+  }
+  .question-text {
+    font-weight: 700;
+    font-size: 1.24em;
+    margin-bottom: 14px;
+  }
+  .options-list {
+    list-style: none;
+    padding-left: 0;
+  }
+  .option-item {
+    margin-bottom: 12px;
+  }
+  .option-item label {
+    cursor: pointer;
+    font-size: 1.05em;
+  }
+  button#submitAnswer, button#nextQuestion {
+    margin-top: 18px;
+    padding: 12px 28px;
+    font-weight: 700;
+    font-size: 1.15em;
+    border-radius: 14px;
+    border: none;
+    cursor: pointer;
+    color: #2e5a20;
+    background: linear-gradient(120deg, #a5d488 40%, #57902c 140%);
+    box-shadow: 0 3px 16px #829b6985;
+    user-select:none;
+  }
+  button#submitAnswer:hover, button#nextQuestion:hover {
+    background: linear-gradient(120deg,#3f6f19 30%, #264a0c 120%);
+    color: #d7e8c7;
+    outline:none;
+  }
+  .feedback {
+    margin-top: 14px;
+    font-weight: 700;
+    font-size: 1.18em;
+    min-height: 30px;
+    text-align: center;
+  }
+  /* Drag & Drop farm match */
+  .farm-match-container {
+    margin-top: 14px;
+  }
+  .drag-list, .drop-list {
+    background: #d4e7d1;
+    padding: 14px 8px;
+    border-radius: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+    user-select:none;
+  }
+  .drag-item {
+    background: #83a67a;
+    padding: 8px 14px;
+    border-radius: 12px;
+    color: #f0f9f0;
+    font-weight: 700;
+    cursor: grab;
+  }
+  .drag-item:active {
+    cursor: grabbing;
+  }
+  .drop-item {
+    background: #99d397cc;
+    color: #2f521e;
+    font-weight: 700;
+    border-radius: 12px;
+    padding: 10px 20px;
+    flex: 1 1 150px;
+    min-height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px dashed transparent;
+    transition: border-color 0.22s ease;
+  }
+  .drop-item.drag-over {
+    border-color: #3a6d13;
+  }
+  .drop-item.filled {
+    border-style: solid;
+    background: #6ba636aa;
+    color: #e9f7d9;
+    cursor: default;
+  }
+</style>
+</head>
+<body>
+<h1>Crop Quiz & Farm Games</h1>
+<div class="cards-container" role="list" aria-label="Crop and farm games collection">
+  <div class="game-card" role="listitem" tabindex="0" aria-describedby="desc-0" onclick="openGame(0)">
+    <div class="card-icon" aria-hidden="true">🌾</div>
+    <span class="game-title">Crop Quiz Click</span>
+    <span class="game-desc" id="desc-0">Multiple choice crop questions with hints.</span>
+  </div>
+  <div class="game-card" role="listitem" tabindex="0" aria-describedby="desc-1" onclick="openGame(1)">
+    <div class="card-icon" aria-hidden="true">🚜</div>
+    <span class="game-title">Farm Match Game</span>
+    <span class="game-desc" id="desc-1">Drag crops to correct season or soil type.</span>
+  </div>
+  <div class="game-card" role="listitem" tabindex="0" aria-describedby="desc-2" onclick="openGame(2)">
+    <div class="card-icon" aria-hidden="true">🏁</div>
+    <span class="game-title">Harvest Race</span>
+    <span class="game-desc" id="desc-2">Answer questions to move farmer to barn.</span>
+  </div>
+  <div class="game-card" role="listitem" tabindex="0" aria-describedby="desc-3" onclick="openGame(3)">
+    <div class="card-icon" aria-hidden="true">🐛</div>
+    <span class="game-title">Pest & Crop Challenge</span>
+    <span class="game-desc" id="desc-3">Select solutions to pests/diseases correctly.</span>
+  </div>
+  <div class="game-card" role="listitem" tabindex="0" aria-describedby="desc-4" onclick="openGame(4)">
+    <div class="card-icon" aria-hidden="true">🧩</div>
+    <span class="game-title">Crop Puzzle Game</span>
+    <span class="game-desc" id="desc-4">Answer questions to reveal farm puzzle pieces.</span>
+  </div>
+</div>
+
+<div id="gameModal" class="modal-bg" role="dialog" aria-modal="true" tabindex="-1">
+  <div class="modal-content" role="document">
+    <button class="close-modal" aria-label="Close game" onclick="closeModal()">&times;</button>
+    <div id="modalBody" tabindex="0"></div>
+  </div>
+</div>
+
+<script>
+  const modal = document.getElementById('gameModal');
+  const modalBody = document.getElementById('modalBody');
+  let gameState = null; // store current game state
+
+  function openGame(idx) {
+    switch(idx) {
+      case 0: cropQuizClick.start(); break;
+      case 1: farmMatchGame.start(); break;
+      case 2: harvestRace.start(); break;
+      case 3: pestCropChallenge.start(); break;
+      case 4: cropPuzzleGame.start(); break;
+    }
+    modal.style.display = 'flex';
+    setTimeout(() => modalBody.focus(), 250);
+  }
+  function closeModal() {
+    modal.style.display = 'none';
+    modalBody.innerHTML = '';
+    gameState = null;
+  }
+  window.onclick = e => { if(e.target === modal) closeModal(); };
+
+  // Utility shuffle
+  function shuffle(arr) {
+    for(let i=arr.length-1;i>0;i--){
+      let j = Math.floor(Math.random()*(i+1));
+      [arr[i],arr[j]] = [arr[j],arr[i]];
+    }
+    return arr;
+  }
+
+  /* 1. Crop Quiz Click 🌾 */
+  const cropQuizClick = {
+    questions:[
+      {q:"Which crop grows primarily in the Kharif season?", options:["Wheat","Rice","Barley","Gram"], ans:1, hint:"It's a water-intensive crop"},
+      {q:"Which is a Rabi crop?", options:["Maize","Sugarcane","Wheat","Millets"], ans:2, hint:"Sown in winter"},
+      {q:"Which crop requires well-drained sandy soil?", options:["Cotton","Rice","Jute","Paddy"], ans:0, hint:"Used for fabric"},
+      {q:"Which provides protein-rich pulses?", options:["Gram","Sugarcane","Tea","Coffee"], ans:0, hint:"Used in dals"},
+      {q:"Major season for harvesting maize?", options:["Kharif","Rabi","Zaidi","Autumn"], ans:0, hint:"Monsoon season"},
+      {q:"Crop that requires waterlogged fields?", options:["Rice","Wheat","Maize","Sugarcane"], ans:0, hint:"Grown in standing water"},
+      {q:"Cotton crop requires which soil?", options:["Black soil","Red soil","Alluvial soil","Laterite"], ans:0, hint:"Retains moisture"},
+      {q:"Which is a kharif crop?", options:["Barley","Cotton","Wheat","Mustard"], ans:1, hint:"Grown monsoon"},
+      {q:"Best season for sowing wheat is?", options:["Summer","Winter","Spring","Rainy"], ans:1, hint:"Cooler months"},
+      {q:"Tea is grown mostly in?", options:["Northern India","Southern India","Eastern India","Western India"], ans:2, hint:"Hilly regions"}
+    ],
+    currentQ: 0,
+    score: 0,
+    start() {
+      this.currentQ = 0;
+      this.score = 0;
+      this._showQuestion();
+    },
+    _showQuestion() {
+      const q = this.questions[this.currentQ];
+      modalBody.innerHTML = `
+        <h2>Crop Quiz Click</h2>
+        <div class="question-container" aria-live="polite" aria-atomic="true">
+          <div class="question-text">${q.q}</div>
+          <ul class="options-list">
+            ${q.options.map((o,i) => `
+              <li class="option-item">
+                <label>
+                  <input type="radio" name="answer" value="${i}" />
+                  ${o}
+                </label>
+              </li>
+            `).join('')}
+          </ul>
+          <button id="submitBtn" disabled>Submit</button>
+          <div class="feedback" id="feedback"></div>
+        </div>
+      `;
+      const radios = modalBody.querySelectorAll('input[name="answer"]');
+      const submitBtn = modalBody.querySelector('#submitBtn');
+      radios.forEach(r => r.addEventListener('change', () => submitBtn.disabled = false));
+      submitBtn.onclick = () => this._submitAnswer();
+    },
+    _submitAnswer() {
+      const selected = modalBody.querySelector('input[name="answer"]:checked');
+      if(!selected) return;
+      const idx = +selected.value;
+      const q = this.questions[this.currentQ];
+      const fb = modalBody.querySelector('#feedback');
+      if(idx === q.ans) {
+        this.score++;
+        fb.style.color = '#236723';
+        fb.textContent = 'Correct! +1 point';
+      } else {
+        fb.style.color = '#b53a3a';
+        fb.textContent = `Wrong! Hint: ${q.hint}`;
+      }
+      [...modalBody.querySelectorAll('input[name="answer"]')].forEach(i=>i.disabled=true);
+      modalBody.querySelector('#submitBtn').disabled=true;
+      this.currentQ++;
+      if(this.currentQ >= this.questions.length) {
+        setTimeout(() => this._showResult(), 1300);
+      } else {
+        setTimeout(() => this._showQuestion(), 1300);
+      }
+    },
+    _showResult() {
+      modalBody.innerHTML = `
+        <h2>Crop Quiz Click</h2>
+        <div style="font-size:1.5em; text-align:center; margin-top: 50px; font-weight:700; color:#256825;">
+          Quiz Finished!<br>Your score: ${this.score} / ${this.questions.length}
+        </div>
+        <button onclick="cropQuizClick.start()" style="margin-top: 28px; padding: 10px 26px; font-weight:700; cursor:pointer;">Play Again</button>
+      `;
+    }
+  };
+
+  /* 2. Farm Match Game 🚜 */
+  const farmMatchGame = {
+    crops: ["Rice", "Wheat", "Sugarcane", "Barley", "Maize", "Soybean"],
+    seasons: ["Kharif", "Rabi"],
+    soils: ["Alluvial", "Black", "Red"],
+    correctMatching: {
+      rice: { season: "Kharif", soil: "Alluvial" },
+      wheat: { season: "Rabi", soil: "Alluvial" },
+      sugarcane: { season: "Kharif", soil: "Black" },
+      barley: { season: "Rabi", soil: "Black" },
+      maize: { season: "Kharif", soil: "Red" },
+      soybean: { season: "Kharif", soil: "Red" }
+    },
+    start() {
+      this._render();
+    },
+    _render() {
+      modalBody.innerHTML = `
+        <h2>Farm Match Game</h2>
+        <div>Drag the crop to its correct season and soil type.</div>
+        <div style="display:flex; justify-content: space-around; margin-top: 14px;">
+          <div>
+            <h3>Drag Crops</h3>
+            <div class="drag-list" id="dragList" aria-label="Draggable crops" role="list" tabindex="0">
+              ${shuffle(this.crops).map(crop => `<div class="drag-item" draggable="true" id="drag-${crop.toLowerCase()}">${crop}</div>`).join('')}
+            </div>
+          </div>
+          <div>
+            <h3>Seasons</h3>
+            <div class="drop-list" id="dropSeason" aria-label="Drop season area" role="list" tabindex="0">
+              ${this.seasons.map(season => `<div class="drop-item" data-type="season" data-name="${season}">${season}</div>`).join('')}
+            </div>
+            <h3 style="margin-top: 18px;">Soil Types</h3>
+            <div class="drop-list" id="dropSoil" aria-label="Drop soil area" role="list" tabindex="0">
+              ${this.soils.map(soil => `<div class="drop-item" data-type="soil" data-name="${soil}">${soil}</div>`).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="feedback" id="farmMatchFeedback"></div>
+      `;
+      this._setupDragDrop();
+    },
+    _setupDragDrop() {
+      const crops = modalBody.querySelectorAll('.drag-item');
+      const seasons = modalBody.querySelectorAll('#dropSeason .drop-item');
+      const soils = modalBody.querySelectorAll('#dropSoil .drop-item');
+      const feedback = modalBody.querySelector('#farmMatchFeedback');
+      let draggedCrop = null;
+      crops.forEach(crop => {
+        crop.addEventListener('dragstart', e => { draggedCrop = crop; });
+        crop.addEventListener('dragend', e => { draggedCrop = null; });
+      });
+      function allowDrop(e) { e.preventDefault(); }
+      function dropHandler(e) {
+        e.preventDefault();
+        if(!draggedCrop) return;
+        const dropTarget = e.target.closest('.drop-item');
+        if(!dropTarget) return;
+        const cropName = draggedCrop.textContent.trim().toLowerCase();
+        const dropType = dropTarget.dataset.type; 
+        const dropName = dropTarget.dataset.name;
+        const correct = farmMatchGame.correctMatching[cropName];
+        if (!correct) return;
+        const isCorrect = (dropType === "season" && correct.season === dropName) ||
+                          (dropType === "soil" && correct.soil === dropName);
+        if(isCorrect) {
+          // Mark slot as filled for this crop and drop type
+          dropTarget.classList.add('filled');
+          dropTarget.textContent = draggedCrop.textContent + " ✓";
+          draggedCrop.remove();
+          feedback.style.color = '#236523';
+          feedback.textContent = `Correct! ${draggedCrop.textContent} matches ${dropName} ${dropType}.`;
+          if(modalBody.querySelectorAll('.drag-item').length === 0) {
+            setTimeout(() => {
+              modalBody.innerHTML = `
+                <h2>Farm Match Game</h2>
+                <div style="font-weight:700; font-size:1.5em; text-align:center; margin-top: 50px; color:#2e662f;">
+                  All crops matched correctly! 🎉
+                </div>
+                <button onclick="farmMatchGame.start()" style="margin-top: 26px; padding: 10px 26px;">Play Again</button>
+              `;
+            }, 1200);
+          }
+        } else {
+          feedback.style.color = '#ad3535';
+          feedback.textContent = `Oops! ${draggedCrop.textContent} does not match ${dropName} ${dropType}. Try again.`;
+        }
+      }
+      seasons.forEach(s => {
+        s.addEventListener('dragover', allowDrop);
+        s.addEventListener('drop', dropHandler);
+      });
+      soils.forEach(s => {
+        s.addEventListener('dragover', allowDrop);
+        s.addEventListener('drop', dropHandler);
+      });
+    }
+  };
+
+  /* 3. Harvest Race 🏁 */
+  const harvestRace = {
+    questions:[
+      {q:"Which crop is the largest producer worldwide?", options:["Rice","Wheat","Corn","Barley"], ans: 2},
+      {q:"Paddy cultivation primarily occurs in which season?", options:["Kharif","Rabi","Zaidi","Summer"], ans: 0},
+      {q:"Which is a staple food?", options:["Sugarcane","Rice","Cotton","Garlic"], ans: 1},
+      {q:"Wheat is harvested in which season?", options:["Rabi","Kharif","Winter","Summer"], ans: 0},
+      {q:"Which crop requires well-irrigated soil?", options:["Wheat","Maize","Sugarcane","Cotton"], ans: 2},
+      {q:"The main food grain of India is?", options:["Rice","Barley","Jute","Coriander"], ans: 0},
+      {q:"Which crop is used for oil production?", options:["Sunflower","Rice","Wheat","Millets"], ans: 0},
+      {q:"Cotton is harvested mainly in?", options:["Winter","Summer","Monsoon","Spring"], ans: 0},
+      {q:"Which crop is grown in black soil?", options:["Sugarcane","Wheat","Rice","Barley"], ans: 0},
+      {q:"Millets are mainly grown in?", options:["Dry regions","Wet regions","Cold regions","Floodplains"], ans: 0}
+    ],
+    currQIdx: 0,
+    playerPos: 0,
+    pathLength: 320,
+    start() {
+      this.currQIdx = 0;
+      this.playerPos = 0;
+      this._render();
+    },
+    _render() {
+      if(this.currQIdx >= this.questions.length){
+        modalBody.innerHTML = `
+          <h2>Harvest Race</h2>
+          <div style="min-height: 180px; font-weight: 700; font-size: 1.5em; color: #2b6a2a; text-align: center; padding-top: 40px;">
+            Race finished!<br>Your final position reached!
+          </div>
+          <button onclick="harvestRace.start()" style="margin-top: 28px; font-weight: 700; padding: 10px 26px;">Play Again</button>
+        `;
+        return;
+      }
+      const q = this.questions[this.currQIdx];
+      modalBody.innerHTML = `
+        <h2>Harvest Race</h2>
+        <div style="position: relative; max-width: 360px; margin: 20px auto;">
+          <div style="height: 56px; background: #e3f3e8; border-radius: 30px; border: 2px solid #7fbf6d;" aria-label="Harvest path"></div>
+          <div style="position: absolute; top: 6px; left: ${this.playerPos}px; font-size: 42px; user-select:none;">👨‍🌾</div>
+        </div>
+        <div class="question-text">${q.q}</div>
+        <div>
+          ${q.options.map((opt,i)=>`<button class="btn-option" data-ans="${i}">${opt}</button>`).join(' ')}
+        </div>
+        <div class="feedback" id="harvestFeedback"></div>
+      `;
+      modalBody.querySelectorAll('button.btn-option').forEach(btn => {
+        btn.onclick = () => {
+          const feedback = document.getElementById('harvestFeedback');
+          const selected = +btn.dataset.ans;
+          if(selected === q.ans){
+            this.playerPos = Math.min(this.playerPos + 60, this.pathLength);
+            feedback.style.color = '#2f7f33';
+            feedback.textContent = 'Correct! Farmer moves forward.';
+            modalBody.querySelector('div[style*="position: absolute"]').style.left = this.playerPos+'px';
+          } else {
+            feedback.style.color = '#b53838';
+            feedback.textContent = 'Wrong! Farmer stays put.';
+          }
+          this.currQIdx++;
+          setTimeout(() => this._render(), 1000);
+        };
+      });
+    }
+  };
+
+  /* 4. Pest & Crop Challenge 🐛 */
+  const pestCropChallenge = {
+    questions: [
+      { crop: "Wheat", issue: "Rust disease", options: ["Use resistant varieties", "Ignore", "Water excessively"], ans: 0 },
+      { crop: "Rice", issue: "Stem borer", options: ["Apply pesticides", "Remove plants", "Use more fertilizer"], ans: 0 },
+      { crop: "Cotton", issue: "Aphids", options: ["Introduce natural predators", "Ignore pests", "Reduce watering"], ans: 0 },
+      { crop: "Maize", issue: "Leaf blight", options: ["Crop rotation", "Harvest early", "Ignore"], ans: 0 },
+      { crop: "Sugarcane", issue: "Scale insects", options: ["Prune affected parts", "Plant later", "Add more water"], ans: 0 },
+      { crop: "Potato", issue: "Late blight", options: ["Use fungicides", "Water at night", "Increase planting density"], ans: 0 },
+      { crop: "Tomato", issue: "Whiteflies", options: ["Use sticky traps", "Reduce fertilizers", "Cut lower leaves"], ans: 0 },
+      { crop: "Soybean", issue: "Root rot", options: ["Improve drainage", "Plant closer", "Ignore"], ans: 0 },
+      { crop: "Barley", issue: "Powdery mildew", options: ["Spray sulfur", "Water more", "Use bigger seeds"], ans: 0 },
+      { crop: "Sunflower", issue: "Downy mildew", options: ["Use resistant seeds", "Keep stressed", "Avoid crop rotation"], ans: 0 }
+    ],
+    currentQ: 0,
+    start() {
+      this.currentQ = 0;
+      this._render();
+    },
+    _render() {
+      if (this.currentQ >= this.questions.length) {
+        modalBody.innerHTML = `
+          <h2>Pest & Crop Challenge</h2>
+          <div style="font-weight:700; font-size:1.5em; color:#235722; text-align:center; padding: 60px 20px;">
+            All pests handled! Healthy crops! 🎉🌿
+          </div>
+          <button onclick="pestCropChallenge.start()" style="margin-top: 28px; font-weight:700; padding:10px 26px;">Try Again</button>
+        `;
+        return;
+      }
+      const q = this.questions[this.currentQ];
+      modalBody.innerHTML = `
+        <h2>Pest & Crop Challenge</h2>
+        <div style="text-align:center; font-weight:700; font-size:1.15em; margin-bottom: 14px;">Crop: <span style="color:#2e5b26;">${q.crop}</span> - Problem: <span style="color:#aa3a3a;">${q.issue}</span></div>
+        <div>
+          ${q.options.map((opt,i) => `<button class="btn-option" data-ans="${i}">${opt}</button>`).join(' ')}
+        </div>
+        <div class="feedback" id="pestFeedback"></div>
+      `;
+      modalBody.querySelectorAll('button.btn-option').forEach(btn => {
+        btn.onclick = () => {
+          const feedback = document.getElementById('pestFeedback');
+          const selected = +btn.dataset.ans;
+          if(selected === q.ans){
+            feedback.textContent = "Correct! Crop grows healthy.";
+            feedback.style.color = "#2f7f33";
+            this.currentQ++;
+            setTimeout(() => this._render(), 1200);
+          } else {
+            feedback.textContent = "Wrong! Try preventive solution.";
+            feedback.style.color = "#b73434";
+          }
+        }
+      });
+    }
+  };
+
+  /* 5. Crop Puzzle Game 🧩 */
+  const cropPuzzleGame = {
+    puzzlePieces: 9,
+    revealed: 0,
+    questions: [
+      {q: "Which crop requires waterlogged fields?", a: "Rice", options: ["Corn","Wheat","Rice","Barley"]},
+      {q: "Which is a Kharif crop?", a: "Maize", options: ["Maize","Wheat","Peas","Mustard"]},
+      {q: "Which crop needs black soil?", a: "Cotton", options: ["Cotton","Rice","Barley","Soybean"]},
+      {q: "Best season for wheat?", a: "Rabi", options: ["Rabi","Kharif","Summer","Spring"]},
+      {q: "Pulse crop in India?", a: "Gram", options: ["Gram","Rice","Sugarcane","Cotton"]},
+      {q: "Which grows in alluvial soil?", a: "Wheat", options: ["Wheat","Cotton","Jute","Millet"]},
+      {q: "Longest duration crop?", a: "Sugarcane", options: ["Sugarcane","Barley","Maize","Rice"]},
+      {q: "Best soil for sunflower?", a: "Black", options: ["Black","Red","Clay","Sandy"]},
+      {q: "Rabi crop example?", a: "Barley", options: ["Barley","Rice","Millet","Paddy"]},
+      {q: "Which crop uses nitrogen fixation?", a: "Soybean", options: ["Soybean","Wheat","Sugarcane","Maize"]}
+    ],
+    start() {
+      this.revealed = 0;
+      this._render();
+    },
+    _render() {
+      modalBody.innerHTML = `
+        <h2>Crop Puzzle Game</h2>
+        <div style="margin: 14px 0 8px; font-weight:700;">Answer correctly to reveal the farm puzzle.</div>
+        <div aria-label="Farm puzzle grid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+          ${Array(this.puzzlePieces).fill(0).map((_,i)=>`
+            <div id="puzzle_${i}" style="aspect-ratio: 1; background: ${i < this.revealed ? 
+            `url('https://i.imgur.com/FyKE9Ed.jpg') center/cover no-repeat` : '#98bb95'}; border-radius:12px; box-shadow: 0 0 8px #569638bb;"></div>
+          `).join('')}
+        </div>
+        <div style="margin-top: 20px;">
+          ${this.questions[this.revealed] ? `
+            <div class="question-text">${this.questions[this.revealed].q}</div>
+            <div>
+              ${this.questions[this.revealed].options.map((opt,i)=>`<button class="btn-option" data-ans="${opt}">${opt}</button>`).join('')}
+            </div>` : 
+          `<div style="font-weight: 700; font-size: 1.4em; color:#23552d; margin-top: 40px; text-align:center;">All puzzle pieces revealed! 🎉</div>
+          <button onclick="cropPuzzleGame.start()" style="margin-top: 20px; padding: 10px 26px; font-weight:700;">Play Again</button>`
+          }
+        </div>
+        <div class="feedback" id="puzzleFeedback"></div>
+      `;
+      if(this.revealed < this.puzzlePieces){
+        modalBody.querySelectorAll('button.btn-option').forEach(btn => {
+          btn.onclick = () => {
+            const feedback = document.getElementById('puzzleFeedback');
+            if(btn.dataset.ans === this.questions[this.revealed].a){
+              this.revealed++;
+              feedback.style.color = '#2e6c2b';
+              feedback.textContent = "Correct! Puzzle piece revealed.";
+              this._render();
+            }else{
+              feedback.style.color = '#a73434';
+              feedback.textContent = "Wrong! Try again.";
+            }
+          }
+        });
+      }
+    }
+  };
+</script>
+</body>
+</html>

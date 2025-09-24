@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Translation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        
+        .translate-icon {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 10000;
+            width: 40px;
+            height: 40px;
+            background: #4285f4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .translate-dropdown {
+            position: fixed;
+            top: 60px;
+            right: 15px;
+            z-index: 9999;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            border: 1px solid #ddd;
+            min-width: 220px;
+            display: none;
+        }
+        
+        .language-select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Translation Icon -->
+    <div class="translate-icon" onclick="toggleDropdown()">
+        <span style="font-size: 18px; color: white;">🌐</span>
+    </div>
+    
+    <!-- Translation Dropdown -->
+    <div id="translate-dropdown" class="translate-dropdown">
+        <div style="margin-bottom: 10px; font-weight: bold;">Choose Language:</div>
+        <select class="language-select" onchange="translateTo(this.value)">
+            <option value="">Select Language</option>
+            <option value="hi">Hindi (हिंदी)</option>
+            <option value="bn">Bengali (বাংলা)</option>
+            <option value="te">Telugu (తెలుగు)</option>
+            <option value="ta">Tamil (தமிழ்)</option>
+            <option value="gu">Gujarati (ગુજરાતી)</option>
+            <option value="kn">Kannada (ಕನ್ನಡ)</option>
+            <option value="ml">Malayalam (മലയാളം)</option>
+            <option value="mr">Marathi (मराठी)</option>
+            <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
+            <option value="ur">Urdu (اردو)</option>
+            <option value="es">Spanish (Español)</option>
+            <option value="fr">French (Français)</option>
+            <option value="de">German (Deutsch)</option>
+            <option value="it">Italian (Italiano)</option>
+            <option value="pt">Portuguese (Português)</option>
+            <option value="ru">Russian (Русский)</option>
+            <option value="ja">Japanese (日本語)</option>
+            <option value="ko">Korean (한국어)</option>
+            <option value="zh">Chinese (中文)</option>
+            <option value="ar">Arabic (العربية)</option>
+            <option value="en">English (Reset)</option>
+        </select>
+        <div style="margin-top: 8px; font-size: 11px; color: #666;">
+            Click a language to translate this page
+        </div>
+    </div>
+
+    <!-- Page Content -->
+    <h1>Translation Debug Test</h1>
+    <p>This page tests if the translation dropdown appears when you click the blue globe icon.</p>
+    <p>Click the blue globe in the top-right corner.</p>
+    <p>You should see a dropdown with language options.</p>
+    <p>Select any language to translate this page using Google Translate.</p>
+
+    <script>
+        let dropdownOpen = false;
+        
+        function toggleDropdown() {
+            const dropdown = document.getElementById('translate-dropdown');
+            dropdownOpen = !dropdownOpen;
+            dropdown.style.display = dropdownOpen ? 'block' : 'none';
+            console.log('Dropdown toggled:', dropdownOpen ? 'OPEN' : 'CLOSED');
+        }
+        
+        function translateTo(langCode) {
+            if (!langCode) return;
+            
+            console.log('Translating to:', langCode);
+            
+            if (langCode === 'en') {
+                // Reset to original
+                window.location.reload();
+            } else {
+                // Use Google Translate URL
+                const currentUrl = window.location.href;
+                const translateUrl = `https://translate.google.com/translate?sl=en&tl=${langCode}&u=${encodeURIComponent(currentUrl)}`;
+                window.open(translateUrl, '_blank');
+            }
+        }
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const icon = document.querySelector('.translate-icon');
+            const dropdown = document.getElementById('translate-dropdown');
+            
+            if (dropdownOpen && !icon.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdownOpen = false;
+                dropdown.style.display = 'none';
+                console.log('Dropdown closed by clicking outside');
+            }
+        });
+        
+        // Debug info
+        console.log('Translation debug page loaded');
+        console.log('Click the blue globe icon to test dropdown');
+    </script>
+</body>
+</html>

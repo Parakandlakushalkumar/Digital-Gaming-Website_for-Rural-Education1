@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Future Innovators - Grade 10 ET</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; overflow-x: hidden; }
+        .container { max-width: 1100px; margin: 0 auto; background: rgba(255, 255, 255, 0.95); border-radius: 25px; padding: 30px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1); backdrop-filter: blur(15px); position: relative; }
+        .header { text-align: center; margin-bottom: 40px; padding: 25px; background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c); background-size: 400% 400%; animation: gradientShift 3s ease infinite; border-radius: 20px; color: white; position: relative; overflow: hidden; }
+        @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+        .header::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 20px 20px; animation: stars 20s linear infinite; }
+        @keyframes stars { 0% { transform: translateY(0) rotate(0deg); } 100% { transform: translateY(-20px) rotate(360deg); } }
+        .header h1 { position: relative; z-index: 2; font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .header p { position: relative; z-index: 2; font-size: 1.2em; opacity: 0.9; }
+        .language-selector { display: flex; justify-content: center; gap: 20px; margin-bottom: 40px; }
+        .lang-btn { padding: 12px 25px; border: none; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 1em; transition: all 0.4s ease; background: linear-gradient(45deg, #f8f9fa, #e9ecef); border: 3px solid transparent; position: relative; overflow: hidden; }
+        .lang-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent); transition: left 0.5s; }
+        .lang-btn:hover::before { left: 100%; }
+        .lang-btn.active { background: linear-gradient(45deg, #667eea, #764ba2); color: white; transform: translateY(-3px); box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4); }
+        .story-section { margin-bottom: 50px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); transition: all 0.4s ease; position: relative; overflow: hidden; }
+        .story-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4); background-size: 200% 100%; animation: shimmer 3s ease-in-out infinite; }
+        @keyframes shimmer { 0%, 100% { background-position: -200% 0; } 50% { background-position: 200% 0; } }
+        .story-section:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15); }
+        .robotics { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .energy { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
+        .transport { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
+        .design { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: #333; }
+        .topic-title { font-size: 2.2em; font-weight: bold; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+        .story-image { width: 100%; max-width: 350px; height: 250px; margin: 25px auto; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 5em; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border: 2px solid rgba(255, 255, 255, 0.3); transition: all 0.4s ease; position: relative; overflow: hidden; }
+        .story-image::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 2px, transparent 2px); background-size: 30px 30px; animation: float 6s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-10px) rotate(180deg); } }
+        .story-image:hover { transform: scale(1.1) rotateY(10deg); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); }
+        .story-text { font-size: 1.2em; line-height: 1.8; margin-bottom: 25px; text-align: justify; position: relative; }
+        .tech-concept { background: rgba(255, 255, 255, 0.3); padding: 20px; border-radius: 15px; margin: 20px 0; border-left: 6px solid rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px); transition: all 0.3s ease; }
+        .tech-concept:hover { background: rgba(255, 255, 255, 0.4); transform: translateX(10px); }
+        .concept-title { font-weight: bold; font-size: 1.1em; margin-bottom: 10px; color: rgba(255, 255, 255, 0.9); }
+        .lang-content { display: none; animation: fadeIn 0.5s ease-in-out; }
+        .lang-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .progress-bar { width: 100%; height: 12px; background: linear-gradient(90deg, #e9ecef, #f8f9fa); border-radius: 6px; margin: 30px 0; overflow: hidden; position: relative; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c); background-size: 200% 100%; width: 0%; transition: width 0.6s ease; border-radius: 6px; animation: progressShimmer 2s ease-in-out infinite; position: relative; }
+        @keyframes progressShimmer { 0%, 100% { background-position: -200% 0; } 50% { background-position: 200% 0; } }
+        .progress-fill::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); animation: progressGlow 1.5s ease-in-out infinite; }
+        @keyframes progressGlow { 0%, 100% { transform: translateX(-100%); } 50% { transform: translateX(100%); } }
+        .chapter-nav { display: flex; justify-content: space-between; margin-top: 40px; gap: 20px; }
+        .nav-btn { padding: 15px 30px; background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 1.1em; transition: all 0.4s ease; position: relative; overflow: hidden; min-width: 150px; }
+        .nav-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); transition: left 0.5s; }
+        .nav-btn:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4); }
+        .nav-btn:hover::before { left: 100%; }
+        .nav-btn:disabled { background: linear-gradient(45deg, #6c757d, #495057); cursor: not-allowed; transform: none; box-shadow: none; }
+        .nav-btn:disabled::before { display: none; }
+        .innovation-badge { position: absolute; top: 20px; right: 20px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); padding: 8px 15px; border-radius: 20px; font-size: 0.9em; font-weight: bold; color: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255, 255, 255, 0.3); }
+        @media (max-width: 768px) { .container { padding: 20px; margin: 10px; } .header h1 { font-size: 2em; } .topic-title { font-size: 1.8em; } .story-image { font-size: 4em; height: 200px; } .chapter-nav { flex-direction: column; } .nav-btn { width: 100%; } }
+    </style>
+    <link rel="icon" href="/favicon.ico">
+    <meta name="robots" content="noindex">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 The Future Innovators 🌟</h1>
+            <p>Join Alex on an incredible journey through the world of technology and innovation!</p>
+        </div>
+        
+        <div class="language-selector">
+            <button class="lang-btn active" data-lang="en" onclick="setLanguage('en')">English</button>
+            <button class="lang-btn" data-lang="hi" onclick="setLanguage('hi')">हिंदी</button>
+            <button class="lang-btn" data-lang="te" onclick="setLanguage('te')">తెలుగు</button>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div id="storyContent"></div>
+        
+        <div class="chapter-nav">
+            <button class="nav-btn" id="prevBtn" onclick="previousChapter()" disabled>← Previous</button>
+            <button class="nav-btn" id="nextBtn" onclick="nextChapter()">Next →</button>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'en';
+        let currentChapter = 0;
+        const totalChapters = 4;
+
+        const storyData = {
+            en: {
+                chapters: [
+                    { title: "🤖 The Robotic Revolution", image: "🤖", story: "Alex discovered an amazing robotics lab where mechanical beings came to life! A friendly robot named R2-Learning explained, 'I have sensors to see the world, actuators to move my parts, and a microcontroller as my brain!' Alex watched as robots assembled cars, performed surgery, and even played soccer. 'Robotics combines mechanical engineering, electronics, and programming,' R2 said. 'We're designed to help humans in dangerous tasks, repetitive work, and space exploration!'", concept: "Robotics integrates sensors (input), processors (control), and actuators (output). Modern robots use AI for decision-making, have applications in manufacturing, healthcare, and exploration, and follow Asimov's laws for safe human-robot interaction.", badge: "Industry 4.0" },
+                    { title: "🌱 The Green Energy Quest", image: "⚡", story: "Alex entered a magnificent sustainable energy park where the sun powered solar panels, wind turned giant turbines, and flowing water generated electricity! 'Fossil fuels are running out and polluting our planet,' explained Dr. GreenTech. 'Solar panels convert sunlight to electricity using photovoltaic cells, wind turbines capture kinetic energy, and hydroelectric plants use water flow.' Alex learned about energy storage in batteries and smart grids that distribute clean energy efficiently across cities.", concept: "Sustainable energy sources like solar, wind, and hydro are renewable and environmentally friendly. Energy conversion involves photovoltaic effect, electromagnetic induction, and kinetic-to-electrical energy transformation. Smart grids and battery storage ensure reliable clean energy supply.", badge: "Climate Action" },
+                    { title: "🚄 The Transportation Time Machine", image: "🚄", story: "Alex boarded a time machine that showed transportation evolution! From horse carts to hyperloop trains traveling at 600 mph! 'Transportation systems move people and goods efficiently,' said Captain Transit. They saw electric vehicles reducing pollution, magnetic levitation trains floating on magnetic fields, and autonomous cars using AI and sensors. 'Future transport includes flying cars, hyperloop tubes, and space elevators!' The captain showed how GPS satellites guide vehicles and traffic management systems optimize routes.", concept: "Modern transport systems use electric propulsion, magnetic levitation, GPS navigation, and AI-powered autonomous systems. Sustainable transport reduces carbon emissions through electric vehicles, public transit efficiency, and alternative fuels like hydrogen.", badge: "Smart Mobility" },
+                    { title: "💡 The Design Thinking Studio", image: "💡", story: "Alex entered a creative studio where innovators solved real-world problems! 'Design thinking has five stages,' announced Professor Create. 'First, EMPATHIZE with users by understanding their needs. Then DEFINE the problem clearly. Next, IDEATE creative solutions through brainstorming. Build PROTOTYPES to test ideas quickly and cheaply. Finally, TEST with real users and improve!' Alex watched teams design better wheelchairs, water purification systems, and educational apps. 'Great innovation comes from understanding people's problems and creating human-centered solutions!'", concept: "Design thinking is a human-centered approach: Empathize (understand users), Define (problem statement), Ideate (brainstorm solutions), Prototype (build testable models), Test (gather feedback). This iterative process leads to innovative solutions that truly meet user needs.", badge: "Innovation" }
+                ]
+            },
+            hi: {
+                chapters: [
+                    { title: "🤖 रोबोटिक क्रांति", image: "🤖", story: "एलेक्स ने एक अद्भुत रोबोटिक्स प्रयोगशाला खोजी जहां यांत्रिक प्राणी जीवंत हो उठे! एक मित्रवत रोबोट R2-लर्निंग ने समझाया, 'मेरे पास दुनिया देखने के लिए सेंसर, अपने भागों को हिलाने के लिए एक्चुएटर, और मेरे मस्तिष्क के रूप में एक माइक्रोकंट्रोलर है!' एलेक्स ने देखा कि रोबोट कारें बना रहे हैं, सर्जरी कर रहे हैं, और यहां तक कि फुटबॉल भी खेल रहे हैं। 'रोबोटिक्स यांत्रिक इंजीनियरिंग, इलेक्ट्रॉनिक्स और प्रोग्रामिंग को जोड़ता है,' R2 ने कहा। 'हम खतरनाक कार्यों, दोहराव वाले काम, और अंतरिक्ष अन्वेषण में मनुष्यों की सहायता के लिए डिज़ाइन किए गए हैं!'", concept: "रोबोटिक्स सेंसर (इनपुट), प्रोसेसर (नियंत्रण), और एक्चुएटर (आउटपुट) को एकीकृत करता है। आधुनिक रोबोट निर्णय लेने के लिए AI का उपयोग करते हैं, विनिर्माण, स्वास्थ्य सेवा और अन्वेषण में उपयोग होते हैं, और सुरक्षित मानव-रोबोट बातचीत के लिए असिमोव के नियमों का पालन करते हैं।", badge: "उद्योग 4.0" },
+                    { title: "🌱 हरित ऊर्जा की खोज", image: "⚡", story: "एलेक्स एक शानदार टिकाऊ ऊर्जा पार्क में पहुंचा जहां सूर्य ने सोलर पैनलों को शक्ति दी, हवा ने विशाल टर्बाइनों को घुमाया, और बहते पानी ने बिजली पैदा की! 'जीवाश्म ईंधन समाप्त हो रहे हैं और हमारे ग्रह को प्रदूषित कर रहे हैं,' डॉ. ग्रीनटेक ने समझाया। 'सोलर पैनल फोटोवोल्टेइक कोशिकाओं का उपयोग करके सूर्य की रोशनी को बिजली में बदलते हैं, पवन टर्बाइन गतिज ऊर्जा को पकड़ते हैं, और हाइड्रोइलेक्ट्रिक संयंत्र पानी के प्रवाह का उपयोग करते हैं।' एलेक्स ने बैटरियों में ऊर्जा भंडारण और स्मार्ट ग्रिड के बारे में सीखा जो शहरों में स्वच्छ ऊर्जा को कुशलता से वितरित करते हैं।", concept: "सौर, पवन और जल जैसे टिकाऊ ऊर्जा स्रोत नवीकरणीय और पर्यावरण अनुकूल हैं। ऊर्जा रूपांतरण में फोटोवोल्टेइक प्रभाव, विद्युत चुम्बकीय प्रेरण, और गतिज-से-विद्युत ऊर्जा परिवर्तन शामिल है। स्मार्ट ग्रिड और बैटरी भंडारण विश्वसनीय स्वच्छ ऊर्जा आपूर्ति सुनिश्चित करते हैं।", badge: "जलवायु कार्रवाई" },
+                    { title: "🚄 परिवहन समय मशीन", image: "🚄", story: "एलेक्स एक समय मशीन में सवार हुआ जो परिवहन के विकास को दिखाती थी! घोड़े की गाड़ियों से लेकर 600 मील प्रति घंटे की रफ्तार से चलने वाली हाइपरलूप ट्रेनों तक! 'परिवहन प्रणालियां लोगों और सामानों को कुशलता से स्थानांतरित करती हैं,' कैप्टन ट्रांजिट ने कहा। उन्होंने इलेक्ट्रिक वाहनों को प्रदूषण कम करते, चुंबकीय उत्तोलन ट्रेनों को चुंबकीय क्षेत्रों पर तैरते, और स्वायत्त कारों को AI और सेंसर का उपयोग करते देखा। 'भविष्य के परिवहन में उड़ने वाली कारें, हाइपरलूप ट्यूब, और अंतरिक्ष लिफ्ट शामिल हैं!' कैप्टन ने दिखाया कि GPS उपग्रह वाहनों का मार्गदर्शन कैसे करते हैं और यातायात प्रबंधन प्रणालियां मार्गों को कैसे अनुकूलित करती हैं।", concept: "आधुनिक परिवहन प्रणालियां विद्युत प्रणोदन, चुंबकीय उत्तोलन, GPS नेविगेशन, और AI-संचालित स्वायत्त प्रणालियों का उपयोग करती हैं। टिकाऊ परिवहन इलेक्ट्रिक वाहनों, सार्वजनिक पारगमन दक्षता, और हाइड्रोजन जैसे वैकल्पिक ईंधन के माध्यम से कार्बन उत्सर्जन को कम करता है।", badge: "स्मार्ट मोबिलिटी" },
+                    { title: "💡 डिज़ाइन थिंकिंग स्टूडियो", image: "💡", story: "एलेक्स एक रचनात्मक स्टूडियो में पहुंचा जहां नवप्रवर्तक वास्तविक समस्याओं को हल करते थे! 'डिज़ाइन थिंकिंग के पांच चरण हैं,' प्रोफेसर क्रिएट ने घोषणा की। 'पहले, उपयोगकर्ताओं की जरूरतों को समझकर उनसे सहानुभूति रखें। फिर समस्या को स्पष्ट रूप से परिभाषित करें। इसके बाद, विचार-मंथन के माध्यम से रचनात्मक समाधानों पर विचार करें। विचारों को जल्दी और सस्ते में परखने के लिए प्रोटोटाइप बनाएं। अंत में, वास्तविक उपयोगकर्ताओं के साथ परीक्षण करें और सुधार करें!' एलेक्स ने टीमों को बेहतर व्हीलचेयर, जल शुद्धिकरण प्रणाली, और शैक्षिक ऐप्स डिज़ाइन करते देखा। 'महान नवाचार लोगों की समस्याओं को समझने और मानव-केंद्रित समाधान बनाने से आता है!'", concept: "डिज़ाइन थिंकिंग एक मानव-केंद्रित दृष्टिकोण है: सहानुभूति (उपयोगकर्ताओं को समझना), परिभाषित करना (समस्या कथन), विचार करना (समाधानों पर विचार-मंथन), प्रोटोटाइप (परीक्षण योग्य मॉडल बनाना), परीक्षण (फीडबैक एकत्र करना)। यह पुनरावर्ती प्रक्रिया नवाचारी समाधानों की ओर ले जाती है जो वास्तव में उपयोगकर्ता की आवश्यकताओं को पूरा करते हैं।", badge: "नवाचार" }
+                ]
+            },
+            te: {
+                chapters: [
+                    { title: "🤖 రోబోటిక్ విప్లవం", image: "🤖", story: "అలెక్స్ ఒక అద్భుతమైన రోబోటిక్స్ ప్రయోగశాలను కనుగొన్నాడు అక్కడ యాంత్రిక జీవులు సజీవంగా మారాయి! R2-లెర్నింగ్ అనే స్నేహపూర్వక రోబోట్ వివరించింది, 'ప్రపంచాన్ని చూడటానికి నాకు సెన్సార్లు, నా భాగాలను కదిలించడానికి యాక్చుయేటర్లు, మరియు నా మెదడుగా మైక్రోకంట్రోలర్ ఉన్నాయి!' అలెక్స్ రోబోట్లు కార్లను అసెంబుల్ చేయడం, సర్జరీ చేయడం, మరియు సాకర్ కూడా ఆడడం చూసాడు. 'రోబోటిక్స్ మెకానికల్ ఇంజినీరింగ్, ఎలక్ట్రానిక్స్, మరియు ప్రోగ్రామింగ్‌ను కలుపుతుంది,' R2 అన్నది। 'మేము ప్రమాదకరమైన పనులు, పునరావృత పని, మరియు అంతరిక్ష అన్వేషణలో మనుషులకు సహాయం చేయడానికి రూపకల్పన చేయబడ్డాము!'", concept: "రోబోటిక్స్ సెన్సార్లు (ఇన్‌పుట్), ప్రాసెసర్లు (నియంత్రణ), మరియు యాక్చుయేటర్లను (అవుట్‌పుట్) ఏకీకృతం చేస్తుంది. ఆధునిక రోబోట్లు నిర్ణయం తీసుకోవడానికి AIని ఉపయోగిస్తాయి, తయారీ, ఆరోగ్య సేవ, మరియు అన్వేషణలో అప్లికేషన్లు కలిగి ఉంటాయి, మరియు సురక్షితమైన మానవ-రోబోట్ పరస్పర చర్య కోసం అసిమోవ్ నియమాలను అనుసరిస్తాయి।", badge: "పరిశ్రమ 4.0" },
+                    { title: "🌱 హరిత శక్తి అన్వేషణ", image: "⚡", story: "అలెక్స్ ఒక అద్భుతమైన స్థిరమైన శక్తి పార్కులోకి ప్రవేశించాడు అక్కడ సూర్యుడు సోలార్ ప్యానెల్‌లకు శక్తినిచ్చాడు, గాలి పెద్ద టర్బైన్‌లను తిప్పాడు, మరియు ప్రవహించే నీరు విద్యుత్‌ను ఉత్పత్తి చేసింది! 'శిలాజ ఇంధనాలు అయిపోతున్నాయి మరియు మన గ్రహాన్ని కలుషితం చేస్తున్నాయి,' డాక్టర్ గ్రీన్‌టెక్ వివరించాడు। 'సోలార్ ప్యానెల్‌లు ఫోటోవోల్టాయిక్ కణాలను ఉపయోగించి సూర్యకాంతిని విద్యుత్‌గా మార్చుతాయి, పవన టర్బైన్‌లు గతిక శక్తిని పట్టుకుంటాయి, మరియు హైడ్రోఎలక్ట్రిక్ ప్లాంట్లు నీటి ప్రవాహాన్ని ఉపయోగిస్తాయి।' అలెక్స్ బ్యాటరీలలో శక్తి నిల్వ మరియు నగరాలలో స్వచ్ఛమైన శక్తిని సమర్థవంతంగా పంపిణీ చేసే స్మార్ట్ గ్రిడ్‌ల గురించి నేర్చుకున్నాడు।", concept: "సౌర, పవన, మరియు జలవిద్యుత్ వంటి స్థిరమైన శక్తి వనరులు పునరుత్పాదనీయ మరియు పర్యావరణ అనుకూలమైనవి. శక్తి మార్పిడిలో ఫోటోవోల్టాయిక్ ప్రభావం, విద్యుదయస్కాంత ప్రేరణ, మరియు గతిక-నుంచి-విద్యుత్ శక్తి మార్పిడి ఉంటాయి. స్మార్ట్ గ్రిడ్‌లు మరియు బ్యాటరీ నిల్వ విశ్వసనీయ స్వచ్ఛ శక్తి సరఫరాను నిర్ధారిస్తాయి।", badge: "వాతావరణ చర్య" },
+                    { title: "🚄 రవాణా కాల యంత్రం", image: "🚄", story: "అలెక్స్ రవాణా పరిణామాన్ని చూపించే కాల యంత్రంలో ఎక్కాడు! గుర్రపు బండ్లు నుంచి గంటకు 600 మైళ్ల వేగంతో ప్రయాణించే హైపర్‌లూప్ రైళ్ల వరకు! 'రవాణా వ్యవస్థలు ప్రజలను మరియు వస్తువులను సమర్థవంతంగా తరలిస్తాయి,' కెప్టెన్ ట్రాన్సిట్ అన్నాడు. వారు ఎలక్ట్రిక్ వాహనాలు కాలుష్యాన్ని తగ్గించడం, అయస్కాంత లెవిటేషన్ రైళ్లు అయస్కాంత క్షేత్రాలపై తేలడం, మరియు స్వయంప్రతిపత్తి కార్లు AI మరియు సెన్సార్లను ఉపయోగించడం చూసారు. 'భవిష్యత్ రవాణాలో ఎగిరే కార్లు, హైపర్‌లూప్ ట్యూబ్‌లు, మరియు అంతరిక్ష ఎలివేటర్లు ఉంటాయి!' కెప్టెన్ GPS ఉపగ్రహాలు వాహనాలకు మార్గదర్శకత్వం ఎలా అందిస్తాయో మరియు ట్రాఫిక్ నిర్వహణ వ్యవస్థలు మార్గాలను ఎలా ఆప్టిమైజ్ చేస్తాయో చూపించాడు।", concept: "ఆధునిక రవాణా వ్యవస్థలు ఎలక్ట్రిక్ ప్రొపల్షన్, మాగ్నెటిక్ లెవిటేషన్, GPS నావిగేషన్, మరియు AI-శక్తితో కూడిన స్వయంప్రతిపత్తి వ్యవస్థలను ఉపయోగిస్తాయి। స్థిరమైన రవాణా ఎలక్ట్రిక్ వాహనాలు, ప్రజా రవాణా సామర్థ్యం, మరియు హైడ్రోజన్ వంటి ప్రత్యామనాయ ఇంధనాల ద్వారా కార్బన్ ఉద్గారాలను తగ్గిస్తుంది।", badge: "స్మార్ట్ మొబిలిటీ" },
+                    { title: "💡 డిజైన్ థింకింగ్ స్టూడియో", image: "💡", story: "అలెక్స్ ఒక సృజనాత్మక స్టూడియోలోకి ప్రవేశించాడు అక్కడ ఆవిష్కర్తలు వాస్తవిక సమస్యలను పరిష్కరించారు! 'డిజైన్ థింకింగ్‌కు ఐదు దశలు ఉన్నాయి,' ప్రొఫెసర్ క్రియేట్ ప్రకటించారు. 'మొదట, వినియోగదారుల అవసరాలను అర్థం చేసుకోవడం ద్వారా వారితో సానుభూతి పడండి. తర్వాత సమస్యను స్పష్టంగా నిర్వచించండి. ఆ తరువాత, బ్రెయిన్‌స్టార్మింగ్ ద్వారా సృజనాత్మక పరిష్కారాలను ఆలోచించండి. ఆలోచనలను త్వరగా మరియు చవకగా పరీక్షించడానికి ప్రోటోటైప్‌లను నిర్మించండి. చివరికి, వాస్తవ వినియోగదారులతో పరీక్షించి మెరుగుపరచండి!' అలెక్స్ బృందాలు మెరుగైన వీల్‌చైర్‌లు, నీటి శుద్దీకరణ వ్యవస్థలు, మరియు విద్యా యాప్‌లను డిజైన్ చేయడం చూసాడు. 'గొప్ప ఆవిష్కరణ ప్రజల సమస్యలను అర్థం చేసుకోవడం మరియు మానవ-కేంద్రిత పరిష్కారాలను సృష్టించడం నుంచి వస్తుంది!'", concept: "డిజైన్ థింకింగ్ ఒక మానవ-కేంద్రిత విధానం: సానుభూతి (వినియోగదారులను అర్థం చేసుకోవడం), నిర్వచించడం (సమస్య ప్రకటన), ఆలోచనలు (పరిష్కారాలను బ్రెయిన్‌స్టార్మ్ చేయడం), ప్రోటోటైప్ (పరీక్షించదగిన మోడల్‌లను నిర్మించడం), పరీక్ష (అభిప్రాయాన్ని సేకరించడం). ఈ పునరావృత ప్రక్రియ వాస్తవంగా వినియోగదారుల అవసరాలను తీర్చే ఆవిష్కరణాత్మక పరిష్కారాలకు దారితీస్తుంది।", badge: "ఆవిష్కరణ" }
+                ]
+            }
+        };
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.querySelector(`.lang-btn[data-lang="${lang}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+            displayChapter(currentChapter);
+        }
+
+        function displayChapter(chapterIndex) {
+            const chapter = storyData[currentLanguage].chapters[chapterIndex];
+            const topicClasses = ['robotics', 'energy', 'transport', 'design'];
+            const topicClass = topicClasses[chapterIndex];
+            
+            document.getElementById('storyContent').innerHTML = `
+                <div class="story-section ${topicClass}">
+                    <div class="innovation-badge">${chapter.badge}</div>
+                    <div class="topic-title">${chapter.title}</div>
+                    <div class="story-image">${chapter.image}</div>
+                    <div class="story-text">${chapter.story}</div>
+                    <div class="tech-concept">
+                        <div class="concept-title">Technology Concept:</div>
+                        ${chapter.concept}
+                    </div>
+                </div>
+            `;
+            
+            const progressPercent = ((chapterIndex + 1) / totalChapters) * 100;
+            document.getElementById('progressFill').style.width = progressPercent + '%';
+            
+            document.getElementById('prevBtn').disabled = chapterIndex === 0;
+            document.getElementById('nextBtn').disabled = chapterIndex === totalChapters - 1;
+            document.getElementById('nextBtn').textContent = chapterIndex === totalChapters - 1 ? 'Innovation Complete! 🎉' : 'Next →';
+        }
+
+        function nextChapter() { if (currentChapter < totalChapters - 1) { currentChapter++; displayChapter(currentChapter); scrollToTop(); } }
+        function previousChapter() { if (currentChapter > 0) { currentChapter--; displayChapter(currentChapter); scrollToTop(); } }
+        function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+        // Initialize
+        displayChapter(0);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowRight' && currentChapter < totalChapters - 1) nextChapter();
+            else if (event.key === 'ArrowLeft' && currentChapter > 0) previousChapter();
+            else if (event.key === 'Escape') { currentChapter = 0; displayChapter(currentChapter); scrollToTop(); }
+        });
+
+        // Touch navigation
+        let touchStartX = 0; let touchEndX = 0;
+        document.addEventListener('touchstart', function(event) { touchStartX = event.changedTouches[0].screenX; });
+        document.addEventListener('touchend', function(event) { touchEndX = event.changedTouches[0].screenX; handleSwipe(); });
+        function handleSwipe() {
+            const swipeThreshold = 50; const diff = touchStartX - touchEndX;
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0 && currentChapter < totalChapters - 1) nextChapter();
+                else if (diff < 0 && currentChapter > 0) previousChapter();
+            }
+        }
+
+        // Visual feedback
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.nav-btn');
+            if (!btn) return; btn.style.transform = 'scale(0.95)'; setTimeout(() => { btn.style.transform = ''; }, 150);
+        });
+
+        // Easter egg
+        let konamiCode = []; const konamiSequence = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight'];
+        document.addEventListener('keydown', function(event) {
+            konamiCode.push(event.key); if (konamiCode.length > konamiSequence.length) konamiCode.shift();
+            if (konamiCode.join(',') === konamiSequence.join(',')) { document.querySelector('.container').style.animation = 'rainbow 2s ease-in-out'; setTimeout(() => { document.querySelector('.container').style.animation = ''; }, 2000); konamiCode = []; }
+        });
+        const style = document.createElement('style');
+        style.textContent = `@keyframes rainbow { 0% { filter: hue-rotate(0deg); } 25% { filter: hue-rotate(90deg); } 50% { filter: hue-rotate(180deg); } 75% { filter: hue-rotate(270deg); } 100% { filter: hue-rotate(360deg); } }`;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
+
+

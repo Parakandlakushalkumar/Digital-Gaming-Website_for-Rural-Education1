@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Translation</title>
+<!-- ORIGINAL GAME CONTENT STARTS HERE -->
+<h1>🧪 pH Testing Laboratory</h1>
+        <div class="game-info">
+            <span>Score: <span id="score">0</span></span>
+            <span>Level: <span id="level">1</span></span>
+            <span>Correct: <span id="correct">0</span>/10</span><div class="ph-scale" id="phScale">
+            <!-- pH scale will be generated here --><div class="substance-container">
+            <div class="substance" id="currentSubstance">Lemon Juice</div>
+            <div class="test-tube" id="testTube"></div><div class="litmus-papers">
+            <div class="litmus-paper red-litmus" onclick="testLitmus('red')">
+                Red Litmus<br>Paper<div class="litmus-paper blue-litmus" onclick="testLitmus('blue')">
+                Blue Litmus<br>Paper<div class="ph-slider">
+            <label for="phSlider" style="font-weight: bold; font-size: 1.2rem;">Predict the pH:</label>
+            <input type="range" id="phSlider" class="slider" min="0" max="14" step="0.5" value="7">
+            <div class="ph-display">pH: <span id="phValue">7.0</span></div><div class="controls">
+            <button class="btn btn-test" onclick="testSubstance()">Test with Indicator</button>
+            <button class="btn btn-check" onclick="checkAnswer()">Submit Answer</button>
+            <button class="btn btn-next" onclick="nextQuestion()">Next Substance</button><div id="result" class="result" style="display: none;"></div>
+        <div id="facts" class="facts" style="display: none;"></div><script>
+        const substances = [
+            { name: "Lemon Juice", ph: 2.0, type: "acid", color: "#ffff99", fact: "Citric acid makes lemons sour and gives them a pH around 2." },
+            { name: "Coffee", ph: 5.0, type: "acid", color: "#8B4513", fact: "Coffee is mildly acidic due to chlorogenic acids." },
+            { name: "Pure Water", ph: 7.0, type: "neutral", color: "#87CEEB", fact: "Pure water is perfectly neutral with equal H⁺ and OH⁻ ions." },
+            { name: "Baking Soda", ph: 9.0, type: "base", color: "#F0F8FF", fact: "Sodium bicarbonate is a weak base commonly used in baking." },
+            { name: "Household Ammonia", ph: 11.0, type: "base", color: "#E6E6FA", fact: "Ammonia solution is a strong base used for cleaning." },
+            { name: "Vinegar", ph: 2.5, type: "acid", color: "#FFFACD", fact: "Acetic acid in vinegar makes it useful for cooking and cleaning." },
+            { name: "Soap Solution", ph: 10.0, type: "base", color: "#F5FFFA", fact: "Soap is basic, which helps it break down oils and grease." },
+            { name: "Orange Juice", ph: 3.5, type: "acid", color: "#FFA500", fact: "Citric acid gives oranges their tangy taste." },
+            { name: "Milk", ph: 6.5, type: "acid", color: "#FFFDD0", fact: "Fresh milk is slightly acidic due to lactic acid." },
+            { name: "Antacid", ph: 8.5, type: "base", color: "#FFFFFF", fact: "Antacids neutralize stomach acid to relieve heartburn." }
+        ];
+        
+        let currentQuestion = 0;
+        let score = 0;
+        let correctAnswers = 0;
+        let hasTestedLitmus = false;
+        let userPrediction = 7.0;
+        
+        function initializePHScale() {
+            const phScale = document.getElementById('phScale');
+            phScale.innerHTML = '';
+            
+            for (let i = 0; i <= 14; i++) {
+                const indicator = document.createElement('div');
+                indicator.className = 'ph-indicator';
+                indicator.innerHTML = `<div>${i}</div>`;
+                
+                if (i <= 6) {
+                    indicator.style.background = `hsl(${360 - (i * 30)}, 80%, ${70 + (i * 2)}%)`;
+                    indicator.style.color = 'white';
+                } else if (i === 7) {
+                    indicator.style.background = '#4CAF50';
+                    indicator.style.color = 'white';
+                } else {
+                    indicator.style.background = `hsl(${240 + ((i-8) * 20)}, 80%, ${70 - ((i-8) * 5)}%)`;
+                    indicator.style.color = 'white';
+                }
+                
+                phScale.appendChild(indicator);
+            }
+        }
+        
+        function displaySubstance() {
+            const substance = substances[currentQuestion];
+            document.getElementById('currentSubstance').textContent = substance.name;
+            document.getElementById('testTube').style.background = 'linear-gradient(to bottom, transparent, ' + substance.color + ')';
+            hasTestedLitmus = false;
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('facts').style.display = 'none';
+            
+            // Reset litmus papers
+            document.querySelectorAll('.litmus-paper').forEach(paper => {
+                if (paper.classList.contains('red-litmus')) {
+                    paper.style.background = 'linear-gradient(45deg, #ff5252, #f44336)';
+                    paper.innerHTML = 'Red Litmus<br>Paper';
+                } else {
+                    paper.style.background = 'linear-gradient(45deg, #2196f3, #1976d2)';
+                    paper.innerHTML = 'Blue Litmus<br>Paper';
+                }
+            });
+        }
+        
+        function testLitmus(color) {
+            const substance = substances[currentQuestion];
+            hasTestedLitmus = true;
+            
+            if (color === 'red') {
+                const redPaper = document.querySelector('.red-litmus');
+                if (substance.type === 'base') {
+                    redPaper.style.background = 'linear-gradient(45deg, #2196f3, #1976d2)';
+                    redPaper.innerHTML = 'Turned<br>Blue!';
+                } else {
+                    redPaper.innerHTML = 'No Change<br>(Red)';
+                }
+            } else {
+                const bluePaper = document.querySelector('.blue-litmus');
+                if (substance.type === 'acid') {
+                    bluePaper.style.background = 'linear-gradient(45deg, #ff5252, #f44336)';
+                    bluePaper.innerHTML = 'Turned<br>Red!';
+                } else {
+                    bluePaper.innerHTML = 'No Change<br>(Blue)';
+                }
+            }
+        }
+        
+        function testSubstance() {
+            const substance = substances[currentQuestion];
+            const testTube = document.getElementById('testTube');
+            
+            // Add indicator color based on pH
+            let indicatorColor;
+            if (substance.ph <= 4) {
+                indicatorColor = '#ff4444'; // Red for strong acid
+            } else if (substance.ph <= 6) {
+                indicatorColor = '#ff8888'; // Light red for weak acid
+            } else if (substance.ph === 7) {
+                indicatorColor = '#4CAF50'; // Green for neutral
+            } else if (substance.ph <= 10) {
+                indicatorColor = '#4488ff'; // Light blue for weak base
+            } else {
+                indicatorColor = '#0044ff'; // Blue for strong base
+            }
+            
+            testTube.style.background = `linear-gradient(to bottom, ${indicatorColor}, ${substance.color})`;
+            testTube.style.border = '4px solid ' + indicatorColor;
+        }
+        
+        function checkAnswer() {
+            const substance = substances[currentQuestion];
+            const resultDiv = document.getElementById('result');
+            const factsDiv = document.getElementById('facts');
+            
+            userPrediction = parseFloat(document.getElementById('phSlider').value);
+            const difference = Math.abs(userPrediction - substance.ph);
+            
+            let correct = false;
+            let message = '';
+            
+            if (difference <= 1.0) {
+                correct = true;
+                message = `🎉 Excellent! You predicted pH ${userPrediction}, actual pH is ${substance.ph}`;
+                score += Math.max(10 - Math.floor(difference * 5), 5);
+                correctAnswers++;
+            } else if (difference <= 2.0) {
+                message = `👍 Close! You predicted pH ${userPrediction}, actual pH is ${substance.ph}`;
+                score += 3;
+            } else {
+                message = `❌ Not quite. You predicted pH ${userPrediction}, actual pH is ${substance.ph}`;
+            }
+            
+            resultDiv.textContent = message;
+            resultDiv.className = correct ? 'result correct' : 'result incorrect';
+            resultDiv.style.display = 'block';
+            
+            // Show educational facts
+            let factText = substance.fact;
+            if (substance.type === 'acid') {
+                factText += " Acids have pH < 7 and turn blue litmus paper red.";
+            } else if (substance.type === 'base') {
+                factText += " Bases have pH > 7 and turn red litmus paper blue.";
+            } else {
+                factText += " Neutral substances have pH = 7 and don't change litmus paper color.";
+            }
+            
+            factsDiv.innerHTML = `<strong>Did you know?</strong> ${factText}`;
+            factsDiv.style.display = 'block';
+            
+            updateDisplay();
+        }
+        
+        function nextQuestion() {
+            currentQuestion = (currentQuestion + 1) % substances.length;
+            if (currentQuestion === 0) {
+                document.getElementById('level').textContent = parseInt(document.getElementById('level').textContent) + 1;
+            }
+            displaySubstance();
+            document.getElementById('phSlider').value = 7;
+            document.getElementById('phValue').textContent = '7.0';
+        }
+        
+        function updateDisplay() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('correct').textContent = correctAnswers;
+        }
+        
+        // pH slider event listener
+        document.getElementById('phSlider').addEventListener('input', function() {
+            document.getElementById('phValue').textContent = parseFloat(this.value).toFixed(1);
+        });
+        
+        // Initialize game
+        initializePHScale();
+        displaySubstance();
+        updateDisplay();
+        
+        // Add keyboard support
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            } else if (e.key === ' ') {
+                e.preventDefault();
+                testSubstance();
+            }
+        });
+    </script></html>

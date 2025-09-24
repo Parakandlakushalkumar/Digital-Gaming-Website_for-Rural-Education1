@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Translation</title>
+<!-- ORIGINAL GAME CONTENT STARTS HERE -->
+<h1 class="text-2xl font-bold flex items-center gap-2">
+          <i class="lucide lucide-atom text-violet-400 w-8 h-8"></i>
+          Matter Puzzle Game
+        </h1>
+        <div class="text-right">
+          <div class="text-sm opacity-80">Score</div>
+          <div class="text-xl font-bold">0</div><div class="flex items-center gap-4">
+        <div class="flex-1">
+          <div class="flex justify-between text-sm mb-1">
+            <span>Puzzle 1 of 5</span>
+            <span class="font-bold text-green-300">45s</span><div class="bg-black/20 rounded-full h-3">
+            <div class="bg-gradient-to-r from-violet-400 to-blue-500 h-3 rounded-full w-1/5"></div><!-- Puzzle Card -->
+    <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 mb-6 shadow-xl border border-white/20">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 bg-gradient-to-r from-violet-500 to-blue-600 rounded-full flex items-center justify-center font-bold">
+          1<div>
+          <h2 class="text-xl font-bold">Classify States of Matter</h2>
+          <div class="text-sm bg-violet-500/20 px-3 py-1 rounded-full border border-violet-400/30 inline-block mt-1">
+            States of Matter<p class="text-lg mb-6">Drag each example to its correct state of matter:</p>
+
+      <!-- Static Drag-Drop Categories -->
+      <div class="grid grid-cols-3 gap-4 mb-6">
+        <div class="bg-white/10 border-2 border-dashed border-white/30 rounded-xl p-4 min-h-32">
+          <h3 class="font-bold text-center mb-2 text-yellow-300">Solid</h3>
+          <!-- Placeholder for dropped items --><div class="bg-white/10 border-2 border-dashed border-white/30 rounded-xl p-4 min-h-32">
+          <h3 class="font-bold text-center mb-2 text-yellow-300">Liquid</h3><div class="bg-white/10 border-2 border-dashed border-white/30 rounded-xl p-4 min-h-32">
+          <h3 class="font-bold text-center mb-2 text-yellow-300">Gas</h3><!-- Draggable Items (non-functional) -->
+      <div class="flex flex-wrap gap-2 justify-center">
+        <div class="bg-blue-500/30 border border-blue-400 text-white p-3 rounded-lg cursor-pointer">Ice</div>
+        <div class="bg-blue-500/30 border border-blue-400 text-white p-3 rounded-lg cursor-pointer">Steam</div>
+        <div class="bg-blue-500/30 border border-blue-400 text-white p-3 rounded-lg cursor-pointer">Water</div>
+        <div class="bg-blue-500/30 border border-blue-400 text-white p-3 rounded-lg cursor-pointer">Oxygen</div>
+        <div class="bg-blue-500/30 border border-blue-400 text-white p-3 rounded-lg cursor-pointer">Wood</div>
+        <div class="bg-blue-500/30 border border-blue-400 text-white p-3 rounded-lg cursor-pointer">Mercury</div><!-- Submit Button -->
+      <button
+        class="w-full mt-6 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 py-3 px-6 rounded-xl font-bold text-white transition-all transform hover:scale-105 flex items-center justify-center gap-2"
+      >
+        <i class="lucide lucide-target w-5 h-5"></i>
+        Submit Answer
+      </button><!-- Result Explanation Placeholder -->
+    <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-6 shadow-xl border-2 border-green-400">
+      <div class="flex items-center gap-3 mb-4 text-green-300">
+        <i class="lucide lucide-check-circle w-8 h-8"></i>
+        <h3 class="text-xl font-bold">Puzzle Complete!</h3><p class="text-white mb-4 leading-relaxed">
+        Solids have fixed shape and volume. Liquids have fixed volume but take container's shape. Gases have neither fixed shape nor volume.
+      </p>
+      <button
+        class="w-full bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 py-3 px-6 rounded-xl font-bold text-white transition-all transform hover:scale-105"
+      >
+        Next Puzzle
+      </button><script>
+    // Optional: Initialize Lucide Icons
+    lucide.createIcons();
+  </script></html>

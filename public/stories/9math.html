@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Mathematics Stories - Grade 9</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header { text-align: center; color: white; margin-bottom: 30px; }
+        .header h1 { font-size: 2.8em; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); margin-bottom: 10px; }
+        .language-selector { display: flex; justify-content: center; gap: 15px; margin: 20px 0; }
+        .lang-btn { padding: 12px 24px; border: none; border-radius: 30px; background: rgba(255,255,255,0.9); color: #667eea; font-weight: bold; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .lang-btn:hover, .lang-btn.active { background: #667eea; color: white; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+        .stories-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(600px, 1fr)); gap: 30px; margin-top: 30px; }
+        .story-card { background: rgba(255,255,255,0.95); border-radius: 20px; padding: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); transition: all 0.3s; backdrop-filter: blur(10px); }
+        .story-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .story-title { font-size: 1.8em; color: #667eea; margin-bottom: 20px; text-align: center; font-weight: bold; }
+        .story-text { line-height: 1.6; font-size: 1.1em; margin: 15px 0; color: #333; }
+        .interactive-demo { background: linear-gradient(135deg, #f8f9ff 0%, #e6f2ff 100%); border-radius: 15px; padding: 25px; margin: 25px 0; text-align: center; border: 2px solid #e0e6ed; }
+        .demo-title { font-size: 1.3em; color: #667eea; margin-bottom: 20px; font-weight: bold; }
+        .polynomial-demo { position: relative; height: 300px; background: #fff; border-radius: 10px; margin: 20px 0; border: 2px solid #ddd; }
+        .polynomial-controls { display: flex; justify-content: center; gap: 15px; margin: 15px 0; flex-wrap: wrap; }
+        .coefficient-control { display: flex; align-items: center; gap: 10px; background: white; padding: 10px; border-radius: 8px; border: 1px solid #ddd; }
+        .coefficient-control input { width: 60px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
+        .equation-demo { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+        .equation-input { background: white; padding: 20px; border-radius: 10px; border: 2px solid #ddd; }
+        .equation-input input { width: 50px; padding: 8px; margin: 0 5px; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
+        .coordinate-plane { width: 400px; height: 400px; background: white; border: 2px solid #333; position: relative; margin: 20px auto; cursor: crosshair; }
+        .axis { position: absolute; background: #666; }
+        .x-axis { width: 100%; height: 2px; top: 50%; left: 0; }
+        .y-axis { width: 2px; height: 100%; left: 50%; top: 0; }
+        .point { width: 8px; height: 8px; background: #ff4757; border-radius: 50%; position: absolute; transform: translate(-50%, -50%); cursor: pointer; }
+        .geometry-demo { display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 20px; margin: 20px 0; }
+        .circle-demo { width: 200px; height: 200px; position: relative; }
+        .circle { width: 180px; height: 180px; border: 3px solid #667eea; border-radius: 50%; position: relative; margin: 10px; cursor: pointer; transition: all 0.3s; }
+        .circle:hover { border-color: #ff4757; transform: scale(1.05); }
+        .radius-line { position: absolute; width: 90px; height: 2px; background: #ff4757; top: 50%; left: 50%; transform-origin: left center; transition: transform 0.3s; }
+        .construction-demo { width: 250px; height: 200px; background: white; border: 2px solid #ddd; border-radius: 10px; position: relative; cursor: pointer; }
+        .shape-demo { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0; }
+        .shape-3d { width: 180px; height: 180px; margin: 10px auto; cursor: pointer; transition: transform 0.3s; }
+        .shape-3d:hover { transform: rotateY(20deg) rotateX(10deg); }
+        .cube { width: 120px; height: 120px; background: #667eea; position: relative; transform: rotateX(-10deg) rotateY(25deg); transform-style: preserve-3d; }
+        .cube-face { position: absolute; width: 120px; height: 120px; border: 2px solid #333; opacity: 0.8; }
+        .cube-front { background: #667eea; transform: translateZ(60px); }
+        .cube-back { background: #5a67d8; transform: translateZ(-60px) rotateY(180deg); }
+        .cube-right { background: #764ba2; transform: rotateY(90deg) translateZ(60px); }
+        .cube-left { background: #9f7aea; transform: rotateY(-90deg) translateZ(60px); }
+        .cube-top { background: #ed8936; transform: rotateX(90deg) translateZ(60px); }
+        .cube-bottom { background: #38b2ac; transform: rotateX(-90deg) translateZ(60px); }
+        .sphere { width: 120px; height: 120px; background: radial-gradient(circle at 30% 30%, #ff6b6b, #ee5a52); border-radius: 50%; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .stats-demo { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+        .bar-chart { background: white; padding: 20px; border-radius: 10px; border: 2px solid #ddd; position: relative; height: 200px; }
+        .bar { display: inline-block; width: 30px; background: #667eea; margin: 0 5px; border-radius: 4px 4px 0 0; transition: all 0.3s; cursor: pointer; position: relative; bottom: 0; }
+        .bar:hover { background: #ff4757; transform: scale(1.1); }
+        .probability-demo { background: white; padding: 20px; border-radius: 10px; border: 2px solid #ddd; }
+        .dice { width: 60px; height: 60px; background: #fff; border: 2px solid #333; border-radius: 8px; display: inline-block; margin: 10px; position: relative; cursor: pointer; transition: transform 0.3s; }
+        .dice:hover { transform: rotateZ(10deg); }
+        .dice-dot { width: 8px; height: 8px; background: #333; border-radius: 50%; position: absolute; }
+        .demo-button { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer; font-size: 1em; font-weight: bold; margin: 10px; transition: all 0.3s; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .demo-button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        .hidden { display: none; }
+        .math-formula { background: #f8f9fa; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 1.1em; color: #495057; margin: 15px 0; border-left: 4px solid #667eea; }
+        .result-display { background: #e8f5e8; padding: 15px; border-radius: 8px; margin: 15px 0; font-weight: bold; color: #2d5a2d; border-left: 4px solid #28a745; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .animated { animation: pulse 1s infinite; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Interactive Mathematics Stories</h1>
+            <p>Learn math through engaging stories and interactive demos!</p>
+            <div class="language-selector">
+                <button class="lang-btn active" onclick="showLanguage('english', this)">English</button>
+                <button class="lang-btn" onclick="showLanguage('hindi', this)">हिंदी</button>
+                <button class="lang-btn" onclick="showLanguage('telugu', this)">తెలుగు</button>
+            </div>
+        </div>
+
+        <div class="stories-grid">
+            <div class="story-card">
+                <div class="story-title">📈 The Polynomial Adventure</div>
+                <div class="lang-content english"><div class="story-text">Meet Alex, a young architect designing a roller coaster! The track's shape follows a polynomial equation. By changing the coefficients, Alex can control how steep the hills are and where the loops occur. Let's help Alex design the perfect ride!</div></div>
+                <div class="lang-content hindi hidden"><div class="story-text">एलेक्स से मिलिए, एक युवा आर्किटेक्ट जो रोलर कोस्टर डिज़ाइन कर रहा है! ट्रैक का आकार एक बहुपद समीकरण का पालन करता है। गुणांकों को बदलकर, एलेक्स नियंत्रित कर सकता है कि पहाड़ियां कितनी तीव्र हैं और लूप कहां होते हैं। आइए एलेक्स को परफेक्ट राइड डिज़ाइन करने में मदद करें!</div></div>
+                <div class="lang-content telugu hidden"><div class="story-text">అలెక్స్‌ను కలుసుకోండి, రోలర్ కోస్టర్ డిజైన్ చేస్తున్న యువ ఆర్కిటెక్ట్! ట్రాక్ ఆకారం ఒక బహుపది సమీకరణాన్ని అనుసరిస్తుంది. గుణకాలను మార్చడం ద్వారా, అలెక్స్ కొండలు ఎంత నిటారుగా ఉంటాయో మరియు లూప్‌లు ఎక్కడ జరుగుతాయో నియంత్రించవచ్చు. అలెక్స్‌కు పర్ఫెక్ట్ రైడ్ డిజైన్ చేయడంలో సహాయం చేద్దాం!</div></div>
+                <div class="interactive-demo">
+                    <h3 class="demo-title english">🎮 Design Your Polynomial Curve!</h3>
+                    <h3 class="demo-title hindi hidden">🎮 अपना बहुपद वक्र डिज़ाइन करें!</h3>
+                    <h3 class="demo-title telugu hidden">🎮 మీ బహుపది వక్రరేఖను డిజైన్ చేయండి!</h3>
+                    <div class="polynomial-controls">
+                        <div class="coefficient-control"><label>a:</label><input type="number" id="coeff-a" value="1" min="-5" max="5" step="0.5"></div>
+                        <div class="coefficient-control"><label>b:</label><input type="number" id="coeff-b" value="0" min="-10" max="10" step="1"></div>
+                        <div class="coefficient-control"><label>c:</label><input type="number" id="coeff-c" value="0" min="-10" max="10" step="1"></div>
+                    </div>
+                    <div class="math-formula" id="polynomial-formula">y = 1x² + 0x + 0</div>
+                    <div class="polynomial-demo" id="polynomial-graph"></div>
+                    <button class="demo-button" onclick="drawPolynomial()">Update Curve</button>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-title">🎯 The Treasure Hunt Mystery</div>
+                <div class="lang-content english"><div class="story-text">Captain Maya has found an ancient treasure map! The treasure's location is hidden at the intersection of two paths described by linear equations. Help Maya solve the system of equations to find where X marks the spot!</div></div>
+                <div class="lang-content hindi hidden"><div class="story-text">कप्तान माया को एक प्राचीन खजाने का नक्शा मिला है! खजाने का स्थान दो रैखिक समीकरणों द्वारा वर्णित दो पथों के चौराहे पर छुपा है। माया को समीकरणों की प्रणाली हल करने में मदद करें और पता करें कि X कहाँ निशान लगाता है!</div></div>
+                <div class="lang-content telugu hidden"><div class="story-text">కెప్టెన్ మాయాకు పురాతన నిధుల మ్యాప్ దొరికింది! నిధి స్థానం రెండు సరళ సమీకరణాల ద్వారా వర్ణించబడిన రెండు మార్గాల ఖండనలో దాగి ఉంది. సమీకరణాల వ్యవస్థను పరిష్కరించడంలో మాయాకు సహాయం చేయండి మరియు X ఎక్కడ గుర్తును చేస్తుందో కనుగొనండి!</div></div>
+                <div class="interactive-demo">
+                    <h3 class="demo-title english">🎮 Find the Intersection Point!</h3>
+                    <h3 class="demo-title hindi hidden">🎮 प्रतिच्छेदन बिंदु खोजें!</h3>
+                    <h3 class="demo-title telugu hidden">🎮 ఖండన బిందువును కనుగొనండి!</h3>
+                    <div class="equation-demo">
+                        <div class="equation-input"><h4>Equation 1:</h4><div class="math-formula"><input type="number" id="eq1-a" value="2" min="-5" max="5">x + <input type="number" id="eq1-b" value="1" min="-5" max="5">y = <input type="number" id="eq1-c" value="7" min="-10" max="10"></div></div>
+                        <div class="equation-input"><h4>Equation 2:</h4><div class="math-formula"><input type="number" id="eq2-a" value="1" min="-5" max="5">x - <input type="number" id="eq2-b" value="1" min="-5" max="5">y = <input type="number" id="eq2-c" value="1" min="-10" max="10"></div></div>
+                    </div>
+                    <button class="demo-button" onclick="solveLinearSystem()">Solve System</button>
+                    <div class="result-display" id="linear-result"></div>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-title">🗺 The Space Navigation Story</div>
+                <div class="lang-content english"><div class="story-text">Astronaut Zara is navigating through space using a coordinate system! Each planet and space station has specific coordinates. Help Zara plot points, calculate distances, and find the shortest route through the galaxy!</div></div>
+                <div class="lang-content hindi hidden"><div class="story-text">अंतरिक्ष यात्री ज़ारा एक निर्देशांक प्रणाली का उपयोग करके अंतरिक्ष में नेविगेट कर रही है! हर ग्रह और स्पेस स्टेशन के विशिष्ट निर्देशांक हैं। ज़ारा को बिंदु प्लॉट करने, दूरी की गणना करने, और आकाशगंगा के माध्यम से सबसे छोटा मार्ग खोजने में मदद करें!</div></div>
+                <div class="lang-content telugu hidden"><div class="story-text">వ్యోమగామి జారా కోఆర్డినేట్ సిస్టమ్‌ను ఉపయోగించి అంతరిక్షంలో నేవిగేట్ చేస్తోంది! ప్రతి గ్రహం మరియు స్పేస్ స్టేషన్‌కు నిర్దిష్ట కోఆర్డినేట్‌లు ఉన్నాయి. జారాకు పాయింట్‌లను ప్లాట్ చేయడంలో, దూరాలను లెక్కించడంలో మరియు గెలాక్సీ ద్వారా అతి తక్కువ మార్గాన్ని కనుగొనడంలో సహాయం చేయండి!</div></div>
+                <div class="interactive-demo">
+                    <h3 class="demo-title english">🎮 Plot Points in Space!</h3>
+                    <h3 class="demo-title hindi hidden">🎮 अंतरिक्ष में बिंदु प्लॉट करें!</h3>
+                    <h3 class="demo-title telugu hidden">🎮 అంతరిక్షంలో పాయింట్లను ప్లాట్ చేయండి!</h3>
+                    <div class="coordinate-plane" id="coordinate-plane" onclick="addPoint(event)">
+                        <div class="axis x-axis"></div>
+                        <div class="axis y-axis"></div>
+                    </div>
+                    <div class="result-display" id="coordinate-info">Click anywhere to add points!</div>
+                    <button class="demo-button" onclick="calculateDistance()">Calculate Distance</button>
+                    <button class="demo-button" onclick="clearPoints()">Clear Points</button>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-title">⭕ The Circle of Ancient Wisdom</div>
+                <div class="lang-content english"><div class="story-text">In ancient Greece, mathematician Euclid discovered the perfect properties of circles! Join young Sophia as she learns about radius, diameter, circumference, and area. She also masters the art of geometric constructions using only a compass and straightedge!</div></div>
+                <div class="lang-content hindi hidden"><div class="story-text">प्राचीन ग्रीस में, गणितज्ञ यूक्लिड ने वृत्तों के परफेक्ट गुणों की खोज की! युवा सोफिया के साथ जुड़ें जब वह त्रिज्या, व्यास, परिधि और क्षेत्रफल के बारे में सीखती है। वह केवल कंपास और स्ट्रेटेज का उपयोग करके ज्यामितीय निर्माण की कला में भी महारत हासिल करती है!</div></div>
+                <div class="lang-content telugu hidden"><div class="story-text">ప్రాచీన గ్రీసులో, గణిత శాస్త్రవేత్త యూక్లిడ్ వృత్తాల పరిపూర్ణ లక్షణాలను కనుగొన్నాడు! యువ సోఫియాతో చేరండి, ఆమె వ్యాసార్ధం, వ్యాసం, చుట్టుకొలత మరియు వైశాల్యం గురించి నేర్చుకుంటుంది. ఆమె కేవలం దిక్సూచి మరియు స్ట్రెయిట్‌ఎడ్జ్ ఉపయోగించి రేఖాగణిత నిర్మాణాల కళలో కూడా నేర్పరితనం సాధిస్తుంది!</div></div>
+                <div class="interactive-demo">
+                    <h3 class="demo-title english">🎮 Explore Circle Properties!</h3>
+                    <h3 class="demo-title hindi hidden">🎮 वृत्त गुणों का अन्वेषण करें!</h3>
+                    <h3 class="demo-title telugu hidden">🎮 వృత్త లక్షణాలను అన్వేషించండి!</h3>
+                    <div class="geometry-demo">
+                        <div class="circle-demo">
+                            <div class="circle" id="interactive-circle" onclick="rotateRadius()">
+                                <div class="radius-line" id="radius-line"></div>
+                            </div>
+                        </div>
+                        <div class="construction-demo" id="construction-area" onclick="addConstruction()">
+                            <p>Construction Area</p>
+                            <p>Click to add geometric elements!</p>
+                        </div>
+                    </div>
+                    <div class="result-display" id="circle-info">
+                        <div class="english">Click the circle to rotate radius and see properties!</div>
+                        <div class="hindi hidden">त्रिज्या घुमाने और गुण देखने के लिए वृत्त पर क्लिक करें!</div>
+                        <div class="telugu hidden">వ్యాసార్ధాన్ని తిప్పడానికి మరియు లక్షణాలను చూడటానికి వృత్తాన్ని క్లిక్ చేయండి!</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-title">📦 The Package Design Challenge</div>
+                <div class="lang-content english"><div class="story-text">Meet Sam, a packaging engineer at a toy company! Sam needs to design boxes that use the least material while holding the most toys. By understanding surface areas and volumes of different 3D shapes, Sam can create the perfect package!</div></div>
+                <div class="lang-content hindi hidden"><div class="story-text">सैम से मिलिए, एक टॉय कंपनी के पैकेजिंग इंजीनियर! सैम को ऐसे बॉक्स डिज़ाइन करने हैं जो सबसे कम सामग्री का उपयोग करते हुए सबसे ज्यादा खिलौने रख सकें। विभिन्न 3D आकारों के पृष्ठीय क्षेत्रफल और आयतन को समझकर, सैम परफेक्ट पैकेज बना सकता है!</div></div>
+                <div class="lang-content telugu hidden"><div class="story-text">సామ్‌ను కలుసుకోండి, ఒక టాయ్ కంపెనీలో ప్యాకేజింగ్ ఇంజనీర్! సామ్ అత్యధిక బొమ్మలను పట్టుకోగలిగే అతి తక్కువ మెటీరియల్‌ను ఉపయోగించే బాక్సులను డిజైన్ చేయాలి. వివిధ 3D ఆకారాల ఉపరితల వైశాల్యాలు మరియు వాల్యూమ్‌లను అర్థం చేసుకోవడం ద్వారా, సామ్ పర్ఫెక్ట్ ప్యాకేజీని సృష్టించగలడు!</div></div>
+                <div class="interactive-demo">
+                    <h3 class="demo-title english">🎮 Design 3D Packages!</h3>
+                    <h3 class="demo-title hindi hidden">🎮 3D पैकेज डिज़ाइन करें!</h3>
+                    <h3 class="demo-title telugu hidden">🎮 3D ప్యాకేజీలను డిజైన్ చేయండి!</h3>
+                    <div class="shape-demo">
+                        <div class="shape-3d" onclick="calculateCube(event)">
+                            <div class="cube">
+                                <div class="cube-face cube-front"></div>
+                                <div class="cube-face cube-back"></div>
+                                <div class="cube-face cube-right"></div>
+                                <div class="cube-face cube-left"></div>
+                                <div class="cube-face cube-top"></div>
+                                <div class="cube-face cube-bottom"></div>
+                            </div>
+                            <p>Cube</p>
+                        </div>
+                        <div class="shape-3d" onclick="calculateSphere(event)">
+                            <div class="sphere"></div>
+                            <p>Sphere</p>
+                        </div>
+                    </div>
+                    <div class="result-display" id="volume-info">
+                        <div class="english">Click on shapes to calculate their properties!</div>
+                        <div class="hindi hidden">गुणों की गणना करने के लिए आकृतियों पर क्लिक करें!</div>
+                        <div class="telugu hidden">వాటి లక్షణాలను లెక్కించడానికి ఆకారాలపై క్లిక్ చేయండి!</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-title">🎲 The Data Detective Agency</div>
+                <div class="lang-content english"><div class="story-text">Detective Emma runs a special agency that solves mysteries using data! She collects information, creates graphs, calculates averages, and uses probability to predict outcomes. Help Emma analyze clues and solve the case of the missing homework!</div></div>
+                <div class="lang-content hindi hidden"><div class="story-text">डिटेक्टिव एम्मा एक विशेष एजेंसी चलाती है जो डेटा का उपयोग करके रहस्यों को सुलझाती है! वह जानकारी एकत्र करती है, ग्राफ बनाती है, औसत की गणना करती है, और परिणामों का अनुमान लगाने के लिए संभावना का उपयोग करती है। एम्मा को सुराग का विश्लेषण करने और लापता होमवर्क के मामले को हल करने में मदद करें!</div></div>
+                <div class="lang-content telugu hidden"><div class="story-text">డిటెక్టివ్ ఎమ్మా డేటాను ఉపయోగించి రహస్యాలను పరిష్కరించే ప్రత్యేక ఏజెన్సీని నడుపుతుంది! ఆమె సమాచారాన్ని సేకరిస్తుంది, గ్రాఫ్‌లను సృష్టిస్తుంది, సగటులను లెక్కిస్తుంది మరియు ఫలితాలను అంచనా వేయడానికి సంభావ్యతను ఉపయోగిస్తుంది. ఎమ్మాకు క్లూలను విశ్లేషించడంలో మరియు తప్పిపోయిన హోంవర్క్ కేసును పరిష్కరించడంలో సహాయం చేయండి!</div></div>
+                <div class="interactive-demo">
+                    <h3 class="demo-title english">🎮 Analyze Data & Calculate Probability!</h3>
+                    <h3 class="demo-title hindi hidden">🎮 डेटा का विश्लेषण करें और संभावना की गणना करें!</h3>
+                    <h3 class="demo-title telugu hidden">🎮 డేటాను విశ్లేషించండి మరియు సంభావ్యతను లెక్కించండి!</h3>
+                    <div class="stats-demo">
+                        <div class="bar-chart" id="bar-chart">
+                            <div class="bar" style="height: 60px;" onclick="updateStats(this, 6)"></div>
+                            <div class="bar" style="height: 80px;" onclick="updateStats(this, 8)"></div>
+                            <div class="bar" style="height: 40px;" onclick="updateStats(this, 4)"></div>
+                            <div class="bar" style="height: 100px;" onclick="updateStats(this, 10)"></div>
+                            <div class="bar" style="height: 70px;" onclick="updateStats(this, 7)"></div>
+                        </div>
+                        <div class="probability-demo">
+                            <div class="dice" id="dice1" onclick="rollDice(1)"><div class="dice-dot" style="top: 25px; left: 25px;"></div></div>
+                            <div class="dice" id="dice2" onclick="rollDice(2)"><div class="dice-dot" style="top: 10px; left: 10px;"></div><div class="dice-dot" style="bottom: 10px; right: 10px;"></div></div>
+                            <button class="demo-button" onclick="rollBothDice()">Roll Both Dice!</button>
+                        </div>
+                    </div>
+                    <div class="result-display" id="stats-result">
+                        <div class="english">Click bars to see statistics or roll dice for probability!</div>
+                        <div class="hindi hidden">सांख्यिकी देखने के लिए बार पर क्लिक करें या संभावना के लिए पासा रोल करें!</div>
+                        <div class="telugu hidden">గణాంకాలను చూడటానికి బార్‌లపై క్లిక్ చేయండి లేదా సంభావ్యత కోసం పాచికలను రోల్ చేయండి!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr style="margin:32px 0; opacity:0.4;">
+        <h2 style="color:#fff; text-shadow:0 1px 3px rgba(0,0,0,0.3); margin-bottom:12px;">📒 Grade 9 Maths Syllabus & Quick Notes</h2>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px;">
+            <div style="background:rgba(255,255,255,0.95); border-radius:14px; padding:16px;">
+                <h3 style="color:#4c51bf; margin-bottom:6px;">Polynomials</h3>
+                <ul style="margin-left:16px; line-height:1.7;">
+                    <li>Degree, coefficient, constant term; value of polynomial</li>
+                    <li>Zeroes and their relationship with coefficients (quadratics)</li>
+                    <li>Factorization methods; remainder & factor theorem (intro)</li>
+                </ul>
+            </div>
+            <div style="background:rgba(255,255,255,0.95); border-radius:14px; padding:16px;">
+                <h3 style="color:#4c51bf; margin-bottom:6px;">Linear Equations in Two Variables</h3>
+                <ul style="margin-left:16px; line-height:1.7;">
+                    <li>Ax + By = C; solutions as points on a line</li>
+                    <li>Intersection as solution for a system of two lines</li>
+                    <li>Elimination/substitution methods (intro)</li>
+                </ul>
+            </div>
+            <div style="background:rgba(255,255,255,0.95); border-radius:14px; padding:16px;">
+                <h3 style="color:#4c51bf; margin-bottom:6px;">Coordinate Geometry</h3>
+                <ul style="margin-left:16px; line-height:1.7;">
+                    <li>Cartesian plane; plotting points (x,y)</li>
+                    <li>Distance formula; section formula (intro)</li>
+                    <li>Midpoint of a segment</li>
+                </ul>
+            </div>
+            <div style="background:rgba(255,255,255,0.95); border-radius:14px; padding:16px;">
+                <h3 style="color:#4c51bf; margin-bottom:6px;">Geometry: Circles & Constructions</h3>
+                <ul style="margin-left:16px; line-height:1.7;">
+                    <li>Radius, diameter, circumference (C = 2πr), area (A = πr²)</li>
+                    <li>Basic constructions with compass & straightedge</li>
+                    <li>Tangents (intro) and angle properties</li>
+                </ul>
+            </div>
+            <div style="background:rgba(255,255,255,0.95); border-radius:14px; padding:16px;">
+                <h3 style="color:#4c51bf; margin-bottom:6px;">Surface Areas & Volumes</h3>
+                <ul style="margin-left:16px; line-height:1.7;">
+                    <li>Cuboid/cube: TSA = 2(lw+lh+wh); V = l×w×h</li>
+                    <li>Cylinder: TSA = 2πr(h + r); V = πr²h</li>
+                    <li>Sphere: SA = 4πr²; V = 4/3 πr³</li>
+                </ul>
+            </div>
+            <div style="background:rgba(255,255,255,0.95); border-radius:14px; padding:16px;">
+                <h3 style="color:#4c51bf; margin-bottom:6px;">Statistics & Probability</h3>
+                <ul style="margin-left:16px; line-height:1.7;">
+                    <li>Mean, median, mode for ungrouped data</li>
+                    <li>Simple bar graphs and pie charts (intro)</li>
+                    <li>Basic probability model; sample space ideas</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'english';
+        let points = [];
+        let currentRadius = 0;
+        let diceResults = [1, 2];
+        let statsData = [6, 8, 4, 10, 7];
+
+        function showLanguage(lang, btn) {
+            currentLanguage = lang;
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            document.querySelectorAll('.lang-content, .demo-title, .english, .hindi, .telugu').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.lang-content.' + lang + ', .demo-title.' + lang + ', .' + lang).forEach(el => el.classList.remove('hidden'));
+        }
+
+        function drawPolynomial() {
+            const a = parseFloat(document.getElementById('coeff-a').value);
+            const b = parseFloat(document.getElementById('coeff-b').value);
+            const c = parseFloat(document.getElementById('coeff-c').value);
+            document.getElementById('polynomial-formula').textContent = `y = ${a}x² + ${b}x + ${c}`;
+            const container = document.getElementById('polynomial-graph');
+            container.innerHTML = '<canvas width="500" height="280" style="border: 1px solid #ccc;"></canvas>';
+            const ctx = container.querySelector('canvas').getContext('2d');
+            ctx.clearRect(0, 0, 500, 280);
+            ctx.strokeStyle = '#666';
+            ctx.beginPath();
+            ctx.moveTo(250, 0); ctx.lineTo(250, 280);
+            ctx.moveTo(0, 140); ctx.lineTo(500, 140);
+            ctx.stroke();
+            ctx.strokeStyle = '#667eea';
+            ctx.lineWidth = 3; ctx.beginPath();
+            for (let x = -10; x <= 10; x += 0.1) {
+                const y = a * x * x + b * x + c;
+                const canvasX = 250 + x * 25;
+                const canvasY = 140 - y * 10;
+                if (x === -10) ctx.moveTo(canvasX, canvasY); else ctx.lineTo(canvasX, canvasY);
+            }
+            ctx.stroke();
+        }
+
+        function solveLinearSystem() {
+            const a1 = parseFloat(document.getElementById('eq1-a').value);
+            const b1 = parseFloat(document.getElementById('eq1-b').value);
+            const c1 = parseFloat(document.getElementById('eq1-c').value);
+            const a2 = parseFloat(document.getElementById('eq2-a').value);
+            const b2 = parseFloat(document.getElementById('eq2-b').value);
+            const c2 = parseFloat(document.getElementById('eq2-c').value);
+            const determinant = a1 * b2 - a2 * b1;
+            if (determinant === 0) {
+                const messages = {
+                    english: 'No unique solution - lines are parallel!',
+                    hindi: 'कोई अनोखा समाधान नहीं - रेखाएं समानांतर हैं!',
+                    telugu: 'అనన్య పరిష్కారం లేదు - రేఖలు సమాంతరం!'
+                };
+                document.getElementById('linear-result').textContent = messages[currentLanguage];
+            } else {
+                const x = (c1 * b2 - c2 * b1) / determinant;
+                const y = (a1 * c2 - a2 * c1) / determinant;
+                const messages = {
+                    english: `Treasure found at coordinates: (${x.toFixed(2)}, ${y.toFixed(2)})`,
+                    hindi: `खजाना निर्देशांक पर मिला: (${x.toFixed(2)}, ${y.toFixed(2)})`,
+                    telugu: `నిధి కోఆర్డినేట్‌లలో దొరికింది: (${x.toFixed(2)}, ${y.toFixed(2)})`
+                };
+                document.getElementById('linear-result').textContent = messages[currentLanguage];
+            }
+        }
+
+        function addPoint(event) {
+            const plane = document.getElementById('coordinate-plane');
+            const rect = plane.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            const point = document.createElement('div');
+            point.className = 'point';
+            point.style.left = x + 'px';
+            point.style.top = y + 'px';
+            plane.appendChild(point);
+            const coordX = ((x - 200) / 20).toFixed(1);
+            const coordY = ((200 - y) / 20).toFixed(1);
+            points.push({ x: parseFloat(coordX), y: parseFloat(coordY) });
+            const messages = {
+                english: `Point added: (${coordX}, ${coordY}). Total points: ${points.length}`,
+                hindi: `बिंदु जोड़ा गया: (${coordX}, ${coordY}). कुल बिंदु: ${points.length}`,
+                telugu: `పాయింట్ జోడించబడింది: (${coordX}, ${coordY}). మొత్తం పాయింట్లు: ${points.length}`
+            };
+            document.getElementById('coordinate-info').textContent = messages[currentLanguage];
+        }
+
+        function calculateDistance() {
+            if (points.length < 2) {
+                const messages = {
+                    english: 'Need at least 2 points to calculate distance!',
+                    hindi: 'दूरी की गणना के लिए कम से कम 2 बिंदुओं की आवश्यकता है!',
+                    telugu: 'దూరాన్ని లెక్కించడానికి కనీసం 2 పాయింట్లు అవసరం!'
+                };
+                document.getElementById('coordinate-info').textContent = messages[currentLanguage];
+                return;
+            }
+            const p1 = points[points.length - 2];
+            const p2 = points[points.length - 1];
+            const distance = Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+            const messages = {
+                english: `Distance between last 2 points: ${distance.toFixed(2)} units`,
+                hindi: `अंतिम 2 बिंदुओं के बीच दूरी: ${distance.toFixed(2)} यूनिट`,
+                telugu: `చివరి 2 పాయింట్ల మధ్య దూరం: ${distance.toFixed(2)} యూనిట్లు`
+            };
+            document.getElementById('coordinate-info').textContent = messages[currentLanguage];
+        }
+
+        function clearPoints() {
+            points = [];
+            document.querySelectorAll('.point').forEach(point => point.remove());
+            const messages = { english: 'All points cleared!', hindi: 'सभी बिंदु साफ़ कर दिए गए!', telugu: 'అన్ని పాయింట్లు క్లియర్ చేయబడ్డాయి!' };
+            document.getElementById('coordinate-info').textContent = messages[currentLanguage];
+        }
+
+        function rotateRadius() {
+            const radiusLine = document.getElementById('radius-line');
+            currentRadius = (currentRadius + 30) % 360;
+            radiusLine.style.transform = `rotate(${currentRadius}deg)`;
+            const radius = 4.5;
+            const diameter = radius * 2;
+            const circumference = 2 * Math.PI * radius;
+            const area = Math.PI * radius * radius;
+            const messages = {
+                english: `Radius: ${radius}, Diameter: ${diameter}, Circumference: ${circumference.toFixed(2)}, Area: ${area.toFixed(2)}`,
+                hindi: `त्रिज्या: ${radius}, व्यास: ${diameter}, परिधि: ${circumference.toFixed(2)}, क्षेत्रफल: ${area.toFixed(2)}`,
+                telugu: `వ్యాసార్ధం: ${radius}, వ్యాసం: ${diameter}, చుట్టుకొలత: ${circumference.toFixed(2)}, వైశాల్యం: ${area.toFixed(2)}`
+            };
+            document.getElementById('circle-info').textContent = messages[currentLanguage];
+        }
+
+        function addConstruction() {
+            const constructionArea = document.getElementById('construction-area');
+            const shapes = ['⬜', '📐', '📏', '⭕'];
+            const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
+            const element = document.createElement('div');
+            element.textContent = randomShape;
+            element.style.position = 'absolute';
+            element.style.left = Math.random() * 200 + 'px';
+            element.style.top = Math.random() * 150 + 'px';
+            element.style.fontSize = '20px';
+            constructionArea.appendChild(element);
+        }
+
+        function calculateCube(e) {
+            const side = 6;
+            const surfaceArea = 6 * side * side;
+            const volume = side * side * side;
+            const messages = {
+                english: `Cube (side=${side}): Surface Area = ${surfaceArea}, Volume = ${volume}`,
+                hindi: `घन (भुजा=${side}): पृष्ठीय क्षेत्रफल = ${surfaceArea}, आयतन = ${volume}`,
+                telugu: `లఘుఘనం (భుజం=${side}): ఉపరితల వైశాల్యం = ${surfaceArea}, వాల్యూమ్ = ${volume}`
+            };
+            document.getElementById('volume-info').textContent = messages[currentLanguage];
+            if (e && e.currentTarget) { e.currentTarget.classList.add('animated'); setTimeout(() => e.currentTarget.classList.remove('animated'), 1000); }
+        }
+
+        function calculateSphere(e) {
+            const radius = 3;
+            const surfaceArea = 4 * Math.PI * radius * radius;
+            const volume = (4/3) * Math.PI * radius * radius * radius;
+            const messages = {
+                english: `Sphere (r=${radius}): Surface Area = ${surfaceArea.toFixed(2)}, Volume = ${volume.toFixed(2)}`,
+                hindi: `गोला (r=${radius}): पृष्ठीय क्षेत्रफल = ${surfaceArea.toFixed(2)}, आयतन = ${volume.toFixed(2)}`,
+                telugu: `గోళం (r=${radius}): ఉపరితల వైశాల్యం = ${surfaceArea.toFixed(2)}, వాల్యూమ్ = ${volume.toFixed(2)}`
+            };
+            document.getElementById('volume-info').textContent = messages[currentLanguage];
+            if (e && e.currentTarget) { e.currentTarget.classList.add('animated'); setTimeout(() => e.currentTarget.classList.remove('animated'), 1000); }
+        }
+
+        function updateStats(bar, value) {
+            const mean = statsData.reduce((a, b) => a + b, 0) / statsData.length;
+            const median = [...statsData].sort((a, b) => a - b)[Math.floor(statsData.length / 2)];
+            const mode = statsData.reduce((a, b, i, arr) => arr.filter(v => v === a).length >= arr.filter(v => v === b).length ? a : b);
+            const messages = {
+                english: `Statistics: Mean = ${mean.toFixed(1)}, Median = ${median}, Mode = ${mode}`,
+                hindi: `सांख्यिकी: औसत = ${mean.toFixed(1)}, मध्यक = ${median}, बहुलक = ${mode}`,
+                telugu: `గణాంకాలు: సగటు = ${mean.toFixed(1)}, మధ్యస్థం = ${median}, బహుళకం = ${mode}`
+            };
+            document.getElementById('stats-result').textContent = messages[currentLanguage];
+            bar.style.backgroundColor = '#ff4757';
+            setTimeout(() => bar.style.backgroundColor = '#667eea', 1000);
+        }
+
+        function rollDice(diceNum) {
+            const newValue = Math.floor(Math.random() * 6) + 1;
+            diceResults[diceNum - 1] = newValue;
+            const dice = document.getElementById('dice' + diceNum);
+            dice.innerHTML = '';
+            for (let i = 0; i < newValue; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dice-dot';
+                const positions = [
+                    {top: '25px', left: '25px'},
+                    {top: '10px', left: '10px'}, {bottom: '10px', right: '10px'},
+                    {top: '10px', left: '10px'}, {top: '25px', left: '25px'}, {bottom: '10px', right: '10px'},
+                    {top: '10px', left: '10px'}, {top: '10px', right: '10px'}, {bottom: '10px', left: '10px'}, {bottom: '10px', right: '10px'},
+                    {top: '10px', left: '10px'}, {top: '10px', right: '10px'}, {top: '25px', left: '25px'}, {bottom: '10px', left: '10px'}, {bottom: '10px', right: '10px'},
+                    {top: '8px', left: '8px'}, {top: '8px', right: '8px'}, {top: '25px', left: '8px'}, {top: '25px', right: '8px'}, {bottom: '8px', left: '8px'}, {bottom: '8px', right: '8px'}
+                ];
+                if (positions[i]) { Object.assign(dot.style, positions[i]); dice.appendChild(dot); }
+            }
+        }
+
+        function rollBothDice() {
+            rollDice(1); rollDice(2);
+            const sum = diceResults[0] + diceResults[1];
+            const probability = { 2: 1/36, 3: 2/36, 4: 3/36, 5: 4/36, 6: 5/36, 7: 6/36, 8: 5/36, 9: 4/36, 10: 3/36, 11: 2/36, 12: 1/36 };
+            const messages = {
+                english: `Rolled: ${diceResults[0]} + ${diceResults[1]} = ${sum}. Probability of ${sum}: ${(probability[sum] * 100).toFixed(1)}%`,
+                hindi: `रोल किया: ${diceResults[0]} + ${diceResults[1]} = ${sum}. ${sum} की संभावना: ${(probability[sum] * 100).toFixed(1)}%`,
+                telugu: `రోల్ చేసింది: ${diceResults[0]} + ${diceResults[1]} = ${sum}. ${sum} యొక్క సంభావ్యత: ${(probability[sum] * 100).toFixed(1)}%`
+            };
+            document.getElementById('stats-result').textContent = messages[currentLanguage];
+        }
+
+        showLanguage('english');
+        drawPolynomial();
+    </script>
+</body>
+</html>
+
+

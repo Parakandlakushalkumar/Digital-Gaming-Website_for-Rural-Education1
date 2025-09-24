@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Science Game Collection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .game-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .draggable {
+            cursor: move;
+            transition: all 0.2s ease;
+        }
+        
+        .draggable:hover {
+            transform: scale(1.1);
+        }
+        
+        .dragging {
+            opacity: 0.5;
+        }
+        
+        .drop-zone {
+            border: 3px dashed #cbd5e0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .drop-zone.drag-over {
+            border-color: #667eea;
+            background-color: rgba(102, 126, 234, 0.1);
+        }
+        
+        .light-beam {
+            position: absolute;
+            height: 3px;
+            background: linear-gradient(90deg, #fbbf24, #f59e0b);
+            transform-origin: left center;
+            box-shadow: 0 0 10px #fbbf24;
+            transition: all 0.5s ease;
+        }
+        
+        .mirror {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            border-radius: 8px;
+            position: absolute;
+            cursor: move;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .mirror::after {
+            content: '';
+            position: absolute;
+            inset: 10px;
+            background: linear-gradient(135deg, #ffffff, #e0e7ff);
+            border-radius: 4px;
+        }
+        
+        .ph-indicator {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .ph-acid { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .ph-base { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .ph-neutral { background: linear-gradient(135deg, #10b981, #059669); }
+        
+        .character {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            transition: all 0.5s ease;
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .thermometer {
+            width: 40px;
+            height: 200px;
+            background: #e5e7eb;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .thermometer-fill {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(180deg, #ef4444, #dc2626);
+            transition: height 0.5s ease;
+            border-radius: 20px;
+        }
+        
+        .potion-bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            animation: bubble 3s infinite ease-in-out;
+        }
+        
+        @keyframes bubble {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.1); }
+        }
+        
+        .station {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .station.completed {
+            background: rgba(16, 185, 129, 0.2);
+            border: 2px solid #10b981;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-5xl font-bold text-white text-center mb-8">Science Game Collection</h1>
+        
+        <!-- Game Selection Menu -->
+        <div id="gameMenu" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div class="game-card p-6 text-center cursor-pointer" onclick="startGame('heatRace')">
+                <div class="text-6xl mb-4">🌡️</div>
+                <h2 class="text-2xl font-bold mb-2">Hot & Cold Race</h2>
+                <p class="text-gray-600">Learn about heat conductors in a fun race!</p>
+            </div>
+            
+            <div class="game-card p-6 text-center cursor-pointer" onclick="startGame('beamBouncer')">
+                <div class="text-6xl mb-4">💡</div>
+                <h2 class="text-2xl font-bold mb-2">Beam Bouncer</h2>
+                <p class="text-gray-600">Guide light beams using mirrors and lenses!</p>
+            </div>
+            
+            <div class="game-card p-6 text-center cursor-pointer" onclick="startGame('phCollector')">
+                <div class="text-6xl mb-4">🧪</div>
+                <h2 class="text-2xl font-bold mb-2">pH Collector</h2>
+                <p class="text-gray-600">Sort acids, bases, and neutral solutions!</p>
+            </div>
+            
+            <div class="game-card p-6 text-center cursor-pointer" onclick="startGame('labAdventure')">
+                <div class="text-6xl mb-4">🌞🔥</div>
+                <h2 class="text-2xl font-bold mb-2">Heat & Light Lab</h2>
+                <p class="text-gray-600">Explore virtual lab stations!</p>
+            </div>
+            
+            <div class="game-card p-6 text-center cursor-pointer" onclick="startGame('potionMaker')">
+                <div class="text-6xl mb-4">⚗️</div>
+                <h2 class="text-2xl font-bold mb-2">Acid-Base Potion Maker</h2>
+                <p class="text-gray-600">Mix chemicals to create potions!</p>
+            </div>
+        </div>
+        
+        <!-- Game Container -->
+        <div id="gameContainer" class="hidden">
+            <div class="game-card p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <button class="btn-primary" onclick="backToMenu()">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Menu
+                    </button>
+                    <div class="flex items-center gap-4">
+                        <span class="text-lg font-semibold">Level: <span id="currentLevel">1</span>/5</span>
+                        <span class="text-lg font-semibold">Score: <span id="score">0</span></span>
+                    </div>
+                </div>
+                
+                <div id="gameContent" class="min-h-[500px]">
+                    <!-- Game content will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentGame = null;
+        let currentLevel = 1;
+        let score = 0;
+        let gameData = {};
+        
+        // Game data for each game
+        const games = {
+            heatRace: {
+                name: "Hot & Cold Race",
+                levels: [
+                    {
+                        question: "Which material is a good conductor of heat?",
+                        options: ["Wood", "Metal", "Plastic", "Rubber"],
+                        correct: "Metal",
+                        experiment: true
+                    },
+                    {
+                        question: "Which material would keep ice from melting fastest?",
+                        options: ["Aluminum foil", "Cotton", "Glass", "Iron"],
+                        correct: "Cotton",
+                        experiment: true
+                    },
+                    {
+                        question: "Why does metal feel colder than wood at the same temperature?",
+                        options: ["Metal is always colder", "Metal conducts heat better", "Wood is warmer", "Metal reflects heat"],
+                        correct: "Metal conducts heat better",
+                        experiment: false
+                    },
+                    {
+                        question: "Which material is best for a pot handle?",
+                        options: ["Copper", "Steel", "Plastic", "Aluminum"],
+                        correct: "Plastic",
+                        experiment: true
+                    },
+                    {
+                        question: "Heat travels through solids by:",
+                        options: ["Convection", "Radiation", "Conduction", "Evaporation"],
+                        correct: "Conduction",
+                        experiment: false
+                    }
+                ]
+            },
+            beamBouncer: {
+                name: "Beam Bouncer",
+                levels: [
+                    {
+                        target: {x: 400, y: 200},
+                        obstacles: [{x: 200, y: 150, type: 'block'}],
+                        tools: ['mirror', 'mirror']
+                    },
+                    {
+                        target: {x: 450, y: 300},
+                        obstacles: [{x: 250, y: 200, type: 'block'}, {x: 350, y: 250, type: 'block'}],
+                        tools: ['mirror', 'mirror', 'prism']
+                    },
+                    {
+                        target: {x: 500, y: 150},
+                        obstacles: [{x: 200, y: 100, type: 'block'}, {x: 300, y: 200, type: 'block'}, {x: 400, y: 100, type: 'block'}],
+                        tools: ['mirror', 'mirror', 'lens', 'mirror']
+                    },
+                    {
+                        target: {x: 400, y: 350},
+                        obstacles: [{x: 150, y: 250, type: 'block'}, {x: 250, y: 300, type: 'block'}, {x: 350, y: 200, type: 'block'}],
+                        tools: ['prism', 'mirror', 'lens', 'mirror']
+                    },
+                    {
+                        target: {x: 550, y: 250},
+                        obstacles: [{x: 200, y: 150, type: 'block'}, {x: 300, y: 250, type: 'block'}, {x: 400, y: 150, type: 'block'}, {x: 500, y: 300, type: 'block'}],
+                        tools: ['mirror', 'prism', 'lens', 'mirror', 'mirror']
+                    }
+                ]
+            },
+            phCollector: {
+                name: "pH Collector",
+                levels: [
+                    {
+                        solutions: [
+                            {name: "Lemon Juice", ph: 2, type: "acid"},
+                            {name: "Water", ph: 7, type: "neutral"},
+                            {name: "Soap", ph: 10, type: "base"}
+                        ]
+                    },
+                    {
+                        solutions: [
+                            {name: "Vinegar", ph: 3, type: "acid"},
+                            {name: "Milk", ph: 6.5, type: "acid"},
+                            {name: "Baking Soda", ph: 9, type: "base"}
+                        ]
+                    },
+                    {
+                        solutions: [
+                            {name: "Coffee", ph: 5, type: "acid"},
+                            {name: "Blood", ph: 7.4, type: "neutral"},
+                            {name: "Ammonia", ph: 11, type: "base"}
+                        ]
+                    },
+                    {
+                        solutions: [
+                            {name: "Orange Juice", ph: 3.5, type: "acid"},
+                            {name: "Pure Water", ph: 7, type: "neutral"},
+                            {name: "Bleach", ph: 12.5, type: "base"}
+                        ]
+                    },
+                    {
+                        solutions: [
+                            {name: "Battery Acid", ph: 1, type: "acid"},
+                            {name: "Saliva", ph: 6.2, type: "acid"},
+                            {name: "Sea Water", ph: 8, type: "base"}
+                        ]
+                    }
+                ]
+            },
+            labAdventure: {
+                name: "Heat & Light Lab Adventure",
+                levels: [
+                    {
+                        stations: [
+                            {question: "Which surface reflects most light?", options: ["Black paper", "White paper", "Red paper", "Blue paper"], correct: "White paper"},
+                            {question: "Which metal rod heats fastest?", options: ["Copper", "Iron", "Aluminum", "Steel"], correct: "Copper"}
+                        ]
+                    },
+                    {
+                        stations: [
+                            {question: "What color absorbs the most heat?", options: ["White", "Yellow", "Black", "Silver"], correct: "Black"},
+                            {question: "Which lens makes things look bigger?", options: ["Concave", "Convex", "Flat", "Prism"], correct: "Convex"}
+                        ]
+                    },
+                    {
+                        stations: [
+                            {question: "Which material is transparent?", options: ["Wood", "Metal", "Glass", "Cardboard"], correct: "Glass"},
+                            {question: "Heat transfer through air is called:", options: ["Conduction", "Convection", "Radiation", "Insulation"], correct: "Convection"}
+                        ]
+                    },
+                    {
+                        stations: [
+                            {question: "Which surface is best for solar panels?", options: ["Matte black", "Shiny white", "Rough gray", "Smooth red"], correct: "Matte black"},
+                            {question: "What happens when light passes through a prism?", options: ["It disappears", "It reflects", "It disperses", "It absorbs"], correct: "It disperses"}
+                        ]
+                    },
+                    {
+                        stations: [
+                            {question: "Which material is the best insulator?", options: ["Aluminum", "Copper", "Fiberglass", "Iron"], correct: "Fiberglass"},
+                            {question: "What type of mirror shows your right side as left?", options: ["Plane mirror", "Concave mirror", "Convex mirror", "All mirrors"], correct: "Plane mirror"}
+                        ]
+                    }
+                ]
+            },
+            potionMaker: {
+                name: "Acid-Base Potion Maker",
+                levels: [
+                    {
+                        goal: "Make a neutral solution (pH 7)",
+                        chemicals: [
+                            {name: "HCl", type: "acid", strength: 1},
+                            {name: "NaOH", type: "base", strength: 1},
+                            {name: "Water", type: "neutral", strength: 0}
+                        ],
+                        targetPh: 7
+                    },
+                    {
+                        goal: "Make a slightly acidic solution (pH 5)",
+                        chemicals: [
+                            {name: "HCl", type: "acid", strength: 1},
+                            {name: "Acetic Acid", type: "acid", strength: 0.5},
+                            {name: "NaOH", type: "base", strength: 1}
+                        ],
+                        targetPh: 5
+                    },
+                    {
+                        goal: "Make a basic solution (pH 9)",
+                        chemicals: [
+                            {name: "NaOH", type: "base", strength: 1},
+                            {name: "NH3", type: "base", strength: 0.7},
+                            {name: "HCl", type: "acid", strength: 1}
+                        ],
+                        targetPh: 9
+                    },
+                    {
+                        goal: "Make a neutral solution using strong acid and strong base",
+                        chemicals: [
+                            {name: "H2SO4", type: "acid", strength: 2},
+                            {name: "KOH", type: "base", strength: 1},
+                            {name: "NaOH", type: "base", strength: 1}
+                        ],
+                        targetPh: 7
+                    },
+                    {
+                        goal: "Create a perfect buffer solution (pH 7)",
+                        chemicals: [
+                            {name: "HCl", type: "acid", strength: 1},
+                            {name: "NaOH", type: "base", strength: 1},
+                            {name: "CH3COOH", type: "acid", strength: 0.5},
+                            {name: "CH3COONa", type: "base", strength: 0.5}
+                        ],
+                        targetPh: 7
+                    }
+                ]
+            }
+        };
+        
+        function startGame(gameName) {
+            currentGame = gameName;
+            currentLevel = 1;
+            score = 0;
+            gameData = {...games[gameName]};
+            
+            document.getElementById('gameMenu').classList.add('hidden');
+            document.getElementById('gameContainer').classList.remove('hidden');
+            
+            updateScore();
+            loadLevel();
+        }
+        
+        function backToMenu() {
+            document.getElementById('gameMenu').classList.remove('hidden');
+            document.getElementById('gameContainer').classList.add('hidden');
+            currentGame = null;
+        }
+        
+        function updateScore() {
+            document.getElementById('currentLevel').textContent = currentLevel;
+            document.getElementById('score').textContent = score;
+        }
+        
+        function loadLevel() {
+            const gameContent = document.getElementById('gameContent');
+            gameContent.innerHTML = '';
+            gameContent.classList.add('fade-in');
+            
+            switch(currentGame) {
+                case 'heatRace':
+                    loadHeatRaceLevel();
+                    break;
+                case 'beamBouncer':
+                    loadBeamBouncerLevel();
+                    break;
+                case 'phCollector':
+                    loadPhCollectorLevel();
+                    break;
+                case 'labAdventure':
+                    loadLabAdventureLevel();
+                    break;
+                case 'potionMaker':
+                    loadPotionMakerLevel();
+                    break;
+            }
+        }
+        
+        function loadHeatRaceLevel() {
+            const level = gameData.levels[currentLevel - 1];
+            const gameContent = document.getElementById('gameContent');
+            
+            gameContent.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4">Question ${currentLevel}</h3>
+                        <p class="text-lg mb-6">${level.question}</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            ${level.options.map(option => `
+                                <button class="btn-primary" onclick="checkHeatAnswer('${option}')">${option}</button>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <div class="bg-gray-100 rounded-lg p-4 h-64 relative overflow-hidden">
+                            <div class="character" id="raceCharacter">🏃</div>
+                            <div class="absolute right-4 top-1/2 transform -translate-y-1/2 text-4xl">🏁</div>
+                            <div class="absolute bottom-4 left-4">
+                                <div class="thermometer">
+                                    <div class="thermometer-fill" id="thermoFill" style="height: 20%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        ${level.experiment ? `
+                            <div class="mt-4 bg-gray-50 rounded-lg p-4">
+                                <p class="font-semibold mb-2">Mini Experiment:</p>
+                                <p class="text-sm mb-2">Drag the ice cube to different surfaces!</p>
+                                <div class="flex gap-4 justify-center">
+                                    <div class="draggable bg-blue-100 p-4 rounded-lg cursor-move" draggable="true" id="iceCube">🧊</div>
+                                    <div class="drop-zone w-20 h-20 bg-gray-300 rounded-lg flex items-center justify-center" data-material="metal">Metal</div>
+                                    <div class="drop-zone w-20 h-20 bg-amber-100 rounded-lg flex items-center justify-center" data-material="wood">Wood</div>
+                                </div>
+                                <div id="experimentResult" class="mt-2 text-center font-semibold"></div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            
+            if (level.experiment) {
+                setupExperiment();
+            }
+        }
+        
+        function setupExperiment() {
+            const iceCube = document.getElementById('iceCube');
+            const dropZones = document.querySelectorAll('.drop-zone');
+            
+            iceCube.addEventListener('dragstart', (e) => {
+                e.dataTransfer.effectAllowed = 'move';
+                iceCube.classList.add('dragging');
+            });
+            
+            iceCube.addEventListener('dragend', () => {
+                iceCube.classList.remove('dragging');
+            });
+            
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    zone.classList.add('drag-over');
+                });
+                
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('drag-over');
+                });
+                
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+                    const material = zone.dataset.material;
+                    const result = document.getElementById('experimentResult');
+                    
+                    if (material === 'metal') {
+                        result.textContent = 'Ice melts faster on metal! Metal is a good conductor.';
+                        result.className = 'mt-2 text-center font-semibold text-red-600';
+                    } else {
+                        result.textContent = 'Ice melts slower on wood! Wood is an insulator.';
+                        result.className = 'mt-2 text-center font-semibold text-blue-600';
+                    }
+                });
+            });
+        }
+        
+        function checkHeatAnswer(answer) {
+            const level = gameData.levels[currentLevel - 1];
+            const character = document.getElementById('raceCharacter');
+            const thermoFill = document.getElementById('thermoFill');
+            
+            if (answer === level.correct) {
+                score += 10;
+                updateScore();
+                
+                // Move character forward
+                const currentLeft = parseInt(character.style.left) || 20;
+                character.style.left = (currentLeft + 100) + 'px';
+                
+                // Increase thermometer
+                const currentHeight = parseInt(thermoFill.style.height) || 20;
+                thermoFill.style.height = Math.min(currentHeight + 20, 100) + '%';
+                
+                setTimeout(() => {
+                    if (currentLevel < 5) {
+                        currentLevel++;
+                        loadLevel();
+                    } else {
+                        showGameComplete();
+                    }
+                }, 1000);
+            } else {
+                // Wrong answer - stop animation
+                character.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    character.style.animation = '';
+                }, 500);
+            }
+        }
+        
+        function loadBeamBouncerLevel() {
+            const level = gameData.levels[currentLevel - 1];
+            const gameContent = document.getElementById('gameContent');
+            
+            gameContent.innerHTML = `
+                <div class="relative bg-gray-100 rounded-lg p-4 h-96">
+                    <div class="absolute top-4 left-4 w-4 h-4 bg-yellow-400 rounded-full shadow-lg" id="lightSource"></div>
+                    <div class="absolute w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white font-bold" style="left: ${level.target.x}px; top: ${level.target.y}px">🎯</div>
+                    <div class="light-beam" id="lightBeam" style="left: 20px; top: 20px; width: 100px; transform: rotate(0deg);"></div>
+                    
+                    ${level.obstacles.map(obs => `
+                        <div class="absolute bg-gray-700 rounded" style="left: ${obs.x}px; top: ${obs.y}px; width: 50px; height: 50px;"></div>
+                    `).join('')}
+                    
+                    <div id="toolsContainer" class="absolute bottom-4 left-4 flex gap-2">
+                        ${level.tools.map((tool, index) => `
+                            <div class="mirror ${tool === 'prism' ? 'bg-gradient-to-br from-purple-400 to-pink-400' : tool === 'lens' ? 'bg-gradient-to-br from-blue-400 to-cyan-400' : ''}" 
+                                 draggable="true" 
+                                 data-tool="${tool}" 
+                                 data-index="${index}"
+                                 id="tool${index}">
+                                ${tool === 'prism' ? '🔺' : tool === 'lens' ? '⭕' : '🪞'}
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <button class="btn-primary absolute top-4 right-4" onclick="checkBeamPath()">Check Path</button>
+                    <div id="beamResult" class="absolute bottom-4 right-4 font-semibold"></div>
+                </div>
+            `;
+            
+            setupBeamBouncer();
+        }
+        
+        function setupBeamBouncer() {
+            const tools = document.querySelectorAll('[draggable="true"]');
+            const gameArea = document.querySelector('.bg-gray-100');
+            
+            tools.forEach(tool => {
+                tool.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.effectAllowed = 'move';
+                    tool.classList.add('dragging');
+                });
+                
+                tool.addEventListener('dragend', () => {
+                    tool.classList.remove('dragging');
+                });
+            });
+            
+            gameArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+            
+            gameArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const tool = document.querySelector('.dragging');
+                if (tool) {
+                    const rect = gameArea.getBoundingClientRect();
+                    tool.style.position = 'absolute';
+                    tool.style.left = (e.clientX - rect.left - 30) + 'px';
+                    tool.style.top = (e.clientY - rect.top - 30) + 'px';
+                }
+            });
+        }
+        
+        function checkBeamPath() {
+            // Simplified beam path checking
+            const result = document.getElementById('beamResult');
+            result.textContent = 'Great job! Light reaches the target!';
+            result.className = 'absolute bottom-4 right-4 font-semibold text-green-600';
+            
+            score += 10;
+            updateScore();
+            
+            setTimeout(() => {
+                if (currentLevel < 5) {
+                    currentLevel++;
+                    loadLevel();
+                } else {
+                    showGameComplete();
+                }
+            }, 1500);
+        }
+        
+        function loadPhCollectorLevel() {
+            const level = gameData.levels[currentLevel - 1];
+            const gameContent = document.getElementById('gameContent');
+            
+            gameContent.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="space-y-4">
+                        <h3 class="text-xl font-bold text-center">Solutions</h3>
+                        ${level.solutions.map((sol, index) => `
+                            <div class="ph-indicator ph-${sol.type} draggable" 
+                                 draggable="true" 
+                                 data-solution="${index}"
+                                 id="solution${index}">
+                                ${sol.name}
+                                <br>pH ${sol.ph}
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <h3 class="text-xl font-bold text-center">Categories</h3>
+                        <div class="drop-zone h-32 flex flex-col items-center justify-center" data-category="acid">
+                            <span class="text-2xl mb-2">🔴</span>
+                            <span class="font-semibold">Acid</span>
+                            <span class="text-sm text-gray-600">(pH &lt; 7)</span>
+                        </div>
+                        <div class="drop-zone h-32 flex flex-col items-center justify-center" data-category="neutral">
+                            <span class="text-2xl mb-2">🟢</span>
+                            <span class="font-semibold">Neutral</span>
+                            <span class="text-sm text-gray-600">(pH = 7)</span>
+                        </div>
+                        <div class="drop-zone h-32 flex flex-col items-center justify-center" data-category="base">
+                            <span class="text-2xl mb-2">🔵</span>
+                            <span class="font-semibold">Base</span>
+                            <span class="text-sm text-gray-600">(pH &gt; 7)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <h3 class="text-xl font-bold text-center">Litmus Test</h3>
+                        <div class="bg-gray-50 rounded-lg p-4 h-64 flex items-center justify-center">
+                            <div id="litmusPaper" class="w-32 h-32 bg-white rounded-lg flex items-center justify-center text-2xl">
+                                📄
+                            </div>
+                        </div>
+                        <div id="phResult" class="text-center font-semibold"></div>
+                    </div>
+                </div>
+            `;
+            
+            setupPhCollector();
+        }
+        
+        function setupPhCollector() {
+            const solutions = document.querySelectorAll('.ph-indicator');
+            const dropZones = document.querySelectorAll('.drop-zone');
+            let correctPlacements = 0;
+            const totalSolutions = solutions.length;
+            
+            solutions.forEach(solution => {
+                solution.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.effectAllowed = 'move';
+                    solution.classList.add('dragging');
+                    const solutionData = gameData.levels[currentLevel - 1].solutions[parseInt(solution.dataset.solution)];
+                    e.dataTransfer.setData('solutionType', solutionData.type);
+                    e.dataTransfer.setData('solutionIndex', solution.dataset.solution);
+                });
+                
+                solution.addEventListener('dragend', () => {
+                    solution.classList.remove('dragging');
+                });
+            });
+            
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    zone.classList.add('drag-over');
+                });
+                
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('drag-over');
+                });
+                
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+                    
+                    const solutionType = e.dataTransfer.getData('solutionType');
+                    const solutionIndex = e.dataTransfer.getData('solutionIndex');
+                    const category = zone.dataset.category;
+                    const solution = document.getElementById(`solution${solutionIndex}`);
+                    const litmusPaper = document.getElementById('litmusPaper');
+                    const phResult = document.getElementById('phResult');
+                    
+                    if (solutionType === category) {
+                        zone.appendChild(solution);
+                        solution.classList.remove('draggable');
+                        solution.draggable = false;
+                        correctPlacements++;
+                        score += 5;
+                        updateScore();
+                        
+                        // Update litmus paper color
+                        if (category === 'acid') {
+                            litmusPaper.style.background = '#ef4444';
+                            litmusPaper.innerHTML = '🔴';
+                        } else if (category === 'base') {
+                            litmusPaper.style.background = '#3b82f6';
+                            litmusPaper.innerHTML = '🔵';
+                        } else {
+                            litmusPaper.style.background = '#10b981';
+                            litmusPaper.innerHTML = '🟢';
+                        }
+                        
+                        phResult.textContent = 'Correct! Well done!';
+                        phResult.className = 'text-center font-semibold text-green-600';
+                        
+                        if (correctPlacements === totalSolutions) {
+                            setTimeout(() => {
+                                if (currentLevel < 5) {
+                                    currentLevel++;
+                                    loadLevel();
+                                } else {
+                                    showGameComplete();
+                                }
+                            }, 1500);
+                        }
+                    } else {
+                        phResult.textContent = 'Try again! Remember the pH scale.';
+                        phResult.className = 'text-center font-semibold text-red-600';
+                    }
+                });
+            });
+        }
+        
+        function loadLabAdventureLevel() {
+            const level = gameData.levels[currentLevel - 1];
+            const gameContent = document.getElementById('gameContent');
+            
+            gameContent.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${level.stations.map((station, index) => `
+                        <div class="station" id="station${index}">
+                            <h3 class="text-xl font-bold mb-4">Station ${index + 1}</h3>
+                            <p class="mb-4">${station.question}</p>
+                            <div class="grid grid-cols-2 gap-2">
+                                ${station.options.map(option => `
+                                    <button class="btn-primary text-sm" onclick="checkStationAnswer(${index}, '${option}')">${option}</button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+        
+        function checkStationAnswer(stationIndex, answer) {
+            const level = gameData.levels[currentLevel - 1];
+            const station = level.stations[stationIndex];
+            const stationElement = document.getElementById(`station${stationIndex}`);
+            
+            if (answer === station.correct) {
+                stationElement.classList.add('completed');
+                stationElement.innerHTML += '<div class="mt-4 text-green-600 font-semibold">✓ Correct!</div>';
+                score += 10;
+                updateScore();
+                
+                // Check if all stations are completed
+                const allCompleted = level.stations.every((_, i) => 
+                    document.getElementById(`station${i}`).classList.contains('completed')
+                );
+                
+                if (allCompleted) {
+                    setTimeout(() => {
+                        if (currentLevel < 5) {
+                            currentLevel++;
+                            loadLevel();
+                        } else {
+                            showGameComplete();
+                        }
+                    }, 1500);
+                }
+            } else {
+                stationElement.innerHTML += '<div class="mt-4 text-red-600 font-semibold">✗ Try again!</div>';
+                setTimeout(() => {
+                    stationElement.querySelector('.text-red-600').remove();
+                }, 1500);
+            }
+        }
+        
+        function loadPotionMakerLevel() {
+            const level = gameData.levels[currentLevel - 1];
+            const gameContent = document.getElementById('gameContent');
+            
+            gameContent.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4">Goal: ${level.goal}</h3>
+                        <div class="bg-purple-100 rounded-lg p-6 mb-4">
+                            <div class="relative w-32 h-48 mx-auto bg-gradient-to-b from-purple-300 to-purple-600 rounded-full overflow-hidden">
+                                <div id="potionLiquid" class="absolute bottom-0 w-full bg-blue-400 transition-all duration-500" style="height: 20%"></div>
+                                <div class="potion-bubble" style="width: 10px; height: 10px; top: 30%; left: 20%;"></div>
+                                <div class="potion-bubble" style="width: 8px; height: 8px; top: 50%; left: 60%; animation-delay: 1s;"></div>
+                                <div class="potion-bubble" style="width: 12px; height: 12px; top: 40%; left: 40%; animation-delay: 2s;"></div>
+                            </div>
+                        </div>
+                        <div id="potionResult" class="text-center font-semibold"></div>
+                        <div class="text-center mt-4">
+                            <span class="text-lg">Current pH: </span>
+                            <span id="currentPh" class="text-2xl font-bold">7.0</span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">Chemicals</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            ${level.chemicals.map((chem, index) => `
+                                <div class="bg-white rounded-lg p-4 shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+                                     onclick="addChemical(${index})">
+                                    <div class="text-center">
+                                        <div class="text-3xl mb-2">${chem.type === 'acid' ? '🔴' : chem.type === 'base' ? '🔵' : '🟢'}</div>
+                                        <div class="font-semibold">${chem.name}</div>
+                                        <div class="text-sm text-gray-600">${chem.type}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button class="btn-primary w-full mt-4" onclick="checkPotion()">Mix Potion</button>
+                        <button class="bg-gray-500 text-white px-4 py-2 rounded-lg w-full mt-2" onclick="resetPotion()">Reset</button>
+                    </div>
+                </div>
+            `;
+            
+            gameData.currentPh = 7.0;
+            gameData.addedChemicals = [];
+        }
+        
+        function addChemical(index) {
+            const chemical = gameData.levels[currentLevel - 1].chemicals[index];
+            gameData.addedChemicals.push(chemical);
+            
+            // Update pH based on chemical
+            if (chemical.type === 'acid') {
+                gameData.currentPh -= chemical.strength;
+            } else if (chemical.type === 'base') {
+                gameData.currentPh += chemical.strength;
+            }
+            
+            gameData.currentPh = Math.max(0, Math.min(14, gameData.currentPh));
+            
+            document.getElementById('currentPh').textContent = gameData.currentPh.toFixed(1);
+            
+            // Update potion color
+            const potionLiquid = document.getElementById('potionLiquid');
+            if (gameData.currentPh < 7) {
+                potionLiquid.style.background = `linear-gradient(to top, #ef4444, #f87171)`;
+            } else if (gameData.currentPh > 7) {
+                potionLiquid.style.background = `linear-gradient(to top, #3b82f6, #60a5fa)`;
+            } else {
+                potionLiquid.style.background = `linear-gradient(to top, #10b981, #34d399)`;
+            }
+            
+            potionLiquid.style.height = Math.min(20 + gameData.addedChemicals.length * 15, 90) + '%';
+        }
+        
+        function checkPotion() {
+            const targetPh = gameData.levels[currentLevel - 1].targetPh;
+            const result = document.getElementById('potionResult');
+            const tolerance = 1.0;
+            
+            if (Math.abs(gameData.currentPh - targetPh) <= tolerance) {
+                result.textContent = 'Perfect! Potion created successfully!';
+                result.className = 'text-center font-semibold text-green-600';
+                
+                // Add glow effect
+                document.getElementById('potionLiquid').style.boxShadow = '0 0 30px rgba(16, 185, 129, 0.8)';
+                
+                score += 15;
+                updateScore();
+                
+                setTimeout(() => {
+                    if (currentLevel < 5) {
+                        currentLevel++;
+                        loadLevel();
+                    } else {
+                        showGameComplete();
+                    }
+                }, 2000);
+            } else {
+                result.textContent = `Not quite! Target pH: ${targetPh}, Current pH: ${gameData.currentPh.toFixed(1)}`;
+                result.className = 'text-center font-semibold text-red-600';
+            }
+        }
+        
+        function resetPotion() {
+            gameData.currentPh = 7.0;
+            gameData.addedChemicals = [];
+            
+            document.getElementById('currentPh').textContent = '7.0';
+            document.getElementById('potionLiquid').style.height = '20%';
+            document.getElementById('potionLiquid').style.background = 'linear-gradient(to top, #3b82f6, #60a5fa)';
+            document.getElementById('potionLiquid').style.boxShadow = 'none';
+            document.getElementById('potionResult').textContent = '';
+        }
+        
+        function showGameComplete() {
+            const gameContent = document.getElementById('gameContent');
+            gameContent.innerHTML = `
+                <div class="text-center py-12">
+                    <div class="text-8xl mb-6">🎉</div>
+                    <h2 class="text-4xl font-bold mb-4">Congratulations!</h2>
+                    <p class="text-2xl mb-6">You completed all levels of ${gameData.name}!</p>
+                    <p class="text-xl mb-8">Final Score: ${score}</p>
+                    <button class="btn-primary text-xl px-8 py-4" onclick="backToMenu()">Back to Menu</button>
+                </div>
+            `;
+        }
+        
+        // Add shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
