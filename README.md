@@ -1,73 +1,129 @@
-# Welcome to your Lovable project
+# Digital-Gaming-Website_for-Rural-Education
 
-## Project info
+netlify link(live link):  https://dainty-alpaca-a5c263.netlify.app/
 
-**URL**: https://lovable.dev/projects/e24e9296-79b7-44de-974b-5ffbe93ed245
+## User Accounts
 
-## How can I edit this code?
+### Student Accounts
+These accounts are created **grade-wise** for students.  
+Each student receives a predefined username and password provided by the school.  
 
-There are several ways of editing your application.
+| username (grade-wise) | password   |
+|-----------------------|------------|
+| meera_9b              | meera      |
+| sameera12             | sameera    |
+| jaya45                | jaya       |
+| sita_10a              | sita       |
+| navya11               | navya      |
+| DL                    | iiugb      |
+| pooja12               | pooja      |
+| priya_7b              | priya      |
+| rohit_8a              | rohit      |
+| akhil                 | 12345      |
+| amit_6a               | amit       |
+| ram_11b               | ram        |
+| ishani12              | isha       |
+| pranathi10            | pranathi   |
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/e24e9296-79b7-44de-974b-5ffbe93ed245) and start prompting.
+### Teacher Accounts
+Teacher account data must be **added manually by the school management (e.g., Vignan Management)**.  
+Teachers **cannot create their own accounts** directly; all credentials are generated and managed by the administration.  
 
-Changes made via Lovable will be committed automatically to this repo.
+| username   | password |
+|------------|----------|
+| teacher8   | pass1234 |
+| teacher11  | pass1234 |
+| teacher10  | pass1234 |
+| teacher9   | pass1234 |
+| teacher12  | pass1234 |
+| teacher7   | pass1234 |
+| teacher6   | pass1234 |
 
-**Use your preferred IDE**
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Gamified Learning Platform – Workflow
+👩‍🎓 Student Workflow
 
-Follow these steps:
+Sign Up / Login
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+New students register with their details → stored in Supabase.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Returning students log in securely.
 
-# Step 3: Install the necessary dependencies.
-npm i
+Dashboard Access
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+Personalized dashboard displays grade, subjects, streak, and points.
 
-**Edit a file directly in GitHub**
+Integrated Gemini API chatbot answers queries instantly.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Play Subject Games
 
-**Use GitHub Codespaces**
+Select subject → play topic-based games designed for their grade.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Earn points and maintain streaks for consistency.
 
-## What technologies are used for this project?
+Overall Subject Game
 
-This project is built with:
+After completing topic games → unlock overall game covering all topics of that subject.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Read Stories
 
-## How can I deploy this project?
+Click Read Story button on each subject → access subject-related stories for better understanding.
 
-Simply open [Lovable](https://lovable.dev/projects/e24e9296-79b7-44de-974b-5ffbe93ed245) and click on Share -> Publish.
+Assignments & Submissions
 
-## Can I connect a custom domain to my Lovable project?
+Students complete assignments given by teachers.
 
-Yes, you can!
+Submit assignments → stored in Supabase.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Grades & Reports
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Teachers assign grade points based on submissions.
+
+Students can view progress analytics, points, and reports in dashboard.
+
+👨‍🏫 Teacher Workflow
+
+Teacher Details Stored in Supabase (linked to specific grades).
+
+Monitor Students
+
+Access each student’s analytics & performance reports.
+
+Track points, streaks, assignment submissions, and overall progress.
+
+Assignments
+
+Create & assign assignments to students.
+
+Review submissions and provide feedback + grade points.
+
+🛠 Tech Workflow
+
+Frontend (TypeScript, React, HTML, CSS, JS)
+
+Student & Teacher Dashboards
+
+Games, Stories, and Chatbot integration
+
+Backend (Supabase)
+
+Authentication (Sign Up / Login)
+
+Store Students, Teachers, Assignments, Reports
+
+Real-time database sync
+
+Gamification Layer
+
+Points, streaks, grade-based progression
+
+Subject/topic game unlock system
+
+AI Chatbot (Gemini API)
+
+Integrated in Student Dashboard
+
+Answers academic queries in real time
