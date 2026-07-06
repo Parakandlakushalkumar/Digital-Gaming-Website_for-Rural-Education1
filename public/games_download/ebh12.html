@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Translation</title>
+<!-- ORIGINAL GAME CONTENT STARTS HERE -->
+<h1>🌍 Ecology & Health Treasure Hunt 🌍</h1>
+        <div class="treasure-count">
+            <span class="treasure-icon">🌱</span>
+            <span>Eco Treasures Found: <span id="score">0</span>/10</span><div id="game-area">
+            <div class="question-container">
+                <div class="question" id="question"></div>
+                <div class="options" id="options"></div>
+                <div class="result" id="result"></div>
+                <button class="next-btn" id="next-btn" onclick="nextQuestion()" style="display: none;">Next Discovery</button><script>
+        const questions = [
+            {
+                question: "Which level of the food chain has the highest energy?",
+                options: ["Primary consumers", "Secondary consumers", "Producers", "Decomposers"],
+                correct: 2,
+                explanation: "Producers (plants) have the highest energy as they capture energy directly from the sun through photosynthesis."
+            },
+            {
+                question: "What is the main cause of ozone depletion?",
+                options: ["Carbon dioxide", "Methane", "Chlorofluorocarbons (CFCs)", "Nitrogen oxides"],
+                correct: 2,
+                explanation: "CFCs are the primary cause of ozone depletion as they release chlorine atoms that break down ozone molecules."
+            },
+            {
+                question: "Which biotechnology technique is used to produce human insulin?",
+                options: ["PCR", "Gel electrophoresis", "Recombinant DNA technology", "Tissue culture"],
+                correct: 2,
+                explanation: "Recombinant DNA technology is used to insert human insulin genes into bacteria to mass-produce insulin."
+            },
+            {
+                question: "What is the normal human body temperature?",
+                options: ["36°C", "37°C", "38°C", "39°C"],
+                correct: 1,
+                explanation: "Normal human body temperature is approximately 37°C (98.6°F)."
+            },
+            {
+                question: "Which gas is primarily responsible for the greenhouse effect?",
+                options: ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"],
+                correct: 2,
+                explanation: "Carbon dioxide is the primary greenhouse gas responsible for trapping heat in Earth's atmosphere."
+            },
+            {
+                question: "What is the function of antibiotics?",
+                options: ["Kill viruses", "Kill bacteria", "Boost immunity", "Reduce fever"],
+                correct: 1,
+                explanation: "Antibiotics specifically target and kill bacteria; they are ineffective against viruses."
+            },
+            {
+                question: "Which process involves the nitrogen cycle?",
+                options: ["Photosynthesis", "Respiration", "Nitrogen fixation", "Fermentation"],
+                correct: 2,
+                explanation: "Nitrogen fixation converts atmospheric nitrogen into compounds that plants can use, completing the nitrogen cycle."
+            },
+            {
+                question: "What is gene therapy used for?",
+                options: ["Treating genetic disorders", "Producing vaccines", "Creating antibiotics", "Cloning organisms"],
+                correct: 0,
+                explanation: "Gene therapy involves introducing healthy genes into patients to treat or cure genetic disorders."
+            },
+            {
+                question: "Which organ is primarily affected by malaria?",
+                options: ["Lungs", "Liver", "Kidneys", "Red blood cells"],
+                correct: 3,
+                explanation: "Malaria parasites primarily infect and destroy red blood cells, causing the characteristic symptoms."
+            },
+            {
+                question: "What is biodiversity?",
+                options: ["Study of life", "Variety of life forms", "Population growth", "Food web structure"],
+                correct: 1,
+                explanation: "Biodiversity refers to the variety of all life forms including genetic, species, and ecosystem diversity."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question').textContent = q.question;
+            
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            
+            q.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => selectAnswer(index);
+                optionsDiv.appendChild(btn);
+            });
+            
+            document.getElementById('result').textContent = '';
+            document.getElementById('next-btn').style.display = 'none';
+            answered = false;
+        }
+
+        function selectAnswer(selected) {
+            if (answered) return;
+            
+            answered = true;
+            const q = questions[currentQuestion];
+            const options = document.querySelectorAll('.option-btn');
+            
+            options.forEach((btn, index) => {
+                if (index === q.correct) {
+                    btn.classList.add('correct');
+                } else if (index === selected && index !== q.correct) {
+                    btn.classList.add('incorrect');
+                }
+                btn.onclick = null;
+            });
+            
+            const resultDiv = document.getElementById('result');
+            if (selected === q.correct) {
+                score++;
+                resultDiv.innerHTML = `<span style="color: #32CD32;">🌟 Perfect! Eco-treasure discovered! 🌟</span><br>${q.explanation}`;
+                document.getElementById('score').textContent = score;
+            } else {
+                resultDiv.innerHTML = `<span style="color: #FF6B6B;">🔬 Study more!</span><br>${q.explanation}`;
+            }
+            
+            if (currentQuestion < questions.length - 1) {
+                document.getElementById('next-btn').style.display = 'inline-block';
+            } else {
+                setTimeout(showFinalScore, 2000);
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            loadQuestion();
+        }
+
+        function showFinalScore() {
+            const gameArea = document.getElementById('game-area');
+            let message, celebration;
+            
+            if (score === questions.length) {
+                message = "🏆 Ecosystem Master! Perfect Conservation! 🏆";
+                celebration = "🌍";
+            } else if (score >= questions.length * 0.8) {
+                message = "🌟 Excellent! You're an Eco-Warrior! 🌟";
+                celebration = "🌿";
+            } else if (score >= questions.length * 0.6) {
+                message = "🌱 Good Progress! Keep Growing! 🌱";
+                celebration = "🌳";
+            } else {
+                message = "🔬 Keep Exploring Life Sciences! 🔬";
+                celebration = "🧬";
+            }
+            
+            gameArea.innerHTML = `
+                <div class="final-score">
+                    <div class="celebration">${celebration}</div>
+                    <h2>${message}</h2>
+                    <p style="font-size: 1.5rem; margin: 1rem 0;">Final Score: ${score}/${questions.length} eco-treasures</p>
+                    <p style="margin: 1rem 0;">You've explored Ecology, Biotechnology, and Human Health!</p>
+                    <button class="restart-btn" onclick="restartGame()">New Ecosystem Adventure</button>`;
+        }
+
+        function restartGame() {
+            currentQuestion = 0;
+            score = 0;
+            document.getElementById('score').textContent = '0';
+            document.getElementById('game-area').innerHTML = `
+                <div class="question-container">
+                    <div class="question" id="question"></div>
+                    <div class="options" id="options"></div>
+                    <div class="result" id="result"></div>
+                    <button class="next-btn" id="next-btn" onclick="nextQuestion()" style="display: none;">Next Discovery</button>`;
+            loadQuestion();
+        }
+
+        // Initialize the game
+        loadQuestion();
+    </script></html>

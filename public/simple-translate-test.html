@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Translation Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .translate-icon {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 10000;
+            width: 40px;
+            height: 40px;
+            background: #4285f4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .translate-dropdown {
+            position: fixed;
+            top: 60px;
+            right: 15px;
+            z-index: 9999;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            border: 1px solid #ddd;
+            min-width: 200px;
+            display: none;
+        }
+        .goog-te-banner-frame { display: none !important; }
+        body { top: 0 !important; }
+        .goog-te-gadget { font-family: inherit !important; }
+    </style>
+</head>
+<body>
+    <div class="translate-icon" onclick="toggleTranslate()">
+        <span style="font-size: 18px; color: white;">🌐</span>
+    </div>
+    
+    <div id="translate-dropdown" class="translate-dropdown">
+        <div style="margin-bottom: 5px; font-weight: bold;">Select Language:</div>
+        <div id="google_translate_element"></div>
+    </div>
+
+    <h1>Translation Test Page</h1>
+    <p>This is a test page to check if Google Translate is working.</p>
+    <p>Click the blue globe icon in the top-right corner to translate this page.</p>
+    <p>Try selecting different languages like Hindi, Spanish, French, or German.</p>
+    <p>If the text changes when you select a language, the translation is working!</p>
+
+    <script type="text/javascript">
+        let translateOpen = false;
+        
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,hi,bn,te,ta,gu,kn,ml,mr,pa,or,as,ur,ne,si,my,th,vi,id,ms,tl,zh,ja,ko,fr,es,pt,de,it,ru,ar,fa,tr,pl,nl,sv,da,no,fi,he,el,hu,cs,sk,ro,bg,hr,sr,sl,et,lv,lt,uk,be,ka,hy,az,kk,ky,uz,tg,mn,bo,km,lo,dz,am,ti,sw,zu,xh,af,ig,yo,ha,ff,wo,sn,rw,lg,ny,st,tn,ts,ve,nr,ss,nd'
+            }, 'google_translate_element');
+        }
+        
+        function toggleTranslate() {
+            const dropdown = document.getElementById('translate-dropdown');
+            translateOpen = !translateOpen;
+            dropdown.style.display = translateOpen ? 'block' : 'none';
+        }
+        
+        // Close when clicking outside
+        document.addEventListener('click', function(e) {
+            const icon = document.querySelector('.translate-icon');
+            const dropdown = document.getElementById('translate-dropdown');
+            if (translateOpen && !icon.contains(e.target) && !dropdown.contains(e.target)) {
+                translateOpen = false;
+                dropdown.style.display = 'none';
+            }
+        });
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

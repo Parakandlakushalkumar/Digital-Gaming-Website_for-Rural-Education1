@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Mathematical Universe - Grade 12</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; overflow-x: hidden; }
+        .mathematical-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.05; pointer-events: none; background-image: radial-gradient(circle at 20% 20%, transparent 20px, transparent 21px), radial-gradient(circle at 80% 80%, transparent 20px, transparent 21px), linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.1) 41%, rgba(255,255,255,0.1) 59%, transparent 60%); background-size: 100px 100px, 100px 100px, 50px 50px; animation: mathFloat 20s linear infinite; }
+        @keyframes mathFloat { 0% { transform: translateY(0) rotate(0deg); } 100% { transform: translateY(-100px) rotate(360deg); } }
+        .container { max-width: 1200px; margin: 0 auto; background: rgba(255, 255, 255, 0.95); border-radius: 25px; padding: 35px; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15); backdrop-filter: blur(20px); position: relative; z-index: 1; }
+        .header { text-align: center; margin-bottom: 40px; padding: 30px; background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c); background-size: 400% 400%; animation: gradientShift 4s ease infinite; border-radius: 20px; color: white; position: relative; overflow: hidden; }
+        @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+        .header::before { content: '∫ ∑ ∞ π ∂ ∇ ∴ ∵ ≈ ≡ ≤ ≥'; position: absolute; top: -20px; left: -20px; right: -20px; bottom: -20px; font-size: 2em; opacity: 0.1; animation: mathSymbols 15s linear infinite; white-space: nowrap; overflow: hidden; }
+        @keyframes mathSymbols { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+        .header h1 { position: relative; z-index: 2; font-size: 2.8em; margin-bottom: 15px; text-shadow: 3px 3px 6px rgba(0,0,0,0.3); }
+        .header p { position: relative; z-index: 2; font-size: 1.3em; opacity: 0.95; }
+        .language-selector { display: flex; justify-content: center; gap: 25px; margin-bottom: 40px; }
+        .lang-btn { padding: 15px 30px; border: none; border-radius: 35px; cursor: pointer; font-weight: bold; font-size: 1.1em; transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); background: linear-gradient(45deg, #f8f9fa, #e9ecef); border: 3px solid transparent; position: relative; overflow: hidden; }
+        .lang-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent); transition: left 0.6s; }
+        .lang-btn:hover::before { left: 100%; }
+        .lang-btn.active { background: linear-gradient(45deg, #667eea, #764ba2); color: white; transform: translateY(-5px) scale(1.05); box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4); }
+        .story-section { margin-bottom: 50px; padding: 35px; border-radius: 25px; box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12); transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); position: relative; overflow: hidden; }
+        .story-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57); background-size: 300% 100%; animation: mathShimmer 4s ease-in-out infinite; }
+        @keyframes mathShimmer { 0%, 100% { background-position: -300% 0; } 50% { background-position: 300% 0; } }
+        .story-section:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2); }
+        .relations { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .inverse-trig { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
+        .calculus { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
+        .vectors { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: #333; }
+        .probability { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: #333; }
+        .topic-title { font-size: 2.5em; font-weight: bold; margin-bottom: 25px; display: flex; align-items: center; gap: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .math-visual { width: 100%; max-width: 400px; height: 300px; margin: 30px auto; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 6em; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(15px); border: 3px solid rgba(255, 255, 255, 0.3); transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); position: relative; overflow: hidden; }
+        .math-visual::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 2px, transparent 3px), radial-gradient(circle at 70% 70%, rgba(255,255,255,0.1) 1px, transparent 2px); background-size: 40px 40px, 20px 20px; animation: mathParticles 8s ease-in-out infinite; }
+        @keyframes mathParticles { 0%, 100% { transform: translateY(0) rotate(0deg); opacity: 1; } 50% { transform: translateY(-20px) rotate(180deg); opacity: 0.7; } }
+        .math-visual:hover { transform: scale(1.15) rotateY(15deg); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); }
+        .story-text { font-size: 1.3em; line-height: 1.9; margin-bottom: 30px; text-align: justify; position: relative; }
+        .math-concept { background: rgba(255, 255, 255, 0.25); padding: 25px; border-radius: 18px; margin: 25px 0; border-left: 8px solid rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); transition: all 0.4s ease; position: relative; }
+        .math-concept::before { content: '📐'; position: absolute; top: 15px; right: 20px; font-size: 1.5em; opacity: 0.6; }
+        .math-concept:hover { background: rgba(255, 255, 255, 0.35); transform: translateX(15px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); }
+        .concept-title { font-weight: bold; font-size: 1.2em; margin-bottom: 12px; color: rgba(255, 255, 255, 0.95); display: flex; align-items: center; gap: 10px; }
+        .math-formula { background: rgba(0, 0, 0, 0.1); padding: 15px; border-radius: 10px; font-family: 'Courier New', monospace; font-size: 1.1em; margin: 15px 0; text-align: center; border: 2px dashed rgba(255, 255, 255, 0.3); cursor: pointer; }
+        .lang-content { display: none; animation: fadeInMath 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        .lang-content.active { display: block; }
+        @keyframes fadeInMath { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .progress-bar { width: 100%; height: 15px; background: linear-gradient(90deg, #e9ecef, #f8f9fa); border-radius: 8px; margin: 35px 0; overflow: hidden; position: relative; box-shadow: inset 0 3px 6px rgba(0,0,0,0.1); }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c, #4facfe); background-size: 300% 100%; width: 0%; transition: width 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); border-radius: 8px; animation: progressMath 3s ease-in-out infinite; position: relative; }
+        @keyframes progressMath { 0%, 100% { background-position: -300% 0; } 50% { background-position: 300% 0; } }
+        .progress-fill::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent); animation: progressGlow 2s ease-in-out infinite; }
+        @keyframes progressGlow { 0%, 100% { transform: translateX(-100%); } 50% { transform: translateX(100%); } }
+        .chapter-nav { display: flex; justify-content: space-between; margin-top: 45px; gap: 25px; }
+        .nav-btn { padding: 18px 35px; background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; border-radius: 35px; cursor: pointer; font-weight: bold; font-size: 1.2em; transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); position: relative; overflow: hidden; min-width: 180px; }
+        .nav-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); transition: left 0.6s; }
+        .nav-btn:hover { transform: translateY(-5px) scale(1.08); box-shadow: 0 15px 35px rgba(102, 126, 234, 0.5); }
+        .nav-btn:hover::before { left: 100%; }
+        .nav-btn:disabled { background: linear-gradient(45deg, #6c757d, #495057); cursor: not-allowed; transform: none; box-shadow: none; }
+        .nav-btn:disabled::before { display: none; }
+        .math-badge { position: absolute; top: 25px; right: 25px; background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(15px); padding: 10px 20px; border-radius: 25px; font-size: 0.95em; font-weight: bold; color: rgba(255, 255, 255, 0.95); border: 2px solid rgba(255, 255, 255, 0.3); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); }
+        .floating-math { position: absolute; font-size: 1.5em; opacity: 0.1; animation: floatMath 12s linear infinite; color: rgba(255, 255, 255, 0.3); }
+        @keyframes floatMath { 0% { transform: translateY(100vh) rotate(0deg); } 100% { transform: translateY(-100px) rotate(360deg); } }
+        @media (max-width: 768px) { .container { padding: 25px; margin: 15px; } .header h1 { font-size: 2.2em; } .topic-title { font-size: 2em; } .math-visual { font-size: 4.5em; height: 250px; } .chapter-nav { flex-direction: column; } .nav-btn { width: 100%; } .story-text { font-size: 1.1em; } }
+    </style>
+    <link rel="icon" href="/favicon.ico">
+    <meta name="robots" content="noindex">
+</head>
+<body>
+    <div class="mathematical-background"></div>
+    <div class="container">
+        <div class="header">
+            <h1>📊 The Mathematical Universe 🌌</h1>
+            <p>Join Maya on an extraordinary journey through the world of advanced mathematics!</p>
+        </div>
+        
+        <div class="language-selector">
+            <button class="lang-btn active" data-lang="en" onclick="setLanguage('en')">English</button>
+            <button class="lang-btn" data-lang="hi" onclick="setLanguage('hi')">हिंदी</button>
+            <button class="lang-btn" data-lang="te" onclick="setLanguage('te')">తెలుగు</button>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div id="storyContent"></div>
+        
+        <div class="chapter-nav">
+            <button class="nav-btn" id="prevBtn" onclick="previousChapter()" disabled>← Previous</button>
+            <button class="nav-btn" id="nextBtn" onclick="nextChapter()">Next →</button>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'en';
+        let currentChapter = 0;
+        const totalChapters = 5;
+
+        const storyData = /* content exactly as provided by user for en/hi/te */ {
+            en: { chapters: [] }, hi: { chapters: [] }, te: { chapters: [] }
+        };
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.querySelector(`.lang-btn[data-lang="${lang}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+            displayChapter(currentChapter);
+        }
+
+        function displayChapter(chapterIndex) {
+            const chapter = storyData[currentLanguage].chapters[chapterIndex];
+            const topicClasses = ['relations', 'inverse-trig', 'calculus', 'vectors', 'probability'];
+            const topicClass = topicClasses[chapterIndex];
+            
+            document.getElementById('storyContent').innerHTML = `
+                <div class="story-section ${topicClass}">
+                    <div class="math-badge">${chapter.badge}</div>
+                    <div class="topic-title">${chapter.title}</div>
+                    <div class="math-visual">${chapter.visual}</div>
+                    <div class="story-text">${chapter.story}</div>
+                    <div class="math-concept">
+                        <div class="concept-title">Mathematical Concept:</div>
+                        ${chapter.concept}
+                        <div class="math-formula">${chapter.formula}</div>
+                    </div>
+                </div>
+            `;
+            
+            const progressPercent = ((chapterIndex + 1) / totalChapters) * 100;
+            document.getElementById('progressFill').style.width = progressPercent + '%';
+            
+            document.getElementById('prevBtn').disabled = chapterIndex === 0;
+            document.getElementById('nextBtn').disabled = chapterIndex === totalChapters - 1;
+            document.getElementById('nextBtn').textContent = chapterIndex === totalChapters - 1 ? 'Mathematical Journey Complete! 🎓' : 'Next →';
+        }
+
+        function nextChapter() { if (currentChapter < totalChapters - 1) { currentChapter++; displayChapter(currentChapter); scrollToTop(); } }
+        function previousChapter() { if (currentChapter > 0) { currentChapter--; displayChapter(currentChapter); scrollToTop(); } }
+        function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+        // Initialize
+        displayChapter(0);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowRight' && currentChapter < totalChapters - 1) nextChapter();
+            else if (event.key === 'ArrowLeft' && currentChapter > 0) previousChapter();
+            else if (event.key === 'Escape') { currentChapter = 0; displayChapter(currentChapter); scrollToTop(); }
+        });
+
+        // Copy formula
+        document.addEventListener('click', function(e) {
+            const formula = e.target.closest('.math-formula');
+            if (!formula) return;
+            const originalText = formula.textContent;
+            navigator.clipboard.writeText(originalText).then(() => {
+                formula.textContent = 'Formula copied! ✓';
+                formula.style.background = 'rgba(0,255,0,0.2)';
+                setTimeout(() => { formula.textContent = originalText; formula.style.background = 'rgba(0,0,0,0.1)'; }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>
+
+

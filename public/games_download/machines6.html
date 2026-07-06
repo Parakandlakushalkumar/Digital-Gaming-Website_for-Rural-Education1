@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Simple Machines Treasure Hunt</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(to bottom right, #dbeafe, #ede9fe);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1000px;
+      margin: auto;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .btn {
+      padding: 12px 18px;
+      border-radius: 8px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .btn:hover {
+      opacity: 0.9;
+    }
+    .options button {
+      display: block;
+      width: 100%;
+      margin: 8px 0;
+    }
+    .progress {
+      height: 12px;
+      border-radius: 8px;
+      background: #e5e7eb;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background: #3b82f6;
+      width: 0%;
+      transition: width 0.4s;
+    }
+    .treasure-map {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .map-item {
+      padding: 10px;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 22px;
+    }
+    .found { background: #d1fae5; color: #065f46; }
+    .current { background: #dbeafe; color: #1e40af; border: 2px solid #60a5fa; }
+    .locked { background: #f3f4f6; color: #6b7280; }
+    .feedback {
+      font-weight: bold;
+      text-align: center;
+      padding: 10px;
+    }
+    .green { color: green; }
+    .red { color: red; }
+    .hint-box {
+      background: #ede9fe;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 10px;
+      color: #5b21b6;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 style="text-align:center;font-size:32px;color:#1e3a8a;">🗺️ Simple Machines Treasure Hunt</h1>
+    <p style="text-align:center;color:#374151;">Follow the clues to discover all 6 simple machines!</p>
+
+    <div id="scoreboard" class="card" style="text-align:center;">
+      <p><b>Score:</b> <span id="score">0</span> | 
+      <b>Clue:</b> <span id="clueNum">1</span>/6 | 
+      <b>Found:</b> <span id="found">0</span></p>
+      <div class="progress"><div id="progressBar" class="progress-bar"></div></div>
+    </div>
+
+    <div id="gameArea" class="card"></div>
+
+    <div class="card">
+      <h3 style="text-align:center;">🗺️ Treasure Map</h3>
+      <div id="map" class="treasure-map"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="text-align:center;">🧠 Simple Machines Facts</h3>
+      <p><b>What are Simple Machines? ⚙️</b><br>
+      They are basic tools that make work easier by changing the direction or amount of force.</p>
+      <p><b>Why are they important? 🤔</b><br>
+      All complex machines are built using these 6 simple machines!</p>
+    </div>
+  </div>
+
+  <script>
+    const treasureClues = [
+      { id:1, machine:'Lever', clue:'🔍 I help you lift heavy things with less effort. Found on playgrounds!', riddle:'What simple machine am I?', options:['Pulley','Lever','Inclined Plane','Wedge'], correct:'Lever', hint:'Think about a seesaw!', explanation:'A lever uses a fulcrum to multiply force.', treasure:'⚖️', location:'Playground' },
+      { id:2, machine:'Wheel and Axle', clue:'🔍 I roll to make moving things easier. Found on vehicles!', riddle:'What simple machine am I?', options:['Screw','Wheel and Axle','Pulley','Lever'], correct:'Wheel and Axle', hint:'I am round and spin!', explanation:'Wheels and axles reduce friction.', treasure:'🎯', location:'Road' },
+      { id:3, machine:'Inclined Plane', clue:'🔍 I am like a gentle hill to move things up high!', riddle:'What simple machine am I?', options:['Wedge','Inclined Plane','Screw','Pulley'], correct:'Inclined Plane', hint:'I am slanted and help you go up!', explanation:'Inclined planes spread work over distance.', treasure:'🏔️', location:'Ramp' },
+      { id:4, machine:'Pulley', clue:'🔍 I have a rope and change direction of force!', riddle:'What simple machine am I?', options:['Pulley','Lever','Wheel and Axle','Wedge'], correct:'Pulley', hint:'Flag poles use me!', explanation:'Pulleys change direction of force.', treasure:'🎪', location:'Flag pole' },
+      { id:5, machine:'Wedge', clue:'🔍 I am triangle-shaped, used for splitting!', riddle:'What simple machine am I?', options:['Screw','Wedge','Lever','Inclined Plane'], correct:'Wedge', hint:'Knives and axes use me!', explanation:'Wedges focus force into a sharp edge.', treasure:'🔺', location:'Kitchen' },
+      { id:6, machine:'Screw', clue:'🔍 I am like an inclined plane wrapped around a cylinder!', riddle:'What simple machine am I?', options:['Screw','Pulley','Wedge','Wheel and Axle'], correct:'Screw', hint:'I spiral around!', explanation:'Screws are inclined planes wrapped around.', treasure:'🌀', location:'Workshop' }
+    ];
+
+    let currentClue=0, score=0, foundTreasures=[];
+
+    function renderGame(){
+      const t=treasureClues[currentClue];
+      const area=document.getElementById('gameArea');
+      area.innerHTML=`
+        <h2 style="text-align:center;">Clue #${currentClue+1}</h2>
+        <p style="font-size:18px;color:#374151;">${t.clue}</p>
+        <h3 style="color:#1d4ed8;">${t.riddle}</h3>
+        <div class="options">
+          ${t.options.map(opt=>`<button class="btn" onclick="checkAnswer('${opt}')">${opt}</button>`).join('')}
+        </div>
+        <div style="text-align:center;margin:10px;">
+          <button class="btn" style="background:#8b5cf6;color:white;" onclick="toggleHint()">💡 Hint</button>
+        </div>
+        <div id="hintBox" class="hint-box" style="display:none;">${t.hint}<br><small>(Using hint gives fewer points!)</small></div>
+        <div id="feedback" class="feedback"></div>
+      `;
+      updateMap();
+      document.getElementById('clueNum').innerText=currentClue+1;
+      document.getElementById('found').innerText=foundTreasures.length;
+      document.getElementById('score').innerText=score;
+      document.getElementById('progressBar').style.width=`${(foundTreasures.length/treasureClues.length)*100}%`;
+    }
+
+    function toggleHint(){
+      const box=document.getElementById('hintBox');
+      box.style.display=box.style.display==='none'?'block':'none';
+    }
+
+    function checkAnswer(ans){
+      const t=treasureClues[currentClue];
+      const fb=document.getElementById('feedback');
+      if(ans===t.correct){
+        const points=document.getElementById('hintBox').style.display==='block'?15:25;
+        score+=points;
+        foundTreasures.push(t);
+        fb.innerHTML=`<span class="green">🎉 Correct! ${t.explanation} (+${points})</span>`;
+        setTimeout(()=>{
+          if(currentClue<treasureClues.length-1){
+            currentClue++;
+            renderGame();
+          } else {
+            showComplete();
+          }
+        },2000);
+      } else {
+        fb.innerHTML=`<span class="red">❌ Wrong! Hint: ${t.hint}</span>`;
+        setTimeout(()=>fb.innerHTML='',2000);
+      }
+      document.getElementById('score').innerText=score;
+    }
+
+    function updateMap(){
+      const map=document.getElementById('map');
+      map.innerHTML=treasureClues.map((t,i)=>{
+        const found=foundTreasures.some(f=>f.id===t.id);
+        return `<div class="map-item ${found?'found':i===currentClue?'current':'locked'}">
+          ${found?t.treasure:'❓'}<br><small>${t.machine}</small>
+        </div>`;
+      }).join('');
+    }
+
+    function showComplete(){
+      document.getElementById('gameArea').innerHTML=`
+        <h2 style="text-align:center;color:#d97706;">🏆 Treasure Hunt Complete!</h2>
+        <p style="text-align:center;">You found all simple machines!</p>
+        <p style="text-align:center;font-size:20px;">Final Score: ${score}</p>
+        <button class="btn" style="background:#f97316;color:white;display:block;margin:10px auto;" onclick="resetGame()">🔄 Play Again</button>
+      `;
+      updateMap();
+    }
+
+    function resetGame(){
+      currentClue=0; score=0; foundTreasures=[];
+      renderGame();
+    }
+
+    renderGame();
+  </script>
+</body>
+</html>

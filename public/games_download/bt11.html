@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Binomial Theorem Magic Quiz - Multiple Cards</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  body {
+    background: linear-gradient(135deg, #f7f0ff 0%, #cab8ff 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    color: #422080;
+    user-select: none;
+  }
+  .container {
+    max-width: 860px;
+    margin: 40px auto;
+    background: #fff4ff;
+    border-radius: 25px;
+    box-shadow: 0 0 45px #7537d0aa;
+    padding: 34px 28px;
+  }
+  h1 {
+    text-align: center;
+    font-weight: 900;
+    font-size: 2.8em;
+    margin-bottom: 24px;
+    color: #5b2a99;
+    letter-spacing: 2.8px;
+  }
+  .card-menu {
+    display: flex;
+    gap: 22px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+  .card {
+    background: linear-gradient(45deg, #a46ce3, #e0b0ff);
+    border-radius: 18px;
+    width: 160px;
+    height: 200px;
+    font-weight: 700;
+    font-size: 1.18em;
+    border: 3px solid transparent;
+    color: white;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 8px 22px rgba(125, 72, 190, 0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+  }
+  .card:hover {
+    transform: scale(1.07) rotate(-1.5deg);
+    border-color: #7a3fbc;
+    box-shadow: 0 14px 48px rgba(104, 72, 174, 1);
+  }
+  .card span {
+    font-size: 3.2em;
+    margin-bottom: 8px;
+    color: #f6d6fc;
+    text-shadow: 1px 1px 4px #622d9a;
+    animation: bounce 2s infinite ease-in-out;
+  }
+  @keyframes bounce {
+    0%, 100% {transform: translateY(0);}
+    50% {transform: translateY(-8px);}
+  }
+  .game {
+    display: none;
+    text-align: center;
+    padding: 12px 14px 20px 14px;
+    position: relative;
+  }
+  .game.active {
+    display: block;
+  }
+  .backbtn {
+    position: absolute;
+    top: 14px;
+    right: 20px;
+    font-weight: 900;
+    font-size: 1.05em;
+    background: #a661f8;
+    border: none;
+    border-radius: 100px;
+    padding: 9px 22px;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 0 20px #7d53d1;
+    user-select: none;
+    transition: background-color 0.3s;
+  }
+  .backbtn:hover {
+    background-color: #6f3edb;
+  }
+  .question-count {
+    font-weight: 700;
+    color: #623fac;
+    font-size: 1.15em;
+    margin-bottom: 18px;
+  }
+  .question-text {
+    font-weight: 900;
+    font-size: 1.36em;
+    margin-bottom: 28px;
+    color: #2f195e;
+  }
+  .options {
+    max-width: 570px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  button.option-btn {
+    font-size: 1.16em;
+    font-weight: 800;
+    padding: 16px 28px;
+    border: none;
+    border-radius: 16px;
+    background: #7a45d1;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(102,54,157,0.85);
+    transition: box-shadow 0.25s, background-color 0.3s, transform 0.18s;
+    user-select: none;
+  }
+  button.option-btn:hover {
+    background-color: #954dda;
+    box-shadow: 0 7px 25px rgba(131,71,199,0.85);
+    transform: scale(1.05);
+  }
+  button.option-btn.wrong {
+    background: #de435b !important;
+    box-shadow: 0 2px 16px #a9323a !important;
+    animation: shake 0.51s ease;
+  }
+  button.option-btn.correct {
+    background: #27d198 !important;
+    box-shadow: 0 2px 18px #1b7b59 !important;
+    cursor: default;
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-7px); }
+    50% { transform: translateX(7px); }
+    75% { transform: translateX(-7px); }
+  }
+  .score-display {
+    margin-top: 30px;
+    font-size: 1.28em;
+    font-weight: 900;
+    color: #2a1a65;
+  }
+  .sparkle {
+    pointer-events:none;
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(177, 203, 241, 0.9);
+    filter: drop-shadow(0 0 8px #6a3dff);
+    animation: sparkleAnim 0.8s ease forwards;
+    z-index: 40;
+  }
+  @keyframes sparkleAnim {
+    0% {
+      opacity: 1;
+      transform: scale(0.15) rotate(0deg);
+    }
+    90% {
+      opacity: 0;
+      transform: scale(1.3) rotate(120deg);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1.3) rotate(195deg);
+    }
+  }
+  .final-result {
+    margin-top: 32px;
+    background: #8c49ffcc;
+    border-radius: 24px;
+    padding: 36px 28px;
+    color: #f0f0ff;
+    text-align: center;
+    box-shadow: 0 10px 32px #841affbb;
+  }
+  .final-score {
+    font-size: 3em;
+    font-weight: 900;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 5px rgba(27,11,94,0.7);
+  }
+  .final-msg {
+    font-size: 1.3em;
+    font-weight: 700;
+    margin-bottom: 25px;
+  }
+  .restart-btn {
+    font-weight: 900;
+    background: #6613ff;
+    border: none;
+    border-radius: 18px;
+    padding: 15px 48px;
+    cursor: pointer;
+    font-size: 1.22em;
+    color: white;
+    box-shadow: 0 7px 26px #5a0df1aa;
+    transition: background-color 0.3s;
+  }
+  .restart-btn:hover {
+    background: #5706e2;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Binomial Theorem Magic Quiz</h1>
+    <div class="card-menu" id="cardMenu">
+      <div class="card" onclick="startCard(0)"><span>🪙</span>Binomial Treasure Chest</div>
+      <div class="card" onclick="startCard(1)"><span>🧙‍♂️</span>Expansion Wizard</div>
+      <div class="card" onclick="startCard(2)"><span>🔢</span>Coefficient Quest</div>
+      <div class="card" onclick="startCard(3)"><span>🧩</span>Puzzle Expansion</div>
+      <div class="card" onclick="startCard(4)"><span>🌍</span>Real-Life Binomial</div>
+    </div>
+
+    <div id="quizContainer" style="display:none;position:relative;">
+      <button class="backbtn" onclick="goBack()">← Back</button>
+      <div class="question-count" id="questionCount"></div>
+      <div class="question-text" id="questionText"></div>
+      <div class="options" id="optionsContainer"></div>
+      <div class="score-display" id="scoreDisplay"></div>
+      <div id="finalResult" class="final-result" style="display:none;">
+        <div class="final-score" id="finalScore"></div>
+        <div class="final-msg" id="finalMessage"></div>
+        <button class="restart-btn" onclick="restart()">Play Again</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const cards = [
+    {
+      title: "Binomial Treasure Chest",
+      questions: [
+        {
+          question: "Find the coefficient of x²y³ in (x + y)⁵",
+          options: ["10", "15", "20", "25"],
+          answer: "10"
+        },
+        {
+          question: "Coefficient of x³y² in (x + y)⁵",
+          options: ["10", "15", "20", "30"],
+          answer: "10"
+        },
+        {
+          question: "Coefficient of x¹y⁴ in (x + y)⁵",
+          options: ["5", "6", "10", "15"],
+          answer: "5"
+        },
+        {
+          question: "Find the coefficient of x⁴y¹ in (x + y)⁵",
+          options: ["5", "6", "10", "15"],
+          answer: "5"
+        },
+        {
+          question: "Coefficient of x³y² in (x - y)⁵",
+          options: ["10", "-10", "-15", "15"],
+          answer: "10"
+        },
+        {
+          question: "Coefficient of x²y³ in (x - y)⁵",
+          options: ["-10", "10", "15", "20"],
+          answer: "-10"
+        },
+        {
+          question: "Coefficient of x³y¹ in (2x + 3y)⁴",
+          options: ["432", "648", "975", "518"],
+          answer: "432"
+        },
+        {
+          question: "Find coefficient of x²y² in (3x + 2y)⁴",
+          options: ["216", "108", "230", "140"],
+          answer: "216"
+        },
+        {
+          question: "Coefficient of x⁵y⁰ in (x + y)⁵",
+          options: ["1", "5", "10", "15"],
+          answer: "1"
+        },
+        {
+          question: "Coefficient of x⁰y⁵ in (x + y)⁵",
+          options: ["1", "5", "10", "15"],
+          answer: "1"
+        }
+      ]
+    },
+    {
+      title: "Expansion Wizard",
+      questions: [
+        {
+          question: "Expand (a + b)³",
+          options: ["a³ + b³", "a³ + 3a²b + 3ab² + b³", "a³ + 2ab + b³", "3a² + 3b²"],
+          answer: "a³ + 3a²b + 3ab² + b³"
+        },
+        {
+          question: "Expand (x + y)²",
+          options: ["x² + y²", "x² + 2xy + y²", "x + y", "2x + 2y"],
+          answer: "x² + 2xy + y²"
+        },
+        {
+          question: "Expand (x - y)²",
+          options: ["x² + y²", "x² - 2xy + y²", "x + y", "2x - 2y"],
+          answer: "x² - 2xy + y²"
+        },
+        {
+          question: "Expand (x + 2)²",
+          options: ["x² + 4", "x² + 4x + 4", "x² + 2x + 4", "x² + 2x + 2"],
+          answer: "x² + 4x + 4"
+        },
+        {
+          question: "Expand (2x + 3)²",
+          options: ["4x² + 9", "4x² + 12x + 9", "4x² + 6x + 9", "2x² + 3x + 6"],
+          answer: "4x² + 12x + 9"
+        },
+        {
+          question: "Expand (x + 1)³",
+          options: ["x³ + 1", "x³ + 3x² + 3x + 1", "x³ + 3x + 1", "x³ + 1 + 3x²"],
+          answer: "x³ + 3x² + 3x + 1"
+        },
+        {
+          question: "Expand (x - 2)³",
+          options: ["x³ - 8", "x³ - 6x² + 12x - 8", "x³ - 3x² + 3x - 8", "x³ - 6x² - 12x - 8"],
+          answer: "x³ - 6x² + 12x - 8"
+        },
+        {
+          question: "Expand (2x - y)²",
+          options: ["4x² + y²", "4x² - 4xy + y²", "4x² - 2xy + y²", "2x² - y²"],
+          answer: "4x² - 4xy + y²"
+        },
+        {
+          question: "Expand (3a + 4b)²",
+          options: ["9a² + 16b²", "9a² + 24ab + 16b²", "9a² + 12ab + 16b²", "3a + 4b"],
+          answer: "9a² + 24ab + 16b²"
+        },
+        {
+          question: "Expand (x + 3)³",
+          options: ["x³ + 27", "x³ + 9x² + 27x + 27", "x³ + 3x² + 9x + 27", "3x³ + 27"],
+          answer: "x³ + 9x² + 27x + 27"
+        }
+      ]
+    },
+    {
+      title: "Coefficient Quest",
+      questions: [
+        {
+          question: "Coefficient of x⁴ in (2x−3)⁶",
+          options: ["240", "720", "1080", "960"],
+          answer: "240"
+        },
+        {
+          question: "Coefficient of x³ in (3x + 2)⁵",
+          options: ["1080", "720", "960", "540"],
+          answer: "1080"
+        },
+        {
+          question: "Coefficient of x² in (4x + 1)⁴",
+          options: ["96", "64", "24", "16"],
+          answer: "96"
+        },
+        {
+          question: "Coefficient of x³ in (5x - 1)⁴",
+          options: ["-500", "-375", "375", "500"],
+          answer: "-500"
+        },
+        {
+          question: "Coefficient of x⁵ in (x + 1)⁵",
+          options: ["1", "5", "10", "0"],
+          answer: "1"
+        },
+        {
+          question: "Coefficient of y⁴ in (2x + 3y)⁴",
+          options: ["81", "54", "36", "72"],
+          answer: "81"
+        },
+        {
+          question: "Coefficient of x² in (x - 2)⁴",
+          options: ["-24", "24", "6", "-6"],
+          answer: "24"
+        },
+        {
+          question: "Coefficient of x³y² in (x + y)⁵",
+          options: ["10", "15", "20", "30"],
+          answer: "10"
+        },
+        {
+          question: "Coefficient of x₁ in (x + 3)⁴",
+          options: ["108", "81", "48", "12"],
+          answer: "108"
+        },
+        {
+          question: "Coefficient of x³ in (2x + 3)⁵",
+          options: ["540", "270", "360", "720"],
+          answer: "540"
+        }
+      ]
+    },
+    {
+      title: "Puzzle Expansion",
+      questions: [
+        {
+          question: "Which term comes 4th in (x + 2)⁵?",
+          options: ["24x²", "80x²", "40x²", "60x²"],
+          answer: "80x²"
+        },
+        {
+          question: "Which term is 3rd in (2x + 3)⁴?",
+          options: ["108x²", "108x", "54x²", "54x"],
+          answer: "108x²"
+        },
+        {
+          question: "Which term is 2nd in (x + 4)³?",
+          options: ["12x²", "12x", "9x²", "9x"],
+          answer: "12x²"
+        },
+        {
+          question: "Find the 5th term in expansion of (x + y)⁶",
+          options: ["15x²y⁴", "6x³y³", "20x²y⁴", "15x³y³"],
+          answer: "15x²y⁴"
+        },
+        {
+          question: "Which term is 3rd in (x - 2)⁵?",
+          options: ["-80x³", "80x³", "-40x³", "40x³"],
+          answer: "-80x³"
+        },
+        {
+          question: "Find the 2nd term in (3x + 5)⁴",
+          options: ["180x³", "270x³", "540x³", "215x³"],
+          answer: "270x³"
+        },
+        {
+          question: "4th term in expansion of (x + 2y)⁵ is",
+          options: ["80x²y³", "80x³y²", "160x²y³", "160x³y²"],
+          answer: "80x²y³"
+        },
+        {
+          question: "Which term is 4th in (2x - 3)⁵?",
+          options: ["240x²", "-240x²", "180x³", "-180x³"],
+          answer: "-240x²"
+        },
+        {
+          question: "Find the middle term in (x + 5)⁶",
+          options: ["1250x³", "250x³", "500x³", "150x³"],
+          answer: "1250x³"
+        },
+        {
+          question: "Which term is 5th in (x + 1)⁵?",
+          options: ["5x⁴", "10x⁴", "3x⁴", "15x⁴"],
+          answer: "5x⁴"
+        }
+      ]
+    },
+    {
+      title: "Real-Life Binomial",
+      questions: [
+        {
+          question: "A committee of 3 chosen from 5 men and 4 women. Ways to choose exactly 2 men?",
+          options: ["10", "15", "20", "25"],
+          answer: "10"
+        },
+        {
+          question: "If 7 coins are tossed, number of ways to get exactly 5 heads?",
+          options: ["15", "21", "35", "20"],
+          answer: "21"
+        },
+        {
+          question: "How many ways to select 2 girls from 6 girls?",
+          options: ["15", "20", "10", "30"],
+          answer: "15"
+        },
+        {
+          question: "If 8 balls are colored red and blue, ways to get 3 red balls?",
+          options: ["28", "38", "56", "48"],
+          answer: "56"
+        },
+        {
+          question: "Number of ways to choose 4 teammates from 9?",
+          options: ["126", "256", "84", "380"],
+          answer: "126"
+        },
+        {
+          question: "From 10 students, selecting 0 students possible ways?",
+          options: ["0", "1", "10", "20"],
+          answer: "1"
+        },
+        {
+          question: "Ways to choose 3 men from 7 and 2 women from 5?",
+          options: ["350", "375", "385", "400"],
+          answer: "350"
+        },
+        {
+          question: "Ways of choosing 2 from 5 and 3 from 4 people?",
+          options: ["50", "30", "40", "45"],
+          answer: "50"
+        },
+        {
+          question: "Ways to choose all men or all women from team?",
+          options: ["20", "22", "18", "25"],
+          answer: "20"
+        },
+        {
+          question: "Number of ways to choose 2 women from 6 if committee size 3?",
+          options: ["30", "15", "20", "18"],
+          answer: "15"
+        }
+      ]
+    }
+  ];
+
+  let currentCardIndex = null;
+  let currentQuestionIndex = 0;
+  let score = 0;
+  const cardMenu = document.getElementById('cardMenu');
+  const quizContainer = document.getElementById('quizContainer');
+  const questionCountEl = document.getElementById('questionCount');
+  const questionTextEl = document.getElementById('questionText');
+  const optionsContainer = document.getElementById('optionsContainer');
+  const scoreDisplay = document.getElementById('scoreDisplay');
+  const finalResult = document.getElementById('finalResult');
+  const finalScore = document.getElementById('finalScore');
+  const finalMessage = document.getElementById('finalMessage');
+
+  function startCard(cardIndex) {
+    currentCardIndex = cardIndex;
+    currentQuestionIndex = 0;
+    score = 0;
+    cardMenu.style.display = 'none';
+    quizContainer.style.display = 'block';
+    finalResult.style.display = 'none';
+    displayQuestion();
+  }
+
+  function displayQuestion() {
+    finalResult.style.display = 'none';
+    const currentCard = cards[currentCardIndex];
+    const qObj = currentCard.questions[currentQuestionIndex];
+    questionCountEl.textContent = `Card: ${currentCard.title} | Question ${currentQuestionIndex + 1} of ${currentCard.questions.length}`;
+    questionTextEl.textContent = qObj.question;
+    optionsContainer.innerHTML = '';
+    scoreDisplay.textContent = `Score: ${score}`;
+
+    qObj.options.forEach(option => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = option;
+      btn.onclick = () => handleAnswer(btn, option, qObj.answer);
+      optionsContainer.appendChild(btn);
+    });
+  }
+
+  function handleAnswer(button, selected, correct) {
+    if(button.classList.contains('correct') || button.classList.contains('wrong')) return;
+
+    if(selected === correct) {
+      score++;
+      button.classList.add('correct');
+      animateSparkles(button);
+      setTimeout(() => {
+        nextQuestion();
+      }, 1100);
+    } else {
+      button.classList.add('wrong');
+      shakeBtn(button);
+      showHint(button, correct);
+    }
+  }
+
+  function nextQuestion() {
+    currentQuestionIndex++;
+    if(currentQuestionIndex >= cards[currentCardIndex].questions.length) {
+      showFinalResult();
+    } else {
+      displayQuestion();
+    }
+  }
+
+  function showFinalResult() {
+    questionCountEl.textContent = '';
+    questionTextEl.textContent = '';
+    optionsContainer.innerHTML = '';
+    scoreDisplay.textContent = '';
+
+    finalScore.textContent = `Score: ${score} / ${cards[currentCardIndex].questions.length}`;
+    if(score >= cards[currentCardIndex].questions.length * 0.8) {
+      finalMessage.textContent = "Fantastic! You mastered this card! 🌟";
+    } else if (score >= cards[currentCardIndex].questions.length * 0.5) {
+      finalMessage.textContent = "Good work! Keep sharpening your skills! 💡";
+    } else {
+      finalMessage.textContent = "Keep practicing and you'll get better! 🚀";
+    }
+    finalResult.style.display = 'block';
+  }
+
+  function restart() {
+    score = 0;
+    currentQuestionIndex = 0;
+    finalResult.style.display = 'none';
+    displayQuestion();
+  }
+
+  function goBack() {
+    quizContainer.style.display = 'none';
+    cardMenu.style.display = 'flex';
+  }
+
+  function animateSparkles(button) {
+    const sparkle = document.createElement('div');
+    sparkle.className = 'sparkle';
+    sparkle.style.width = sparkle.style.height = '22px';
+    sparkle.style.left = button.offsetWidth/2 - 11 + 'px';
+    sparkle.style.top = button.offsetHeight/2 - 11 + 'px';
+    button.style.position = 'relative';
+    button.appendChild(sparkle);
+    setTimeout(() => sparkle.remove(), 900);
+  }
+  function shakeBtn(button) {
+    button.classList.add('wrong');
+    setTimeout(() => button.classList.remove('wrong'), 510);
+  }
+  function showHint(button, correct){
+    // Optional: Could add a small hint UI or highlight correct answers briefly
+  }
+</script>
+
+</body>
+</html>

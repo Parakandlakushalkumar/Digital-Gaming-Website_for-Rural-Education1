@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geometry Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            min-height: 100vh;
+        }
+        
+        .game-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+        
+        .shape-card {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            cursor: move;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .shape-card:hover {
+            transform: scale(1.1);
+        }
+        
+        .name-card {
+            min-height: 100px;
+            border: 3px dashed #cbd5e0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        .name-card.drag-over {
+            border-color: #6366f1;
+            background-color: rgba(99, 102, 241, 0.1);
+        }
+        
+        .puzzle-piece {
+            position: absolute;
+            cursor: move;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #6366f1;
+            border-radius: 8px;
+        }
+        
+        .puzzle-piece:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+        
+        .puzzle-piece.correct {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.2);
+        }
+        
+        .character {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            transition: all 0.5s ease;
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .track {
+            height: 80px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .track::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: white;
+            transform: translateY(-50%);
+        }
+        
+        .polygon {
+            transition: all 0.5s ease;
+        }
+        
+        .polygon.lit-up {
+            filter: drop-shadow(0 0 20px #fbbf24);
+            animation: glow 1s ease-in-out;
+        }
+        
+        @keyframes glow {
+            0%, 100% { filter: drop-shadow(0 0 20px #fbbf24); }
+            50% { filter: drop-shadow(0 0 30px #f59e0b); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .draggable {
+            cursor: move;
+        }
+        
+        .dragging {
+            opacity: 0.5;
+        }
+        
+        .angle-input {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #6366f1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .angle-input:hover {
+            transform: scale(1.1);
+            background: rgba(99, 102, 241, 0.1);
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-5xl font-bold text-white text-center mb-8">Geometry Explorer</h1>
+        
+        <!-- Game Selection Menu -->
+        <div id="gameMenu" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div class="game-card p-6 text-center cursor-pointer" onclick="startGame('shapeMatch')">
+                <div class="text-6xl mb-4">🔷</div>
+                <h2 class="text-2xl font-bold mb-2">Shape Match Game</h2>
+                <p class="text-gray-600">Match shapes with their names!</p>
+            </div>
+            
+            <div class="game-card p-6 text-center cursor-pointer" onclick="startGame('polygonPuzzle')">
+                <div class="text-6xl mb-4">🧩</div>
+                <h2 class="text-2xl font-bold mb-2">Polygon Puzzle</h2>
+                <p class="text-gray-600">Assemble polygon pieces!</p>
+            </div>
+            
+            <div class="game-card p-6 text-center cursor-pointer" onclick="startGame('quadRace')">
+                <div class="text-6xl mb-4">🏁</div>
+                <h2 class="text-2xl font-bold mb-2">Quadrilateral Quiz Race</h2>
+                <p class="text-gray-600">Race through quadrilateral questions!</p>
+            </div>
+            
+            <div class="game-card p-6 text-center cursor-pointer" onclick="startGame('angleExplorer')">
+                <div class="text-6xl mb-4">🔺</div>
+                <h2 class="text-2xl font-bold mb-2">Angle Explorer</h2>
+                <p class="text-gray-600">Calculate missing angles!</p>
+            </div>
+        </div>
+        
+        <!-- Game Container -->
+        <div id="gameContainer" class="hidden">
+            <div class="game-card p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <button class="btn-primary" onclick="backToMenu()">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Menu
+                    </button>
+                    <div class="flex items-center gap-4">
+                        <span class="text-lg font-semibold">Level: <span id="currentLevel">1</span>/5</span>
+                        <span class="text-lg font-semibold">Score: <span id="score">0</span></span>
+                    </div>
+                </div>
+                
+                <div id="gameContent" class="min-h-[500px]">
+                    <!-- Game content will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentGame = null;
+        let currentLevel = 1;
+        let score = 0;
+        let gameData = {};
+        
+        // Game data for each game
+        const games = {
+            shapeMatch: {
+                name: "Shape Match Game",
+                levels: [
+                    {
+                        shapes: [
+                            {name: "Square", icon: "⬜"},
+                            {name: "Rectangle", icon: "▭"},
+                            {name: "Pentagon", icon: "⬟"},
+                            {name: "Hexagon", icon: "⬡"}
+                        ]
+                    },
+                    {
+                        shapes: [
+                            {name: "Triangle", icon: "▲"},
+                            {name: "Circle", icon: "⭕"},
+                            {name: "Octagon", icon: "⯃"},
+                            {name: "Rhombus", icon: "◆"}
+                        ]
+                    },
+                    {
+                        shapes: [
+                            {name: "Trapezoid", icon: "⏢"},
+                            {name: "Parallelogram", icon: "▱"},
+                            {name: "Heptagon", icon: "⯄"},
+                            {name: "Nonagon", icon: "⯅"}
+                        ]
+                    },
+                    {
+                        shapes: [
+                            {name: "Decagon", icon: "⯆"},
+                            {name: "Kite", icon: "🪁"},
+                            {name: "Crescent", icon: "🌙"},
+                            {name: "Star", icon: "⭐"}
+                        ]
+                    },
+                    {
+                        shapes: [
+                            {name: "Heart", icon: "❤️"},
+                            {name: "Diamond", icon: "💎"},
+                            {name: "Arrow", icon: "➡️"},
+                            {name: "Cross", icon: "✝️"}
+                        ]
+                    }
+                ]
+            },
+            polygonPuzzle: {
+                name: "Polygon Puzzle",
+                levels: [
+                    {
+                        target: "Square",
+                        pieces: [
+                            {id: 1, x: 50, y: 50, width: 100, height: 100, rotation: 0},
+                            {id: 2, x: 200, y: 50, width: 100, height: 100, rotation: 45}
+                        ]
+                    },
+                    {
+                        target: "Triangle",
+                        pieces: [
+                            {id: 1, x: 50, y: 50, width: 120, height: 120, rotation: 0},
+                            {id: 2, x: 200, y: 50, width: 120, height: 120, rotation: 120},
+                            {id: 3, x: 350, y: 50, width: 120, height: 120, rotation: 240}
+                        ]
+                    },
+                    {
+                        target: "Pentagon",
+                        pieces: [
+                            {id: 1, x: 50, y: 50, width: 100, height: 100, rotation: 0},
+                            {id: 2, x: 200, y: 50, width: 100, height: 100, rotation: 72},
+                            {id: 3, x: 350, y: 50, width: 100, height: 100, rotation: 144},
+                            {id: 4, x: 50, y: 200, width: 100, height: 100, rotation: 216}
+                        ]
+                    },
+                    {
+                        target: "Hexagon",
+                        pieces: [
+                            {id: 1, x: 50, y: 50, width: 80, height: 80, rotation: 0},
+                            {id: 2, x: 200, y: 50, width: 80, height: 80, rotation: 60},
+                            {id: 3, x: 350, y: 50, width: 80, height: 80, rotation: 120},
+                            {id: 4, x: 50, y: 200, width: 80, height: 80, rotation: 180},
+                            {id: 5, x: 200, y: 200, width: 80, height: 80, rotation: 240}
+                        ]
+                    },
+                    {
+                        target: "Star",
+                        pieces: [
+                            {id: 1, x: 50, y: 50, width: 100, height: 100, rotation: 0},
+                            {id: 2, x: 200, y: 50, width: 100, height: 100, rotation: 72},
+                            {id: 3, x: 350, y: 50, width: 100, height: 100, rotation: 144},
+                            {id: 4, x: 50, y: 200, width: 100, height: 100, rotation: 216},
+                            {id: 5, x: 200, y: 200, width: 100, height: 100, rotation: 288}
+                        ]
+                    }
+                ]
+            },
+            quadRace: {
+                name: "Quadrilateral Quiz Race",
+                levels: [
+                    {
+                        question: "Which quadrilateral has all sides equal and all angles 90°?",
+                        options: ["Square", "Rectangle", "Rhombus", "Trapezoid"],
+                        correct: "Square"
+                    },
+                    {
+                        question: "Which quadrilateral has opposite sides parallel and equal?",
+                        options: ["Parallelogram", "Kite", "Trapezoid", "Rhombus"],
+                        correct: "Parallelogram"
+                    },
+                    {
+                        question: "Which quadrilateral has exactly one pair of parallel sides?",
+                        options: ["Trapezoid", "Square", "Rectangle", "Kite"],
+                        correct: "Trapezoid"
+                    },
+                    {
+                        question: "Which quadrilateral has all sides equal but angles not necessarily 90°?",
+                        options: ["Rhombus", "Square", "Rectangle", "Parallelogram"],
+                        correct: "Rhombus"
+                    },
+                    {
+                        question: "Which quadrilateral has diagonals that bisect each other at 90°?",
+                        options: ["Rhombus", "Square", "Rectangle", "Kite"],
+                        correct: "Rhombus"
+                    }
+                ]
+            },
+            angleExplorer: {
+                name: "Angle Explorer",
+                levels: [
+                    {
+                        shape: "Triangle",
+                        angles: [60, 60, null],
+                        sides: 3,
+                        hint: "Sum of angles in a triangle is 180°"
+                    },
+                    {
+                        shape: "Quadrilateral",
+                        angles: [90, 90, 90, null],
+                        sides: 4,
+                        hint: "Sum of angles in a quadrilateral is 360°"
+                    },
+                    {
+                        shape: "Pentagon",
+                        angles: [108, 108, 108, 108, null],
+                        sides: 5,
+                        hint: "Sum of angles in a pentagon is 540°"
+                    },
+                    {
+                        shape: "Hexagon",
+                        angles: [120, 120, 120, 120, 120, null],
+                        sides: 6,
+                        hint: "Sum of angles in a hexagon is 720°"
+                    },
+                    {
+                        shape: "Heptagon",
+                        angles: [128.57, 128.57, 128.57, 128.57, 128.57, 128.57, null],
+                        sides: 7,
+                        hint: "Sum of angles in a heptagon is 900°"
+                    }
+                ]
+            }
+        };
+        
+        function startGame(gameName) {
+            currentGame = gameName;
+            currentLevel = 1;
+            score = 0;
+            gameData = {...games[gameName]};
+            
+            document.getElementById('gameMenu').classList.add('hidden');
+            document.getElementById('gameContainer').classList.remove('hidden');
+            
+            updateScore();
+            loadLevel();
+        }
+        
+        function backToMenu() {
+            document.getElementById('gameMenu').classList.remove('hidden');
+            document.getElementById('gameContainer').classList.add('hidden');
+            currentGame = null;
+        }
+        
+        function updateScore() {
+            document.getElementById('currentLevel').textContent = currentLevel;
+            document.getElementById('score').textContent = score;
+        }
+        
+        function loadLevel() {
+            const gameContent = document.getElementById('gameContent');
+            gameContent.innerHTML = '';
+            gameContent.classList.add('fade-in');
+            
+            switch(currentGame) {
+                case 'shapeMatch':
+                    loadShapeMatchLevel();
+                    break;
+                case 'polygonPuzzle':
+                    loadPolygonPuzzleLevel();
+                    break;
+                case 'quadRace':
+                    loadQuadRaceLevel();
+                    break;
+                case 'angleExplorer':
+                    loadAngleExplorerLevel();
+                    break;
+            }
+        }
+        
+        function loadShapeMatchLevel() {
+            const level = gameData.levels[currentLevel - 1];
+            const gameContent = document.getElementById('gameContent');
+            
+            gameContent.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 text-center">Shapes</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            ${level.shapes.map(shape => `
+                                <div class="shape-card draggable" 
+                                     draggable="true" 
+                                     data-shape="${shape.name}"
+                                     id="shape-${shape.name}">
+                                    ${shape.icon}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 text-center">Names</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            ${level.shapes.map(shape => `
+                                <div class="name-card" 
+                                     data-name="${shape.name}"
+                                     id="name-${shape.name}">
+                                    ${shape.name}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="matchResult" class="mt-6 text-center font-semibold"></div>
+            `;
+            
+            setupShapeMatch();
+        }
+        
+        function setupShapeMatch() {
+            const shapes = document.querySelectorAll('.shape-card');
+            const names = document.querySelectorAll('.name-card');
+            let correctMatches = 0;
+            const totalShapes = shapes.length;
+            
+            shapes.forEach(shape => {
+                shape.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.effectAllowed = 'move';
+                    shape.classList.add('dragging');
+                    e.dataTransfer.setData('shapeName', shape.dataset.shape);
+                });
+                
+                shape.addEventListener('dragend', () => {
+                    shape.classList.remove('dragging');
+                });
+            });
+            
+            names.forEach(name => {
+                name.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    name.classList.add('drag-over');
+                });
+                
+                name.addEventListener('dragleave', () => {
+                    name.classList.remove('drag-over');
+                });
+                
+                name.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    name.classList.remove('drag-over');
+                    
+                    const shapeName = e.dataTransfer.getData('shapeName');
+                    const nameName = name.dataset.name;
+                    const result = document.getElementById('matchResult');
+                    
+                    if (shapeName === nameName) {
+                        const shape = document.getElementById(`shape-${shapeName}`);
+                        name.appendChild(shape);
+                        shape.classList.remove('draggable');
+                        shape.draggable = false;
+                        
+                        correctMatches++;
+                        score += 5;
+                        updateScore();
+                        
+                        result.textContent = 'Correct match!';
+                        result.className = 'mt-6 text-center font-semibold text-green-600';
+                        
+                        if (correctMatches === totalShapes) {
+                            setTimeout(() => {
+                                if (currentLevel < 5) {
+                                    currentLevel++;
+                                    loadLevel();
+                                } else {
+                                    showGameComplete();
+                                }
+                            }, 1500);
+                        }
+                    } else {
+                        result.textContent = 'Try again! This shape doesn\'t match.';
+                        result.className = 'mt-6 text-center font-semibold text-red-600';
+                    }
+                });
+            });
+        }
+        
+        function loadPolygonPuzzleLevel() {
+            const level = gameData.levels[currentLevel - 1];
+            const gameContent = document.getElementById('gameContent');
+            
+            gameContent.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 text-center">Puzzle Pieces</h3>
+                        <div class="relative bg-gray-100 rounded-lg p-4 h-96">
+                            ${level.pieces.map(piece => `
+                                <div class="puzzle-piece" 
+                                     id="piece-${piece.id}"
+                                     style="left: ${piece.x}px; top: ${piece.y}px; width: ${piece.width}px; height: ${piece.height}px; transform: rotate(${piece.rotation}deg);">
+                                    <svg width="100%" height="100%" viewBox="0 0 100 100">
+                                        <polygon points="50,10 90,90 10,90" fill="rgba(99, 102, 241, 0.3)" stroke="#6366f1" stroke-width="2"/>
+                                    </svg>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 text-center">Target: ${level.target}</h3>
+                        <div class="bg-gray-100 rounded-lg p-4 h-96 flex items-center justify-center">
+                            <div class="relative">
+                                <svg width="200" height="200" viewBox="0 0 200 200">
+                                    ${level.target === 'Square' ? 
+                                        '<rect x="50" y="50" width="100" height="100" fill="rgba(99, 102, 241, 0.2)" stroke="#6366f1" stroke-width="3"/>' :
+                                      level.target === 'Triangle' ?
+                                        '<polygon points="100,30 170,150 30,150" fill="rgba(99, 102, 241, 0.2)" stroke="#6366f1" stroke-width="3"/>' :
+                                      level.target === 'Pentagon' ?
+                                        '<polygon points="100,30 160,70 140,130 60,130 40,70" fill="rgba(99, 102, 241, 0.2)" stroke="#6366f1" stroke-width="3"/>' :
+                                      level.target === 'Hexagon' ?
+                                        '<polygon points="100,30 150,60 150,110 100,140 50,110 50,60" fill="rgba(99, 102, 241, 0.2)" stroke="#6366f1" stroke-width="3"/>' :
+                                        '<polygon points="100,30 120,80 170,80 130,110 150,160 100,130 50,160 70,110 30,80 80,80" fill="rgba(99, 102, 241, 0.2)" stroke="#6366f1" stroke-width="3"/>'
+                                    }
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-center">
+                            <button class="btn-primary" onclick="checkPuzzle()">Check Puzzle</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="puzzleResult" class="mt-4 text-center font-semibold"></div>
+            `;
+            
+            setupPolygonPuzzle();
+        }
+        
+        function setupPolygonPuzzle() {
+            const pieces = document.querySelectorAll('.puzzle-piece');
+            const gameArea = document.querySelector('.bg-gray-100');
+            
+            pieces.forEach(piece => {
+                let isDragging = false;
+                let startX, startY, initialX, initialY;
+                
+                piece.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    initialX = piece.offsetLeft;
+                    initialY = piece.offsetTop;
+                    piece.style.zIndex = 1000;
+                });
+                
+                document.addEventListener('mousemove', (e) => {
+                    if (!isDragging) return;
+                    
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+                    
+                    piece.style.left = (initialX + dx) + 'px';
+                    piece.style.top = (initialY + dy) + 'px';
+                });
+                
+                document.addEventListener('mouseup', () => {
+                    isDragging = false;
+                    piece.style.zIndex = '';
+                });
+                
+                // Double click to rotate
+                piece.addEventListener('dblclick', () => {
+                    const currentRotation = parseInt(piece.style.transform.replace('rotate(', '').replace('deg)', '')) || 0;
+                    piece.style.transform = `rotate(${(currentRotation + 45) % 360}deg)`;
+                });
+            });
+        }
+        
+        function checkPuzzle() {
+            const pieces = document.querySelectorAll('.puzzle-piece');
+            const result = document.getElementById('puzzleResult');
+            
+            // Simplified check - in a real implementation, you'd check positions and rotations
+            let allCorrect = true;
+            pieces.forEach(piece => {
+                // This is a simplified check - you'd need more complex logic for actual puzzle validation
+                piece.classList.add('correct');
+            });
+            
+            if (allCorrect) {
+                score += 15;
+                updateScore();
+                
+                result.textContent = 'Puzzle completed! Great job!';
+                result.className = 'mt-4 text-center font-semibold text-green-600';
+                
+                setTimeout(() => {
+                    if (currentLevel < 5) {
+                        currentLevel++;
+                        loadLevel();
+                    } else {
+                        showGameComplete();
+                    }
+                }, 1500);
+            } else {
+                result.textContent = 'Keep trying! Double-click pieces to rotate them.';
+                result.className = 'mt-4 text-center font-semibold text-red-600';
+            }
+        }
+        
+        function loadQuadRaceLevel() {
+            const level = gameData.levels[currentLevel - 1];
+            const gameContent = document.getElementById('gameContent');
+            
+            gameContent.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4">Question ${currentLevel}</h3>
+                        <p class="text-lg mb-6">${level.question}</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            ${level.options.map(option => `
+                                <button class="btn-primary" onclick="checkQuadAnswer('${option}')">${option}</button>
+                            `).join('')}
+                        </div>
+                        <div class="mt-6 bg-gray-50 rounded-lg p-4">
+                            <h4 class="font-bold mb-2">Quadrilateral Properties:</h4>
+                            <ul class="text-sm space-y-1">
+                                <li>• Square: All sides equal, all angles 90°</li>
+                                <li>• Rectangle: Opposite sides equal, all angles 90°</li>
+                                <li>• Rhombus: All sides equal, opposite angles equal</li>
+                                <li>• Parallelogram: Opposite sides parallel and equal</li>
+                                <li>• Trapezoid: One pair of parallel sides</li>
+                                <li>• Kite: Two pairs of adjacent equal sides</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <div class="bg-green-100 rounded-lg p-4 h-64 relative overflow-hidden">
+                            <div class="character" id="raceCharacter">🏃</div>
+                            <div class="absolute right-4 top-1/2 transform -translate-y-1/2 text-4xl">🏁</div>
+                            <div class="track absolute bottom-4 left-4 right-4"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function checkQuadAnswer(answer) {
+            const level = gameData.levels[currentLevel - 1];
+            const character = document.getElementById('raceCharacter');
+            
+            if (answer === level.correct) {
+                score += 10;
+                updateScore();
+                
+                // Move character forward
+                const currentLeft = parseInt(character.style.left) || 20;
+                character.style.left = Math.min(currentLeft + 80, 320) + 'px';
+                
+                setTimeout(() => {
+                    if (currentLevel < 5) {
+                        currentLevel++;
+                        loadLevel();
+                    } else {
+                        showGameComplete();
+                    }
+                }, 1000);
+            } else {
+                // Wrong answer - shake animation
+                character.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    character.style.animation = '';
+                }, 500);
+            }
+        }
+        
+        function loadAngleExplorerLevel() {
+            const level = gameData.levels[currentLevel - 1];
+            const gameContent = document.getElementById('gameContent');
+            
+            gameContent.innerHTML = `
+                <div class="max-w-2xl mx-auto">
+                    <h3 class="text-2xl font-bold mb-4 text-center">Find the Missing Angle</h3>
+                    <p class="text-center mb-6">${level.shape} - ${level.hint}</p>
+                    
+                    <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                        <div class="flex justify-center">
+                            <svg width="300" height="300" viewBox="0 0 300 300">
+                                ${level.shape === 'Triangle' ? 
+                                    `<polygon points="150,50 250,250 50,250" class="polygon" id="mainShape"/>
+                                     <text x="150" y="40" text-anchor="middle" class="font-semibold">${level.angles[0]}°</text>
+                                     <text x="260" y="250" text-anchor="start" class="font-semibold">${level.angles[1]}°</text>
+                                     <circle cx="150" cy="250" r="20" class="angle-input" onclick="inputAngle(${2})" id="angle-2"/>
+                                     <text x="150" y="255" text-anchor="middle" class="text-sm font-bold">?</text>` :
+                                  level.shape === 'Quadrilateral' ?
+                                    `<polygon points="100,50 200,50 200,150 100,150" class="polygon" id="mainShape"/>
+                                     <text x="100" y="40" text-anchor="middle" class="font-semibold">${level.angles[0]}°</text>
+                                     <text x="210" y="100" text-anchor="start" class="font-semibold">${level.angles[1]}°</text>
+                                     <text x="150" y="165" text-anchor="middle" class="font-semibold">${level.angles[2]}°</text>
+                                     <circle cx="100" cy="100" r="20" class="angle-input" onclick="inputAngle(${3})" id="angle-3"/>
+                                     <text x="100" y="105" text-anchor="middle" class="text-sm font-bold">?</text>` :
+                                  level.shape === 'Pentagon' ?
+                                    `<polygon points="150,50 220,100 190,180 110,180 80,100" class="polygon" id="mainShape"/>
+                                     <text x="150" y="40" text-anchor="middle" class="font-semibold">${level.angles[0]}°</text>
+                                     <text x="230" y="100" text-anchor="start" class="font-semibold">${level.angles[1]}°</text>
+                                     <text x="200" y="190" text-anchor="middle" class="font-semibold">${level.angles[2]}°</text>
+                                     <text x="100" y="190" text-anchor="middle" class="font-semibold">${level.angles[3]}°</text>
+                                     <circle cx="80" cy="100" r="20" class="angle-input" onclick="inputAngle(${4})" id="angle-4"/>
+                                     <text x="80" y="105" text-anchor="middle" class="text-sm font-bold">?</text>` :
+                                  level.shape === 'Hexagon' ?
+                                    `<polygon points="150,50 210,90 210,150 150,190 90,150 90,90" class="polygon" id="mainShape"/>
+                                     <text x="150" y="40" text-anchor="middle" class="font-semibold">${level.angles[0]}°</text>
+                                     <text x="220" y="120" text-anchor="start" class="font-semibold">${level.angles[1]}°</text>
+                                     <text x="210" y="160" text-anchor="middle" class="font-semibold">${level.angles[2]}°</text>
+                                     <text x="150" y="200" text-anchor="middle" class="font-semibold">${level.angles[3]}°</text>
+                                     <text x="90" y="160" text-anchor="middle" class="font-semibold">${level.angles[4]}°</text>
+                                     <circle cx="90" cy="120" r="20" class="angle-input" onclick="inputAngle(${5})" id="angle-5"/>
+                                     <text x="90" y="125" text-anchor="middle" class="text-sm font-bold">?</text>` :
+                                    `<polygon points="150,50 190,70 210,110 190,150 150,170 110,150 90,110 110,70" class="polygon" id="mainShape"/>
+                                     <text x="150" y="40" text-anchor="middle" class="font-semibold">${level.angles[0]}°</text>
+                                     <text x="200" y="60" text-anchor="start" class="font-semibold">${level.angles[1]}°</text>
+                                     <text x="220" y="110" text-anchor="start" class="font-semibold">${level.angles[2]}°</text>
+                                     <text x="200" y="160" text-anchor="middle" class="font-semibold">${level.angles[3]}°</text>
+                                     <text x="150" y="180" text-anchor="middle" class="font-semibold">${level.angles[4]}°</text>
+                                     <text x="100" y="160" text-anchor="middle" class="font-semibold">${level.angles[5]}°</text>
+                                     <circle cx="100" cy="110" r="20" class="angle-input" onclick="inputAngle(${6})" id="angle-6"/>
+                                     <text x="100" y="115" text-anchor="middle" class="text-sm font-bold">?</text>`
+                                }
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <input type="number" id="angleInput" class="border-2 border-purple-500 rounded-lg px-4 py-2 mr-2" placeholder="Angle">
+                        <button class="btn-primary" onclick="checkAngle()">Submit</button>
+                    </div>
+                    
+                    <div id="angleResult" class="mt-4 text-center font-semibold"></div>
+                </div>
+            `;
+            
+            gameData.selectedAngle = null;
+        }
+        
+        function inputAngle(index) {
+            gameData.selectedAngle = index;
+            document.getElementById('angleInput').focus();
+        }
+        
+        function checkAngle() {
+            const level = gameData.levels[currentLevel - 1];
+            const input = document.getElementById('angleInput');
+            const result = document.getElementById('angleResult');
+            const shape = document.getElementById('mainShape');
+            
+            if (gameData.selectedAngle === null) {
+                result.textContent = 'Please click on the missing angle first!';
+                result.className = 'mt-4 text-center font-semibold text-red-600';
+                return;
+            }
+            
+            const userAngle = parseFloat(input.value);
+            const correctAngle = level.angles[gameData.selectedAngle];
+            
+            if (Math.abs(userAngle - correctAngle) < 1) {
+                score += 15;
+                updateScore();
+                
+                shape.classList.add('lit-up');
+                result.textContent = 'Correct! Well done!';
+                result.className = 'mt-4 text-center font-semibold text-green-600';
+                
+                setTimeout(() => {
+                    if (currentLevel < 5) {
+                        currentLevel++;
+                        loadLevel();
+                    } else {
+                        showGameComplete();
+                    }
+                }, 1500);
+            } else {
+                result.textContent = `Not quite. Remember: ${level.hint}`;
+                result.className = 'mt-4 text-center font-semibold text-red-600';
+            }
+        }
+        
+        function showGameComplete() {
+            const gameContent = document.getElementById('gameContent');
+            gameContent.innerHTML = `
+                <div class="text-center py-12">
+                    <div class="text-8xl mb-6">🎉</div>
+                    <h2 class="text-4xl font-bold mb-4">Congratulations!</h2>
+                    <p class="text-2xl mb-6">You completed all levels of ${gameData.name}!</p>
+                    <p class="text-xl mb-8">Final Score: ${score}</p>
+                    <button class="btn-primary text-xl px-8 py-4" onclick="backToMenu()">Back to Menu</button>
+                </div>
+            `;
+        }
+        
+        // Add shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

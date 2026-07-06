@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Translation</title>
+<!-- ORIGINAL GAME CONTENT STARTS HERE -->
+<h1>Cell Structure Puzzle</h1><div class="score-timer">
+      <div>Score: <span id="score">0</span></div>
+      <div>Time left: <span id="timeLeft">50</span>s</div><div id="puzzleArea">
+      <!-- Puzzle content goes here --><div class="footer">
+      <button id="submitBtn">Submit Answer</button>
+      <button id="nextBtn" style="display:none;">Next Puzzle</button><div class="message" id="messageArea"></div><script>
+    // Data for puzzles
+    const puzzles = [
+      {
+        type: "process-sequence",
+        title: "Arrange the stages of mitosis in correct order:",
+        stages: ["Telophase", "Prophase", "Metaphase", "Anaphase"],
+        correctOrder: ["Prophase", "Metaphase", "Anaphase", "Telophase"],
+        explanation: "Mitosis follows PMAT: Prophase, Metaphase, Anaphase, Telophase.",
+      },
+      {
+        type: "function-match",
+        title: "Connect each organelle with its primary function:",
+        pairs: [
+          { left: "Nucleus", right: "Controls cell activities" },
+          { left: "Mitochondria", right: "Produces energy (ATP)" },
+          { left: "Ribosomes", right: "Protein synthesis" },
+        ],
+        explanation: "Each organelle has specific functions that work together to maintain cellular life and activities.",
+      },
+      {
+        type: "tissue-classification",
+        title: "Sort these plant tissues into categories:",
+        tissues: ["Xylem", "Phloem", "Epidermis", "Meristem"],
+        categories: {
+          "Transport Tissues": ["Xylem", "Phloem"],
+          "Protective / Growth Tissues": ["Epidermis", "Meristem"]
+        },
+        explanation: "Transport tissues conduct water/nutrients, protective/growth tissues protect and help grow.",
+      }
+    ];
+
+    let current = 0;
+    let score = 0;
+    let timeLeft = 50;
+    let timerInterval = null;
+    let userAnswer = {
+      sequence: [],
+      matches: [],
+      classifications: {}
+    };
+
+    const scoreEl = document.getElementById('score');
+    const timeLeftEl = document.getElementById('timeLeft');
+    const puzzleArea = document.getElementById('puzzleArea');
+    const submitBtn = document.getElementById('submitBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const messageArea = document.getElementById('messageArea');
+
+    function startTimer() {
+      timeLeft = 50;
+      timeLeftEl.textContent = timeLeft;
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timeLeftEl.textContent = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          checkAnswer();
+        }
+      }, 1000);
+    }
+
+    function loadPuzzle() {
+      messageArea.textContent = '';
+      userAnswer = { sequence: [], matches: [], classifications: {} };
+      submitBtn.style.display = 'inline-block';
+      nextBtn.style.display = 'none';
+      puzzleArea.innerHTML = '';
+      const p = puzzles[current];
+      const title = document.createElement('div');
+      title.className = 'puzzle-title';
+      title.textContent = p.title;
+      puzzleArea.appendChild(title);
+
+      if (p.type === "process-sequence") {
+        const seqDiv = document.createElement('div');
+        seqDiv.className = 'sequence-box';
+
+        // Display buttons for each stage
+        p.stages.forEach(stage => {
+          const btn = document.createElement('button');
+          btn.textContent = stage;
+          btn.addEventListener('click', () => {
+            if (!userAnswer.sequence.includes(stage)) {
+              userAnswer.sequence.push(stage);
+              renderSequenceChosen();
+            }
+          });
+          seqDiv.appendChild(btn);
+        });
+        puzzleArea.appendChild(seqDiv);
+
+        const chosenDiv = document.createElement('div');
+        chosenDiv.className = 'sequence-chosen';
+        puzzleArea.appendChild(chosenDiv);
+
+      } else if (p.type === "function-match") {
+        const matchDiv = document.createElement('div');
+        matchDiv.className = 'match-box';
+
+        const leftDiv = document.createElement('div');
+        const rightDiv = document.createElement('div');
+
+        p.pairs.forEach(pair => {
+          const btnL = document.createElement('button');
+          btnL.textContent = pair.left;
+          btnL.addEventListener('click', () => {
+            userAnswer.matches.push({ left: pair.left });
+            renderMatchChosen();
+          });
+          leftDiv.appendChild(btnL);
+
+          const btnR = document.createElement('button');
+          btnR.textContent = pair.right;
+          btnR.addEventListener('click', () => {
+            // attach to last unmatched left
+            const unmatched = userAnswer.matches.find(m => m.left && !m.right);
+            if (unmatched) {
+              unmatched.right = pair.right;
+            } else {
+              userAnswer.matches.push({ right: pair.right });
+            }
+            renderMatchChosen();
+          });
+          rightDiv.appendChild(btnR);
+        });
+
+        const row = document.createElement('div');
+        row.className = 'match-row';
+        matchDiv.appendChild(leftDiv);
+        matchDiv.appendChild(rightDiv);
+        puzzleArea.appendChild(matchDiv);
+
+        const chosenDiv = document.createElement('div');
+        chosenDiv.className = 'match-chosen';
+        puzzleArea.appendChild(chosenDiv);
+
+      } else if (p.type === "tissue-classification") {
+        // Simple drag-drop
+        const categories = Object.keys(p.categories);
+        const catContainer = document.createElement('div');
+        catContainer.className = 'classify-area';
+        categories.forEach(cat => {
+          const div = document.createElement('div');
+          div.className = 'category-box';
+          div.textContent = cat;
+          div.style = "border: 2px dashed #9ca3af; padding:10px; margin:10px; min-height:50px;";
+          div.addEventListener('dragover', (ev) => {
+            ev.preventDefault();
+          });
+          div.addEventListener('drop', (ev) => {
+            ev.preventDefault();
+            const data = ev.dataTransfer.getData("text/plain");
+            const item = document.getElementById(data);
+            div.appendChild(item);
+            userAnswer.classifications[item.textContent] = cat;
+          });
+          puzzleArea.appendChild(div);
+        });
+
+        const itemsDiv = document.createElement('div');
+        itemsDiv.className = 'items-area';
+        p.tissues.forEach(tissue => {
+          const span = document.createElement('span');
+          span.textContent = tissue;
+          span.id = 'item-'+tissue;
+          span.draggable = true;
+          span.style = "display:inline-block; padding:5px 10px; background:#059669; margin:5px; border-radius:5px; cursor: grab;";
+          span.addEventListener('dragstart', (ev) => {
+            ev.dataTransfer.setData("text/plain", span.id);
+          });
+          itemsDiv.appendChild(span);
+        });
+        puzzleArea.appendChild(itemsDiv);
+      }
+
+      startTimer();
+    }
+
+    function renderSequenceChosen() {
+      const div = puzzleArea.querySelector('.sequence-chosen');
+      div.innerHTML = 'Chosen order: ' + userAnswer.sequence.join(' → ');
+    }
+
+    function renderMatchChosen() {
+      const div = puzzleArea.querySelector('.match-chosen');
+      const pairs = userAnswer.matches.map(m => {
+        if (m.left && m.right) {
+          return m.left + " ↔ " + m.right;
+        }
+        return m.left ? m.left + " ↔ ❓" : "❓ ↔ " + m.right;
+      });
+      div.innerHTML = 'Matches: ' + pairs.join(', ');
+    }
+
+    function checkAnswer() {
+      clearInterval(timerInterval);
+      submitBtn.style.display = 'none';
+      nextBtn.style.display = 'inline-block';
+      const p = puzzles[current];
+      let correct = false;
+      let points = 0;
+
+      if (p.type === "process-sequence") {
+        if (userAnswer.sequence.length === p.correctOrder.length &&
+            userAnswer.sequence.every((v,i) => v === p.correctOrder[i])) {
+          correct = true;
+          points = 10;
+        }
+      } else if (p.type === "function-match") {
+        // count exact matches
+        let count = 0;
+        p.pairs.forEach(pair => {
+          const m = userAnswer.matches.find(mm => mm.left === pair.left && mm.right === pair.right);
+          if (m) count++;
+        });
+        points = count * 4;
+        if (count === p.pairs.length) correct = true;
+      } else if (p.type === "tissue-classification") {
+        let count = 0;
+        for (const tissue of p.tissues) {
+          const assigned = userAnswer.classifications[tissue];
+          if (assigned && p.categories[assigned] && p.categories[assigned].includes(tissue)) {
+            count++;
+          }
+        }
+        points = count * 3;
+        if (count === p.tissues.length) correct = true;
+      }
+
+      // time bonus
+      if (timeLeft > (puzzles.length * 5)) {
+        points += 2; 
+      }
+
+      score += points;
+      scoreEl.textContent = score;
+
+      messageArea.textContent = correct 
+        ? "✅ Correct! " + p.explanation 
+        : "❌ Some or all answers are incorrect. " + p.explanation;
+
+    }
+
+    submitBtn.addEventListener('click', checkAnswer);
+    nextBtn.addEventListener('click', () => {
+      current++;
+      if (current >= puzzles.length) {
+        // game over
+        puzzleArea.innerHTML = "<h2>Game Complete!</h2><p>Your final score: " + score + "</p>";
+        submitBtn.style.display = 'none';
+        nextBtn.style.display = 'none';
+        messageArea.textContent = "";
+      } else {
+        loadPuzzle();
+      }
+    });
+
+    // Initialize first puzzle
+    loadPuzzle();
+
+  </script></html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Translation</title>
+<!-- ORIGINAL GAME CONTENT STARTS HERE -->
+<h1>🧬 Carbon Compounds Lab</h1>
+        <div class="game-info">
+            <span>Score: <span id="score">0</span></span>
+            <span>Challenge: <span id="challenge-num">1</span>/10</span>
+            <span>Streak: <span id="streak">0</span></span><div class="challenge" id="challenge">
+            Build the molecular structure for: Methane (CH₄)<div class="atom-palette">
+            <div class="palette-atom carbon" data-element="C">C</div>
+            <div class="palette-atom hydrogen" data-element="H">H</div>
+            <div class="palette-atom oxygen" data-element="O">O</div>
+            <div class="palette-atom nitrogen" data-element="N">N</div><div class="bond-controls">
+            <button class="bond-type active" data-bond="single">Single Bond</button>
+            <button class="bond-type" data-bond="double">Double Bond</button>
+            <button class="bond-type" data-bond="triple">Triple Bond</button><div class="molecule-canvas" id="canvas">
+            <div style="color: #666; font-size: 1.2rem;">Click atoms from palette, then click canvas to place them</div><div class="functional-groups">
+            <div class="functional-group" onclick="showFunctionalGroup('alkane')">Alkane</div>
+            <div class="functional-group" onclick="showFunctionalGroup('alcohol')">Alcohol</div>
+            <div class="functional-group" onclick="showFunctionalGroup('carboxylic')">Carboxylic Acid</div>
+            <div class="functional-group" onclick="showFunctionalGroup('ester')">Ester</div><div class="controls">
+            <button class="btn btn-check" onclick="checkMolecule()">Check Structure</button>
+            <button class="btn btn-clear" onclick="clearCanvas()">Clear Canvas</button>
+            <button class="btn btn-hint" onclick="showHint()">Show Hint</button>
+            <button class="btn btn-next" onclick="nextChallenge()">Next Challenge</button><div id="result" class="result" style="display: none;"></div>
+        <div id="hint" class="hint" style="display: none;"></div>
+        <div id="molecule-info" class="molecule-info" style="display: none;"></div><script>
+        const challenges = [
+            {
+                name: "Methane",
+                formula: "CH₄",
+                description: "The simplest hydrocarbon - one carbon bonded to four hydrogens",
+                structure: { C: 1, H: 4, bonds: [["C","H"],["C","H"],["C","H"],["C","H"]] },
+                type: "alkane",
+                hint: "Place one carbon atom in the center, then add four hydrogen atoms around it with single bonds."
+            },
+            {
+                name: "Ethanol",
+                formula: "C₂H₆O",
+                description: "Drinking alcohol - contains a hydroxyl (-OH) functional group",
+                structure: { C: 2, H: 6, O: 1, bonds: [["C","C"],["C","H"],["C","H"],["C","H"],["C","O"],["C","H"],["C","H"],["O","H"]] },
+                type: "alcohol",
+                hint: "Two carbons bonded together, one carbon has three hydrogens, the other has two hydrogens and an OH group."
+            },
+            {
+                name: "Carbon Dioxide",
+                formula: "CO₂",
+                description: "A greenhouse gas with double bonds between carbon and oxygen",
+                structure: { C: 1, O: 2, bonds: [["C","O","double"],["C","O","double"]] },
+                type: "oxide",
+                hint: "One carbon in the center with two oxygen atoms, each connected by double bonds."
+            },
+            {
+                name: "Acetylene",
+                formula: "C₂H₂",
+                description: "Used in welding - has a triple bond between carbons",
+                structure: { C: 2, H: 2, bonds: [["C","C","triple"],["C","H"],["C","H"]] },
+                type: "alkyne",
+                hint: "Two carbons connected by a triple bond, each carbon also bonded to one hydrogen."
+            },
+            {
+                name: "Formaldehyde",
+                formula: "CH₂O",
+                description: "Contains a carbonyl group (C=O)",
+                structure: { C: 1, H: 2, O: 1, bonds: [["C","O","double"],["C","H"],["C","H"]] },
+                type: "aldehyde",
+                hint: "One carbon double-bonded to oxygen and single-bonded to two hydrogens."
+            }
+        ];
+        
+        let currentChallenge = 0;
+        let score = 0;
+        let streak = 0;
+        let selectedAtom = null;
+        let selectedBondType = 'single';
+        let placedAtoms = [];
+        let molecularBonds = [];
+        let atomCounter = 0;
+        
+        function initializeGame() {
+            setupChallenge();
+            setupEventListeners();
+        }
+        
+        function setupEventListeners() {
+            // Atom palette selection
+            document.querySelectorAll('.palette-atom').forEach(atom => {
+                atom.addEventListener('click', function() {
+                    document.querySelectorAll('.palette-atom').forEach(a => a.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedAtom = this.dataset.element;
+                });
+            });
+            
+            // Bond type selection
+            document.querySelectorAll('.bond-type').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.bond-type').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    selectedBondType = this.dataset.bond;
+                });
+            });
+            
+            // Canvas click for placing atoms
+            document.getElementById('canvas').addEventListener('click', placeAtom);
+        }
+        
+        function setupChallenge() {
+            const challenge = challenges[currentChallenge];
+            document.getElementById('challenge').innerHTML = 
+                `Build the molecular structure for: <strong>${challenge.name}</strong> (${challenge.formula})`;
+            
+            clearCanvas();
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('hint').style.display = 'none';
+            document.getElementById('molecule-info').style.display = 'none';
+            updateDisplay();
+        }
+        
+        function placeAtom(e) {
+            if (!selectedAtom) return;
+            
+            const canvas = document.getElementById('canvas');
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left - 25; // Offset for atom center
+            const y = e.clientY - rect.top - 25;
+            
+            // Remove placeholder text
+            if (canvas.children.length === 1 && canvas.children[0].tagName === 'DIV') {
+                canvas.innerHTML = '';
+            }
+            
+            const atom = document.createElement('div');
+            atom.className = `atom ${selectedAtom.toLowerCase()}`;
+            atom.textContent = selectedAtom;
+            atom.style.left = x + 'px';
+            atom.style.top = y + 'px';
+            atom.dataset.element = selectedAtom;
+            atom.dataset.id = atomCounter++;
+            
+            // Add click event for bonding
+            atom.addEventListener('click', function(e) {
+                e.stopPropagation();
+                handleAtomClick(this);
+            });
+            
+            canvas.appendChild(atom);
+            placedAtoms.push({
+                id: atom.dataset.id,
+                element: selectedAtom,
+                x: x + 25,
+                y: y + 25,
+                domElement: atom
+            });
+        }
+        
+        let firstBondAtom = null;
+        
+        function handleAtomClick(atomElement) {
+            if (!firstBondAtom) {
+                firstBondAtom = atomElement;
+                atomElement.style.boxShadow = '0 0 20px #ffd700';
+            } else if (firstBondAtom === atomElement) {
+                // Deselect
+                firstBondAtom.style.boxShadow = '';
+                firstBondAtom = null;
+            } else {
+                // Create bond
+                createBond(firstBondAtom, atomElement);
+                firstBondAtom.style.boxShadow = '';
+                firstBondAtom = null;
+            }
+        }
+        
+        function createBond(atom1, atom2) {
+            const canvas = document.getElementById('canvas');
+            const rect = canvas.getBoundingClientRect();
+            
+            const x1 = parseInt(atom1.style.left) + 25;
+            const y1 = parseInt(atom1.style.top) + 25;
+            const x2 = parseInt(atom2.style.left) + 25;
+            const y2 = parseInt(atom2.style.top) + 25;
+            
+            const length = Math.sqrt((x2-x1)**2 + (y2-y1)**2);
+            const angle = Math.atan2(y2-y1, x2-x1) * 180 / Math.PI;
+            
+            const bond = document.createElement('div');
+            bond.className = `bond ${selectedBondType}-bond`;
+            bond.style.width = length + 'px';
+            bond.style.left = x1 + 'px';
+            bond.style.top = y1 + 'px';
+            bond.style.transform = `rotate(${angle}deg)`;
+            
+            canvas.appendChild(bond);
+            
+            molecularBonds.push({
+                atom1: atom1.dataset.id,
+                atom2: atom2.dataset.id,
+                type: selectedBondType,
+                domElement: bond
+            });
+        }
+        
+        function checkMolecule() {
+            const challenge = challenges[currentChallenge];
+            const resultDiv = document.getElementById('result');
+            
+            // Count atoms
+            const atomCounts = {};
+            placedAtoms.forEach(atom => {
+                atomCounts[atom.element] = (atomCounts[atom.element] || 0) + 1;
+            });
+            
+            // Check if atom counts match
+            let atomsCorrect = true;
+            Object.keys(challenge.structure).forEach(element => {
+                if (element !== 'bonds' && (atomCounts[element] || 0) !== challenge.structure[element]) {
+                    atomsCorrect = false;
+                }
+            });
+            
+            // For now, we'll check atoms and basic bond count
+            const expectedBonds = challenge.structure.bonds ? challenge.structure.bonds.length : 0;
+            const bondsCorrect = molecularBonds.length >= expectedBonds;
+            
+            if (atomsCorrect && bondsCorrect) {
+                score += 20 + (streak * 5);
+                streak++;
+                resultDiv.textContent = `🎉 Excellent! You've correctly built ${challenge.name}!`;
+                resultDiv.className = 'result correct';
+                
+                showMoleculeInfo(challenge);
+            } else {
+                streak = 0;
+                let errorMsg = "Not quite right. ";
+                if (!atomsCorrect) {
+                    errorMsg += `Check your atom count. Need: ${Object.keys(challenge.structure).filter(k => k !== 'bonds').map(k => `${challenge.structure[k]} ${k}`).join(', ')}. `;
+                }
+                if (!bondsCorrect) {
+                    errorMsg += `You need at least ${expectedBonds} bonds.`;
+                }
+                
+                resultDiv.textContent = errorMsg;
+                resultDiv.className = 'result incorrect';
+            }
+            
+            resultDiv.style.display = 'block';
+            updateDisplay();
+        }
+        
+        function showMoleculeInfo(challenge) {
+            const infoDiv = document.getElementById('molecule-info');
+            infoDiv.innerHTML = `
+                <h3>🧪 About ${challenge.name}</h3>
+                <p><strong>Formula:</strong> ${challenge.formula}</p>
+                <p><strong>Description:</strong> ${challenge.description}</p>
+                <p><strong>Type:</strong> ${challenge.type}</p>
+                <p><strong>Uses:</strong> ${getMoleculeUses(challenge.name)}</p>
+            `;
+            infoDiv.style.display = 'block';
+        }
+        
+        function getMoleculeUses(name) {
+            const uses = {
+                "Methane": "Natural gas for heating and cooking",
+                "Ethanol": "Alcoholic beverages, fuel additive, antiseptic",
+                "Carbon Dioxide": "Carbonated drinks, fire extinguishers, photosynthesis",
+                "Acetylene": "Welding and cutting metals",
+                "Formaldehyde": "Preservatives, plastics, disinfectants"
+            };
+            return uses[name] || "Various industrial and laboratory applications";
+        }
+        
+        function showHint() {
+            const challenge = challenges[currentChallenge];
+            const hintDiv = document.getElementById('hint');
+            hintDiv.innerHTML = `<strong>💡 Hint:</strong> ${challenge.hint}`;
+            hintDiv.style.display = 'block';
+        }
+        
+        function clearCanvas() {
+            const canvas = document.getElementById('canvas');
+            canvas.innerHTML = '<div style="color: #666; font-size: 1.2rem;">Click atoms from palette, then click canvas to place them</div>';
+            placedAtoms = [];
+            molecularBonds = [];
+            atomCounter = 0;
+            firstBondAtom = null;
+        }
+        
+        function nextChallenge() {
+            currentChallenge = (currentChallenge + 1) % challenges.length;
+            setupChallenge();
+        }
+        
+        function showFunctionalGroup(type) {
+            const groups = {
+                alkane: "Alkanes: Hydrocarbons with only single bonds (C-C). Examples: methane, ethane, propane.",
+                alcohol: "Alcohols: Contain hydroxyl group (-OH). Examples: methanol, ethanol, isopropanol.",
+                carboxylic: "Carboxylic Acids: Contain carboxyl group (-COOH). Examples: acetic acid, citric acid.",
+                ester: "Esters: Formed from carboxylic acids and alcohols. Examples: ethyl acetate, aspirin."
+            };
+            
+            const infoDiv = document.getElementById('molecule-info');
+            infoDiv.innerHTML = `<h3>📚 ${type.charAt(0).toUpperCase() + type.slice(1)} Group</h3><p>${groups[type]}</p>`;
+            infoDiv.style.display = 'block';
+        }
+        
+        function updateDisplay() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('challenge-num').textContent = currentChallenge + 1;
+            document.getElementById('streak').textContent = streak;
+        }
+        
+        // Initialize game
+        initializeGame();
+        
+        // Select carbon by default
+        document.querySelector('.palette-atom.carbon').click();
+    </script></html>

@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Probability Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #f97316 0%, #f59e0b 100%);
+            min-height: 100vh;
+        }
+        
+        .game-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #f97316 0%, #f59e0b 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(249, 115, 22, 0.4);
+        }
+        
+        .spinner {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+        }
+        
+        .spinner-section {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: 100% 100%;
+        }
+        
+        .character {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            transition: all 0.5s ease;
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .track {
+            height: 80px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .track::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: white;
+            transform: translateY(-50%);
+        }
+        
+        .ball {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .ball:hover {
+            transform: scale(1.1);
+        }
+        
+        .card {
+            width: 80px;
+            height: 120px;
+            background: white;
+            border-radius: 8px;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin: 5px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card.selected {
+            border: 3px solid #f97316;
+            transform: translateY(-5px);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .input-box {
+            border: 2px solid #f97316;
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-size: 18px;
+            width: 200px;
+            transition: all 0.3s ease;
+        }
+        
+        .input-box:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.3);
+        }
+        
+        .input-box.correct {
+            border-color: #10b981;
+            background-color: rgba(16, 185, 129, 0.1);
+        }
+        
+        .input-box.incorrect {
+            border-color: #ef4444;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-5xl font-bold text-white text-center mb-8">Probability Explorer</h1>
+        
+        <!-- Game Selection Menu -->
+        <div id="gameMenu" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div class="game-card p-6 text-center cursor-pointer" onclick="startGame('spinner')">
+                <div class="text-6xl mb-4">🎡</div>
+                <h2 class="text-2xl font-bold mb-2">Click & Answer Spinner</h2>
+                <p class="text-gray-600">Spin and answer probability questions!</p>
+            </div>
+            
+            <div class="game-card p-6 text-center cursor-pointer" onclick="startGame('fillBox')">
+                <div class="text-6xl mb-4">📦</div>
+                <h2 class="text-2xl font-bold mb-2">Fill the Box Probability</h2>
+                <p class="text-gray-600">Calculate probabilities and fill in the answer!</p>
+            </div>
+            
+            <div class="game-card p-6 text-center cursor-pointer" onclick="startGame('probRace')">
+                <div class="text-6xl mb-4">🏁</div>
+                <h2 class="text-2xl font-bold mb-2">Probability Race</h2>
+                <p class="text-gray-600">Race through probability questions!</p>
+            </div>
+            
+            <div class="game-card p-6 text-center cursor-pointer" onclick="startGame('mysteryBag')">
+                <div class="text-6xl mb-4">🎁</div>
+                <h2 class="text-2xl font-bold mb-2">Mystery Bag Challenge</h2>
+                <p class="text-gray-600">Guess the probability in the mystery bag!</p>
+            </div>
+            
+            <div class="game-card p-6 text-center cursor-pointer" onclick="startGame('cardProb')">
+                <div class="text-6xl mb-4">🃏</div>
+                <h2 class="text-2xl font-bold mb-2">Card Probability Click</h2>
+                <p class="text-gray-600">Click cards to answer probability questions!</p>
+            </div>
+        </div>
+        
+        <!-- Game Container -->
+        <div id="gameContainer" class="hidden">
+            <div class="game-card p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <button class="btn-primary" onclick="backToMenu()">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Menu
+                    </button>
+                    <div class="flex items-center gap-4">
+                        <span class="text-lg font-semibold">Level: <span id="currentLevel">1</span>/5</span>
+                        <span class="text-lg font-semibold">Score: <span id="score">0</span></span>
+                    </div>
+                </div>
+                
+                <div id="gameContent" class="min-h-[500px]">
+                    <!-- Game content will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentGame = null;
+        let currentLevel = 1;
+        let score = 0;
+        let gameData = {};
+        let currentQuestionIndex = 0;
+        
+        // Game data for each game
+        const games = {
+            spinner: {
+                name: "Click & Answer Spinner",
+                levels: [
+                    {
+                        questions: [
+                            { 
+                                question: "A spinner has 8 sections numbered 1–8. Probability of landing on a prime number?",
+                                options: ["1/2", "3/8", "1/4", "5/8"],
+                                correct: "1/2",
+                                sections: 8
+                            },
+                            { 
+                                question: "A spinner has 6 sections colored red, blue, green, yellow, purple, orange. Probability of landing on a primary color?",
+                                options: ["1/2", "1/3", "1/6", "2/3"],
+                                correct: "1/2",
+                                sections: 6
+                            },
+                            { 
+                                question: "A spinner has 10 sections numbered 1–10. Probability of landing on an even number?",
+                                options: ["1/2", "2/5", "3/5", "1/5"],
+                                correct: "1/2",
+                                sections: 10
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "A spinner has 12 sections with 4 red, 3 blue, 5 green. Probability of landing on blue?",
+                                options: ["1/4", "1/3", "1/6", "1/12"],
+                                correct: "1/4",
+                                sections: 12
+                            },
+                            { 
+                                question: "A spinner has 5 sections: A, B, C, D, E. Probability of landing on a vowel?",
+                                options: ["2/5", "1/5", "3/5", "4/5"],
+                                correct: "2/5",
+                                sections: 5
+                            },
+                            { 
+                                question: "A spinner has 9 sections: 3 stars, 3 circles, 3 triangles. Probability of landing on a star?",
+                                options: ["1/3", "1/9", "2/3", "1/2"],
+                                correct: "1/3",
+                                sections: 9
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "A spinner has 16 sections numbered 1–16. Probability of landing on a multiple of 4?",
+                                options: ["1/4", "1/8", "1/16", "1/2"],
+                                correct: "1/4",
+                                sections: 16
+                            },
+                            { 
+                                question: "A spinner has 7 sections colored with rainbow colors. Probability of landing on red or orange?",
+                                options: ["2/7", "1/7", "3/7", "4/7"],
+                                correct: "2/7",
+                                sections: 7
+                            },
+                            { 
+                                question: "A spinner has 20 sections: 5 with animals, 10 with fruits, 5 with vehicles. Probability of landing on a fruit?",
+                                options: ["1/2", "1/4", "1/5", "3/4"],
+                                correct: "1/2",
+                                sections: 20
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "A spinner has 15 sections: 6 even numbers, 9 odd numbers. Probability of landing on an odd number?",
+                                options: ["3/5", "2/5", "1/3", "1/2"],
+                                correct: "3/5",
+                                sections: 15
+                            },
+                            { 
+                                question: "A spinner has 8 sections: 2 with $, 3 with €, 3 with £. Probability of landing on $ or €?",
+                                options: ["5/8", "3/8", "1/2", "1/4"],
+                                correct: "5/8",
+                                sections: 8
+                            },
+                            { 
+                                question: "A spinner has 18 sections with letters A-R. Probability of landing on a letter in the word 'SPINNER'?",
+                                options: ["4/9", "1/3", "2/9", "5/9"],
+                                correct: "4/9",
+                                sections: 18
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "A spinner has 24 sections: 8 triangles, 8 squares, 8 circles. Probability of landing on a shape with all sides equal?",
+                                options: ["2/3", "1/3", "1/2", "1/4"],
+                                correct: "2/3",
+                                sections: 24
+                            },
+                            { 
+                                question: "A spinner has 10 sections: 4 with cats, 3 with dogs, 2 with birds, 1 with fish. Probability of landing on a mammal?",
+                                options: ["7/10", "3/10", "1/2", "2/5"],
+                                correct: "7/10",
+                                sections: 10
+                            },
+                            { 
+                                question: "A spinner has 30 sections numbered 1–30. Probability of landing on a prime number less than 15?",
+                                options: ["1/3", "1/5", "2/15", "1/6"],
+                                correct: "1/3",
+                                sections: 30
+                            }
+                        ]
+                    }
+                ]
+            },
+            fillBox: {
+                name: "Fill the Box Probability",
+                levels: [
+                    {
+                        questions: [
+                            { 
+                                question: "A bag has 5 red, 3 blue, and 2 green balls. What is the probability of picking a red ball?",
+                                correct: "1/2",
+                                balls: {red: 5, blue: 3, green: 2}
+                            },
+                            { 
+                                question: "A jar contains 4 white marbles and 6 black marbles. What is the probability of picking a white marble?",
+                                correct: "2/5",
+                                balls: {white: 4, black: 6}
+                            },
+                            { 
+                                question: "A box has 7 yellow pencils and 3 green pencils. What is the probability of picking a yellow pencil?",
+                                correct: "7/10",
+                                balls: {yellow: 7, green: 3}
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "A bag contains 8 red, 4 blue, and 8 green balls. What is the probability of picking a blue ball?",
+                                correct: "1/5",
+                                balls: {red: 8, blue: 4, green: 8}
+                            },
+                            { 
+                                question: "A jar has 3 purple, 5 orange, and 2 pink marbles. What is the probability of picking a purple marble?",
+                                correct: "3/10",
+                                balls: {purple: 3, orange: 5, pink: 2}
+                            },
+                            { 
+                                question: "A box contains 6 black, 6 white, and 8 gray pens. What is the probability of picking a black pen?",
+                                correct: "3/10",
+                                balls: {black: 6, white: 6, gray: 8}
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "A bag has 10 red, 15 blue, and 5 green balls. What is the probability of picking a green ball?",
+                                correct: "1/6",
+                                balls: {red: 10, blue: 15, green: 5}
+                            },
+                            { 
+                                question: "A jar contains 12 white, 18 black, and 6 brown marbles. What is the probability of picking a brown marble?",
+                                correct: "1/6",
+                                balls: {white: 12, black: 18, brown: 6}
+                            },
+                            { 
+                                question: "A box has 9 yellow, 6 orange, and 15 red pencils. What is the probability of picking an orange pencil?",
+                                correct: "1/5",
+                                balls: {yellow: 9, orange: 6, red: 15}
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "A bag contains 7 purple, 14 pink, and 9 teal balls. What is the probability of picking a purple ball?",
+                                correct: "7/30",
+                                balls: {purple: 7, pink: 14, teal: 9}
+                            },
+                            { 
+                                question: "A jar has 16 gold, 8 silver, and 16 bronze marbles. What is the probability of picking a silver marble?",
+                                correct: "1/5",
+                                balls: {gold: 16, silver: 8, bronze: 16}
+                            },
+                            { 
+                                question: "A box contains 11 navy, 22 cyan, and 7 magenta pens. What is the probability of picking a magenta pen?",
+                                correct: "7/40",
+                                balls: {navy: 11, cyan: 22, magenta: 7}
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "A bag has 20 crimson, 15 azure, 10 emerald, and 5 amber balls. What is the probability of picking an amber ball?",
+                                correct: "1/10",
+                                balls: {crimson: 20, azure: 15, emerald: 10, amber: 5}
+                            },
+                            { 
+                                question: "A jar contains 24 pearl, 18 onyx, 12 jade, and 6 ruby marbles. What is the probability of picking a ruby marble?",
+                                correct: "1/10",
+                                balls: {pearl: 24, onyx: 18, jade: 12, ruby: 6}
+                            },
+                            { 
+                                question: "A box has 30 scarlet, 20 indigo, 15 violet, and 10 gold pens. What is the probability of picking a gold pen?",
+                                correct: "1/7",
+                                balls: {scarlet: 30, indigo: 20, violet: 15, gold: 10}
+                            }
+                        ]
+                    }
+                ]
+            },
+            probRace: {
+                name: "Probability Race",
+                levels: [
+                    {
+                        questions: [
+                            { 
+                                question: "Two dice are rolled. What is the probability that the sum is 7?",
+                                options: ["1/6", "1/12", "1/9", "1/4"],
+                                correct: "1/6"
+                            },
+                            { 
+                                question: "A coin is flipped twice. What is the probability of getting two heads?",
+                                options: ["1/4", "1/2", "1/8", "3/4"],
+                                correct: "1/4"
+                            },
+                            { 
+                                question: "A card is drawn from a deck. What is the probability it's a heart?",
+                                options: ["1/4", "1/13", "1/2", "1/52"],
+                                correct: "1/4"
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "Two dice are rolled. What is the probability that the sum is even?",
+                                options: ["1/2", "1/3", "2/3", "1/4"],
+                                correct: "1/2"
+                            },
+                            { 
+                                question: "A coin is flipped three times. What is the probability of getting exactly two heads?",
+                                options: ["3/8", "1/8", "1/2", "3/4"],
+                                correct: "3/8"
+                            },
+                            { 
+                                question: "A card is drawn from a deck. What is the probability it's a face card?",
+                                options: ["3/13", "1/13", "4/13", "1/4"],
+                                correct: "3/13"
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "Two dice are rolled. What is the probability that the product is 6?",
+                                options: ["1/9", "1/6", "1/12", "1/18"],
+                                correct: "1/9"
+                            },
+                            { 
+                                question: "A coin is flipped four times. What is the probability of getting at least one head?",
+                                options: ["15/16", "1/16", "1/2", "3/4"],
+                                correct: "15/16"
+                            },
+                            { 
+                                question: "Two cards are drawn from a deck. What is the probability both are aces?",
+                                options: ["1/221", "1/52", "1/13", "1/169"],
+                                correct: "1/221"
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "Three dice are rolled. What is the probability that the sum is 10?",
+                                options: ["1/8", "1/12", "1/6", "1/9"],
+                                correct: "1/8"
+                            },
+                            { 
+                                question: "A coin is flipped five times. What is the probability of getting exactly three heads?",
+                                options: ["5/16", "1/2", "3/16", "1/32"],
+                                correct: "5/16"
+                            },
+                            { 
+                                question: "A card is drawn from a deck. What is the probability it's red or a king?",
+                                options: ["7/13", "1/2", "15/26", "28/52"],
+                                correct: "7/13"
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "Four dice are rolled. What is the probability that the sum is 14?",
+                                options: ["73/648", "1/36", "5/162", "1/18"],
+                                correct: "73/648"
+                            },
+                            { 
+                                question: "A coin is flipped six times. What is the probability of getting exactly four heads?",
+                                options: ["15/64", "5/16", "1/2", "3/8"],
+                                correct: "15/64"
+                            },
+                            { 
+                                question: "Five cards are drawn from a deck. What is the probability all are hearts?",
+                                options: ["33/66640", "1/5198", "1/3865", "1/2598960"],
+                                correct: "33/66640"
+                            }
+                        ]
+                    }
+                ]
+            },
+            mysteryBag: {
+                name: "Mystery Bag Challenge",
+                levels: [
+                    {
+                        questions: [
+                            { 
+                                question: "Probability of drawing a yellow ball if bag has 4 red, 3 yellow, 5 blue?",
+                                correct: "1/4",
+                                balls: {red: 4, yellow: 3, blue: 5}
+                            },
+                            { 
+                                question: "Probability of drawing a green ball if bag has 6 green, 4 orange, 10 purple?",
+                                correct: "3/10",
+                                balls: {green: 6, orange: 4, purple: 10}
+                            },
+                            { 
+                                question: "Probability of drawing a black ball if bag has 8 black, 12 white, 5 gray?",
+                                correct: "8/25",
+                                balls: {black: 8, white: 12, gray: 5}
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "Probability of drawing a silver ball if bag has 7 gold, 5 silver, 8 bronze?",
+                                correct: "1/4",
+                                balls: {gold: 7, silver: 5, bronze: 8}
+                            },
+                            { 
+                                question: "Probability of drawing a pink ball if bag has 9 pink, 6 teal, 15 coral?",
+                                correct: "3/10",
+                                balls: {pink: 9, teal: 6, coral: 15}
+                            },
+                            { 
+                                question: "Probability of drawing a brown ball if bag has 11 brown, 9 beige, 20 tan?",
+                                correct: "11/40",
+                                balls: {brown: 11, beige: 9, tan: 20}
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "Probability of drawing a violet ball if bag has 12 violet, 18 indigo, 10 blue?",
+                                correct: "4/13",
+                                balls: {violet: 12, indigo: 18, blue: 10}
+                            },
+                            { 
+                                question: "Probability of drawing a turquoise ball if bag has 8 turquoise, 12 cyan, 20 aqua?",
+                                correct: "1/5",
+                                balls: {turquoise: 8, cyan: 12, aqua: 20}
+                            },
+                            { 
+                                question: "Probability of drawing a magenta ball if bag has 15 magenta, 25 fuchsia, 10 rose?",
+                                correct: "3/10",
+                                balls: {magenta: 15, fuchsia: 25, rose: 10}
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "Probability of drawing a crimson ball if bag has 20 crimson, 30 scarlet, 15 ruby?",
+                                correct: "4/13",
+                                balls: {crimson: 20, scarlet: 30, ruby: 15}
+                            },
+                            { 
+                                question: "Probability of drawing an emerald ball if bag has 14 emerald, 21 jade, 7 peridot?",
+                                correct: "1/3",
+                                balls: {emerald: 14, jade: 21, peridot: 7}
+                            },
+                            { 
+                                question: "Probability of drawing a sapphire ball if bag has 16 sapphire, 24 topaz, 10 amethyst?",
+                                correct: "8/25",
+                                balls: {sapphire: 16, topaz: 24, amethyst: 10}
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "Probability of drawing a platinum ball if bag has 25 platinum, 35 gold, 15 silver, 25 bronze?",
+                                correct: "1/4",
+                                balls: {platinum: 25, gold: 35, silver: 15, bronze: 25}
+                            },
+                            { 
+                                question: "Probability of drawing an onyx ball if bag has 18 onyx, 27 obsidian, 9 jet, 36 granite?",
+                                correct: "1/5",
+                                balls: {onyx: 18, obsidian: 27, jet: 9, granite: 36}
+                            },
+                            { 
+                                question: "Probability of drawing a pearl ball if bag has 22 pearl, 33 coral, 11 amber, 44 ivory?",
+                                correct: "11/55",
+                                balls: {pearl: 22, coral: 33, amber: 11, ivory: 44}
+                            }
+                        ]
+                    }
+                ]
+            },
+            cardProb: {
+                name: "Card Probability Click",
+                levels: [
+                    {
+                        questions: [
+                            { 
+                                question: "Probability of drawing a face card?",
+                                correct: "face",
+                                hint: "Face cards are Jack, Queen, King"
+                            },
+                            { 
+                                question: "Probability of drawing a heart?",
+                                correct: "heart",
+                                hint: "Hearts are one of the four suits"
+                            },
+                            { 
+                                question: "Probability of drawing an ace?",
+                                correct: "ace",
+                                hint: "Aces are the highest cards"
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "Probability of drawing a red card?",
+                                correct: "red",
+                                hint: "Red cards are hearts and diamonds"
+                            },
+                            { 
+                                question: "Probability of drawing a spade?",
+                                correct: "spade",
+                                hint: "Spades are black cards"
+                            },
+                            { 
+                                question: "Probability of drawing a numbered card?",
+                                correct: "number",
+                                hint: "Numbered cards are 2-10"
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "Probability of drawing a king?",
+                                correct: "king",
+                                hint: "Kings are one type of face card"
+                            },
+                            { 
+                                question: "Probability of drawing a diamond?",
+                                correct: "diamond",
+                                hint: "Diamonds are red cards"
+                            },
+                            { 
+                                question: "Probability of drawing a black face card?",
+                                correct: "blackface",
+                                hint: "Black face cards are spades and clubs"
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "Probability of drawing a queen of hearts?",
+                                correct: "queenheart",
+                                hint: "This is a specific card"
+                            },
+                            { 
+                                question: "Probability of drawing a club?",
+                                correct: "club",
+                                hint: "Clubs are black cards"
+                            },
+                            { 
+                                question: "Probability of drawing a jack?",
+                                correct: "jack",
+                                hint: "Jacks are one type of face card"
+                            }
+                        ]
+                    },
+                    {
+                        questions: [
+                            { 
+                                question: "Probability of drawing an even-numbered red card?",
+                                correct: "evenred",
+                                hint: "Even numbers on hearts or diamonds"
+                            },
+                            { 
+                                question: "Probability of drawing a black ace?",
+                                correct: "blackace",
+                                hint: "Aces that are spades or clubs"
+                            },
+                            { 
+                                question: "Probability of drawing a face card or an ace?",
+                                correct: "faceace",
+                                hint: "Jack, Queen, King, or Ace"
+                            }
+                        ]
+                    }
+                ]
+            }
+        };
+        
+        function startGame(gameName) {
+            currentGame = gameName;
+            currentLevel = 1;
+            score = 0;
+            gameData = {...games[gameName]};
+            currentQuestionIndex = 0;
+            
+            document.getElementById('gameMenu').classList.add('hidden');
+            document.getElementById('gameContainer').classList.remove('hidden');
+            
+            updateScore();
+            loadLevel();
+        }
+        
+        function backToMenu() {
+            document.getElementById('gameMenu').classList.remove('hidden');
+            document.getElementById('gameContainer').classList.add('hidden');
+            currentGame = null;
+        }
+        
+        function updateScore() {
+            document.getElementById('currentLevel').textContent = currentLevel;
+            document.getElementById('score').textContent = score;
+        }
+        
+        function loadLevel() {
+            const gameContent = document.getElementById('gameContent');
+            gameContent.innerHTML = '';
+            gameContent.classList.add('fade-in');
+            
+            switch(currentGame) {
+                case 'spinner':
+                    loadSpinnerLevel();
+                    break;
+                case 'fillBox':
+                    loadFillBoxLevel();
+                    break;
+                case 'probRace':
+                    loadProbRaceLevel();
+                    break;
+                case 'mysteryBag':
+                    loadMysteryBagLevel();
+                    break;
+                case 'cardProb':
+                    loadCardProbLevel();
+                    break;
+            }
+        }
+        
+        function loadSpinnerLevel() {
+            const level = gameData.levels[currentLevel - 1];
+            const question = level.questions[currentQuestionIndex];
+            const gameContent = document.getElementById('gameContent');
+            
+            gameContent.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="flex flex-col items-center">
+                        <h3 class="text-2xl font-bold mb-4">Virtual Spinner</h3>
+                        <div class="spinner" id="spinner">
+                            ${createSpinnerSections(question.sections)}
+                        </div>
+                        <button class="btn-primary mt-4" onclick="spinSpinner()">Spin!</button>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4">Question ${currentQuestionIndex + 1}</h3>
+                        <p class="text-lg mb-6">${question.question}</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            ${question.options.map(option => `
+                                <button class="btn-primary" onclick="checkSpinnerAnswer('${option}')">${option}</button>
+                            `).join('')}
+                        </div>
+                        <div id="spinnerResult" class="mt-4 text-center font-semibold"></div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function createSpinnerSections(count) {
+            const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#06b6d4'];
+            let sections = '';
+            const angleStep = 360 / count;
+            
+            for (let i = 0; i < count; i++) {
+                const rotation = i * angleStep;
+                sections += `<div class="spinner-section" style="background: ${colors[i % colors.length]}; transform: rotate(${rotation}deg);"></div>`;
+            }
+            
+            return sections;
+        }
+        
+        function spinSpinner() {
+            const spinner = document.getElementById('spinner');
+            const randomRotation = Math.floor(Math.random() * 360) + 720; // At least 2 full rotations
+            spinner.style.transform = `rotate(${randomRotation}deg)`;
+        }
+        
+        function checkSpinnerAnswer(answer) {
+            const level = gameData.levels[currentLevel - 1];
+            const question = level.questions[currentQuestionIndex];
+            const result = document.getElementById('spinnerResult');
+            
+            if (answer === question.correct) {
+                score += 10;
+                updateScore();
+                
+                result.textContent = 'Correct! Well done!';
+                result.className = 'mt-4 text-center font-semibold text-green-600';
+                
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    if (currentQuestionIndex < level.questions.length) {
+                        loadSpinnerLevel();
+                    } else {
+                        currentQuestionIndex = 0;
+                        if (currentLevel < 5) {
+                            currentLevel++;
+                            loadLevel();
+                        } else {
+                            showGameComplete();
+                        }
+                    }
+                }, 1500);
+            } else {
+                result.textContent = 'Try again! Remember to count the favorable outcomes.';
+                result.className = 'mt-4 text-center font-semibold text-red-600';
+            }
+        }
+        
+        function loadFillBoxLevel() {
+            const level = gameData.levels[currentLevel - 1];
+            const question = level.questions[currentQuestionIndex];
+            const gameContent = document.getElementById('gameContent');
+            
+            gameContent.innerHTML = `
+                <div class="max-w-2xl mx-auto">
+                    <h3 class="text-2xl font-bold mb-4 text-center">Question ${currentQuestionIndex + 1}</h3>
+                    <p class="text-lg mb-6 text-center">${question.question}</p>
+                    
+                    <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                        <div class="flex justify-center flex-wrap">
+                            ${Object.entries(question.balls).map(([color, count]) => 
+                                Array(count).fill().map(() => `
+                                    <div class="ball" style="background: ${getColorForBall(color)}">${getBallIcon(color)}</div>
+                                `).join('')
+                            ).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <input type="text" id="answerInput" class="input-box" placeholder="Enter fraction">
+                        <button class="btn-primary ml-2" onclick="checkFillBoxAnswer()">Submit</button>
+                    </div>
+                    
+                    <div id="fillBoxResult" class="mt-4 text-center font-semibold"></div>
+                </div>
+            `;
+        }
+        
+        function getColorForBall(color) {
+            const colors = {
+                red: '#ef4444',
+                blue: '#3b82f6',
+                green: '#22c55e',
+                yellow: '#eab308',
+                white: '#f3f4f6',
+                black: '#1f2937',
+                purple: '#8b5cf6',
+                orange: '#f97316',
+                pink: '#ec4899',
+                teal: '#14b8a6',
+                gray: '#6b7280',
+                brown: '#92400e',
+                crimson: '#dc2626',
+                azure: '#3b82f6',
+                emerald: '#10b981',
+                amber: '#f59e0b',
+                pearl: '#f9fafb',
+                onyx: '#1f2937',
+                gold: '#f59e0b',
+                silver: '#e5e7eb',
+                bronze: '#92400e',
+                violet: '#8b5cf6',
+                indigo: '#4f46e5',
+                magenta: '#d946ef',
+                turquoise: '#14b8a6',
+                cyan: '#06b6d4',
+                aqua: '#06b6d4',
+                fuchsia: '#d946ef',
+                rose: '#f43f5e',
+                scarlet: '#dc2626',
+                ruby: '#e11d48',
+                jade: '#10b981',
+                peridot: '#84cc16',
+                sapphire: '#3b82f6',
+                topaz: '#f59e0b',
+                amethyst: '#8b5cf6',
+                platinum: '#e5e7eb',
+                obsidian: '#1f2937',
+                jet: '#1f2937',
+                granite: '#6b7280',
+                coral: '#f97316',
+                ivory: '#f9fafb'
+            };
+            return colors[color] || '#6b7280';
+        }
+        
+        function getBallIcon(color) {
+            return '⚫';
+        }
+        
+        function checkFillBoxAnswer() {
+            const level = gameData.levels[currentLevel - 1];
+            const question = level.questions[currentQuestionIndex];
+            const input = document.getElementById('answerInput');
+            const result = document.getElementById('fillBoxResult');
+            
+            if (input.value === question.correct) {
+                score += 10;
+                updateScore();
+                
+                input.classList.remove('incorrect');
+                input.classList.add('correct');
+                
+                result.textContent = 'Correct! Well done!';
+                result.className = 'mt-4 text-center font-semibold text-green-600';
+                
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    if (currentQuestionIndex < level.questions.length) {
+                        loadFillBoxLevel();
+                    } else {
+                        currentQuestionIndex = 0;
+                        if (currentLevel < 5) {
+                            currentLevel++;
+                            loadLevel();
+                        } else {
+                            showGameComplete();
+                        }
+                    }
+                }, 1500);
+            } else {
+                input.classList.remove('correct');
+                input.classList.add('incorrect');
+                
+                result.textContent = `Not quite. The correct answer is ${question.correct}`;
+                result.className = 'mt-4 text-center font-semibold text-red-600';
+            }
+        }
+        
+        function loadProbRaceLevel() {
+            const level = gameData.levels[currentLevel - 1];
+            const question = level.questions[currentQuestionIndex];
+            const gameContent = document.getElementById('gameContent');
+            
+            gameContent.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4">Question ${currentQuestionIndex + 1}</h3>
+                        <p class="text-lg mb-6">${question.question}</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            ${question.options.map(option => `
+                                <button class="btn-primary" onclick="checkProbRaceAnswer('${option}')">${option}</button>
+                            `).join('')}
+                        </div>
+                        <div id="probRaceHint" class="mt-4 text-center font-semibold"></div>
+                    </div>
+                    <div class="relative">
+                        <div class="bg-green-100 rounded-lg p-4 h-64 relative overflow-hidden">
+                            <div class="character" id="raceCharacter">🏃</div>
+                            <div class="absolute right-4 top-1/2 transform -translate-y-1/2 text-4xl">🏁</div>
+                            <div class="track absolute bottom-4 left-4 right-4"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function checkProbRaceAnswer(answer) {
+            const level = gameData.levels[currentLevel - 1];
+            const question = level.questions[currentQuestionIndex];
+            const character = document.getElementById('raceCharacter');
+            const hint = document.getElementById('probRaceHint');
+            
+            if (answer === question.correct) {
+                score += 10;
+                updateScore();
+                
+                // Move character forward
+                const currentLeft = parseInt(character.style.left) || 20;
+                character.style.left = Math.min(currentLeft + 80, 320) + 'px';
+                
+                hint.textContent = 'Correct! Keep going!';
+                hint.className = 'mt-4 text-center font-semibold text-green-600';
+                
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    if (currentQuestionIndex < level.questions.length) {
+                        loadProbRaceLevel();
+                    } else {
+                        currentQuestionIndex = 0;
+                        if (currentLevel < 5) {
+                            currentLevel++;
+                            loadLevel();
+                        } else {
+                            showGameComplete();
+                        }
+                    }
+                }, 1000);
+            } else {
+                hint.textContent = 'Not quite. Remember to count all possible outcomes.';
+                hint.className = 'mt-4 text-center font-semibold text-red-600';
+            }
+        }
+        
+        function loadMysteryBagLevel() {
+            const level = gameData.levels[currentLevel - 1];
+            const question = level.questions[currentQuestionIndex];
+            const gameContent = document.getElementById('gameContent');
+            
+            gameContent.innerHTML = `
+                <div class="max-w-2xl mx-auto">
+                    <h3 class="text-2xl font-bold mb-4 text-center">Question ${currentQuestionIndex + 1}</h3>
+                    <p class="text-lg mb-6 text-center">${question.question}</p>
+                    
+                    <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                        <div class="flex justify-center flex-wrap">
+                            ${Object.entries(question.balls).map(([color, count]) => 
+                                Array(count).fill().map(() => `
+                                    <div class="ball" style="background: ${getColorForBall(color)}">${getBallIcon(color)}</div>
+                                `).join('')
+                            ).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <button class="btn-primary" onclick="checkMysteryBagAnswer('1/2')">1/2</button>
+                        <button class="btn-primary" onclick="checkMysteryBagAnswer('1/3')">1/3</button>
+                        <button class="btn-primary" onclick="checkMysteryBagAnswer('1/4')">1/4</button>
+                        <button class="btn-primary" onclick="checkMysteryBagAnswer('1/5')">1/5</button>
+                        <button class="btn-primary" onclick="checkMysteryBagAnswer('2/5')">2/5</button>
+                        <button class="btn-primary" onclick="checkMysteryBagAnswer('3/10')">3/10</button>
+                        <button class="btn-primary" onclick="checkMysteryBagAnswer('3/4')">3/4</button>
+                        <button class="btn-primary" onclick="checkMysteryBagAnswer('4/13')">4/13</button>
+                    </div>
+                    
+                    <div id="mysteryBagResult" class="mt-4 text-center font-semibold"></div>
+                </div>
+            `;
+        }
+        
+        function checkMysteryBagAnswer(answer) {
+            const level = gameData.levels[currentLevel - 1];
+            const question = level.questions[currentQuestionIndex];
+            const result = document.getElementById('mysteryBagResult');
+            
+            if (answer === question.correct) {
+                score += 10;
+                updateScore();
+                
+                result.textContent = 'Correct! Well done!';
+                result.className = 'mt-4 text-center font-semibold text-green-600';
+                
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    if (currentQuestionIndex < level.questions.length) {
+                        loadMysteryBagLevel();
+                    } else {
+                        currentQuestionIndex = 0;
+                        if (currentLevel < 5) {
+                            currentLevel++;
+                            loadLevel();
+                        } else {
+                            showGameComplete();
+                        }
+                    }
+                }, 1500);
+            } else {
+                result.textContent = 'Try again! Count the total and the specific color.';
+                result.className = 'mt-4 text-center font-semibold text-red-600';
+            }
+        }
+        
+        function loadCardProbLevel() {
+            const level = gameData.levels[currentLevel - 1];
+            const question = level.questions[currentQuestionIndex];
+            const gameContent = document.getElementById('gameContent');
+            
+            gameContent.innerHTML = `
+                <div class="max-w-4xl mx-auto">
+                    <h3 class="text-2xl font-bold mb-4 text-center">Question ${currentQuestionIndex + 1}</h3>
+                    <p class="text-lg mb-6 text-center">${question.question}</p>
+                    
+                    <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                        <div class="flex justify-center flex-wrap">
+                            <!-- Hearts -->
+                            <div class="card" data-type="heart" onclick="selectCard('heart')">
+                                <div>♥</div>
+                                <div class="text-xs mt-1">Heart</div>
+                            </div>
+                            <div class="card" data-type="heart" onclick="selectCard('heart')">
+                                <div>♥</div>
+                                <div class="text-xs mt-1">Heart</div>
+                            </div>
+                            <!-- Diamonds -->
+                            <div class="card" data-type="diamond" onclick="selectCard('diamond')">
+                                <div>♦</div>
+                                <div class="text-xs mt-1">Diamond</div>
+                            </div>
+                            <div class="card" data-type="diamond" onclick="selectCard('diamond')">
+                                <div>♦</div>
+                                <div class="text-xs mt-1">Diamond</div>
+                            </div>
+                            <!-- Clubs -->
+                            <div class="card" data-type="club" onclick="selectCard('club')">
+                                <div>♣</div>
+                                <div class="text-xs mt-1">Club</div>
+                            </div>
+                            <div class="card" data-type="club" onclick="selectCard('club')">
+                                <div>♣</div>
+                                <div class="text-xs mt-1">Club</div>
+                            </div>
+                            <!-- Spades -->
+                            <div class="card" data-type="spade" onclick="selectCard('spade')">
+                                <div>♠</div>
+                                <div class="text-xs mt-1">Spade</div>
+                            </div>
+                            <div class="card" data-type="spade" onclick="selectCard('spade')">
+                                <div>♠</div>
+                                <div class="text-xs mt-1">Spade</div>
+                            </div>
+                            <!-- Face cards -->
+                            <div class="card" data-type="face" onclick="selectCard('face')">
+                                <div>J</div>
+                                <div class="text-xs mt-1">Jack</div>
+                            </div>
+                            <div class="card" data-type="face" onclick="selectCard('face')">
+                                <div>Q</div>
+                                <div class="text-xs mt-1">Queen</div>
+                            </div>
+                            <div class="card" data-type="face" onclick="selectCard('face')">
+                                <div>K</div>
+                                <div class="text-xs mt-1">King</div>
+                            </div>
+                            <!-- Aces -->
+                            <div class="card" data-type="ace" onclick="selectCard('ace')">
+                                <div>A</div>
+                                <div class="text-xs mt-1">Ace</div>
+                            </div>
+                            <!-- Number cards -->
+                            <div class="card" data-type="number" onclick="selectCard('number')">
+                                <div>2</div>
+                                <div class="text-xs mt-1">Number</div>
+                            </div>
+                            <div class="card" data-type="number" onclick="selectCard('number')">
+                                <div>10</div>
+                                <div class="text-xs mt-1">Number</div>
+                            </div>
+                            <!-- Red cards -->
+                            <div class="card" data-type="red" onclick="selectCard('red')">
+                                <div>♥</div>
+                                <div class="text-xs mt-1">Red</div>
+                            </div>
+                            <div class="card" data-type="red" onclick="selectCard('red')">
+                                <div>♦</div>
+                                <div class="text-xs mt-1">Red</div>
+                            </div>
+                            <!-- Black cards -->
+                            <div class="card" data-type="black" onclick="selectCard('black')">
+                                <div>♣</div>
+                                <div class="text-xs mt-1">Black</div>
+                            </div>
+                            <div class="card" data-type="black" onclick="selectCard('black')">
+                                <div>♠</div>
+                                <div class="text-xs mt-1">Black</div>
+                            </div>
+                            <!-- Special combinations -->
+                            <div class="card" data-type="blackface" onclick="selectCard('blackface')">
+                                <div>♠K</div>
+                                <div class="text-xs mt-1">Black Face</div>
+                            </div>
+                            <div class="card" data-type="queenheart" onclick="selectCard('queenheart')">
+                                <div>♥Q</div>
+                                <div class="text-xs mt-1">Q♥</div>
+                            </div>
+                            <div class="card" data-type="blackace" onclick="selectCard('blackace')">
+                                <div>♠A</div>
+                                <div class="text-xs mt-1">Black Ace</div>
+                            </div>
+                            <div class="card" data-type="evenred" onclick="selectCard('evenred')">
+                                <div>♥2</div>
+                                <div class="text-xs mt-1">Even Red</div>
+                            </div>
+                            <div class="card" data-type="faceace" onclick="selectCard('faceace')">
+                                <div>Face/Ace</div>
+                                <div class="text-xs mt-1">Face or Ace</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button class="btn-primary" onclick="checkCardAnswer()">Submit Answer</button>
+                    </div>
+                    
+                    <div id="cardResult" class="mt-4 text-center font-semibold"></div>
+                    <div id="cardHint" class="mt-2 text-center text-sm text-gray-600"></div>
+                </div>
+            `;
+            
+            gameData.selectedCardType = null;
+        }
+        
+        function selectCard(type) {
+            // Remove previous selection
+            document.querySelectorAll('.card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selection to clicked card
+            document.querySelectorAll(`[data-type="${type}"]`).forEach(card => {
+                card.classList.add('selected');
+            });
+            
+            gameData.selectedCardType = type;
+            
+            // Show hint
+            const question = gameData.levels[currentLevel - 1].questions[currentQuestionIndex];
+            const hint = document.getElementById('cardHint');
+            hint.textContent = question.hint;
+        }
+        
+        function checkCardAnswer() {
+            const level = gameData.levels[currentLevel - 1];
+            const question = level.questions[currentQuestionIndex];
+            const result = document.getElementById('cardResult');
+            
+            if (gameData.selectedCardType === question.correct) {
+                score += 10;
+                updateScore();
+                
+                result.textContent = 'Correct! Well done!';
+                result.className = 'mt-4 text-center font-semibold text-green-600';
+                
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    if (currentQuestionIndex < level.questions.length) {
+                        loadCardProbLevel();
+                    } else {
+                        currentQuestionIndex = 0;
+                        if (currentLevel < 5) {
+                            currentLevel++;
+                            loadLevel();
+                        } else {
+                            showGameComplete();
+                        }
+                    }
+                }, 1500);
+            } else {
+                result.textContent = 'Try again! Select the correct card type.';
+                result.className = 'mt-4 text-center font-semibold text-red-600';
+            }
+        }
+        
+        function showGameComplete() {
+            const gameContent = document.getElementById('gameContent');
+            gameContent.innerHTML = `
+                <div class="text-center py-12">
+                    <div class="text-8xl mb-6">🎉</div>
+                    <h2 class="text-4xl font-bold mb-4">Congratulations!</h2>
+                    <p class="text-2xl mb-6">You completed all levels of ${gameData.name}!</p>
+                    <p class="text-xl mb-8">Final Score: ${score}</p>
+                    <button class="btn-primary text-xl px-8 py-4" onclick="backToMenu()">Back to Menu</button>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

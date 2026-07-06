@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complex Number Games - Interactive Learning</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            color: white;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .game-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .game-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .game-description {
+            color: #64748b;
+            margin-bottom: 15px;
+        }
+
+        .game-learning {
+            background: #f1f5f9;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 900px;
+            margin: 50px auto;
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #64748b;
+            transition: color 0.3s;
+        }
+
+        .close-btn:hover {
+            color: var(--danger);
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .game-header h2 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .score-display {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            margin: 10px;
+        }
+
+        /* Game-specific styles */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .memory-card {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .memory-card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .memory-card.matched {
+            background: var(--success);
+            cursor: default;
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            background: white;
+            color: var(--dark);
+            border: 2px solid var(--primary);
+        }
+
+        .addition-problem {
+            text-align: center;
+            font-size: 2rem;
+            margin: 30px 0;
+            color: var(--dark);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .option-btn {
+            padding: 20px;
+            background: var(--light);
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .option-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-5px);
+        }
+
+        .option-btn.correct {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .option-btn.incorrect {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+
+        .sorting-area {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            min-height: 400px;
+        }
+
+        .sort-bin {
+            width: 45%;
+            min-height: 300px;
+            border: 3px dashed #cbd5e1;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .sort-bin.active {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .sort-bin h3 {
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .number-card {
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            padding: 15px 25px;
+            margin: 10px auto;
+            cursor: move;
+            display: inline-block;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+
+        .number-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .number-card.dragging {
+            opacity: 0.5;
+        }
+
+        .current-number {
+            text-align: center;
+            font-size: 2.5rem;
+            margin: 30px 0;
+            color: var(--dark);
+        }
+
+        .timer-display {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--warning);
+            margin: 20px 0;
+        }
+
+        .input-area {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .complex-input {
+            font-size: 1.5rem;
+            padding: 15px 25px;
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+        }
+
+        .submit-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-left: 15px;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: var(--secondary);
+            transform: translateY(-3px);
+        }
+
+        .magnitude-options {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .magnitude-btn {
+            padding: 15px 30px;
+            background: var(--light);
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .magnitude-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-5px);
+        }
+
+        .feedback {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            min-height: 30px;
+        }
+
+        .feedback.success {
+            color: var(--success);
+        }
+
+        .feedback.error {
+            color: var(--danger);
+        }
+
+        .next-btn {
+            display: block;
+            margin: 20px auto;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .next-btn:hover {
+            background: var(--secondary);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .memory-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .sorting-area {
+                flex-direction: column;
+            }
+            
+            .sort-bin {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Complex Number Games</h1>
+            <p class="subtitle">Master complex numbers through interactive games!</p>
+        </header>
+
+        <main class="games-grid">
+            <!-- Game 1: Complex Match -->
+            <div class="game-card" onclick="openGame('complex-match')">
+                <span class="game-icon">🃏</span>
+                <h2 class="game-title">Complex Match</h2>
+                <p class="game-description">Flip cards and match complex numbers with their conjugates!</p>
+                <div class="game-learning">
+                    <i class="fas fa-graduation-cap"></i> Learning: Concept of conjugates
+                </div>
+            </div>
+
+            <!-- Game 2: Add & Win -->
+            <div class="game-card" onclick="openGame('add-win')">
+                <span class="game-icon">➕</span>
+                <h2 class="game-title">Add & Win</h2>
+                <p class="game-description">Add two complex numbers and pick the correct sum!</p>
+                <div class="game-learning">
+                    <i class="fas fa-graduation-cap"></i> Learning: Practice addition of complex numbers
+                </div>
+            </div>
+
+            <!-- Game 3: Real vs Imaginary Sort -->
+            <div class="game-card" onclick="openGame('sort-game')">
+                <span class="game-icon">🗂️</span>
+                <h2 class="game-title">Real vs Imaginary Sort</h2>
+                <p class="game-description">Drag complex numbers to the correct category!</p>
+                <div class="game-learning">
+                    <i class="fas fa-graduation-cap"></i> Learning: Distinguish real and complex numbers
+                </div>
+            </div>
+
+            <!-- Game 4: Quick Multiply -->
+            <div class="game-card" onclick="openGame('quick-multiply')">
+                <span class="game-icon">⚡</span>
+                <h2 class="game-title">Quick Multiply</h2>
+                <p class="game-description">Multiply complex numbers quickly before time runs out!</p>
+                <div class="game-learning">
+                    <i class="fas fa-graduation-cap"></i> Learning: Master multiplication & simplification
+                </div>
+            </div>
+
+            <!-- Game 5: Magnitude Challenge -->
+            <div class="game-card" onclick="openGame('magnitude-challenge')">
+                <span class="game-icon">📏</span>
+                <h2 class="game-title">Magnitude Challenge</h2>
+                <p class="game-description">Find the magnitude of complex numbers!</p>
+                <div class="game-learning">
+                    <i class="fas fa-graduation-cap"></i> Learning: Understanding magnitude of complex numbers
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals for each game -->
+    <div id="complex-match-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeGame('complex-match')">&times;</span>
+            <div class="game-header">
+                <h2>Complex Match 🃏</h2>
+                <div class="score-display">Score: <span id="match-score">0</span></div>
+                <div class="score-display">Moves: <span id="match-moves">0</span></div>
+            </div>
+            <div class="memory-grid" id="memory-grid"></div>
+            <div class="feedback" id="match-feedback"></div>
+            <button class="next-btn" onclick="initComplexMatch()">New Game</button>
+        </div>
+    </div>
+
+    <div id="add-win-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeGame('add-win')">&times;</span>
+            <div class="game-header">
+                <h2>Add & Win ➕</h2>
+                <div class="score-display">Score: <span id="add-score">0</span></div>
+            </div>
+            <div class="addition-problem" id="add-problem"></div>
+            <div class="options-grid" id="add-options"></div>
+            <div class="feedback" id="add-feedback"></div>
+            <button class="next-btn" onclick="initAddWin()" style="display:none;" id="add-next-btn">Next Problem</button>
+        </div>
+    </div>
+
+    <div id="sort-game-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeGame('sort-game')">&times;</span>
+            <div class="game-header">
+                <h2>Real vs Imaginary Sort 🗂️</h2>
+                <div class="score-display">Score: <span id="sort-score">0</span></div>
+            </div>
+            <div class="current-number" id="current-sort-number"></div>
+            <div class="sorting-area">
+                <div class="sort-bin" id="real-bin" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <h3>Real Numbers</h3>
+                    <p>(Imaginary part = 0)</p>
+                </div>
+                <div class="sort-bin" id="complex-bin" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <h3>Complex Numbers</h3>
+                    <p>(Imaginary part ≠ 0)</p>
+                </div>
+            </div>
+            <div class="feedback" id="sort-feedback"></div>
+            <button class="next-btn" onclick="initSortGame()">Next Number</button>
+        </div>
+    </div>
+
+    <div id="quick-multiply-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeGame('quick-multiply')">&times;</span>
+            <div class="game-header">
+                <h2>Quick Multiply ⚡</h2>
+                <div class="score-display">Score: <span id="multiply-score">0</span></div>
+                <div class="timer-display" id="multiply-timer">30</div>
+            </div>
+            <div class="addition-problem" id="multiply-problem"></div>
+            <div class="input-area">
+                <input type="text" class="complex-input" id="multiply-answer" placeholder="Enter answer (e.g., 3+2i)">
+                <button class="submit-btn" onclick="checkMultiplyAnswer()">Submit</button>
+            </div>
+            <div class="feedback" id="multiply-feedback"></div>
+            <button class="next-btn" onclick="initQuickMultiply()" style="display:none;" id="multiply-restart-btn">Restart Game</button>
+        </div>
+    </div>
+
+    <div id="magnitude-challenge-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeGame('magnitude-challenge')">&times;</span>
+            <div class="game-header">
+                <h2>Magnitude Challenge 📏</h2>
+                <div class="score-display">Score: <span id="magnitude-score">0</span></div>
+            </div>
+            <div class="current-number" id="magnitude-number"></div>
+            <div class="magnitude-options" id="magnitude-options"></div>
+            <div class="feedback" id="magnitude-feedback"></div>
+            <button class="next-btn" onclick="initMagnitudeChallenge()" style="display:none;" id="magnitude-next-btn">Next Number</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state variables
+        let gameState = {
+            complexMatch: {
+                cards: [],
+                flipped: [],
+                matched: 0,
+                moves: 0,
+                score: 0
+            },
+            addWin: {
+                score: 0,
+                currentProblem: null,
+                answered: false
+            },
+            sortGame: {
+                score: 0,
+                currentNumber: null
+            },
+            quickMultiply: {
+                score: 0,
+                timer: 30,
+                timerInterval: null,
+                currentProblem: null,
+                gameOver: false
+            },
+            magnitudeChallenge: {
+                score: 0,
+                currentNumber: null,
+                answered: false
+            }
+        };
+
+        // Modal functions
+        function openGame(gameId) {
+            document.getElementById(`${gameId}-modal`).style.display = 'block';
+            
+            switch(gameId) {
+                case 'complex-match':
+                    initComplexMatch();
+                    break;
+                case 'add-win':
+                    initAddWin();
+                    break;
+                case 'sort-game':
+                    initSortGame();
+                    break;
+                case 'quick-multiply':
+                    initQuickMultiply();
+                    break;
+                case 'magnitude-challenge':
+                    initMagnitudeChallenge();
+                    break;
+            }
+        }
+
+        function closeGame(gameId) {
+            document.getElementById(`${gameId}-modal`).style.display = 'none';
+            
+            // Clean up game state
+            if (gameId === 'quick-multiply' && gameState.quickMultiply.timerInterval) {
+                clearInterval(gameState.quickMultiply.timerInterval);
+            }
+        }
+
+        // Complex number utilities
+        function parseComplex(str) {
+            // Parse complex number from string format like "3+2i" or "3-2i"
+            const regex = /^(-?\d*\.?\d+)?([+-]?\d*\.?\d+)i$/;
+            const match = str.match(regex);
+            
+            if (!match) {
+                // Handle pure real numbers
+                const real = parseFloat(str);
+                if (!isNaN(real)) {
+                    return { real: real, imag: 0 };
+                }
+                // Handle pure imaginary numbers
+                const imagRegex = /^([+-]?\d*\.?\d+)i$/;
+                const imagMatch = str.match(imagRegex);
+                if (imagMatch) {
+                    return { real: 0, imag: parseFloat(imagMatch[1]) };
+                }
+                return null;
+            }
+            
+            const real = match[1] ? parseFloat(match[1]) : 0;
+            const imag = parseFloat(match[2]);
+            return { real, imag };
+        }
+
+        function formatComplex(num) {
+            if (num.imag === 0) {
+                return num.real.toString();
+            } else if (num.real === 0) {
+                return num.imag === 1 ? 'i' : num.imag === -1 ? '-i' : `${num.imag}i`;
+            } else {
+                const imagSign = num.imag < 0 ? '-' : '+';
+                const imagValue = Math.abs(num.imag) === 1 ? '' : Math.abs(num.imag);
+                return `${num.real}${imagSign}${imagValue}i`;
+            }
+        }
+
+        function conjugate(num) {
+            return { real: num.real, imag: -num.imag };
+        }
+
+        function addComplex(a, b) {
+            return {
+                real: a.real + b.real,
+                imag: a.imag + b.imag
+            };
+        }
+
+        function multiplyComplex(a, b) {
+            return {
+                real: a.real * b.real - a.imag * b.imag,
+                imag: a.real * b.imag + a.imag * b.real
+            };
+        }
+
+        function magnitude(num) {
+            return Math.sqrt(num.real * num.real + num.imag * num.imag);
+        }
+
+        // Game 1: Complex Match
+        function initComplexMatch() {
+            const pairs = [
+                { real: 3, imag: 2 },
+                { real: 1, imag: -4 },
+                { real: 5, imag: 0 },
+                { real: 0, imag: 3 },
+                { real: -2, imag: 1 },
+                { real: 4, imag: -3 }
+            ];
+
+            // Reset game state
+            gameState.complexMatch = {
+                cards: [],
+                flipped: [],
+                matched: 0,
+                moves: 0,
+                score: 0
+            };
+
+            // Create cards
+            pairs.forEach((pair, index) => {
+                gameState.complexMatch.cards.push({
+                    id: index * 2,
+                    value: pair,
+                    conjugate: false
+                });
+                gameState.complexMatch.cards.push({
+                    id: index * 2 + 1,
+                    value: conjugate(pair),
+                    conjugate: true
+                });
+            });
+
+            // Shuffle cards
+            gameState.complexMatch.cards.sort(() => Math.random() - 0.5);
+
+            // Render cards
+            renderMemoryGrid();
+            updateMatchScore();
+        }
+
+        function renderMemoryGrid() {
+            const grid = document.getElementById('memory-grid');
+            grid.innerHTML = '';
+
+            gameState.complexMatch.cards.forEach(card => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'memory-card';
+                cardEl.dataset.id = card.id;
+                cardEl.onclick = () => flipCard(card.id);
+
+                cardEl.innerHTML = `
+                    <div class="card-front">
+                        <i class="fas fa-question" style="font-size: 2rem;"></i>
+                    </div>
+                    <div class="card-back">
+                        ${formatComplex(card.value)}
+                    </div>
+                `;
+
+                grid.appendChild(cardEl);
+            });
+        }
+
+        function flipCard(id) {
+            if (gameState.complexMatch.flipped.length >= 2) return;
+            if (gameState.complexMatch.flipped.includes(id)) return;
+
+            const cardEl = document.querySelector(`[data-id="${id}"]`);
+            cardEl.classList.add('flipped');
+            gameState.complexMatch.flipped.push(id);
+
+            if (gameState.complexMatch.flipped.length === 2) {
+                gameState.complexMatch.moves++;
+                updateMatchScore();
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            const [id1, id2] = gameState.complexMatch.flipped;
+            const card1 = gameState.complexMatch.cards.find(c => c.id === id1);
+            const card2 = gameState.complexMatch.cards.find(c => c.id === id2);
+
+            const isMatch = (card1.conjugate !== card2.conjugate) &&
+                          (card1.value.real === card2.value.real) &&
+                          (Math.abs(card1.value.imag) === Math.abs(card2.value.imag));
+
+            if (isMatch) {
+                setTimeout(() => {
+                    document.querySelector(`[data-id="${id1}"]`).classList.add('matched');
+                    document.querySelector(`[data-id="${id2}"]`).classList.add('matched');
+                    gameState.complexMatch.matched++;
+                    gameState.complexMatch.score += 10;
+                    updateMatchScore();
+                    
+                    if (gameState.complexMatch.matched === 6) {
+                        document.getElementById('match-feedback').innerHTML = 
+                            '<span class="success">🎉 Congratulations! You matched all pairs!</span>';
+                    }
+                    
+                    gameState.complexMatch.flipped = [];
+                }, 500);
+            } else {
+                setTimeout(() => {
+                    document.querySelector(`[data-id="${id1}"]`).classList.remove('flipped');
+                    document.querySelector(`[data-id="${id2}"]`).classList.remove('flipped');
+                    gameState.complexMatch.flipped = [];
+                }, 1000);
+            }
+        }
+
+        function updateMatchScore() {
+            document.getElementById('match-score').textContent = gameState.complexMatch.score;
+            document.getElementById('match-moves').textContent = gameState.complexMatch.moves;
+        }
+
+        // Game 2: Add & Win
+        function initAddWin() {
+            gameState.addWin.answered = false;
+            document.getElementById('add-next-btn').style.display = 'none';
+            document.getElementById('add-feedback').innerHTML = '';
+            
+            // Generate random complex numbers
+            const num1 = {
+                real: Math.floor(Math.random() * 10) - 5,
+                imag: Math.floor(Math.random() * 10) - 5
+            };
+            const num2 = {
+                real: Math.floor(Math.random() * 10) - 5,
+                imag: Math.floor(Math.random() * 10) - 5
+            };
+
+            const sum = addComplex(num1, num2);
+            gameState.addWin.currentProblem = { num1, num2, sum };
+
+            // Display problem
+            document.getElementById('add-problem').innerHTML = 
+                `(${formatComplex(num1)}) + (${formatComplex(num2)}) = ?`;
+
+            // Generate options
+            const options = [sum];
+            while (options.length < 3) {
+                const wrong = {
+                    real: sum.real + Math.floor(Math.random() * 5) - 2,
+                    imag: sum.imag + Math.floor(Math.random() * 5) - 2
+                };
+                if (!options.some(o => o.real === wrong.real && o.imag === wrong.imag)) {
+                    options.push(wrong);
+                }
+            }
+
+            // Shuffle options
+            options.sort(() => Math.random() - 0.5);
+
+            // Render options
+            const optionsGrid = document.getElementById('add-options');
+            optionsGrid.innerHTML = '';
+            options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = formatComplex(option);
+                btn.onclick = () => checkAddAnswer(option);
+                optionsGrid.appendChild(btn);
+            });
+        }
+
+        function checkAddAnswer(selected) {
+            if (gameState.addWin.answered) return;
+            
+            gameState.addWin.answered = true;
+            const { sum } = gameState.addWin.currentProblem;
+            const feedback = document.getElementById('add-feedback');
+            
+            if (selected.real === sum.real && selected.imag === sum.imag) {
+                gameState.addWin.score += 10;
+                feedback.innerHTML = '<span class="success">✓ Correct! Well done!</span>';
+                
+                // Highlight correct answer
+                document.querySelectorAll('.option-btn').forEach(btn => {
+                    if (btn.textContent === formatComplex(sum)) {
+                        btn.classList.add('correct');
+                    }
+                });
+            } else {
+                feedback.innerHTML = '<span class="error">✗ Incorrect. Try again!</span>';
+                
+                // Highlight correct and wrong answers
+                document.querySelectorAll('.option-btn').forEach(btn => {
+                    if (btn.textContent === formatComplex(sum)) {
+                        btn.classList.add('correct');
+                    } else if (btn.textContent === formatComplex(selected)) {
+                        btn.classList.add('incorrect');
+                    }
+                });
+            }
+            
+            document.getElementById('add-score').textContent = gameState.addWin.score;
+            document.getElementById('add-next-btn').style.display = 'block';
+        }
+
+        // Game 3: Real vs Imaginary Sort
+        function initSortGame() {
+            document.getElementById('sort-feedback').innerHTML = '';
+            
+            // Generate random complex number
+            const isReal = Math.random() > 0.5;
+            const num = {
+                real: Math.floor(Math.random() * 10) - 5,
+                imag: isReal ? 0 : Math.floor(Math.random() * 10) - 5
+            };
+            
+            gameState.sortGame.currentNumber = num;
+            
+            // Create draggable card
+            const currentNumberEl = document.getElementById('current-sort-number');
+            currentNumberEl.innerHTML = `
+                <div class="number-card" draggable="true" ondragstart="drag(event)" id="drag-card">
+                    ${formatComplex(num)}
+                </div>
+            `;
+        }
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.add('active');
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.remove('active');
+            
+            const data = ev.dataTransfer.getData("text");
+            const draggedEl = document.getElementById(data);
+            
+            const binId = ev.currentTarget.id;
+            const isRealBin = binId === 'real-bin';
+            const isRealNumber = gameState.sortGame.currentNumber.imag === 0;
+            
+            const feedback = document.getElementById('sort-feedback');
+            
+            if (isRealBin === isRealNumber) {
+                gameState.sortGame.score += 10;
+                feedback.innerHTML = '<span class="success">✓ Correct!</span>';
+                ev.currentTarget.appendChild(draggedEl);
+                draggedEl.draggable = false;
+                draggedEl.style.cursor = 'default';
+            } else {
+                feedback.innerHTML = '<span class="error">✗ Incorrect. Try again!</span>';
+                draggedEl.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    draggedEl.style.animation = '';
+                }, 500);
+            }
+            
+            document.getElementById('sort-score').textContent = gameState.sortGame.score;
+        }
+
+        // Game 4: Quick Multiply
+        function initQuickMultiply() {
+            gameState.quickMultiply = {
+                score: 0,
+                timer: 30,
+                timerInterval: null,
+                currentProblem: null,
+                gameOver: false
+            };
+            
+            document.getElementById('multiply-restart-btn').style.display = 'none';
+            document.getElementById('multiply-feedback').innerHTML = '';
+            document.getElementById('multiply-answer').value = '';
+            document.getElementById('multiply-answer').focus();
+            
+            // Start timer
+            updateTimer();
+            gameState.quickMultiply.timerInterval = setInterval(() => {
+                gameState.quickMultiply.timer--;
+                updateTimer();
+                
+                if (gameState.quickMultiply.timer <= 0) {
+                    endQuickMultiply();
+                }
+            }, 1000);
+            
+            generateMultiplyProblem();
+        }
+
+        function updateTimer() {
+            document.getElementById('multiply-timer').textContent = gameState.quickMultiply.timer;
+        }
+
+        function generateMultiplyProblem() {
+            const num1 = {
+                real: Math.floor(Math.random() * 5) - 2,
+                imag: Math.floor(Math.random() * 5) - 2
+            };
+            const num2 = {
+                real: Math.floor(Math.random() * 5) - 2,
+                imag: Math.floor(Math.random() * 5) - 2
+            };
+
+            const product = multiplyComplex(num1, num2);
+            gameState.quickMultiply.currentProblem = { num1, num2, product };
+
+            document.getElementById('multiply-problem').innerHTML = 
+                `(${formatComplex(num1)}) × (${formatComplex(num2)}) = ?`;
+        }
+
+        function checkMultiplyAnswer() {
+            if (gameState.quickMultiply.gameOver) return;
+            
+            const answer = document.getElementById('multiply-answer').value;
+            const parsed = parseComplex(answer);
+            
+            if (!parsed) {
+                document.getElementById('multiply-feedback').innerHTML = 
+                    '<span class="error">Please enter a valid complex number!</span>';
+                return;
+            }
+            
+            const { product } = gameState.quickMultiply.currentProblem;
+            const feedback = document.getElementById('multiply-feedback');
+            
+            if (parsed.real === product.real && parsed.imag === product.imag) {
+                gameState.quickMultiply.score += 15;
+                gameState.quickMultiply.timer += 5; // Bonus time
+                feedback.innerHTML = '<span class="success">✓ Correct! +5 seconds bonus!</span>';
+                
+                setTimeout(() => {
+                    document.getElementById('multiply-answer').value = '';
+                    feedback.innerHTML = '';
+                    generateMultiplyProblem();
+                }, 1500);
+            } else {
+                gameState.quickMultiply.score = Math.max(0, gameState.quickMultiply.score - 5);
+                feedback.innerHTML = `<span class="error">✗ Incorrect. The answer is ${formatComplex(product)}</span>`;
+            }
+            
+            document.getElementById('multiply-score').textContent = gameState.quickMultiply.score;
+        }
+
+        function endQuickMultiply() {
+            clearInterval(gameState.quickMultiply.timerInterval);
+            gameState.quickMultiply.gameOver = true;
+            
+            document.getElementById('multiply-feedback').innerHTML = 
+                `<span class="success">Game Over! Final Score: ${gameState.quickMultiply.score}</span>`;
+            document.getElementById('multiply-restart-btn').style.display = 'block';
+        }
+
+        // Game 5: Magnitude Challenge
+        function initMagnitudeChallenge() {
+            gameState.magnitudeChallenge.answered = false;
+            document.getElementById('magnitude-next-btn').style.display = 'none';
+            document.getElementById('magnitude-feedback').innerHTML = '';
+            
+            // Generate random complex number
+            const num = {
+                real: Math.floor(Math.random() * 10) - 5,
+                imag: Math.floor(Math.random() * 10) - 5
+            };
+            
+            const mag = magnitude(num);
+            gameState.magnitudeChallenge.currentNumber = { num, mag };
+            
+            // Display number
+            document.getElementById('magnitude-number').innerHTML = 
+                `|${formatComplex(num)}| = ?`;
+            
+            // Generate options
+            const options = [mag];
+            while (options.length < 4) {
+                const wrong = mag + (Math.random() * 4 - 2);
+                if (!options.some(o => Math.abs(o - wrong) < 0.1)) {
+                    options.push(wrong);
+                }
+            }
+            
+            // Shuffle options
+            options.sort(() => Math.random() - 0.5);
+            
+            // Render options
+            const optionsContainer = document.getElementById('magnitude-options');
+            optionsContainer.innerHTML = '';
+            options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'magnitude-btn';
+                btn.textContent = option.toFixed(2);
+                btn.onclick = () => checkMagnitudeAnswer(option);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkMagnitudeAnswer(selected) {
+            if (gameState.magnitudeChallenge.answered) return;
+            
+            gameState.magnitudeChallenge.answered = true;
+            const { mag } = gameState.magnitudeChallenge.currentNumber;
+            const feedback = document.getElementById('magnitude-feedback');
+            
+            if (Math.abs(selected - mag) < 0.01) {
+                gameState.magnitudeChallenge.score += 10;
+                feedback.innerHTML = '<span class="success">✓ Correct!</span>';
+                
+                // Highlight correct answer
+                document.querySelectorAll('.magnitude-btn').forEach(btn => {
+                    if (Math.abs(parseFloat(btn.textContent) - mag) < 0.01) {
+                        btn.style.background = 'var(--success)';
+                        btn.style.color = 'white';
+                    }
+                });
+            } else {
+                feedback.innerHTML = `<span class="error">✗ Incorrect. The answer is ${mag.toFixed(2)}</span>`;
+                
+                // Highlight correct and wrong answers
+                document.querySelectorAll('.magnitude-btn').forEach(btn => {
+                    if (Math.abs(parseFloat(btn.textContent) - mag) < 0.01) {
+                        btn.style.background = 'var(--success)';
+                        btn.style.color = 'white';
+                    } else if (Math.abs(parseFloat(btn.textContent) - selected) < 0.01) {
+                        btn.style.background = 'var(--danger)';
+                        btn.style.color = 'white';
+                    }
+                });
+            }
+            
+            document.getElementById('magnitude-score').textContent = gameState.magnitudeChallenge.score;
+            document.getElementById('magnitude-next-btn').style.display = 'block';
+        }
+
+        // Add shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Handle Enter key for Quick Multiply
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('multiply-answer').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    checkMultiplyAnswer();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

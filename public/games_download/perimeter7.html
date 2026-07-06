@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geometry Games Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #5D4157 0%, #A8CABA 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+        }
+
+        /* Main Menu Styles */
+        .main-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #5D4157, #A8CABA);
+        }
+
+        .game-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .game-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .game-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        /* Game Container Styles */
+        .game-container {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            animation: slideIn 0.5s ease-in;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .game-title {
+            font-size: 28px;
+            color: #333;
+        }
+
+        .score {
+            font-size: 20px;
+            font-weight: bold;
+            color: #5D4157;
+        }
+
+        .back-btn {
+            background: #5D4157;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #A8CABA;
+            transform: scale(1.05);
+        }
+
+        /* Perimeter Click Game Styles */
+        .shape-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px 0;
+            height: 200px;
+        }
+
+        .shape {
+            position: relative;
+        }
+
+        .rectangle {
+            width: 150px;
+            height: 100px;
+            background: #5D4157;
+            border: 3px solid #333;
+        }
+
+        .square {
+            width: 120px;
+            height: 120px;
+            background: #A8CABA;
+            border: 3px solid #333;
+        }
+
+        .triangle {
+            width: 0;
+            height: 0;
+            border-left: 75px solid transparent;
+            border-right: 75px solid transparent;
+            border-bottom: 130px solid #5D4157;
+        }
+
+        .dimension-label {
+            position: absolute;
+            background: rgba(255,255,255,0.8);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .input-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .input-container input {
+            padding: 10px 20px;
+            font-size: 18px;
+            border: 2px solid #5D4157;
+            border-radius: 10px;
+            width: 200px;
+            text-align: center;
+            margin-right: 10px;
+        }
+
+        .input-container button {
+            padding: 10px 30px;
+            font-size: 18px;
+            background: #5D4157;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .input-container button:hover {
+            background: #A8CABA;
+        }
+
+        .hint {
+            text-align: center;
+            color: #f44336;
+            margin-top: 10px;
+            min-height: 20px;
+        }
+
+        /* Area Match Game Styles */
+        .area-shape-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px 0;
+            height: 200px;
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .option-btn {
+            padding: 20px;
+            background: #f8f9fa;
+            border: 2px solid #5D4157;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .option-btn:hover {
+            background: #5D4157;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .timer {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #5D4157;
+        }
+
+        /* Volume Quiz Game Styles */
+        .volume-shape-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px 0;
+            height: 200px;
+            perspective: 800px;
+        }
+
+        .cube {
+            width: 100px;
+            height: 100px;
+            background: #5D4157;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(-30deg) rotateY(30deg);
+        }
+
+        .cube-face {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: rgba(93, 65, 87, 0.8);
+            border: 2px solid #333;
+        }
+
+        .cube-face.front { transform: translateZ(50px); }
+        .cube-face.back { transform: rotateY(180deg) translateZ(50px); }
+        .cube-face.right { transform: rotateY(90deg) translateZ(50px); }
+        .cube-face.left { transform: rotateY(-90deg) translateZ(50px); }
+        .cube-face.top { transform: rotateX(90deg) translateZ(50px); }
+        .cube-face.bottom { transform: rotateX(-90deg) translateZ(50px); }
+
+        .cuboid {
+            width: 120px;
+            height: 80px;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(-30deg) rotateY(30deg);
+        }
+
+        .cuboid-face {
+            position: absolute;
+            border: 2px solid #333;
+        }
+
+        .cuboid-face.front, .cuboid-face.back {
+            width: 120px;
+            height: 80px;
+            background: rgba(168, 202, 186, 0.8);
+        }
+
+        .cuboid-face.front { transform: translateZ(40px); }
+        .cuboid-face.back { transform: rotateY(180deg) translateZ(40px); }
+
+        .cuboid-face.right, .cuboid-face.left {
+            width: 80px;
+            height: 80px;
+            background: rgba(93, 65, 87, 0.8);
+        }
+
+        .cuboid-face.right { transform: rotateY(90deg) translateZ(60px); }
+        .cuboid-face.left { transform: rotateY(-90deg) translateZ(60px); }
+
+        .cuboid-face.top, .cuboid-face.bottom {
+            width: 120px;
+            height: 80px;
+            background: rgba(168, 202, 186, 0.8);
+        }
+
+        .cuboid-face.top { transform: rotateX(90deg) translateZ(40px); }
+        .cuboid-face.bottom { transform: rotateX(-90deg) translateZ(40px); }
+
+        .volume-options {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .volume-option {
+            padding: 15px 25px;
+            background: #f8f9fa;
+            border: 2px solid #5D4157;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .volume-option:hover {
+            background: #5D4157;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Surface Area Pop Game Styles */
+        .pop-area {
+            position: relative;
+            height: 400px;
+            background: linear-gradient(to bottom, #87CEEB, #98FB98);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .floating-shape {
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .floating-shape:hover {
+            transform: scale(1.1);
+        }
+
+        .shape-number {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .pop-question {
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .hint-box {
+            text-align: center;
+            color: #f44336;
+            margin-top: 10px;
+            min-height: 20px;
+        }
+
+        /* Perimeter/Area Race Game Styles */
+        .race-track {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .track {
+            position: relative;
+            height: 100px;
+            background: #ddd;
+            border-radius: 50px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .track-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: repeating-linear-gradient(
+                90deg,
+                #fff,
+                #fff 20px,
+                #999 20px,
+                #999 40px
+            );
+            transform: translateY(-50%);
+        }
+
+        .character {
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%);
+            font-size: 40px;
+            transition: left 0.5s ease;
+        }
+
+        .race-question {
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .race-input {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .race-input input {
+            padding: 10px 20px;
+            font-size: 20px;
+            border: 2px solid #5D4157;
+            border-radius: 10px;
+            width: 150px;
+            text-align: center;
+        }
+
+        .race-input button {
+            padding: 10px 30px;
+            font-size: 18px;
+            background: #5D4157;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .race-input button:hover {
+            background: #A8CABA;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5); }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        .feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 40px;
+            border-radius: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            z-index: 1000;
+            animation: feedbackPop 1s ease-out forwards;
+        }
+
+        .feedback.correct {
+            background: #4CAF50;
+        }
+
+        .feedback.incorrect {
+            background: #f44336;
+        }
+
+        @keyframes feedbackPop {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Main Menu -->
+        <div id="mainMenu" class="main-menu">
+            <div class="game-card" onclick="showGame('perimeterClick')">
+                <div class="game-icon">📐</div>
+                <h3>Perimeter Click Game</h3>
+                <p>Calculate the perimeter of shapes and type your answer!</p>
+            </div>
+            <div class="game-card" onclick="showGame('areaMatch')">
+                <div class="game-icon">🔲</div>
+                <h3>Area Match</h3>
+                <p>Match shapes with their correct area from multiple choices!</p>
+            </div>
+            <div class="game-card" onclick="showGame('volumeQuiz')">
+                <div class="game-icon">📦</div>
+                <h3>Volume Quiz</h3>
+                <p>Calculate the volume of 3D shapes and select the correct answer!</p>
+            </div>
+            <div class="game-card" onclick="showGame('surfaceAreaPop')">
+                <div class="game-icon">🎈</div>
+                <h3>Surface Area Pop</h3>
+                <p>Pop the floating shapes with the correct surface area!</p>
+            </div>
+            <div class="game-card" onclick="showGame('perimeterAreaRace')">
+                <div class="game-icon">🏃</div>
+                <h3>Perimeter/Area Race</h3>
+                <p>Race to the finish line by solving perimeter and area problems!</p>
+            </div>
+        </div>
+
+        <!-- Perimeter Click Game -->
+        <div id="perimeterClick" class="game-container">
+            <div class="game-header">
+                <h2 class="game-title">Perimeter Click Game</h2>
+                <div class="score">Score: <span id="perimeterScore">0</span></div>
+                <button class="back-btn" onclick="showMainMenu()">Back to Menu</button>
+            </div>
+            <div class="shape-container" id="perimeterShapeContainer"></div>
+            <div class="input-container">
+                <input type="number" id="perimeterInput" placeholder="Enter perimeter">
+                <button onclick="checkPerimeter()">Submit</button>
+            </div>
+            <div class="hint" id="perimeterHint"></div>
+            <button onclick="generatePerimeterShape()" style="padding: 10px 20px; background: #5D4157; color: white; border: none; border-radius: 10px; cursor: pointer; margin: 20px auto; display: block;">New Shape</button>
+        </div>
+
+        <!-- Area Match Game -->
+        <div id="areaMatch" class="game-container">
+            <div class="game-header">
+                <h2 class="game-title">Area Match</h2>
+                <div class="score">Score: <span id="areaScore">0</span></div>
+                <button class="back-btn" onclick="showMainMenu()">Back to Menu</button>
+            </div>
+            <div class="timer" id="areaTimer">Time: 5s</div>
+            <div class="area-shape-container" id="areaShapeContainer"></div>
+            <div class="options-container" id="areaOptions"></div>
+            <button onclick="generateAreaShape()" style="padding: 10px 20px; background: #5D4157; color: white; border: none; border-radius: 10px; cursor: pointer; margin: 20px auto; display: block;">New Shape</button>
+        </div>
+
+        <!-- Volume Quiz Game -->
+        <div id="volumeQuiz" class="game-container">
+            <div class="game-header">
+                <h2 class="game-title">Volume Quiz</h2>
+                <div class="score">Score: <span id="volumeScore">0</span></div>
+                <button class="back-btn" onclick="showMainMenu()">Back to Menu</button>
+            </div>
+            <div class="volume-shape-container" id="volumeShapeContainer"></div>
+            <div class="volume-options" id="volumeOptions"></div>
+            <button onclick="generateVolumeShape()" style="padding: 10px 20px; background: #5D4157; color: white; border: none; border-radius: 10px; cursor: pointer; margin: 20px auto; display: block;">New Shape</button>
+        </div>
+
+        <!-- Surface Area Pop Game -->
+        <div id="surfaceAreaPop" class="game-container">
+            <div class="game-header">
+                <h2 class="game-title">Surface Area Pop</h2>
+                <div class="score">Score: <span id="popScore">0</span></div>
+                <button class="back-btn" onclick="showMainMenu()">Back to Menu</button>
+            </div>
+            <div class="pop-question" id="popQuestion">Click the number equal to surface area of this cuboid</div>
+            <div class="pop-area" id="popArea"></div>
+            <div class="hint-box" id="popHint"></div>
+            <button onclick="generatePopShapes()" style="padding: 10px 20px; background: #5D4157; color: white; border: none; border-radius: 10px; cursor: pointer; margin: 20px auto; display: block;">New Round</button>
+        </div>
+
+        <!-- Perimeter/Area Race Game -->
+        <div id="perimeterAreaRace" class="game-container">
+            <div class="game-header">
+                <h2 class="game-title">Perimeter/Area Race</h2>
+                <div class="score">Position: <span id="racePosition">0</span>%</div>
+                <button class="back-btn" onclick="showMainMenu()">Back to Menu</button>
+            </div>
+            <div class="race-track">
+                <div class="track">
+                    <div class="track-line"></div>
+                    <div class="character" id="raceCharacter">🏃</div>
+                </div>
+            </div>
+            <div class="race-question" id="raceQuestion">Calculate the perimeter or area of this shape</div>
+            <div class="shape-container" id="raceShapeContainer" style="height: 150px;"></div>
+            <div class="race-input">
+                <input type="number" id="raceInput" placeholder="Your answer">
+                <button onclick="checkRaceAnswer()">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state variables
+        let currentGame = '';
+        let scores = {
+            perimeter: 0,
+            area: 0,
+            volume: 0,
+            pop: 0,
+            race: 0
+        };
+
+        // Show main menu
+        function showMainMenu() {
+            document.querySelectorAll('.game-container').forEach(container => {
+                container.style.display = 'none';
+            });
+            document.getElementById('mainMenu').style.display = 'grid';
+            currentGame = '';
+        }
+
+        // Show specific game
+        function showGame(gameName) {
+            document.getElementById('mainMenu').style.display = 'none';
+            document.querySelectorAll('.game-container').forEach(container => {
+                container.style.display = 'none';
+            });
+            document.getElementById(gameName).style.display = 'block';
+            currentGame = gameName;
+            
+            // Initialize game
+            switch(gameName) {
+                case 'perimeterClick':
+                    generatePerimeterShape();
+                    break;
+                case 'areaMatch':
+                    generateAreaShape();
+                    break;
+                case 'volumeQuiz':
+                    generateVolumeShape();
+                    break;
+                case 'surfaceAreaPop':
+                    generatePopShapes();
+                    break;
+                case 'perimeterAreaRace':
+                    initRaceGame();
+                    break;
+            }
+        }
+
+        // Feedback function
+        function showFeedback(correct) {
+            const feedback = document.createElement('div');
+            feedback.className = `feedback ${correct ? 'correct' : 'incorrect'}`;
+            feedback.textContent = correct ? 'Correct! 🎉' : 'Try Again! 💪';
+            document.body.appendChild(feedback);
+            setTimeout(() => feedback.remove(), 1000);
+        }
+
+        // Perimeter Click Game
+        let currentPerimeter = 0;
+        let perimeterAttempts = 0;
+
+        function generatePerimeterShape() {
+            const container = document.getElementById('perimeterShapeContainer');
+            container.innerHTML = '';
+            document.getElementById('perimeterInput').value = '';
+            document.getElementById('perimeterHint').textContent = '';
+            perimeterAttempts = 0;
+            
+            const shapes = ['rectangle', 'square', 'triangle'];
+            const shapeType = shapes[Math.floor(Math.random() * shapes.length)];
+            
+            const shape = document.createElement('div');
+            shape.className = `shape ${shapeType}`;
+            
+            if (shapeType === 'rectangle') {
+                const width = Math.floor(Math.random() * 10) + 5;
+                const height = Math.floor(Math.random() * 10) + 5;
+                shape.style.width = `${width * 15}px`;
+                shape.style.height = `${height * 15}px`;
+                currentPerimeter = 2 * (width + height);
+                
+                // Add dimension labels
+                const widthLabel = document.createElement('div');
+                widthLabel.className = 'dimension-label';
+                widthLabel.textContent = `${width}`;
+                widthLabel.style.bottom = '-30px';
+                widthLabel.style.left = '50%';
+                widthLabel.style.transform = 'translateX(-50%)';
+                
+                const heightLabel = document.createElement('div');
+                heightLabel.className = 'dimension-label';
+                heightLabel.textContent = `${height}`;
+                heightLabel.style.right = '-40px';
+                heightLabel.style.top = '50%';
+                heightLabel.style.transform = 'translateY(-50%)';
+                
+                shape.appendChild(widthLabel);
+                shape.appendChild(heightLabel);
+            } else if (shapeType === 'square') {
+                const side = Math.floor(Math.random() * 10) + 5;
+                shape.style.width = `${side * 15}px`;
+                shape.style.height = `${side * 15}px`;
+                currentPerimeter = 4 * side;
+                
+                // Add dimension label
+                const label = document.createElement('div');
+                label.className = 'dimension-label';
+                label.textContent = `${side}`;
+                label.style.right = '-40px';
+                label.style.top = '50%';
+                label.style.transform = 'translateY(-50%)';
+                
+                shape.appendChild(label);
+            } else if (shapeType === 'triangle') {
+                const base = Math.floor(Math.random() * 10) + 5;
+                const height = Math.floor(Math.random() * 10) + 5;
+                shape.style.borderLeftWidth = `${base * 7.5}px`;
+                shape.style.borderRightWidth = `${base * 7.5}px`;
+                shape.style.borderBottomWidth = `${height * 15}px`;
+                
+                // For simplicity, we'll use an isosceles triangle
+                const side = Math.sqrt(Math.pow(base/2, 2) + Math.pow(height, 2));
+                currentPerimeter = base + 2 * Math.round(side);
+                
+                // Add dimension labels
+                const baseLabel = document.createElement('div');
+                baseLabel.className = 'dimension-label';
+                baseLabel.textContent = `${base}`;
+                baseLabel.style.bottom = '-30px';
+                baseLabel.style.left = '50%';
+                baseLabel.style.transform = 'translateX(-50%)';
+                
+                shape.appendChild(baseLabel);
+            }
+            
+            container.appendChild(shape);
+        }
+
+        function checkPerimeter() {
+            const userAnswer = parseFloat(document.getElementById('perimeterInput').value);
+            
+            if (userAnswer === currentPerimeter) {
+                scores.perimeter++;
+                document.getElementById('perimeterScore').textContent = scores.perimeter;
+                showFeedback(true);
+                setTimeout(() => generatePerimeterShape(), 1000);
+            } else {
+                perimeterAttempts++;
+                document.getElementById('perimeterHint').textContent = 
+                    perimeterAttempts >= 2 ? `Hint: The perimeter is ${currentPerimeter}` : 'Incorrect, try again!';
+                showFeedback(false);
+            }
+        }
+
+        // Area Match Game
+        let currentArea = 0;
+        let areaTimer = 5;
+        let areaTimerInterval;
+        let areaPoints = 5;
+
+        function generateAreaShape() {
+            clearInterval(areaTimerInterval);
+            const container = document.getElementById('areaShapeContainer');
+            const optionsContainer = document.getElementById('areaOptions');
+            container.innerHTML = '';
+            optionsContainer.innerHTML = '';
+            
+            areaTimer = 5;
+            areaPoints = 5;
+            document.getElementById('areaTimer').textContent = `Time: ${areaTimer}s`;
+            
+            const shapes = ['rectangle', 'square'];
+            const shapeType = shapes[Math.floor(Math.random() * shapes.length)];
+            
+            const shape = document.createElement('div');
+            shape.className = `shape ${shapeType}`;
+            
+            if (shapeType === 'rectangle') {
+                const width = Math.floor(Math.random() * 8) + 3;
+                const height = Math.floor(Math.random() * 8) + 3;
+                shape.style.width = `${width * 20}px`;
+                shape.style.height = `${height * 20}px`;
+                currentArea = width * height;
+                
+                // Add dimension labels
+                const widthLabel = document.createElement('div');
+                widthLabel.className = 'dimension-label';
+                widthLabel.textContent = `${width}`;
+                widthLabel.style.bottom = '-30px';
+                widthLabel.style.left = '50%';
+                widthLabel.style.transform = 'translateX(-50%)';
+                
+                const heightLabel = document.createElement('div');
+                heightLabel.className = 'dimension-label';
+                heightLabel.textContent = `${height}`;
+                heightLabel.style.right = '-40px';
+                heightLabel.style.top = '50%';
+                heightLabel.style.transform = 'translateY(-50%)';
+                
+                shape.appendChild(widthLabel);
+                shape.appendChild(heightLabel);
+            } else if (shapeType === 'square') {
+                const side = Math.floor(Math.random() * 8) + 3;
+                shape.style.width = `${side * 20}px`;
+                shape.style.height = `${side * 20}px`;
+                currentArea = side * side;
+                
+                // Add dimension label
+                const label = document.createElement('div');
+                label.className = 'dimension-label';
+                label.textContent = `${side}`;
+                label.style.right = '-40px';
+                label.style.top = '50%';
+                label.style.transform = 'translateY(-50%)';
+                
+                shape.appendChild(label);
+            }
+            
+            container.appendChild(shape);
+            
+            // Generate options
+            const options = [currentArea];
+            while (options.length < 4) {
+                const randomOption = Math.floor(Math.random() * 100) + 1;
+                if (!options.includes(randomOption)) {
+                    options.push(randomOption);
+                }
+            }
+            
+            // Shuffle options
+            options.sort(() => Math.random() - 0.5);
+            
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'option-btn';
+                button.textContent = option;
+                button.onclick = () => checkArea(option);
+                optionsContainer.appendChild(button);
+            });
+            
+            // Start timer
+            areaTimerInterval = setInterval(() => {
+                areaTimer--;
+                areaPoints = Math.max(1, areaPoints - 1);
+                document.getElementById('areaTimer').textContent = `Time: ${areaTimer}s`;
+                
+                if (areaTimer <= 0) {
+                    clearInterval(areaTimerInterval);
+                    showFeedback(false);
+                    setTimeout(() => generateAreaShape(), 1000);
+                }
+            }, 1000);
+        }
+
+        function checkArea(selectedArea) {
+            clearInterval(areaTimerInterval);
+            
+            if (selectedArea === currentArea) {
+                scores.area += areaPoints;
+                document.getElementById('areaScore').textContent = scores.area;
+                showFeedback(true);
+                setTimeout(() => generateAreaShape(), 1000);
+            } else {
+                showFeedback(false);
+                setTimeout(() => generateAreaShape(), 1000);
+            }
+        }
+
+        // Volume Quiz Game
+        let currentVolume = 0;
+
+        function generateVolumeShape() {
+            const container = document.getElementById('volumeShapeContainer');
+            const optionsContainer = document.getElementById('volumeOptions');
+            container.innerHTML = '';
+            optionsContainer.innerHTML = '';
+            
+            const shapes = ['cube', 'cuboid'];
+            const shapeType = shapes[Math.floor(Math.random() * shapes.length)];
+            
+            if (shapeType === 'cube') {
+                const side = Math.floor(Math.random() * 5) + 2;
+                currentVolume = side * side * side;
+                
+                const cube = document.createElement('div');
+                cube.className = 'cube';
+                
+                // Add faces
+                for (let i = 0; i < 6; i++) {
+                    const face = document.createElement('div');
+                    face.className = 'cube-face';
+                    if (i === 0) face.classList.add('front');
+                    else if (i === 1) face.classList.add('back');
+                    else if (i === 2) face.classList.add('right');
+                    else if (i === 3) face.classList.add('left');
+                    else if (i === 4) face.classList.add('top');
+                    else if (i === 5) face.classList.add('bottom');
+                    cube.appendChild(face);
+                }
+                
+                // Add dimension label
+                const label = document.createElement('div');
+                label.className = 'dimension-label';
+                label.textContent = `${side}`;
+                label.style.bottom = '-40px';
+                label.style.left = '50%';
+                label.style.transform = 'translateX(-50%)';
+                label.style.zIndex = '10';
+                
+                container.appendChild(cube);
+                container.appendChild(label);
+            } else if (shapeType === 'cuboid') {
+                const length = Math.floor(Math.random() * 5) + 2;
+                const width = Math.floor(Math.random() * 5) + 2;
+                const height = Math.floor(Math.random() * 5) + 2;
+                currentVolume = length * width * height;
+                
+                const cuboid = document.createElement('div');
+                cuboid.className = 'cuboid';
+                cuboid.style.width = `${length * 20}px`;
+                cuboid.style.height = `${height * 20}px`;
+                
+                // Add faces
+                for (let i = 0; i < 6; i++) {
+                    const face = document.createElement('div');
+                    face.className = 'cuboid-face';
+                    if (i === 0) face.classList.add('front');
+                    else if (i === 1) face.classList.add('back');
+                    else if (i === 2) face.classList.add('right');
+                    else if (i === 3) face.classList.add('left');
+                    else if (i === 4) face.classList.add('top');
+                    else if (i === 5) face.classList.add('bottom');
+                    cuboid.appendChild(face);
+                }
+                
+                // Add dimension labels
+                const lengthLabel = document.createElement('div');
+                lengthLabel.className = 'dimension-label';
+                lengthLabel.textContent = `${length}`;
+                lengthLabel.style.bottom = '-40px';
+                lengthLabel.style.left = '50%';
+                lengthLabel.style.transform = 'translateX(-50%)';
+                lengthLabel.style.zIndex = '10';
+                
+                const widthLabel = document.createElement('div');
+                widthLabel.className = 'dimension-label';
+                widthLabel.textContent = `${width}`;
+                widthLabel.style.right = '-50px';
+                widthLabel.style.top = '50%';
+                widthLabel.style.transform = 'translateY(-50%)';
+                widthLabel.style.zIndex = '10';
+                
+                const heightLabel = document.createElement('div');
+                heightLabel.className = 'dimension-label';
+                heightLabel.textContent = `${height}`;
+                heightLabel.style.top = '-40px';
+                heightLabel.style.left = '50%';
+                heightLabel.style.transform = 'translateX(-50%)';
+                heightLabel.style.zIndex = '10';
+                
+                container.appendChild(cuboid);
+                container.appendChild(lengthLabel);
+                container.appendChild(widthLabel);
+                container.appendChild(heightLabel);
+            }
+            
+            // Generate options
+            const options = [currentVolume];
+            while (options.length < 3) {
+                const randomOption = Math.floor(Math.random() * 100) + 1;
+                if (!options.includes(randomOption)) {
+                    options.push(randomOption);
+                }
+            }
+            
+            // Shuffle options
+            options.sort(() => Math.random() - 0.5);
+            
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'volume-option';
+                button.textContent = option;
+                button.onclick = () => checkVolume(option);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function checkVolume(selectedVolume) {
+            if (selectedVolume === currentVolume) {
+                scores.volume++;
+                document.getElementById('volumeScore').textContent = scores.volume;
+                showFeedback(true);
+                setTimeout(() => generateVolumeShape(), 1000);
+            } else {
+                showFeedback(false);
+            }
+        }
+
+        // Surface Area Pop Game
+        let currentSurfaceArea = 0;
+
+        function generatePopShapes() {
+            const area = document.getElementById('popArea');
+            const question = document.getElementById('popQuestion');
+            area.innerHTML = '';
+            document.getElementById('popHint').textContent = '';
+            
+            // Generate a cuboid with dimensions
+            const length = Math.floor(Math.random() * 3) + 2;
+            const width = Math.floor(Math.random() * 3) + 2;
+            const height = Math.floor(Math.random() * 3) + 2;
+            currentSurfaceArea = 2 * (length * width + length * height + width * height);
+            
+            question.textContent = `Click the number equal to surface area of this cuboid (${length}×${width}×${height})`;
+            
+            // Generate floating shapes with numbers
+            const numbers = [currentSurfaceArea];
+            while (numbers.length < 6) {
+                const randomNum = Math.floor(Math.random() * 50) + 10;
+                if (!numbers.includes(randomNum)) {
+                    numbers.push(randomNum);
+                }
+            }
+            
+            // Shuffle numbers
+            numbers.sort(() => Math.random() - 0.5);
+            
+            numbers.forEach((num, index) => {
+                const shape = document.createElement('div');
+                shape.className = 'floating-shape';
+                shape.style.left = `${(index + 1) * 15}%`;
+                shape.style.top = `${Math.random() * 60 + 20}%`;
+                shape.style.animationDelay = `${index * 0.2}s`;
+                
+                const shapeBody = document.createElement('div');
+                shapeBody.style.width = '60px';
+                shapeBody.style.height = '60px';
+                shapeBody.style.background = `hsl(${index * 60}, 70%, 60%)`;
+                shapeBody.style.borderRadius = '10px';
+                shapeBody.style.position = 'relative';
+                
+                const number = document.createElement('div');
+                number.className = 'shape-number';
+                number.textContent = num;
+                
+                shapeBody.appendChild(number);
+                shape.appendChild(shapeBody);
+                
+                shape.onclick = () => popShape(shape, num);
+                area.appendChild(shape);
+            });
+        }
+
+        function popShape(shape, number) {
+            if (number === currentSurfaceArea) {
+                shape.style.animation = 'pop 0.5s ease-out forwards';
+                scores.pop++;
+                document.getElementById('popScore').textContent = scores.pop;
+                showFeedback(true);
+                setTimeout(() => generatePopShapes(), 1000);
+            } else {
+                shape.style.animation = 'shake 0.5s ease-out';
+                document.getElementById('popHint').textContent = 'Incorrect! Try again.';
+                showFeedback(false);
+            }
+        }
+
+        // Perimeter/Area Race Game
+        let racePosition = 0;
+        let currentRaceAnswer = 0;
+        let raceQuestionType = '';
+
+        function initRaceGame() {
+            racePosition = 0;
+            updateRacePosition();
+            generateRaceQuestion();
+        }
+
+        function generateRaceQuestion() {
+            const container = document.getElementById('raceShapeContainer');
+            const question = document.getElementById('raceQuestion');
+            container.innerHTML = '';
+            document.getElementById('raceInput').value = '';
+            
+            // Randomly choose perimeter or area
+            const types = ['perimeter', 'area'];
+            raceQuestionType = types[Math.floor(Math.random() * types.length)];
+            
+            const shapes = ['rectangle', 'square'];
+            const shapeType = shapes[Math.floor(Math.random() * shapes.length)];
+            
+            const shape = document.createElement('div');
+            shape.className = `shape ${shapeType}`;
+            
+            if (shapeType === 'rectangle') {
+                const width = Math.floor(Math.random() * 8) + 3;
+                const height = Math.floor(Math.random() * 8) + 3;
+                shape.style.width = `${width * 15}px`;
+                shape.style.height = `${height * 15}px`;
+                
+                if (raceQuestionType === 'perimeter') {
+                    currentRaceAnswer = 2 * (width + height);
+                    question.textContent = `Calculate the perimeter of this rectangle`;
+                } else {
+                    currentRaceAnswer = width * height;
+                    question.textContent = `Calculate the area of this rectangle`;
+                }
+                
+                // Add dimension labels
+                const widthLabel = document.createElement('div');
+                widthLabel.className = 'dimension-label';
+                widthLabel.textContent = `${width}`;
+                widthLabel.style.bottom = '-30px';
+                widthLabel.style.left = '50%';
+                widthLabel.style.transform = 'translateX(-50%)';
+                
+                const heightLabel = document.createElement('div');
+                heightLabel.className = 'dimension-label';
+                heightLabel.textContent = `${height}`;
+                heightLabel.style.right = '-40px';
+                heightLabel.style.top = '50%';
+                heightLabel.style.transform = 'translateY(-50%)';
+                
+                shape.appendChild(widthLabel);
+                shape.appendChild(heightLabel);
+            } else if (shapeType === 'square') {
+                const side = Math.floor(Math.random() * 8) + 3;
+                shape.style.width = `${side * 15}px`;
+                shape.style.height = `${side * 15}px`;
+                
+                if (raceQuestionType === 'perimeter') {
+                    currentRaceAnswer = 4 * side;
+                    question.textContent = `Calculate the perimeter of this square`;
+                } else {
+                    currentRaceAnswer = side * side;
+                    question.textContent = `Calculate the area of this square`;
+                }
+                
+                // Add dimension label
+                const label = document.createElement('div');
+                label.className = 'dimension-label';
+                label.textContent = `${side}`;
+                label.style.right = '-40px';
+                label.style.top = '50%';
+                label.style.transform = 'translateY(-50%)';
+                
+                shape.appendChild(label);
+            }
+            
+            container.appendChild(shape);
+        }
+
+        function checkRaceAnswer() {
+            const userAnswer = parseFloat(document.getElementById('raceInput').value);
+            
+            if (userAnswer === currentRaceAnswer) {
+                racePosition += 10;
+                showFeedback(true);
+                
+                if (racePosition >= 100) {
+                    racePosition = 100;
+                    setTimeout(() => {
+                        alert('Congratulations! You won the race! 🏆');
+                        initRaceGame();
+                    }, 500);
+                } else {
+                    generateRaceQuestion();
+                }
+            } else {
+                showFeedback(false);
+            }
+            
+            updateRacePosition();
+        }
+
+        function updateRacePosition() {
+            document.getElementById('raceCharacter').style.left = `${20 + (racePosition * 0.6)}%`;
+            document.getElementById('racePosition').textContent = racePosition;
+        }
+
+        // Add shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Allow Enter key for inputs
+        document.getElementById('perimeterInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkPerimeter();
+            }
+        });
+
+        document.getElementById('raceInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkRaceAnswer();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triangle Geometry Games</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .page-title {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .game-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        
+        .game-card-body {
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+        }
+        
+        .game-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #6a11cb;
+        }
+        
+        .game-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .game-description {
+            color: #666;
+            font-size: 0.95rem;
+        }
+        
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border-radius: 15px 15px 0 0;
+            border: none;
+        }
+        
+        .btn-close {
+            filter: brightness(0) invert(1);
+        }
+        
+        .game-canvas {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+            margin: 20px auto;
+            display: block;
+        }
+        
+        .draggable {
+            cursor: move;
+            transition: transform 0.1s;
+            padding: 8px 12px;
+            margin: 5px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        
+        .draggable:hover {
+            transform: scale(1.05);
+            background-color: #e3f2fd;
+        }
+        
+        .drop-zone {
+            border: 2px dashed #ccc;
+            border-radius: 5px;
+            min-height: 40px;
+            margin: 5px;
+            padding: 8px;
+            transition: all 0.3s;
+            background-color: #fafafa;
+        }
+        
+        .drop-zone.drag-over {
+            background-color: #e3f2fd;
+            border-color: #2196f3;
+        }
+        
+        .drop-zone.correct {
+            background-color: #e8f5e9;
+            border-color: #4caf50;
+        }
+        
+        .drop-zone.incorrect {
+            background-color: #ffebee;
+            border-color: #f44336;
+        }
+        
+        .quiz-option {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            background-color: #f5f5f5;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .quiz-option:hover {
+            background-color: #e3f2fd;
+            border-color: #2196f3;
+        }
+        
+        .quiz-option.correct {
+            background-color: #e8f5e9;
+            border-color: #4caf50;
+        }
+        
+        .quiz-option.incorrect {
+            background-color: #ffebee;
+            border-color: #f44336;
+        }
+        
+        .car-container {
+            position: relative;
+            height: 100px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .road {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 10px;
+            background-color: #757575;
+            transform: translateY(-50%);
+        }
+        
+        .car {
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%);
+            font-size: 2rem;
+            transition: left 0.5s ease;
+        }
+        
+        .lock-level {
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .lock-level.unlocked {
+            background-color: #e8f5e9;
+            border-color: #4caf50;
+        }
+        
+        .lock-level.locked {
+            background-color: #ffebee;
+            border-color: #f44336;
+            opacity: 0.7;
+        }
+        
+        .shape-container {
+            position: relative;
+            margin: 20px auto;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        
+        .triangle {
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .triangle:hover {
+            filter: brightness(1.2);
+        }
+        
+        .triangle.selected {
+            filter: drop-shadow(0 0 8px #ff9800);
+        }
+        
+        .triangle.matched {
+            filter: drop-shadow(0 0 8px #4caf50);
+        }
+        
+        .feedback {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .feedback.success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #4caf50;
+        }
+        
+        .feedback.error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #f44336;
+        }
+        
+        .feedback.info {
+            background-color: #e3f2fd;
+            color: #1565c0;
+            border: 1px solid #2196f3;
+        }
+        
+        .game-controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-game {
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-game:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .mcq-section {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .mcq-question {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #495057;
+        }
+        
+        .mcq-options {
+            display: grid;
+            gap: 10px;
+        }
+        
+        .mcq-option {
+            padding: 12px;
+            border-radius: 8px;
+            background-color: white;
+            border: 2px solid #dee2e6;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .mcq-option:hover {
+            border-color: #6a11cb;
+            background-color: #f0f4ff;
+        }
+        
+        .mcq-option.selected {
+            border-color: #6a11cb;
+            background-color: #e3f2fd;
+        }
+        
+        .mcq-option.correct {
+            border-color: #4caf50;
+            background-color: #e8f5e9;
+        }
+        
+        .mcq-option.incorrect {
+            border-color: #f44336;
+            background-color: #ffebee;
+        }
+        
+        .mcq-score {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 15px;
+            color: #6a11cb;
+        }
+        
+        .shape-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .shape-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background-color: #f0f0f0;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .shape-btn:hover {
+            background-color: #e3f2fd;
+            border-color: #2196f3;
+        }
+        
+        .shape-btn.active {
+            background-color: #6a11cb;
+            color: white;
+            border-color: #6a11cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <h1 class="page-title">Triangle Geometry Games</h1>
+        
+        <div class="row g-4">
+            <!-- Game 1: Triangle Builder -->
+            <div class="col-md-6 col-lg-4">
+                <div class="game-card h-100" onclick="openGame(1)">
+                    <div class="game-card-body">
+                        <div class="game-icon">🏗️</div>
+                        <h3 class="game-title">Triangle Builder</h3>
+                        <p class="game-description">Construct triangles and test your knowledge with 10 MCQs!</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Game 2: Congruence Match -->
+            <div class="col-md-6 col-lg-4">
+                <div class="game-card h-100" onclick="openGame(2)">
+                    <div class="game-card-body">
+                        <div class="game-icon">🔗</div>
+                        <h3 class="game-title">Congruence Match</h3>
+                        <p class="game-description">Match triangles and answer 10 congruence MCQs!</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Game 3: Triangle Quiz Race -->
+            <div class="col-md-6 col-lg-4">
+                <div class="game-card h-100" onclick="openGame(3)">
+                    <div class="game-card-body">
+                        <div class="game-icon">🚗</div>
+                        <h3 class="game-title">Triangle Quiz Race</h3>
+                        <p class="game-description">Answer congruence questions to make your car zoom forward!</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Game 4: Congruence Puzzle Unlock -->
+            <div class="col-md-6 col-lg-4">
+                <div class="game-card h-100" onclick="openGame(4)">
+                    <div class="game-card-body">
+                        <div class="game-icon">🔐</div>
+                        <h3 class="game-title">Congruence Puzzle Unlock</h3>
+                        <p class="game-description">Solve puzzles to unlock levels and reach the treasure!</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Game 5: Spot the Congruent Triangles -->
+            <div class="col-md-6 col-lg-4">
+                <div class="game-card h-100" onclick="openGame(5)">
+                    <div class="game-card-body">
+                        <div class="game-icon">👀</div>
+                        <h3 class="game-title">Spot the Congruent Triangles</h3>
+                        <p class="game-description">Find congruent pairs in various geometric shapes!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Modals -->
+    <!-- Game 1: Triangle Builder Modal -->
+    <div class="modal fade" id="game1Modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Triangle Builder 🏗️</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Given Values:</h5>
+                            <div id="triangleValues" class="mb-3">
+                                <p>AB = <span id="abValue">5</span></p>
+                                <p>AC = <span id="acValue">7</span></p>
+                                <p>∠A = <span id="angleAValue">40</span>°</p>
+                            </div>
+                            <div class="game-controls">
+                                <button class="btn btn-primary btn-game" onclick="generateNewTriangle()">New Triangle</button>
+                                <button class="btn btn-success btn-game" onclick="checkTriangle()">Check Triangle</button>
+                            </div>
+                            <div id="triangleFeedback" class="feedback" style="display: none;"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <canvas id="triangleCanvas" class="game-canvas" width="400" height="300"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="mcq-section">
+                        <h5>Triangle Knowledge Quiz</h5>
+                        <div id="mcqContainer1">
+                            <div class="mcq-question" id="mcqQuestion1">Loading question...</div>
+                            <div class="mcq-options" id="mcqOptions1"></div>
+                            <div class="game-controls">
+                                <button class="btn btn-primary btn-game" onclick="submitMCQ1()">Submit Answer</button>
+                                <button class="btn btn-secondary btn-game" onclick="nextMCQ1()">Next Question</button>
+                            </div>
+                            <div class="mcq-score">Score: <span id="mcqScore1">0</span> / 10</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game 2: Congruence Match Modal -->
+    <div class="modal fade" id="game2Modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Congruence Match 🔗</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <h5>Triangle ABC</h5>
+                            <canvas id="triangleABC" class="game-canvas" width="300" height="250"></canvas>
+                            <div class="mt-3">
+                                <div class="draggable" draggable="true" data-value="AB">AB</div>
+                                <div class="draggable" draggable="true" data-value="BC">BC</div>
+                                <div class="draggable" draggable="true" data-value="AC">AC</div>
+                                <div class="draggable" draggable="true" data-value="∠A">∠A</div>
+                                <div class="draggable" draggable="true" data-value="∠B">∠B</div>
+                                <div class="draggable" draggable="true" data-value="∠C">∠C</div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-center justify-content-center">
+                            <i class="bi bi-arrow-left-right" style="font-size: 2rem; color: #6a11cb;"></i>
+                        </div>
+                        <div class="col-md-5">
+                            <h5>Triangle PQR</h5>
+                            <canvas id="trianglePQR" class="game-canvas" width="300" height="250"></canvas>
+                            <div class="mt-3">
+                                <div class="drop-zone" data-accept="PQ">PQ</div>
+                                <div class="drop-zone" data-accept="QR">QR</div>
+                                <div class="drop-zone" data-accept="PR">PR</div>
+                                <div class="drop-zone" data-accept="∠P">∠P</div>
+                                <div class="drop-zone" data-accept="∠Q">∠Q</div>
+                                <div class="drop-zone" data-accept="∠R">∠R</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-controls">
+                        <button class="btn btn-primary btn-game" onclick="resetCongruenceMatch()">Reset</button>
+                        <button class="btn btn-success btn-game" onclick="checkCongruenceMatch()">Check Match</button>
+                    </div>
+                    <div id="congruenceFeedback" class="feedback" style="display: none;"></div>
+                    
+                    <div class="mcq-section">
+                        <h5>Congruence Knowledge Quiz</h5>
+                        <div id="mcqContainer2">
+                            <div class="mcq-question" id="mcqQuestion2">Loading question...</div>
+                            <div class="mcq-options" id="mcqOptions2"></div>
+                            <div class="game-controls">
+                                <button class="btn btn-primary btn-game" onclick="submitMCQ2()">Submit Answer</button>
+                                <button class="btn btn-secondary btn-game" onclick="nextMCQ2()">Next Question</button>
+                            </div>
+                            <div class="mcq-score">Score: <span id="mcqScore2">0</span> / 10</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game 3: Triangle Quiz Race Modal -->
+    <div class="modal fade" id="game3Modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Triangle Quiz Race 🚗</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="car-container">
+                        <div class="road"></div>
+                        <div class="car" id="raceCar">🚗</div>
+                    </div>
+                    <div class="progress mb-3">
+                        <div class="progress-bar" id="raceProgress" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <div id="quizQuestion" class="mb-3">
+                        <h5>Question: <span id="questionText">Which rule proves ΔABC ≅ ΔPQR if AB = PQ, BC = QR, AC = PR?</span></h5>
+                    </div>
+                    <div id="quizOptions">
+                        <div class="quiz-option" onclick="checkAnswer(0, 'SSS')">SSS</div>
+                        <div class="quiz-option" onclick="checkAnswer(1, 'SAS')">SAS</div>
+                        <div class="quiz-option" onclick="checkAnswer(2, 'ASA')">ASA</div>
+                    </div>
+                    <div id="quizFeedback" class="feedback" style="display: none;"></div>
+                    <div class="game-controls">
+                        <button class="btn btn-primary btn-game" onclick="nextQuestion()">Next Question</button>
+                        <button class="btn btn-warning btn-game" onclick="resetRace()">Reset Race</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game 4: Congruence Puzzle Unlock Modal -->
+    <div class="modal fade" id="game4Modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Congruence Puzzle Unlock 🔐</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-lock-fill" style="font-size: 3rem; color: #f44336;" id="lockIcon"></i>
+                        <h3 id="lockStatus">LOCKED</h3>
+                    </div>
+                    
+                    <div id="puzzleLevels">
+                        <div class="lock-level" id="level1">
+                            <h5>Level 1</h5>
+                            <p>Two sides and included angle equal, which congruence rule?</p>
+                            <div class="game-controls">
+                                <button class="btn btn-outline-primary btn-game" onclick="checkPuzzleAnswer(1, 'SAS')">SAS</button>
+                                <button class="btn btn-outline-primary btn-game" onclick="checkPuzzleAnswer(1, 'SSS')">SSS</button>
+                                <button class="btn btn-outline-primary btn-game" onclick="checkPuzzleAnswer(1, 'ASA')">ASA</button>
+                            </div>
+                        </div>
+                        
+                        <div class="lock-level locked" id="level2">
+                            <h5>Level 2</h5>
+                            <p>Three sides equal, which congruence rule?</p>
+                            <div class="game-controls">
+                                <button class="btn btn-outline-primary btn-game" onclick="checkPuzzleAnswer(2, 'SAS')">SAS</button>
+                                <button class="btn btn-outline-primary btn-game" onclick="checkPuzzleAnswer(2, 'SSS')">SSS</button>
+                                <button class="btn btn-outline-primary btn-game" onclick="checkPuzzleAnswer(2, 'ASA')">ASA</button>
+                            </div>
+                        </div>
+                        
+                        <div class="lock-level locked" id="level3">
+                            <h5>Level 3</h5>
+                            <p>Two angles and included side equal, which congruence rule?</p>
+                            <div class="game-controls">
+                                <button class="btn btn-outline-primary btn-game" onclick="checkPuzzleAnswer(3, 'SAS')">SAS</button>
+                                <button class="btn btn-outline-primary btn-game" onclick="checkPuzzleAnswer(3, 'SSS')">SSS</button>
+                                <button class="btn btn-outline-primary btn-game" onclick="checkPuzzleAnswer(3, 'ASA')">ASA</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="puzzleFeedback" class="feedback" style="display: none;"></div>
+                    <div class="game-controls">
+                        <button class="btn btn-warning btn-game" onclick="resetPuzzle()">Reset Puzzle</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game 5: Spot the Congruent Triangles Modal -->
+    <div class="modal fade" id="game5Modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Spot the Congruent Triangles 👀</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5>Score: <span id="spotScore">0</span></h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h5>Pairs Found: <span id="pairsFound">0</span> / <span id="totalPairs">0</span></h5>
+                        </div>
+                    </div>
+                    
+                    <div class="shape-selector">
+                        <button class="shape-btn active" onclick="selectShape('parallelogram')">Parallelogram</button>
+                        <button class="shape-btn" onclick="selectShape('kite')">Kite</button>
+                        <button class="shape-btn" onclick="selectShape('hexagon')">Hexagon</button>
+                        <button class="shape-btn" onclick="selectShape('star')">Star</button>
+                        <button class="shape-btn" onclick="selectShape('trapezoid')">Trapezoid</button>
+                    </div>
+                    
+                    <div class="shape-container" id="shapeContainer">
+                        <svg width="800" height="500" id="shapeSvg">
+                            <!-- Shape will be drawn here -->
+                        </svg>
+                    </div>
+                    
+                    <div id="spotFeedback" class="feedback" style="display: none;"></div>
+                    <div class="game-controls">
+                        <button class="btn btn-primary btn-game" onclick="generateNewShape()">New Shape</button>
+                        <button class="btn btn-warning btn-game" onclick="resetSpotGame()">Reset Game</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let currentGame = 0;
+        let triangleData = { ab: 5, ac: 7, angleA: 40 };
+        let congruenceMatches = {};
+        let raceProgress = 0;
+        let currentQuestion = 0;
+        let unlockedLevels = 1;
+        let selectedTriangles = [];
+        let matchedPairs = [];
+        let spotScore = 0;
+        let currentShape = 'parallelogram';
+        
+        // MCQ variables
+        let mcq1Current = 0;
+        let mcq1Score = 0;
+        let mcq1Selected = null;
+        let mcq2Current = 0;
+        let mcq2Score = 0;
+        let mcq2Selected = null;
+        
+        // Quiz questions for Game 1
+        const mcq1Questions = [
+            {
+                question: "What is the sum of angles in a triangle?",
+                options: ["90°", "180°", "270°", "360°"],
+                correct: 1
+            },
+            {
+                question: "Which of these cannot be the sides of a triangle?",
+                options: ["3, 4, 5", "5, 12, 13", "1, 2, 3", "7, 24, 25"],
+                correct: 2
+            },
+            {
+                question: "In a right triangle, the side opposite the right angle is called:",
+                options: ["Adjacent", "Opposite", "Hypotenuse", "Base"],
+                correct: 2
+            },
+            {
+                question: "What is the triangle inequality theorem?",
+                options: ["Sum of angles = 180°", "Sum of any two sides > third side", "All angles are equal", "All sides are equal"],
+                correct: 1
+            },
+            {
+                question: "An equilateral triangle has:",
+                options: ["All angles equal", "All sides equal", "Both A and B", "Neither A nor B"],
+                correct: 2
+            },
+            {
+                question: "Which triangle has two equal sides?",
+                options: ["Scalene", "Isosceles", "Equilateral", "Right"],
+                correct: 1
+            },
+            {
+                question: "The exterior angle of a triangle is equal to:",
+                options: ["Sum of interior angles", "Sum of opposite interior angles", "Difference of interior angles", "None of these"],
+                correct: 1
+            },
+            {
+                question: "A triangle with angles 30°, 60°, 90° is:",
+                options: ["Acute", "Right", "Obtuse", "Equilateral"],
+                correct: 1
+            },
+            {
+                question: "The area of a triangle is:",
+                options: ["base × height", "½ × base × height", "2 × base × height", "base + height"],
+                correct: 1
+            },
+            {
+                question: "In an isosceles right triangle, the acute angles are:",
+                options: ["30°, 60°", "45°, 45°", "60°, 60°", "90°, 0°"],
+                correct: 1
+            }
+        ];
+        
+        // Quiz questions for Game 2
+        const mcq2Questions = [
+            {
+                question: "Two triangles are congruent if:",
+                options: ["They look similar", "All corresponding sides and angles are equal", "They have the same area", "They have the same perimeter"],
+                correct: 1
+            },
+            {
+                question: "SSS congruence rule means:",
+                options: ["Side-Side-Side", "Side-Angle-Side", "Angle-Side-Angle", "Angle-Angle-Side"],
+                correct: 0
+            },
+            {
+                question: "SAS congruence rule requires:",
+                options: ["Two sides and any angle", "Two sides and included angle", "Two angles and included side", "Three angles"],
+                correct: 1
+            },
+            {
+                question: "ASA congruence rule stands for:",
+                options: ["Angle-Side-Angle", "Angle-Angle-Side", "Side-Angle-Side", "Side-Side-Angle"],
+                correct: 0
+            },
+            {
+                question: "Which of these is NOT a congruence rule?",
+                options: ["SSS", "SAS", "ASA", "SSA"],
+                correct: 3
+            },
+            {
+                question: "If two triangles are congruent, their corresponding parts are:",
+                options: ["Proportional", "Equal", "Similar", "Different"],
+                correct: 1
+            },
+            {
+                question: "RHS congruence rule is for:",
+                options: ["All triangles", "Right triangles", "Acute triangles", "Obtuse triangles"],
+                correct: 1
+            },
+            {
+                question: "AAS congruence rule is valid because:",
+                options: ["Sum of angles is 180°", "Triangles are similar", "Sides are proportional", "None of these"],
+                correct: 0
+            },
+            {
+                question: "If ΔABC ≅ ΔPQR, then:",
+                options: ["AB = PQ, BC = QR, AC = PR", "∠A = ∠P, ∠B = ∠Q, ∠C = ∠R", "Both A and B", "Neither A nor B"],
+                correct: 2
+            },
+            {
+                question: "The symbol ≅ means:",
+                options: ["Similar", "Congruent", "Equal", "Proportional"],
+                correct: 1
+            }
+        ];
+        
+        // Quiz questions for Game 3
+        const quizQuestions = [
+            {
+                question: "Which rule proves ΔABC ≅ ΔPQR if AB = PQ, BC = QR, AC = PR?",
+                options: ["SSS", "SAS", "ASA"],
+                correct: 0
+            },
+            {
+                question: "Which rule proves ΔABC ≅ ΔPQR if AB = PQ, ∠B = ∠Q, BC = QR?",
+                options: ["SSS", "SAS", "ASA"],
+                correct: 1
+            },
+            {
+                question: "Which rule proves ΔABC ≅ ΔPQR if ∠A = ∠P, AB = PQ, ∠B = ∠Q?",
+                options: ["SSS", "SAS", "ASA"],
+                correct: 2
+            },
+            {
+                question: "Which rule proves ΔABC ≅ ΔPQR if ∠A = ∠P, ∠B = ∠Q, AC = PR?",
+                options: ["AAS", "SAS", "SSA"],
+                correct: 0
+            },
+            {
+                question: "Which rule proves ΔABC ≅ ΔPQR if AB = PQ, ∠A = ∠P, ∠C = ∠R?",
+                options: ["ASA", "SAS", "AAS"],
+                correct: 2
+            }
+        ];
+        
+        // Open game modal
+        function openGame(gameNumber) {
+            currentGame = gameNumber;
+            
+            switch(gameNumber) {
+                case 1:
+                    initTriangleBuilder();
+                    new bootstrap.Modal(document.getElementById('game1Modal')).show();
+                    break;
+                case 2:
+                    initCongruenceMatch();
+                    new bootstrap.Modal(document.getElementById('game2Modal')).show();
+                    break;
+                case 3:
+                    initQuizRace();
+                    new bootstrap.Modal(document.getElementById('game3Modal')).show();
+                    break;
+                case 4:
+                    initPuzzleUnlock();
+                    new bootstrap.Modal(document.getElementById('game4Modal')).show();
+                    break;
+                case 5:
+                    initSpotTriangles();
+                    new bootstrap.Modal(document.getElementById('game5Modal')).show();
+                    break;
+            }
+        }
+        
+        // Game 1: Triangle Builder
+        function initTriangleBuilder() {
+            generateNewTriangle();
+            drawTriangleCanvas();
+            initMCQ1();
+        }
+        
+        function generateNewTriangle() {
+            triangleData.ab = Math.floor(Math.random() * 8) + 3;
+            triangleData.ac = Math.floor(Math.random() * 8) + 3;
+            triangleData.angleA = Math.floor(Math.random() * 120) + 20;
+            
+            document.getElementById('abValue').textContent = triangleData.ab;
+            document.getElementById('acValue').textContent = triangleData.ac;
+            document.getElementById('angleAValue').textContent = triangleData.angleA;
+            
+            drawTriangleCanvas();
+            hideFeedback('triangleFeedback');
+        }
+        
+        function drawTriangleCanvas() {
+            const canvas = document.getElementById('triangleCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw point A
+            const ax = 100;
+            const ay = 150;
+            
+            // Draw side AB
+            const angleRad = triangleData.angleA * Math.PI / 180;
+            const bx = ax + triangleData.ab * 20;
+            const by = ay;
+            
+            // Draw side AC
+            const cx = ax + triangleData.ac * 20 * Math.cos(angleRad);
+            const cy = ay - triangleData.ac * 20 * Math.sin(angleRad);
+            
+            // Draw triangle
+            ctx.beginPath();
+            ctx.moveTo(ax, ay);
+            ctx.lineTo(bx, by);
+            ctx.lineTo(cx, cy);
+            ctx.closePath();
+            ctx.strokeStyle = '#6a11cb';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Draw points
+            ctx.fillStyle = '#6a11cb';
+            ctx.beginPath();
+            ctx.arc(ax, ay, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(bx, by, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Label points
+            ctx.fillStyle = '#333';
+            ctx.font = '16px Arial';
+            ctx.fillText('A', ax - 15, ay + 5);
+            ctx.fillText('B', bx + 10, by + 5);
+            ctx.fillText('C', cx - 5, cy - 10);
+            
+            // Draw angle arc
+            ctx.beginPath();
+            ctx.arc(ax, 30, 30, 0, angleRad, false);
+            ctx.strokeStyle = '#f44336';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+        
+        function checkTriangle() {
+            const ab = triangleData.ab;
+            const ac = triangleData.ac;
+            const angleA = triangleData.angleA;
+            
+            // Check triangle inequality
+            const a = Math.sqrt(ab * ab + ac * ac - 2 * ab * ac * Math.cos(angleA * Math.PI / 180));
+            const b = ac;
+            const c = ab;
+            
+            if (a + b > c && a + c > b && b + c > a) {
+                showFeedback('triangleFeedback', 'success', 'Great! This triangle is possible to construct.');
+            } else {
+                showFeedback('triangleFeedback', 'error', 'Sorry, this triangle cannot be constructed. The sum of any two sides must be greater than the third side.');
+            }
+        }
+        
+        // MCQ functions for Game 1
+        function initMCQ1() {
+            mcq1Current = 0;
+            mcq1Score = 0;
+            mcq1Selected = null;
+            updateMCQ1Score();
+            loadMCQ1();
+        }
+        
+        function loadMCQ1() {
+            if (mcq1Current >= mcq1Questions.length) {
+                showFeedback('triangleFeedback', 'success', `Quiz completed! Your score: ${mcq1Score}/${mcq1Questions.length}`);
+                return;
+            }
+            
+            const question = mcq1Questions[mcq1Current];
+            document.getElementById('mcqQuestion1').textContent = `${mcq1Current + 1}. ${question.question}`;
+            
+            const optionsContainer = document.getElementById('mcqOptions1');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'mcq-option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => selectMCQ1(index);
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            mcq1Selected = null;
+        }
+        
+        function selectMCQ1(index) {
+            const options = document.querySelectorAll('#mcqOptions1 .mcq-option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            options[index].classList.add('selected');
+            mcq1Selected = index;
+        }
+        
+        function submitMCQ1() {
+            if (mcq1Selected === null) {
+                showFeedback('triangleFeedback', 'error', 'Please select an answer.');
+                return;
+            }
+            
+            const question = mcq1Questions[mcq1Current];
+            const options = document.querySelectorAll('#mcqOptions1 .mcq-option');
+            
+            if (mcq1Selected === question.correct) {
+                options[mcq1Selected].classList.add('correct');
+                mcq1Score++;
+                updateMCQ1Score();
+                showFeedback('triangleFeedback', 'success', 'Correct!');
+            } else {
+                options[mcq1Selected].classList.add('incorrect');
+                options[question.correct].classList.add('correct');
+                showFeedback('triangleFeedback', 'error', `Incorrect. The correct answer is: ${question.options[question.correct]}`);
+            }
+            
+            // Disable all options
+            options.forEach(opt => opt.style.pointerEvents = 'none');
+        }
+        
+        function nextMCQ1() {
+            mcq1Current++;
+            loadMCQ1();
+            hideFeedback('triangleFeedback');
+        }
+        
+        function updateMCQ1Score() {
+            document.getElementById('mcqScore1').textContent = mcq1Score;
+        }
+        
+        // Game 2: Congruence Match
+        function initCongruenceMatch() {
+            drawTriangleABC();
+            drawTrianglePQR();
+            setupDragAndDrop();
+            congruenceMatches = {};
+            hideFeedback('congruenceFeedback');
+            initMCQ2();
+        }
+        
+        function drawTriangleABC() {
+            const canvas = document.getElementById('triangleABC');
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Triangle ABC coordinates
+            const ax = 150;
+            const ay = 200;
+            const bx = 80;
+            const by = 80;
+            const cx = 220;
+            const cy = 80;
+            
+            // Draw triangle
+            ctx.beginPath();
+            ctx.moveTo(ax, ay);
+            ctx.lineTo(bx, by);
+            ctx.lineTo(cx, cy);
+            ctx.closePath();
+            ctx.strokeStyle = '#6a11cb';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Draw points
+            ctx.fillStyle = '#6a11cb';
+            ctx.beginPath();
+            ctx.arc(ax, ay, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(bx, by, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Label points
+            ctx.fillStyle = '#333';
+            ctx.font = '16px Arial';
+            ctx.fillText('A', ax - 15, ay + 5);
+            ctx.fillText('B', bx - 15, by + 5);
+            ctx.fillText('C', cx + 10, cy + 5);
+            
+            // Label sides
+            ctx.fillText('AB', (ax + bx) / 2 - 15, (ay + by) / 2 + 5);
+            ctx.fillText('BC', (bx + cx) / 2, (by + cy) / 2 - 10);
+            ctx.fillText('AC', (ax + cx) / 2 + 10, (ay + cy) / 2 + 5);
+            
+            // Label angles
+            ctx.fillText('∠A', ax + 10, ay - 10);
+            ctx.fillText('∠B', bx - 25, by + 10);
+            ctx.fillText('∠C', cx + 10, cy + 10);
+        }
+        
+        function drawTrianglePQR() {
+            const canvas = document.getElementById('trianglePQR');
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Triangle PQR coordinates (congruent to ABC but rotated)
+            const px = 150;
+            const py = 200;
+            const qx = 220;
+            const qy = 80;
+            const rx = 80;
+            const ry = 80;
+            
+            // Draw triangle
+            ctx.beginPath();
+            ctx.moveTo(px, py);
+            ctx.lineTo(qx, qy);
+            ctx.lineTo(rx, ry);
+            ctx.closePath();
+            ctx.strokeStyle = '#2575fc';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Draw points
+            ctx.fillStyle = '#2575fc';
+            ctx.beginPath();
+            ctx.arc(px, py, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(qx, qy, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(rx, ry, 5, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Label points
+            ctx.fillStyle = '#333';
+            ctx.font = '16px Arial';
+            ctx.fillText('P', px - 15, py + 5);
+            ctx.fillText('Q', qx + 10, qy + 5);
+            ctx.fillText('R', rx - 15, ry + 5);
+            
+            // Label sides
+            ctx.fillText('PQ', (px + qx) / 2 + 10, (py + qy) / 2 + 5);
+            ctx.fillText('QR', (qx + rx) / 2, (qy + ry) / 2 - 10);
+            ctx.fillText('PR', (px + rx) / 2 - 15, (py + ry) / 2 + 5);
+            
+            // Label angles
+            ctx.fillText('∠P', px + 10, py - 10);
+            ctx.fillText('∠Q', qx + 10, qy + 10);
+            ctx.fillText('∠R', rx - 25, ry + 10);
+        }
+        
+        function setupDragAndDrop() {
+            const draggables = document.querySelectorAll('.draggable');
+            const dropZones = document.querySelectorAll('.drop-zone');
+            
+            draggables.forEach(draggable => {
+                draggable.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text', e.target.dataset.value);
+                    e.target.style.opacity = '0.5';
+                });
+                
+                draggable.addEventListener('dragend', (e) => {
+                    e.target.style.opacity = '1';
+                });
+            });
+            
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    zone.classList.add('drag-over');
+                });
+                
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('drag-over');
+                });
+                
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+                    
+                    const data = e.dataTransfer.getData('text');
+                    const accept = zone.dataset.accept;
+                    
+                    zone.textContent = `${data} ↔ ${accept}`;
+                    congruenceMatches[data] = accept;
+                    
+                    // Check if this is a correct match
+                    const correctMatches = {
+                        'AB': 'PQ',
+                        'BC': 'QR',
+                        'AC': 'PR',
+                        '∠A': '∠P',
+                        '∠B': '∠Q',
+                        '∠C': '∠R'
+                    };
+                    
+                    if (correctMatches[data] === accept) {
+                        zone.classList.add('correct');
+                        zone.classList.remove('incorrect');
+                    } else {
+                        zone.classList.add('incorrect');
+                        zone.classList.remove('correct');
+                    }
+                });
+            });
+        }
+        
+        function resetCongruenceMatch() {
+            const dropZones = document.querySelectorAll('.drop-zone');
+            dropZones.forEach(zone => {
+                zone.textContent = zone.dataset.accept;
+                zone.classList.remove('correct', 'incorrect');
+            });
+            congruenceMatches = {};
+            hideFeedback('congruenceFeedback');
+        }
+        
+        function checkCongruenceMatch() {
+            const correctMatches = {
+                'AB': 'PQ',
+                'BC': 'QR',
+                'AC': 'PR',
+                '∠A': '∠P',
+                '∠B': '∠Q',
+                '∠C': '∠R'
+            };
+            
+            let allCorrect = true;
+            
+            for (const key in correctMatches) {
+                if (congruenceMatches[key] !== correctMatches[key]) {
+                    allCorrect = false;
+                    break;
+                }
+            }
+            
+            if (allCorrect && Object.keys(congruenceMatches).length === 6) {
+                showFeedback('congruenceFeedback', 'success', 'Excellent! All matches are correct. Triangles ABC and PQR are congruent!');
+            } else {
+                showFeedback('congruenceFeedback', 'error', 'Not all matches are correct. Please try again.');
+            }
+        }
+        
+        // MCQ functions for Game 2
+        function initMCQ2() {
+            mcq2Current = 0;
+            mcq2Score = 0;
+            mcq2Selected = null;
+            updateMCQ2Score();
+            loadMCQ2();
+        }
+        
+        function loadMCQ2() {
+            if (mcq2Current >= mcq2Questions.length) {
+                showFeedback('congruenceFeedback', 'success', `Quiz completed! Your score: ${mcq2Score}/${mcq2Questions.length}`);
+                return;
+            }
+            
+            const question = mcq2Questions[mcq2Current];
+            document.getElementById('mcqQuestion2').textContent = `${mcq2Current + 1}. ${question.question}`;
+            
+            const optionsContainer = document.getElementById('mcqOptions2');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'mcq-option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => selectMCQ2(index);
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            mcq2Selected = null;
+        }
+        
+        function selectMCQ2(index) {
+            const options = document.querySelectorAll('#mcqOptions2 .mcq-option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            options[index].classList.add('selected');
+            mcq2Selected = index;
+        }
+        
+        function submitMCQ2() {
+            if (mcq2Selected === null) {
+                showFeedback('congruenceFeedback', 'error', 'Please select an answer.');
+                return;
+            }
+            
+            const question = mcq2Questions[mcq2Current];
+            const options = document.querySelectorAll('#mcqOptions2 .mcq-option');
+            
+            if (mcq2Selected === question.correct) {
+                options[mcq2Selected].classList.add('correct');
+                mcq2Score++;
+                updateMCQ2Score();
+                showFeedback('congruenceFeedback', 'success', 'Correct!');
+            } else {
+                options[mcq2Selected].classList.add('incorrect');
+                options[question.correct].classList.add('correct');
+                showFeedback('congruenceFeedback', 'error', `Incorrect. The correct answer is: ${question.options[question.correct]}`);
+            }
+            
+            // Disable all options
+            options.forEach(opt => opt.style.pointerEvents = 'none');
+        }
+        
+        function nextMCQ2() {
+            mcq2Current++;
+            loadMCQ2();
+            hideFeedback('congruenceFeedback');
+        }
+        
+        function updateMCQ2Score() {
+            document.getElementById('mcqScore2').textContent = mcq2Score;
+        }
+        
+        // Game 3: Triangle Quiz Race
+        function initQuizRace() {
+            raceProgress = 0;
+            currentQuestion = 0;
+            updateRaceProgress();
+            loadQuestion();
+            hideFeedback('quizFeedback');
+        }
+        
+        function loadQuestion() {
+            if (currentQuestion >= quizQuestions.length) {
+                currentQuestion = 0;
+            }
+            
+            const question = quizQuestions[currentQuestion];
+            document.getElementById('questionText').textContent = question.question;
+            
+            const optionsContainer = document.getElementById('quizOptions');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'quiz-option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => checkAnswer(index, option);
+                optionsContainer.appendChild(optionDiv);
+            });
+        }
+        
+        function checkAnswer(index, answer) {
+            const question = quizQuestions[currentQuestion];
+            const options = document.querySelectorAll('.quiz-option');
+            
+            if (index === question.correct) {
+                options[index].classList.add('correct');
+                showFeedback('quizFeedback', 'success', 'Correct! The car moves forward.');
+                raceProgress += 20;
+                updateRaceProgress();
+                
+                if (raceProgress >= 100) {
+                    showFeedback('quizFeedback', 'success', 'Congratulations! You won the race!');
+                }
+            } else {
+                options[index].classList.add('incorrect');
+                options[question.correct].classList.add('correct');
+                showFeedback('quizFeedback', 'error', `Incorrect. The correct answer is ${question.options[question.correct]}.`);
+                raceProgress = Math.max(0, raceProgress - 10);
+                updateRaceProgress();
+            }
+            
+            // Disable all options
+            options.forEach(option => {
+                option.style.pointerEvents = 'none';
+            });
+        }
+        
+        function updateRaceProgress() {
+            const car = document.getElementById('raceCar');
+            const progressBar = document.getElementById('raceProgress');
+            
+            car.style.left = `${20 + (raceProgress / 100) * 700}px`;
+            progressBar.style.width = `${raceProgress}%`;
+            
+            if (raceProgress >= 100) {
+                progressBar.classList.add('bg-success');
+            } else if (raceProgress >= 50) {
+                progressBar.classList.add('bg-warning');
+                progressBar.classList.remove('bg-success');
+            } else {
+                progressBar.classList.add('bg-danger');
+                progressBar.classList.remove('bg-warning', 'bg-success');
+            }
+        }
+        
+        function nextQuestion() {
+            currentQuestion++;
+            loadQuestion();
+            hideFeedback('quizFeedback');
+        }
+        
+        function resetRace() {
+            raceProgress = 0;
+            currentQuestion = 0;
+            updateRaceProgress();
+            loadQuestion();
+            hideFeedback('quizFeedback');
+        }
+        
+        // Game 4: Congruence Puzzle Unlock
+        function initPuzzleUnlock() {
+            unlockedLevels = 1;
+            updatePuzzleLevels();
+            hideFeedback('puzzleFeedback');
+        }
+        
+        function updatePuzzleLevels() {
+            for (let i = 1; i <= 3; i++) {
+                const level = document.getElementById(`level${i}`);
+                if (i <= unlockedLevels) {
+                    level.classList.remove('locked');
+                    level.classList.add('unlocked');
+                } else {
+                    level.classList.add('locked');
+                    level.classList.remove('unlocked');
+                }
+            }
+            
+            if (unlockedLevels > 3) {
+                document.getElementById('lockIcon').className = 'bi bi-unlock-fill';
+                document.getElementById('lockIcon').style.color = '#4caf50';
+                document.getElementById('lockStatus').textContent = 'UNLOCKED';
+                document.getElementById('lockStatus').style.color = '#4caf50';
+                showFeedback('puzzleFeedback', 'success', 'Congratulations! You unlocked the treasure!');
+            }
+        }
+        
+        function checkPuzzleAnswer(level, answer) {
+            if (level !== unlockedLevels) {
+                showFeedback('puzzleFeedback', 'error', 'Please complete the previous levels first.');
+                return;
+            }
+            
+            let correctAnswer = '';
+            switch(level) {
+                case 1:
+                    correctAnswer = 'SAS';
+                    break;
+                case 2:
+                    correctAnswer = 'SSS';
+                    break;
+                case 3:
+                    correctAnswer = 'ASA';
+                    break;
+            }
+            
+            if (answer === correctAnswer) {
+                unlockedLevels++;
+                updatePuzzleLevels();
+                showFeedback('puzzleFeedback', 'success', `Correct! Level ${level} unlocked.`);
+            } else {
+                showFeedback('puzzleFeedback', 'error', `Incorrect. The correct answer is ${correctAnswer}.`);
+            }
+        }
+        
+        function resetPuzzle() {
+            unlockedLevels = 1;
+            updatePuzzleLevels();
+            hideFeedback('puzzleFeedback');
+        }
+        
+        // Game 5: Spot the Congruent Triangles
+        function initSpotTriangles() {
+            selectedTriangles = [];
+            matchedPairs = [];
+            spotScore = 0;
+            updateSpotScore();
+            generateNewShape();
+            hideFeedback('spotFeedback');
+        }
+        
+        function selectShape(shape) {
+            currentShape = shape;
+            document.querySelectorAll('.shape-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            generateNewShape();
+        }
+        
+        function generateNewShape() {
+            const svg = document.getElementById('shapeSvg');
+            svg.innerHTML = '';
+            
+            switch(currentShape) {
+                case 'parallelogram':
+                    drawParallelogram(svg);
+                    break;
+                case 'kite':
+                    drawKite(svg);
+                    break;
+                case 'hexagon':
+                    drawHexagon(svg);
+                    break;
+                case 'star':
+                    drawStar(svg);
+                    break;
+                case 'trapezoid':
+                    drawTrapezoid(svg);
+                    break;
+            }
+            
+            selectedTriangles = [];
+            matchedPairs = [];
+            document.getElementById('pairsFound').textContent = '0';
+        }
+        
+        function drawParallelogram(svg) {
+            // Create a parallelogram with congruent triangles
+            const parallelogram = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            parallelogram.setAttribute('points', '100,100 500,100 600,300 200,300');
+            parallelogram.setAttribute('fill', 'rgba(106, 17, 203, 0.2)');
+            parallelogram.setAttribute('stroke', '#6a11cb');
+            parallelogram.setAttribute('stroke-width', '2');
+            svg.appendChild(parallelogram);
+            
+            // Create triangles inside the parallelogram
+            const triangles = [
+                { id: 't1', points: '100,100 500,100 300,200' },
+                { id: 't2', points: '500,100 600,300 300,200' },
+                { id: 't3', points: '600,300 200,300 300,200' },
+                { id: 't4', points: '200,300 100,100 300,200' },
+                { id: 't5', points: '100,100 300,200 200,300' },
+                { id: 't6', points: '500,100 300,200 600,300' }
+            ];
+            
+            triangles.forEach(triangle => {
+                const tri = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                tri.setAttribute('points', triangle.points);
+                tri.setAttribute('fill', 'rgba(37, 117, 252, 0.3)');
+                tri.setAttribute('stroke', '#2575fc');
+                tri.setAttribute('stroke-width', '2');
+                tri.setAttribute('id', triangle.id);
+                tri.setAttribute('class', 'triangle');
+                tri.addEventListener('click', () => selectTriangle(triangle.id));
+                svg.appendChild(tri);
+            });
+            
+            // Define congruent pairs
+            window.currentCongruentPairs = [
+                ['t1', 't3'],
+                ['t2', 't4'],
+                ['t5', 't6']
+            ];
+            
+            document.getElementById('totalPairs').textContent = '3';
+        }
+        
+        function drawKite(svg) {
+            // Create a kite shape
+            const kite = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            kite.setAttribute('points', '400,100 500,200 400,350 300,200');
+            kite.setAttribute('fill', 'rgba(106, 17, 203, 0.2)');
+            kite.setAttribute('stroke', '#6a11cb');
+            kite.setAttribute('stroke-width', '2');
+            svg.appendChild(kite);
+            
+            // Create triangles inside the kite
+            const triangles = [
+                { id: 't1', points: '400,100 500,200 400,200' },
+                { id: 't2', points: '400,100 400,200 300,200' },
+                { id: 't3', points: '500,200 400,350 400,200' },
+                { id: 't4', points: '300,200 400,350 400,200' },
+                { id: 't5', points: '400,100 300,200 400,350' },
+                { id: 't6', points: '400,100 400,350 500,200' }
+            ];
+            
+            triangles.forEach(triangle => {
+                const tri = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                tri.setAttribute('points', triangle.points);
+                tri.setAttribute('fill', 'rgba(37, 117, 252, 0.3)');
+                tri.setAttribute('stroke', '#2575fc');
+                tri.setAttribute('stroke-width', '2');
+                tri.setAttribute('id', triangle.id);
+                tri.setAttribute('class', 'triangle');
+                tri.addEventListener('click', () => selectTriangle(triangle.id));
+                svg.appendChild(tri);
+            });
+            
+            // Define congruent pairs
+            window.currentCongruentPairs = [
+                ['t1', 't2'],
+                ['t3', 't4'],
+                ['t5', 't6']
+            ];
+            
+            document.getElementById('totalPairs').textContent = '3';
+        }
+        
+        function drawHexagon(svg) {
+            // Create a hexagon
+            const hexagon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            hexagon.setAttribute('points', '400,100 500,150 500,250 400,300 300,250 300,150');
+            hexagon.setAttribute('fill', 'rgba(106, 17, 203, 0.2)');
+            hexagon.setAttribute('stroke', '#6a11cb');
+            hexagon.setAttribute('stroke-width', '2');
+            svg.appendChild(hexagon);
+            
+            // Create triangles inside the hexagon
+            const triangles = [
+                { id: 't1', points: '400,100 500,150 400,175' },
+                { id: 't2', points: '400,100 400,175 300,150' },
+                { id: 't3', points: '500,150 500,250 400,175' },
+                { id: 't4', points: '300,150 400,175 300,250' },
+                { id: 't5', points: '500,250 400,300 400,175' },
+                { id: 't6', points: '300,250 400,175 400,300' },
+                { id: 't7', points: '400,100 300,150 400,175' },
+                { id: 't8', points: '400,100 400,175 500,150' }
+            ];
+            
+            triangles.forEach(triangle => {
+                const tri = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                tri.setAttribute('points', triangle.points);
+                tri.setAttribute('fill', 'rgba(37, 117, 252, 0.3)');
+                tri.setAttribute('stroke', '#2575fc');
+                tri.setAttribute('stroke-width', '2');
+                tri.setAttribute('id', triangle.id);
+                tri.setAttribute('class', 'triangle');
+                tri.addEventListener('click', () => selectTriangle(triangle.id));
+                svg.appendChild(tri);
+            });
+            
+            // Define congruent pairs
+            window.currentCongruentPairs = [
+                ['t1', 't2'],
+                ['t3', 't4'],
+                ['t5', 't6'],
+                ['t7', 't8']
+            ];
+            
+            document.getElementById('totalPairs').textContent = '4';
+        }
+        
+        function drawStar(svg) {
+            // Create a star shape
+            const star = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            star.setAttribute('points', '400,100 420,180 500,180 440,230 460,310 400,260 340,310 360,230 300,180 380,180');
+            star.setAttribute('fill', 'rgba(106, 17, 203, 0.2)');
+            star.setAttribute('stroke', '#6a11cb');
+            star.setAttribute('stroke-width', '2');
+            svg.appendChild(star);
+            
+            // Create triangles inside the star
+            const triangles = [
+                { id: 't1', points: '400,100 420,180 400,140' },
+                { id: 't2', points: '400,100 400,140 380,180' },
+                { id: 't3', points: '420,180 500,180 460,180' },
+                { id: 't4', points: '380,180 300,180 340,180' },
+                { id: 't5', points: '500,180 440,230 470,205' },
+                { id: 't6', points: '300,180 360,230 330,205' },
+                { id: 't7', points: '440,230 460,310 450,270' },
+                { id: 't8', points: '360,230 340,310 350,270' },
+                { id: 't9', points: '460,310 400,260 430,285' },
+                { id: 't10', points: '340,310 400,260 370,285' }
+            ];
+            
+            triangles.forEach(triangle => {
+                const tri = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                tri.setAttribute('points', triangle.points);
+                tri.setAttribute('fill', 'rgba(37, 117, 252, 0.3)');
+                tri.setAttribute('stroke', '#2575fc');
+                tri.setAttribute('stroke-width', '2');
+                tri.setAttribute('id', triangle.id);
+                tri.setAttribute('class', 'triangle');
+                tri.addEventListener('click', () => selectTriangle(triangle.id));
+                svg.appendChild(tri);
+            });
+            
+            // Define congruent pairs
+            window.currentCongruentPairs = [
+                ['t1', 't2'],
+                ['t3', 't4'],
+                ['t5', 't6'],
+                ['t7', 't8'],
+                ['t9', 't10']
+            ];
+            
+            document.getElementById('totalPairs').textContent = '5';
+        }
+        
+        function drawTrapezoid(svg) {
+            // Create a trapezoid
+            const trapezoid = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            trapezoid.setAttribute('points', '200,100 600,100 500,300 300,300');
+            trapezoid.setAttribute('fill', 'rgba(106, 17, 203, 0.2)');
+            trapezoid.setAttribute('stroke', '#6a11cb');
+            trapezoid.setAttribute('stroke-width', '2');
+            svg.appendChild(trapezoid);
+            
+            // Create triangles inside the trapezoid
+            const triangles = [
+                { id: 't1', points: '200,100 600,100 400,150' },
+                { id: 't2', points: '600,100 500,300 400,150' },
+                { id: 't3', points: '500,300 300,300 400,150' },
+                { id: 't4', points: '300,300 200,100 400,150' },
+                { id: 't5', points: '200,100 400,150 300,300' },
+                { id: 't6', points: '600,100 400,150 500,300' }
+            ];
+            
+            triangles.forEach(triangle => {
+                const tri = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                tri.setAttribute('points', triangle.points);
+                tri.setAttribute('fill', 'rgba(37, 117, 252, 0.3)');
+                tri.setAttribute('stroke', '#2575fc');
+                tri.setAttribute('stroke-width', '2');
+                tri.setAttribute('id', triangle.id);
+                tri.setAttribute('class', 'triangle');
+                tri.addEventListener('click', () => selectTriangle(triangle.id));
+                svg.appendChild(tri);
+            });
+            
+            // Define congruent pairs
+            window.currentCongruentPairs = [
+                ['t1', 't3'],
+                ['t2', 't4'],
+                ['t5', 't6']
+            ];
+            
+            document.getElementById('totalPairs').textContent = '3';
+        }
+        
+        function selectTriangle(triangleId) {
+            const triangle = document.getElementById(triangleId);
+            
+            if (selectedTriangles.includes(triangleId)) {
+                // Deselect if already selected
+                selectedTriangles = selectedTriangles.filter(id => id !== triangleId);
+                triangle.classList.remove('selected');
+            } else if (selectedTriangles.length < 2) {
+                // Select if less than 2 selected
+                selectedTriangles.push(triangleId);
+                triangle.classList.add('selected');
+                
+                // Check if we have 2 selected triangles
+                if (selectedTriangles.length === 2) {
+                    checkCongruentPair();
+                }
+            }
+        }
+        
+        function checkCongruentPair() {
+            const [t1, t2] = selectedTriangles;
+            
+            let isCongruent = false;
+            for (const pair of window.currentCongruentPairs) {
+                if ((pair[0] === t1 && pair[1] === t2) || (pair[0] === t2 && pair[1] === t1)) {
+                    isCongruent = true;
+                    break;
+                }
+            }
+            
+            if (isCongruent) {
+                // Mark as matched
+                document.getElementById(t1).classList.remove('selected');
+                document.getElementById(t2).classList.remove('selected');
+                document.getElementById(t1).classList.add('matched');
+                document.getElementById(t2).classList.add('matched');
+                
+                // Update score and pairs found
+                spotScore += 10;
+                updateSpotScore();
+                
+                const pairsFound = document.querySelectorAll('.triangle.matched').length / 2;
+                document.getElementById('pairsFound').textContent = pairsFound;
+                
+                showFeedback('spotFeedback', 'success', 'Correct! These triangles are congruent.');
+                
+                // Check if all pairs are found
+                if (pairsFound === parseInt(document.getElementById('totalPairs').textContent)) {
+                    showFeedback('spotFeedback', 'success', 'Congratulations! You found all congruent pairs!');
+                }
+            } else {
+                showFeedback('spotFeedback', 'error', 'These triangles are not congruent. Try again.');
+                
+                // Deselect after a delay
+                setTimeout(() => {
+                    document.getElementById(t1).classList.remove('selected');
+                    document.getElementById(t2).classList.remove('selected');
+                    selectedTriangles = [];
+                }, 1000);
+            }
+            
+            // Reset selection
+            selectedTriangles = [];
+        }
+        
+        function updateSpotScore() {
+            document.getElementById('spotScore').textContent = spotScore;
+        }
+        
+        function resetSpotGame() {
+            selectedTriangles = [];
+            matchedPairs = [];
+            spotScore = 0;
+            updateSpotScore();
+            
+            // Reset all triangles
+            document.querySelectorAll('.triangle').forEach(triangle => {
+                triangle.classList.remove('selected', 'matched');
+            });
+            
+            document.getElementById('pairsFound').textContent = '0';
+            hideFeedback('spotFeedback');
+        }
+        
+        // Utility functions
+        function showFeedback(elementId, type, message) {
+            const element = document.getElementById(elementId);
+            element.className = `feedback ${type}`;
+            element.textContent = message;
+            element.style.display = 'block';
+        }
+        
+        function hideFeedback(elementId) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

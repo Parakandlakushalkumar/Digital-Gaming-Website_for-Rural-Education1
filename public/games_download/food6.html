@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutrition Learning Games</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57);
+            transition: left 0.3s ease;
+        }
+
+        .game-card:hover::before {
+            left: 0;
+        }
+
+        .game-icon {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .game-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+            text-align: center;
+        }
+
+        .game-description {
+            color: #666;
+            line-height: 1.5;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .play-btn {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .play-btn:hover {
+            background: linear-gradient(45deg, #e55555, #3bb5a8);
+            transform: scale(1.05);
+        }
+
+        .game-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            margin: 20px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .score {
+            text-align: center;
+            font-size: 1.2rem;
+            margin: 15px 0;
+            color: #2c5aa0;
+            font-weight: bold;
+        }
+
+        .food-item, .source-category, .nutrient-btn, .plate, .calorie-input, .category-btn {
+            padding: 10px 15px;
+            margin: 5px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .food-item:hover, .source-category:hover, .nutrient-btn:hover, .category-btn:hover {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            transform: scale(1.05);
+        }
+
+        .drag-area {
+            min-height: 100px;
+            border: 3px dashed #ccc;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 10px;
+            text-align: center;
+            background: #fafafa;
+        }
+
+        .correct {
+            background: #c8e6c9 !important;
+            border-color: #4caf50 !important;
+        }
+
+        .incorrect {
+            background: #ffcdd2 !important;
+            border-color: #f44336 !important;
+        }
+
+        .game-area {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .current-food {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .plate-visual {
+            width: 300px;
+            height: 300px;
+            border: 5px solid #8d6e63;
+            border-radius: 50%;
+            margin: 20px auto;
+            background: #fff;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .plate-section {
+            position: absolute;
+            font-size: 2rem;
+            padding: 10px;
+            border-radius: 50%;
+            min-width: 60px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.9);
+        }
+
+        .character {
+            width: 60px;
+            height: 60px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            margin: 20px auto;
+            position: relative;
+            transition: transform 0.5s ease;
+        }
+
+        .character::before {
+            content: '🏃';
+            position: absolute;
+            font-size: 30px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .race-track {
+            width: 100%;
+            height: 60px;
+            background: linear-gradient(90deg, #4caf50 0%, #2196f3 50%, #ff9800 100%);
+            border-radius: 30px;
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .racer {
+            position: absolute;
+            left: 0;
+            top: 5px;
+            font-size: 40px;
+            transition: left 0.5s ease;
+        }
+
+        .food-rain {
+            position: absolute;
+            top: -50px;
+            font-size: 2rem;
+            animation: fall 3s linear;
+        }
+
+        @keyframes fall {
+            to {
+                top: 100vh;
+            }
+        }
+
+        .game-instructions {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #4caf50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍎 Nutrition Learning Games 🥗</h1>
+        
+        <div class="games-grid">
+            <div class="game-card" onclick="openGame('foodSource')">
+                <div class="game-icon">🍎🌾</div>
+                <div class="game-title">Food Source Match</div>
+                <div class="game-description">Match foods to their source - plant, animal, or both!</div>
+                <button class="play-btn">Play Now</button>
+            </div>
+
+            <div class="game-card" onclick="openGame('nutrientDetective')">
+                <div class="game-icon">🕵️‍♀️🥛</div>
+                <div class="game-title">Nutrient Detective</div>
+                <div class="game-description">Identify the main nutrient in different food items!</div>
+                <button class="play-btn">Play Now</button>
+            </div>
+
+            <div class="game-card" onclick="openGame('balancedPlate')">
+                <div class="game-icon">🍽️</div>
+                <div class="game-title">Balanced Plate Challenge</div>
+                <div class="game-description">Build a balanced meal plate with all food groups!</div>
+                <button class="play-btn">Play Now</button>
+            </div>
+
+            <div class="game-card" onclick="openGame('calorieCounter')">
+                <div class="game-icon">🥗💪</div>
+                <div class="game-title">Calorie Counter</div>
+                <div class="game-description">Guess the calorie content to fuel your character!</div>
+                <button class="play-btn">Play Now</button>
+            </div>
+
+            <div class="game-card" onclick="openGame('foodSort')">
+                <div class="game-icon">🚀</div>
+                <div class="game-title">Food Sort Race</div>
+                <div class="game-description">Sort foods into categories to win the race!</div>
+                <button class="play-btn">Play Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Modals -->
+    <div id="foodSource" class="game-modal">
+        <div class="game-content">
+            <button class="close-btn" onclick="closeGame('foodSource')">&times;</button>
+            <h2>🍎 Food Source Match 🌾</h2>
+            <div class="game-instructions">
+                Drag each food item to its correct source: Plant 🌱, Animal 🐄, or Both 🌱🐄
+            </div>
+            <div class="score">Score: <span id="sourceScore">0</span></div>
+            <div class="game-area">
+                <div id="currentSourceFood" class="current-food"></div>
+                <div class="options-grid">
+                    <div class="source-category" data-source="plant" ondrop="dropSource(event)" ondragover="allowDrop(event)">
+                        🌱 Plant
+                    </div>
+                    <div class="source-category" data-source="animal" ondrop="dropSource(event)" ondragover="allowDrop(event)">
+                        🐄 Animal
+                    </div>
+                    <div class="source-category" data-source="both" ondrop="dropSource(event)" ondragover="allowDrop(event)">
+                        🌱🐄 Both
+                    </div>
+                </div>
+                <button onclick="nextSourceFood()" class="play-btn" style="margin-top: 20px;">Next Food</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="nutrientDetective" class="game-modal">
+        <div class="game-content">
+            <button class="close-btn" onclick="closeGame('nutrientDetective')">&times;</button>
+            <h2>🕵️‍♀️ Nutrient Detective 🥛</h2>
+            <div class="game-instructions">
+                Identify the main nutrient in each food item!
+            </div>
+            <div class="score">Score: <span id="nutrientScore">0</span></div>
+            <div class="game-area">
+                <div id="currentNutrientFood" class="current-food"></div>
+                <div class="options-grid">
+                    <button class="nutrient-btn" onclick="selectNutrient('carbs')">🍞 Carbohydrates</button>
+                    <button class="nutrient-btn" onclick="selectNutrient('protein')">🥩 Proteins</button>
+                    <button class="nutrient-btn" onclick="selectNutrient('fats')">🥑 Fats</button>
+                    <button class="nutrient-btn" onclick="selectNutrient('vitamins')">🍊 Vitamins/Minerals</button>
+                </div>
+                <div id="nutrientFeedback"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="balancedPlate" class="game-modal">
+        <div class="game-content">
+            <button class="close-btn" onclick="closeGame('balancedPlate')">&times;</button>
+            <h2>🍽️ Balanced Plate Challenge</h2>
+            <div class="game-instructions">
+                Build a balanced meal! Include foods from all groups: Carbs, Proteins, Fats, and Vitamins.
+            </div>
+            <div class="score">Score: <span id="plateScore">0</span></div>
+            <div class="game-area">
+                <div class="plate-visual" id="plateVisual">
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #999;">
+                        Drag foods here!
+                    </div>
+                </div>
+                <div style="margin: 20px 0;">
+                    <h3>Available Foods:</h3>
+                    <div id="availableFoods"></div>
+                </div>
+                <button onclick="checkPlateBalance()" class="play-btn">Check Balance</button>
+                <button onclick="resetPlate()" class="play-btn" style="background: #ff6b6b; margin-left: 10px;">Reset Plate</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="calorieCounter" class="game-modal">
+        <div class="game-content">
+            <button class="close-btn" onclick="closeGame('calorieCounter')">&times;</button>
+            <h2>🥗 Calorie Counter 💪</h2>
+            <div class="game-instructions">
+                Guess the approximate calorie content of each food to fuel your character!
+            </div>
+            <div class="score">Score: <span id="calorieScore">0</span></div>
+            <div class="game-area">
+                <div id="currentCalorieFood" class="current-food"></div>
+                <div class="character" id="character"></div>
+                <input type="number" id="calorieGuess" placeholder="Enter calories..." style="padding: 10px; margin: 10px; border-radius: 5px; border: 2px solid #ddd; width: 200px;">
+                <button onclick="submitCalorieGuess()" class="play-btn" style="margin-left: 10px;">Submit Guess</button>
+                <div id="calorieFeedback" style="margin-top: 15px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="foodSort" class="game-modal">
+        <div class="game-content">
+            <button class="close-btn" onclick="closeGame('foodSort')">&times;</button>
+            <h2>🚀 Food Sort Race</h2>
+            <div class="game-instructions">
+                Sort falling foods into the correct categories to move your racer forward!
+            </div>
+            <div class="score">Score: <span id="raceScore">0</span> | Distance: <span id="raceDistance">0</span>%</div>
+            <div class="game-area">
+                <div class="race-track">
+                    <div class="racer" id="racer">🏃</div>
+                </div>
+                <div id="fallingFood" style="position: relative; height: 200px; overflow: hidden; border: 2px solid #ddd; border-radius: 10px; margin: 20px 0;"></div>
+                <div class="options-grid">
+                    <button class="category-btn" onclick="sortFood('carbs')">🍞 Carbs</button>
+                    <button class="category-btn" onclick="sortFood('protein')">🥩 Protein</button>
+                    <button class="category-btn" onclick="sortFood('fats')">🥑 Fats</button>
+                    <button class="category-btn" onclick="sortFood('vitamins')">🍊 Vitamins</button>
+                </div>
+                <button onclick="startRace()" class="play-btn" id="raceStartBtn">Start Race!</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game data
+        const foodSources = {
+            '🍎 Apple': 'plant',
+            '🥩 Beef': 'animal',
+            '🥛 Milk': 'animal',
+            '🥕 Carrot': 'plant',
+            '🍳 Egg': 'animal',
+            '🍞 Bread': 'plant',
+            '🧀 Cheese': 'animal',
+            '🌽 Corn': 'plant',
+            '🐟 Fish': 'animal',
+            '🥜 Nuts': 'plant',
+            '🍯 Honey': 'animal',
+            '🥔 Potato': 'plant'
+        };
+
+        const foodNutrients = {
+            '🍞 Bread': 'carbs',
+            '🥩 Steak': 'protein',
+            '🥑 Avocado': 'fats',
+            '🍊 Orange': 'vitamins',
+            '🍝 Pasta': 'carbs',
+            '🐟 Fish': 'protein',
+            '🥜 Nuts': 'fats',
+            '🥕 Carrot': 'vitamins',
+            '🍚 Rice': 'carbs',
+            '🥛 Milk': 'protein',
+            '🫒 Olive Oil': 'fats',
+            '🥬 Spinach': 'vitamins'
+        };
+
+        const foodCalories = {
+            '🍎 Apple': 80,
+            '🍞 Slice of Bread': 70,
+            '🥛 Cup of Milk': 150,
+            '🍳 Egg': 70,
+            '🍌 Banana': 100,
+            '🥕 Carrot': 25,
+            '🧀 Cheese Slice': 110,
+            '🥔 Potato': 160,
+            '🐟 Fish Fillet': 200,
+            '🥜 Handful of Nuts': 180
+        };
+
+        const plateFoods = {
+            'carbs': ['🍞 Bread', '🍚 Rice', '🍝 Pasta', '🥔 Potato'],
+            'protein': ['🥩 Meat', '🐟 Fish', '🥛 Milk', '🥚 Egg'],
+            'fats': ['🥑 Avocado', '🥜 Nuts', '🫒 Oil', '🧈 Butter'],
+            'vitamins': ['🍎 Apple', '🥕 Carrot', '🥬 Spinach', '🍊 Orange']
+        };
+
+        // Game state
+        let currentFood = '';
+        let scores = {
+            source: 0,
+            nutrient: 0,
+            plate: 0,
+            calorie: 0,
+            race: 0
+        };
+        let plateItems = [];
+        let raceDistance = 0;
+        let currentRaceFood = '';
+        let raceInterval;
+
+        function openGame(gameId) {
+            document.getElementById(gameId).style.display = 'flex';
+            initGame(gameId);
+        }
+
+        function closeGame(gameId) {
+            document.getElementById(gameId).style.display = 'none';
+            if (gameId === 'foodSort') {
+                clearInterval(raceInterval);
+            }
+        }
+
+        function initGame(gameId) {
+            switch(gameId) {
+                case 'foodSource':
+                    nextSourceFood();
+                    break;
+                case 'nutrientDetective':
+                    nextNutrientFood();
+                    break;
+                case 'balancedPlate':
+                    setupPlateGame();
+                    break;
+                case 'calorieCounter':
+                    nextCalorieFood();
+                    break;
+                case 'foodSort':
+                    resetRace();
+                    break;
+            }
+        }
+
+        // Food Source Game
+        function nextSourceFood() {
+            const foods = Object.keys(foodSources);
+            currentFood = foods[Math.floor(Math.random() * foods.length)];
+            document.getElementById('currentSourceFood').innerHTML = currentFood;
+            document.getElementById('currentSourceFood').setAttribute('draggable', 'true');
+            document.getElementById('currentSourceFood').setAttribute('ondragstart', 'dragStart(event)');
+        }
+
+        function dragStart(event) {
+            event.dataTransfer.setData('text/plain', event.target.innerHTML);
+        }
+
+        function allowDrop(event) {
+            event.preventDefault();
+        }
+
+        function dropSource(event) {
+            event.preventDefault();
+            const foodName = event.dataTransfer.getData('text/plain');
+            const targetSource = event.target.getAttribute('data-source');
+            const correctSource = foodSources[foodName];
+            
+            if (targetSource === correctSource) {
+                scores.source += 10;
+                event.target.classList.add('correct');
+                setTimeout(() => event.target.classList.remove('correct'), 1000);
+                showFeedback('Correct! 🎉', 'correct');
+            } else {
+                event.target.classList.add('incorrect');
+                setTimeout(() => event.target.classList.remove('incorrect'), 1000);
+                showFeedback(`Wrong! ${foodName} comes from ${correctSource}`, 'incorrect');
+            }
+            
+            document.getElementById('sourceScore').textContent = scores.source;
+            setTimeout(nextSourceFood, 1500);
+        }
+
+        // Nutrient Detective Game
+        function nextNutrientFood() {
+            const foods = Object.keys(foodNutrients);
+            currentFood = foods[Math.floor(Math.random() * foods.length)];
+            document.getElementById('currentNutrientFood').innerHTML = currentFood;
+        }
+
+        function selectNutrient(selectedNutrient) {
+            const correctNutrient = foodNutrients[currentFood];
+            const feedbackEl = document.getElementById('nutrientFeedback');
+            
+            if (selectedNutrient === correctNutrient) {
+                scores.nutrient += 10;
+                feedbackEl.innerHTML = '<div style="color: green; font-size: 1.2rem;">Correct! 🎉</div>';
+            } else {
+                feedbackEl.innerHTML = `<div style="color: red; font-size: 1.2rem;">Wrong! ${currentFood} is mainly ${correctNutrient}</div>`;
+            }
+            
+            document.getElementById('nutrientScore').textContent = scores.nutrient;
+            setTimeout(() => {
+                feedbackEl.innerHTML = '';
+                nextNutrientFood();
+            }, 2000);
+        }
+
+        // Balanced Plate Game
+        function setupPlateGame() {
+            const container = document.getElementById('availableFoods');
+            container.innerHTML = '';
+            
+            Object.values(plateFoods).flat().forEach(food => {
+                const foodEl = document.createElement('div');
+                foodEl.className = 'food-item';
+                foodEl.innerHTML = food;
+                foodEl.draggable = true;
+                foodEl.ondragstart = (e) => e.dataTransfer.setData('text/plain', food);
+                container.appendChild(foodEl);
+            });
+
+            document.getElementById('plateVisual').ondrop = dropOnPlate;
+            document.getElementById('plateVisual').ondragover = allowDrop;
+        }
+
+        function dropOnPlate(event) {
+            event.preventDefault();
+            const food = event.dataTransfer.getData('text/plain');
+            
+            if (plateItems.length < 8) {
+                plateItems.push(food);
+                updatePlateVisual();
+            }
+        }
+
+        function updatePlateVisual() {
+            const plate = document.getElementById('plateVisual');
+            plate.innerHTML = '';
+            
+            plateItems.forEach((food, index) => {
+                const foodEl = document.createElement('div');
+                foodEl.className = 'plate-section';
+                foodEl.innerHTML = food;
+                const angle = (360 / plateItems.length) * index;
+                const x = Math.cos(angle * Math.PI / 180) * 80;
+                const y = Math.sin(angle * Math.PI / 180) * 80;
+                foodEl.style.transform = `translate(${x}px, ${y}px)`;
+                plate.appendChild(foodEl);
+            });
+        }
+
+        function checkPlateBalance() {
+            const categories = {carbs: 0, protein: 0, fats: 0, vitamins: 0};
+            
+            plateItems.forEach(item => {
+                for (let category in plateFoods) {
+                    if (plateFoods[category].some(food => food === item)) {
+                        categories[category]++;
+                    }
+                }
+            });
+            
+            const isBalanced = Object.values(categories).every(count => count >= 1);
+            
+            if (isBalanced) {
+                scores.plate += 20;
+                showFeedback('Perfect! Your plate is balanced! 🎉', 'correct');
+            } else {
+                showFeedback('Not quite balanced. Make sure you have foods from all groups!', 'incorrect');
+            }
+            
+            document.getElementById('plateScore').textContent = scores.plate;
+        }
+
+        function resetPlate() {
+            plateItems = [];
+            updatePlateVisual();
+        }
+
+        // Calorie Counter Game
+        function nextCalorieFood() {
+            const foods = Object.keys(foodCalories);
+            currentFood = foods[Math.floor(Math.random() * foods.length)];
+            document.getElementById('currentCalorieFood').innerHTML = currentFood;
+            document.getElementById('calorieGuess').value = '';
+            document.getElementById('calorieFeedback').innerHTML = '';
+        }
+
+        function submitCalorieGuess() {
+            const guess = parseInt(document.getElementById('calorieGuess').value);
+            const correct = foodCalories[currentFood];
+            const difference = Math.abs(guess - correct);
+            const feedbackEl = document.getElementById('calorieFeedback');
+            const character = document.getElementById('character');
+            
+            if (difference <= 20) {
+                scores.calorie += 15;
+                feedbackEl.innerHTML = '<div style="color: green;">Great guess! 🎉</div>';
+                character.style.transform = 'translateX(20px) scale(1.2)';
+            } else if (difference <= 50) {
+                scores.calorie += 5;
+                feedbackEl.innerHTML = '<div style="color: orange;">Close enough! 👍</div>';
+                character.style.transform = 'translateX(10px)';
+            } else {
+                feedbackEl.innerHTML = `<div style="color: red;">Not quite! The correct answer is ${correct} calories</div>`;
+            }
+            
+            document.getElementById('calorieScore').textContent = scores.calorie;
+            
+            setTimeout(() => {
+                character.style.transform = 'translateX(0) scale(1)';
+                nextCalorieFood();
+            }, 2000);
+        }
+
+        // Food Sort Race Game
+        function startRace() {
+            raceDistance = 0;
+            scores.race = 0;
+            document.getElementById('raceStartBtn').style.display = 'none';
+            updateRaceDisplay();
+            
+            raceInterval = setInterval(() => {
+                dropRandomFood();
+            }, 2000);
+        }
+
+        function dropRandomFood() {
+            const foods = Object.keys(foodNutrients);
+            currentRaceFood = foods[Math.floor(Math.random() * foods.length)];
+            
+            const container = document.getElementById('fallingFood');
+            const foodEl = document.createElement('div');
+            foodEl.className = 'food-rain';
+            foodEl.innerHTML = currentRaceFood;
+            foodEl.style.left = Math.random() * (container.offsetWidth - 50) + 'px';
+            container.appendChild(foodEl);
+            
+            setTimeout(() => {
+                if (foodEl.parentNode) {
+                    foodEl.remove();
+                    raceDistance = Math.max(0, raceDistance - 5);
+                    updateRaceDisplay();
+                }
+            }, 3000);
+        }
+
+        function sortFood(category) {
+            const correctCategory = foodNutrients[currentRaceFood];
+            const container = document.getElementById('fallingFood');
+            const fallingFoods = container.getElementsByClassName('food-rain');
+            
+            if (fallingFoods.length > 0 && category === correctCategory) {
+                scores.race += 10;
+                raceDistance = Math.min(100, raceDistance + 10);
+                fallingFoods[0].remove();
+                showFeedback('Correct! 🏃', 'correct');
+            } else if (fallingFoods.length > 0) {
+                raceDistance = Math.max(0, raceDistance - 5);
+                showFeedback('Wrong category!', 'incorrect');
+            }
+            
+            updateRaceDisplay();
+            
+            if (raceDistance >= 100) {
+                clearInterval(raceInterval);
+                showFeedback('🏆 You won the race! 🎉', 'correct');
+                document.getElementById('raceStartBtn').style.display = 'block';
+                document.getElementById('raceStartBtn').textContent = 'Play Again!';
+            }
+        }
+
+        function updateRaceDisplay() {
+            document.getElementById('raceScore').textContent = scores.race;
+            document.getElementById('raceDistance').textContent = raceDistance;
+            document.getElementById('racer').style.left = raceDistance + '%';
+        }
+
+        function resetRace() {
+            clearInterval(raceInterval);
+            raceDistance = 0;
+            scores.race = 0;
+            document.getElementById('fallingFood').innerHTML = '';
+            document.getElementById('raceStartBtn').style.display = 'block';
+            document.getElementById('raceStartBtn').textContent = 'Start Race!';
+            updateRaceDisplay();
+        }
+
+        function showFeedback(message, type) {
+            // Create temporary feedback element
+            const feedback = document.createElement('div');
+            feedback.style.position = 'fixed';
+            feedback.style.top = '20px';
+            feedback.style.right = '20px';
+            feedback.style.padding = '15px 20px';
+            feedback.style.borderRadius = '10px';
+            feedback.style.fontWeight = 'bold';
+            feedback.style.zIndex = '9999';
+            feedback.style.boxShadow = '0 5px 15px rgba(0,0,0,0.3)';
+            feedback.style.transition = 'all 0.3s ease';
+            
+            if (type === 'correct') {
+                feedback.style.background = '#4caf50';
+                feedback.style.color = 'white';
+            } else {
+                feedback.style.background = '#f44336';
+                feedback.style.color = 'white';
+            }
+            
+            feedback.innerHTML = message;
+            document.body.appendChild(feedback);
+            
+            setTimeout(() => {
+                feedback.style.opacity = '0';
+                feedback.style.transform = 'translateY(-20px)';
+                setTimeout(() => feedback.remove(), 300);
+            }, 2000);
+        }
+
+        // Initialize random foods for plate game
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add some visual enhancements
+            const cards = document.querySelectorAll('.game-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+
+        // Add keyboard support for calorie counter
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && document.getElementById('calorieCounter').style.display === 'flex') {
+                submitCalorieGuess();
+            }
+        });
+
+        // Prevent default drag behavior on images
+        document.addEventListener('dragstart', function(e) {
+            if (e.target.tagName === 'IMG') {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>

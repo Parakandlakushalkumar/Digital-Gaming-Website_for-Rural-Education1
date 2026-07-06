@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics Adventure - 5 Games in 1!</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #8b5cf6;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+            --dark-color: #1f2937;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px 0;
+        }
+
+        .game-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .game-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .game-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .game-content {
+            padding: 20px;
+            min-height: 450px;
+        }
+
+        .dataset {
+            background: #f3f4f6;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            text-align: center;
+            border: 2px solid #e5e7eb;
+        }
+
+        .btn-game {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            margin: 5px;
+            font-weight: 600;
+        }
+
+        .btn-game:hover {
+            background: var(--secondary-color);
+            transform: scale(1.05);
+            color: white;
+        }
+
+        .btn-game:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Treasure Game Styles */
+        .treasure-container {
+            text-align: center;
+        }
+
+        .treasure-chest {
+            width: 120px;
+            height: 80px;
+            background: #8b4513;
+            border-radius: 10px;
+            margin: 20px auto;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .treasure-chest::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 20px;
+            background: #654321;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .treasure-digit {
+            width: 60px;
+            height: 60px;
+            border: 3px solid var(--primary-color);
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 5px;
+            background: #f9fafb;
+            transition: all 0.3s ease;
+        }
+
+        .treasure-digit.unlocked {
+            background: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+            animation: pulse 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Island Game Styles */
+        .island-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .island {
+            width: 70px;
+            height: 70px;
+            background: #10b981;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .island::before {
+            content: '🌴';
+            position: absolute;
+            top: -15px;
+            font-size: 1.5rem;
+        }
+
+        .island.locked {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .island.locked::before {
+            content: '🔒';
+        }
+
+        .island.completed {
+            background: var(--success-color);
+        }
+
+        .island.completed::before {
+            content: '✅';
+        }
+
+        .island.current {
+            animation: bounce 1s infinite;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.6);
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .bridge {
+            width: 40px;
+            height: 4px;
+            background: #8b4513;
+            margin: 0 -5px;
+        }
+
+        /* Balloon Game Styles */
+        .balloon-container {
+            min-height: 150px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 10px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .balloon {
+            width: 50px;
+            height: 60px;
+            background: var(--info-color);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            color: white;
+            text-align: center;
+            line-height: 60px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .balloon::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 20px;
+            background: #6b7280;
+        }
+
+        .balloon:hover {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        .balloon.popped {
+            opacity: 0.3;
+            transform: scale(0.5) rotate(180deg);
+            pointer-events: none;
+        }
+
+        .calculator-basket {
+            border: 3px dashed var(--warning-color);
+            border-radius: 15px;
+            padding: 20px;
+            min-height: 100px;
+            margin: 20px 0;
+            text-align: center;
+            background: #fef3c7;
+            transition: all 0.3s ease;
+        }
+
+        .calculator-basket.drag-over {
+            background: #fde68a;
+            border-color: var(--warning-color);
+            transform: scale(1.02);
+        }
+
+        .draggable-number {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 5px;
+            cursor: move;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .draggable-number:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .draggable-number.dragging {
+            opacity: 0.5;
+        }
+
+        /* Detective Game Styles */
+        .detective-board {
+            background: #1f2937;
+            border-radius: 15px;
+            padding: 20px;
+            color: white;
+            margin: 15px 0;
+            position: relative;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .detective-board::before {
+            content: '🕵️‍♂️';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 2rem;
+        }
+
+        .clue-card {
+            background: #fef3c7;
+            border-left: 4px solid var(--warning-color);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            position: relative;
+            animation: slideIn 0.5s ease;
+        }
+
+        .clue-card::before {
+            content: '🔍';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5rem;
+        }
+
+        /* Creature Game Styles */
+        .creature-display {
+            text-align: center;
+            margin: 20px 0;
+            min-height: 120px;
+        }
+
+        .creature-part {
+            display: inline-block;
+            margin: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .creature-part.locked {
+            opacity: 0.3;
+            filter: grayscale(100%);
+            transform: scale(0.9);
+        }
+
+        .creature-part.unlocked {
+            animation: unlockPart 0.6s ease;
+        }
+
+        @keyframes unlockPart {
+            0% { transform: scale(0) rotate(0deg); opacity: 0; }
+            50% { transform: scale(1.2) rotate(180deg); opacity: 0.8; }
+            100% { transform: scale(1) rotate(360deg); opacity: 1; }
+        }
+
+        .creature-emoji {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* Feedback Styles */
+        .feedback {
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            animation: slideIn 0.5s ease;
+            font-weight: 500;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feedback.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .feedback.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .feedback.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+
+        /* Progress Styles */
+        .progress-container {
+            background: #f3f4f6;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 15px 0;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.5s ease;
+            border-radius: 5px;
+        }
+
+        /* Input Styles */
+        .answer-input {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            width: 120px;
+            text-align: center;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Question Counter */
+        .question-counter {
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .game-card {
+                margin-bottom: 20px;
+            }
+            
+            .treasure-digit {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+            
+            .island {
+                width: 60px;
+                height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container game-container">
+        <h1 class="text-center text-white mb-5">
+            <i class="bi bi-controller"></i> Statistics Adventure - 5 Games in 1!
+        </h1>
+        
+        <div class="row g-4">
+            <!-- Game 1: Treasure Code Challenge -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card">
+                    <div class="game-header">
+                        <i class="bi bi-box-seam game-icon"></i>
+                        <h3>Treasure Code Challenge</h3>
+                        <p class="mb-0">Solve for Mean, Median, Mode to unlock!</p>
+                    </div>
+                    <div class="game-content">
+                        <div id="treasure-game">
+                            <div class="question-counter" id="treasure-counter">Question 1 of 10</div>
+                            <div class="treasure-container">
+                                <div class="treasure-chest"></div>
+                                <div class="mb-3">
+                                    <div class="treasure-digit" id="digit1">?</div>
+                                    <div class="treasure-digit" id="digit2">?</div>
+                                    <div class="treasure-digit" id="digit3">?</div>
+                                </div>
+                            </div>
+                            <div class="dataset" id="treasure-dataset"></div>
+                            <div class="text-center">
+                                <button class="btn btn-game" onclick="solveTreasure('mean')">
+                                    <i class="bi bi-calculator"></i> Mean
+                                </button>
+                                <button class="btn btn-game" onclick="solveTreasure('median')">
+                                    <i class="bi bi-bar-chart"></i> Median
+                                </button>
+                                <button class="btn btn-game" onclick="solveTreasure('mode')">
+                                    <i class="bi bi-hash"></i> Mode
+                                </button>
+                            </div>
+                            <div id="treasure-feedback"></div>
+                            <div class="progress-container">
+                                <div class="progress-header">
+                                    <span>Progress</span>
+                                    <span id="treasure-progress-text">0/3</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="treasure-progress"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 2: Data Island Hop -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card">
+                    <div class="game-header">
+                        <i class="bi bi-island game-icon"></i>
+                        <h3>Data Island Hop</h3>
+                        <p class="mb-0">Jump between islands by solving!</p>
+                    </div>
+                    <div class="game-content">
+                        <div id="island-game">
+                            <div class="question-counter" id="island-counter">Island 1 of 10</div>
+                            <div class="island-container">
+                                <div class="island completed" id="island1">1</div>
+                                <div class="bridge"></div>
+                                <div class="island current" id="island2">2</div>
+                                <div class="bridge"></div>
+                                <div class="island locked" id="island3">3</div>
+                                <div class="bridge"></div>
+                                <div class="island locked" id="island4">4</div>
+                                <div class="bridge"></div>
+                                <div class="island locked" id="island5">5</div>
+                            </div>
+                            <div class="dataset" id="island-dataset"></div>
+                            <div class="text-center">
+                                <input type="number" class="answer-input" id="island-answer" placeholder="Answer">
+                                <button class="btn btn-game" onclick="checkIsland()">
+                                    <i class="bi bi-check-circle"></i> Submit
+                                </button>
+                            </div>
+                            <div id="island-feedback"></div>
+                            <div class="progress-container">
+                                <div class="progress-header">
+                                    <span>Islands Conquered</span>
+                                    <span id="island-progress-text">1/10</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="island-progress"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 3: Number Pop Balloons -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card">
+                    <div class="game-header">
+                        <i class="bi bi-balloon game-icon"></i>
+                        <h3>Number Pop Balloons</h3>
+                        <p class="mb-0">Pop or drag to find the answer!</p>
+                    </div>
+                    <div class="game-content">
+                        <div id="balloon-game">
+                            <div class="question-counter" id="balloon-counter">Challenge 1 of 10</div>
+                            <div class="text-center mb-3">
+                                <strong>Challenge:</strong> <span id="balloon-type"></span>
+                            </div>
+                            <div id="balloon-container" class="balloon-container"></div>
+                            <div id="calculator-basket" class="calculator-basket" style="display: none;">
+                                <i class="bi bi-calculator"></i> Drag numbers here to calculate mean
+                                <div id="basket-numbers"></div>
+                            </div>
+                            <div class="text-center">
+                                <button class="btn btn-game" onclick="nextBalloonChallenge()">
+                                    <i class="bi bi-arrow-clockwise"></i> New Challenge
+                                </button>
+                                <button class="btn btn-game" onclick="calculateMean()" id="mean-calc-btn" style="display: none;">
+                                    <i class="bi bi-equal"></i> Calculate Mean
+                                </button>
+                            </div>
+                            <div id="balloon-feedback"></div>
+                            <div class="progress-container">
+                                <div class="progress-header">
+                                    <span>Challenges Completed</span>
+                                    <span id="balloon-progress-text">0/10</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="balloon-progress"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 4: Statistics Detective -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card">
+                    <div class="game-header">
+                        <i class="bi bi-search game-icon"></i>
+                        <h3>Statistics Detective</h3>
+                        <p class="mb-0">Solve mysteries with data!</p>
+                    </div>
+                    <div class="game-content">
+                        <div id="detective-game">
+                            <div class="question-counter" id="detective-counter">Clue 1 of 10</div>
+                            <div class="detective-board">
+                                <h5 class="mb-3">🕵️‍♂️ Case File: The Missing Cookies</h5>
+                                <p>Who stole the cookies from the cookie jar? Solve each clue to find out!</p>
+                            </div>
+                            <div id="detective-clues"></div>
+                            <div class="dataset" id="detective-dataset"></div>
+                            <div class="text-center">
+                                <input type="number" class="answer-input" id="detective-answer" placeholder="Answer">
+                                <button class="btn btn-game" onclick="checkDetective()">
+                                    <i class="bi bi-magnifying-glass"></i> Reveal Clue
+                                </button>
+                            </div>
+                            <div id="detective-feedback"></div>
+                            <div class="progress-container">
+                                <div class="progress-header">
+                                    <span>Clues Found</span>
+                                    <span id="detective-progress-text">0/10</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="detective-progress"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 5: Build Your Own Data Creature -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card">
+                    <div class="game-header">
+                        <i class="bi bi-robot game-icon"></i>
+                        <h3>Build Your Data Creature</h3>
+                        <p class="mb-0">Solve to collect creature parts!</p>
+                    </div>
+                    <div class="game-content">
+                        <div id="creature-game">
+                            <div class="question-counter" id="creature-counter">Part 1 of 10</div>
+                            <div class="creature-display" id="creature-display">
+                                <!-- Parts will be dynamically added -->
+                            </div>
+                            <div class="dataset" id="creature-dataset"></div>
+                            <div class="text-center">
+                                <strong>Challenge:</strong> <span id="creature-type"></span>
+                                <input type="number" class="answer-input ms-2" id="creature-answer" placeholder="Answer">
+                                <button class="btn btn-game d-block mx-auto mt-2" onclick="checkCreature()">
+                                    <i class="bi bi-plus-circle"></i> Build Part
+                                </button>
+                            </div>
+                            <div id="creature-feedback"></div>
+                            <div class="progress-container">
+                                <div class="progress-header">
+                                    <span>Parts Built</span>
+                                    <span id="creature-progress-text">0/10</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="creature-progress"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game Data - 10 questions each
+        const treasureDatasets = [
+            { data: [5, 7, 8, 8, 10], mean: 7.6, median: 8, mode: 8 },
+            { data: [12, 15, 18, 22, 22, 25], mean: 19, median: 20, mode: 22 },
+            { data: [3, 5, 5, 7, 9, 9, 9], mean: 6.71, median: 7, mode: 9 },
+            { data: [10, 20, 30, 40, 50], mean: 30, median: 30, mode: 'none' },
+            { data: [4, 4, 6, 8, 8, 8, 10], mean: 6.86, median: 8, mode: 8 },
+            { data: [2, 3, 5, 7, 11, 13], mean: 6.83, median: 6, mode: 'none' },
+            { data: [1, 2, 2, 3, 4, 4, 4, 5], mean: 3.125, median: 3.5, mode: 4 },
+            { data: [15, 20, 25, 30, 35], mean: 25, median: 25, mode: 'none' },
+            { data: [6, 6, 8, 10, 10, 10], mean: 8.33, median: 9, mode: 10 },
+            { data: [1, 1, 1, 2, 3, 4, 5, 5], mean: 2.75, median: 2.5, mode: 1 }
+        ];
+
+        const islandChallenges = [
+            { data: [2, 4, 6, 8, 10], type: 'mean', answer: 6 },
+            { data: [1, 3, 5, 7, 9, 11], type: 'median', answer: 6 },
+            { data: [5, 5, 8, 10, 10, 10], type: 'mode', answer: 10 },
+            { data: [15, 20, 25, 30], type: 'mean', answer: 22.5 },
+            { data: [3, 7, 7, 9, 12], type: 'median', answer: 7 },
+            { data: [4, 4, 4, 6, 8, 8], type: 'mode', answer: 4 },
+            { data: [10, 15, 20, 25, 30], type: 'mean', answer: 20 },
+            { data: [2, 5, 8, 11, 14], type: 'median', answer: 8 },
+            { data: [1, 2, 2, 3, 3, 3, 4], type: 'mode', answer: 3 },
+            { data: [5, 10, 15, 20, 25, 30], type: 'mean', answer: 17.5 }
+        ];
+
+        const balloonChallenges = [
+            { data: [3, 1, 4, 1, 5], type: 'median', answer: 3 },
+            { data: [2, 2, 3, 3, 3, 4], type: 'mode', answer: 3 },
+            { data: [10, 20, 30], type: 'mean', answer: 20 },
+            { data: [5, 2, 8, 2, 5], type: 'mode', answer: 2 },
+            { data: [1, 2, 3, 4, 5, 6], type: 'median', answer: 3.5 },
+            { data: [7, 8, 9, 10, 11], type: 'mean', answer: 9 },
+            { data: [4, 4, 5, 6, 6, 6], type: 'mode', answer: 6 },
+            { data: [1, 3, 5, 7, 9], type: 'median', answer: 5 },
+            { data: [2, 4, 6, 8], type: 'mean', answer: 5 },
+            { data: [1, 1, 2, 2, 3, 3], type: 'mode', answer: 'none' }
+        ];
+
+        const detectiveClues = [
+            { data: [8, 12, 16, 20], type: 'mean', clue: "The thief has brown hair" },
+            { data: [5, 10, 15, 20, 25], type: 'median', clue: "The thief wears glasses" },
+            { data: [3, 3, 7, 9, 9, 9], type: 'mode', clue: "The suspect was seen near the kitchen" },
+            { data: [2, 4, 6, 8, 10], type: 'mean', clue: "The thief loves chocolate chip cookies" },
+            { data: [1, 2, 3, 4, 5, 6], type: 'median', clue: "The suspect is left-handed" },
+            { data: [4, 4, 5, 5, 6], type: 'mode', clue: "The thief has a tattoo" },
+            { data: [10, 20, 30, 40], type: 'mean', clue: "The suspect was wearing a red shirt" },
+            { data: [7, 8, 9, 10, 11], type: 'median', clue: "The thief drives a blue car" },
+            { data: [2, 2, 3, 3, 3, 4], type: 'mode', clue: "The suspect has a scar" },
+            { data: [5, 10, 15, 20, 25, 30], type: 'mean', clue: "The thief was carrying a bag" }
+        ];
+
+        const creatureParts = [
+            { data: [4, 6, 8, 10], type: 'mean', part: 'head', emoji: '👁️' },
+            { data: [2, 3, 5, 7, 11], type: 'median', part: 'body', emoji: '🎯' },
+            { data: [1, 1, 2, 3, 5, 8], type: 'mode', part: 'legs', emoji: '🦵' },
+            { data: [3, 5, 7, 9], type: 'mean', part: 'arms', emoji: '💪' },
+            { data: [4, 4, 6, 8, 8], type: 'mode', part: 'eyes', emoji: '👀' },
+            { data: [1, 2, 3, 4, 5], type: 'median', part: 'mouth', emoji: '👄' },
+            { data: [5, 10, 15], type: 'mean', part: 'hat', emoji: '🎩' },
+            { data: [2, 4, 6, 8, 10], type: 'median', part: 'shoes', emoji: '👟' },
+            { data: [3, 3, 5, 7, 7], type: 'mode', part: 'accessory', emoji: '🎀' },
+            { data: [1, 3, 5, 7, 9, 11], type: 'mean', part: 'tail', emoji: '🦊' }
+        ];
+
+        // Game States
+        let currentTreasure = 0;
+        let treasureDigits = { mean: null, median: null, mode: null };
+        let currentIsland = 1;
+        let currentBalloon = 0;
+        let balloonCompleted = 0;
+        let currentDetective = 0;
+        let currentCreature = 0;
+        let creatureBuilt = 0;
+        let poppedOrder = [];
+
+        // Initialize Games
+        function initGames() {
+            loadTreasureChallenge();
+            loadIslandChallenge();
+            nextBalloonChallenge();
+            loadDetectiveChallenge();
+            loadCreatureChallenge();
+            initCreatureDisplay();
+        }
+
+        // Treasure Code Challenge
+        function loadTreasureChallenge() {
+            const dataset = treasureDatasets[currentTreasure];
+            document.getElementById('treasure-dataset').textContent = `Data: [${dataset.data.join(', ')}]`;
+            document.getElementById('treasure-counter').textContent = `Question ${currentTreasure + 1} of 10`;
+            updateTreasureProgress();
+        }
+
+        function solveTreasure(type) {
+            const dataset = treasureDatasets[currentTreasure];
+            let answer;
+            
+            switch(type) {
+                case 'mean':
+                    answer = dataset.mean;
+                    break;
+                case 'median':
+                    answer = dataset.median;
+                    break;
+                case 'mode':
+                    answer = dataset.mode;
+                    break;
+            }
+
+            const userAnswer = prompt(`Enter the ${type}:`);
+            if (userAnswer === null) return;
+            
+            if (parseFloat(userAnswer) === answer || userAnswer === answer) {
+                treasureDigits[type] = answer;
+                updateTreasureDisplay();
+                showFeedback('treasure-feedback', `✅ Correct! ${type.charAt(0).toUpperCase() + type.slice(1)} is ${answer}`, 'success');
+                
+                if (treasureDigits.mean !== null && treasureDigits.median !== null && treasureDigits.mode !== null) {
+                    const code = Math.round(treasureDigits.mean) + Math.round(treasureDigits.median) + 
+                                 (treasureDigits.mode === 'none' ? 0 : Math.round(treasureDigits.mode));
+                    showFeedback('treasure-feedback', `🎉 Treasure Unlocked! Code: ${code}`, 'success');
+                    
+                    setTimeout(() => {
+                        currentTreasure = (currentTreasure + 1) % treasureDatasets.length;
+                        treasureDigits = { mean: null, median: null, mode: null };
+                        updateTreasureDisplay();
+                        loadTreasureChallenge();
+                    }, 3000);
+                }
+            } else {
+                showFeedback('treasure-feedback', `❌ Incorrect. The ${type} is ${answer}`, 'error');
+            }
+        }
+
+        function updateTreasureDisplay() {
+            const digits = ['digit1', 'digit2', 'digit3'];
+            const types = ['mean', 'median', 'mode'];
+            
+            types.forEach((type, index) => {
+                const digit = document.getElementById(digits[index]);
+                if (treasureDigits[type] !== null) {
+                    digit.textContent = treasureDigits[type] === 'none' ? 0 : Math.round(treasureDigits[type]);
+                    digit.classList.add('unlocked');
+                } else {
+                    digit.textContent = '?';
+                    digit.classList.remove('unlocked');
+                }
+            });
+        }
+
+        function updateTreasureProgress() {
+            const progress = ((treasureDigits.mean !== null ? 1 : 0) + 
+                            (treasureDigits.median !== null ? 1 : 0) + 
+                            (treasureDigits.mode !== null ? 1 : 0)) / 3 * 100;
+            document.getElementById('treasure-progress').style.width = progress + '%';
+            document.getElementById('treasure-progress-text').textContent = 
+                `${(treasureDigits.mean !== null ? 1 : 0) + (treasureDigits.median !== null ? 1 : 0) + (treasureDigits.mode !== null ? 1 : 0)}/3`;
+        }
+
+        // Data Island Hop
+        function loadIslandChallenge() {
+            if (currentIsland > islandChallenges.length) {
+                showFeedback('island-feedback', '🏆 All islands conquered! You win!', 'success');
+                return;
+            }
+            
+            const challenge = islandChallenges[currentIsland - 1];
+            document.getElementById('island-dataset').textContent = `Data: [${challenge.data.join(', ')}]`;
+            document.getElementById('island-counter').textContent = `Island ${currentIsland} of 10`;
+            document.getElementById('island-answer').value = '';
+            updateIslandProgress();
+        }
+
+        function checkIsland() {
+            const challenge = islandChallenges[currentIsland - 1];
+            const userAnswer = parseFloat(document.getElementById('island-answer').value);
+            
+            if (userAnswer === challenge.answer) {
+                document.getElementById(`island${currentIsland}`).classList.remove('current');
+                document.getElementById(`island${currentIsland}`).classList.add('completed');
+                showFeedback('island-feedback', `✅ Correct! Moving to island ${currentIsland + 1}`, 'success');
+                
+                if (currentIsland < islandChallenges.length) {
+                    document.getElementById(`island${currentIsland + 1}`).classList.remove('locked');
+                    document.getElementById(`island${currentIsland + 1}`).classList.add('current');
+                }
+                
+                currentIsland++;
+                setTimeout(() => {
+                    loadIslandChallenge();
+                }, 1500);
+            } else {
+                showFeedback('island-feedback', '💦 Splash! Try again!', 'error');
+            }
+        }
+
+        function updateIslandProgress() {
+            const progress = ((currentIsland - 1) / islandChallenges.length) * 100;
+            document.getElementById('island-progress').style.width = progress + '%';
+            document.getElementById('island-progress-text').textContent = `${currentIsland - 1}/10`;
+        }
+
+        // Number Pop Balloons
+        function nextBalloonChallenge() {
+            const challenge = balloonChallenges[currentBalloon];
+            document.getElementById('balloon-type').textContent = `Find the ${challenge.type}`;
+            document.getElementById('balloon-counter').textContent = `Challenge ${currentBalloon + 1} of 10`;
+            
+            const container = document.getElementById('balloon-container');
+            container.innerHTML = '';
+            
+            if (challenge.type === 'mean') {
+                document.getElementById('calculator-basket').style.display = 'block';
+                document.getElementById('mean-calc-btn').style.display = 'inline-block';
+                document.getElementById('basket-numbers').innerHTML = '';
+                
+                challenge.data.forEach((num, index) => {
+                    const draggable = document.createElement('div');
+                    draggable.className = 'draggable-number';
+                    draggable.textContent = num;
+                    draggable.draggable = true;
+                    draggable.id = `drag-${index}`;
+                    
+                    draggable.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text', num);
+                        draggable.classList.add('dragging');
+                    });
+                    
+                    draggable.addEventListener('dragend', () => {
+                        draggable.classList.remove('dragging');
+                    });
+                    
+                    container.appendChild(draggable);
+                });
+                
+                setupCalculatorBasket();
+            } else {
+                document.getElementById('calculator-basket').style.display = 'none';
+                document.getElementById('mean-calc-btn').style.display = 'none';
+                poppedOrder = [];
+                
+                const shuffled = [...challenge.data].sort(() => Math.random() - 0.5);
+                shuffled.forEach(num => {
+                    const balloon = document.createElement('div');
+                    balloon.className = 'balloon';
+                    balloon.textContent = num;
+                    balloon.onclick = () => popBalloon(balloon, num, challenge);
+                    container.appendChild(balloon);
+                });
+            }
+        }
+
+        function popBalloon(balloon, num, challenge) {
+            if (balloon.classList.contains('popped')) return;
+            
+            balloon.classList.add('popped');
+            poppedOrder.push(num);
+            
+            if (poppedOrder.length === challenge.data.length) {
+                let answer;
+                if (challenge.type === 'median') {
+                    const sorted = [...poppedOrder].sort((a, b) => a - b);
+                    const mid = Math.floor(sorted.length / 2);
+                    answer = sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+                } else if (challenge.type === 'mode') {
+                    const counts = {};
+                    poppedOrder.forEach(n => counts[n] = (counts[n] || 0) + 1);
+                    const maxCount = Math.max(...Object.values(counts));
+                    const modes = Object.keys(counts).filter(k => counts[k] === maxCount);
+                    answer = modes.length === 1 ? parseFloat(modes[0]) : 'none';
+                }
+                
+                if (answer === challenge.answer) {
+                    showFeedback('balloon-feedback', `🎈 Correct! The ${challenge.type} is ${answer}`, 'success');
+                    balloonCompleted++;
+                    updateBalloonProgress();
+                    
+                    currentBalloon = (currentBalloon + 1) % balloonChallenges.length;
+                    setTimeout(() => nextBalloonChallenge(), 2000);
+                } else {
+                    showFeedback('balloon-feedback', `❌ Incorrect. The ${challenge.type} is ${challenge.answer}`, 'error');
+                    setTimeout(() => nextBalloonChallenge(), 2000);
+                }
+            }
+        }
+
+        function setupCalculatorBasket() {
+            const basket = document.getElementById('calculator-basket');
+            const basketNumbers = document.getElementById('basket-numbers');
+            
+            basket.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                basket.classList.add('drag-over');
+            });
+            
+            basket.addEventListener('dragleave', () => {
+                basket.classList.remove('drag-over');
+            });
+            
+            basket.addEventListener('drop', (e) => {
+                e.preventDefault();
+                basket.classList.remove('drag-over');
+                const num = e.dataTransfer.getData('text');
+                const display = document.createElement('span');
+                display.className = 'badge bg-primary me-1 mb-1';
+                display.textContent = num;
+                basketNumbers.appendChild(display);
+            });
+        }
+
+        function calculateMean() {
+            const challenge = balloonChallenges[currentBalloon];
+            const basketNumbers = document.getElementById('basket-numbers');
+            const numbers = Array.from(basketNumbers.children).map(span => parseFloat(span.textContent));
+            
+            if (numbers.length !== challenge.data.length) {
+                showFeedback('balloon-feedback', 'Please drag all numbers to the basket!', 'error');
+                return;
+            }
+            
+            const mean = numbers.reduce((a, b) => a + b, 0) / numbers.length;
+            
+            if (Math.abs(mean - challenge.answer) < 0.01) {
+                showFeedback('balloon-feedback', `🎈 Correct! The mean is ${mean}`, 'success');
+                balloonCompleted++;
+                updateBalloonProgress();
+                
+                currentBalloon = (currentBalloon + 1) % balloonChallenges.length;
+                basketNumbers.innerHTML = '';
+                setTimeout(() => nextBalloonChallenge(), 2000);
+            } else {
+                showFeedback('balloon-feedback', `❌ Incorrect. The mean is ${challenge.answer}`, 'error');
+            }
+        }
+
+        function updateBalloonProgress() {
+            const progress = (balloonCompleted / balloonChallenges.length) * 100;
+            document.getElementById('balloon-progress').style.width = progress + '%';
+            document.getElementById('balloon-progress-text').textContent = `${balloonCompleted}/10`;
+        }
+
+        // Statistics Detective
+        function loadDetectiveChallenge() {
+            if (currentDetective >= detectiveClues.length) {
+                showFeedback('detective-feedback', '🕵️‍♂️ Mystery Solved! The butler did it!', 'success');
+                return;
+            }
+            
+            const clue = detectiveClues[currentDetective];
+            document.getElementById('detective-dataset').textContent = `Data: [${clue.data.join(', ')}]`;
+            document.getElementById('detective-counter').textContent = `Clue ${currentDetective + 1} of 10`;
+            document.getElementById('detective-answer').value = '';
+            updateDetectiveProgress();
+        }
+
+        function checkDetective() {
+            const clue = detectiveClues[currentDetective];
+            const userAnswer = parseFloat(document.getElementById('detective-answer').value);
+            let correctAnswer;
+            
+            switch(clue.type) {
+                case 'mean':
+                    correctAnswer = clue.data.reduce((a, b) => a + b, 0) / clue.data.length;
+                    break;
+                case 'median':
+                    const sorted = [...clue.data].sort((a, b) => a - b);
+                    const mid = Math.floor(sorted.length / 2);
+                    correctAnswer = sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+                    break;
+                case 'mode':
+                    const counts = {};
+                    clue.data.forEach(n => counts[n] = (counts[n] || 0) + 1);
+                    const maxCount = Math.max(...Object.values(counts));
+                    const modes = Object.keys(counts).filter(k => counts[k] === maxCount);
+                    correctAnswer = modes.length === 1 ? parseFloat(modes[0]) : 'none';
+                    break;
+            }
+            
+            if (Math.abs(userAnswer - correctAnswer) < 0.01 || userAnswer === correctAnswer) {
+                const clueDiv = document.createElement('div');
+                clueDiv.className = 'clue-card mt-2';
+                clueDiv.innerHTML = `<strong>Clue ${currentDetective + 1}:</strong> ${clue.clue}`;
+                document.getElementById('detective-clues').appendChild(clueDiv);
+                
+                showFeedback('detective-feedback', '✅ Clue revealed!', 'success');
+                currentDetective++;
+                updateDetectiveProgress();
+                setTimeout(() => loadDetectiveChallenge(), 1500);
+            } else {
+                showFeedback('detective-feedback', `❌ Incorrect. The ${clue.type} is ${correctAnswer}`, 'error');
+            }
+        }
+
+        function updateDetectiveProgress() {
+            const progress = (currentDetective / detectiveClues.length) * 100;
+            document.getElementById('detective-progress').style.width = progress + '%';
+            document.getElementById('detective-progress-text').textContent = `${currentDetective}/10`;
+        }
+
+        // Build Your Own Data Creature
+        function initCreatureDisplay() {
+            const display = document.getElementById('creature-display');
+            display.innerHTML = '';
+            
+            creatureParts.forEach((part, index) => {
+                const partDiv = document.createElement('div');
+                partDiv.className = 'creature-part locked';
+                partDiv.id = `creature-${part.part}`;
+                partDiv.innerHTML = `
+                    <span class="creature-emoji">${part.emoji}</span>
+                    <small>${part.part.charAt(0).toUpperCase() + part.part.slice(1)}</small>
+                `;
+                display.appendChild(partDiv);
+            });
+        }
+
+        function loadCreatureChallenge() {
+            if (currentCreature >= creatureParts.length) {
+                showFeedback('creature-feedback', '👾 Creature Complete! You win!', 'success');
+                return;
+            }
+            
+            const part = creatureParts[currentCreature];
+            document.getElementById('creature-dataset').textContent = `Data: [${part.data.join(', ')}]`;
+            document.getElementById('creature-type').textContent = `Find the ${part.type}`;
+            document.getElementById('creature-counter').textContent = `Part ${currentCreature + 1} of 10`;
+            document.getElementById('creature-answer').value = '';
+            updateCreatureProgress();
+        }
+
+        function checkCreature() {
+            const part = creatureParts[currentCreature];
+            const userAnswer = parseFloat(document.getElementById('creature-answer').value);
+            let correctAnswer;
+            
+            switch(part.type) {
+                case 'mean':
+                    correctAnswer = part.data.reduce((a, b) => a + b, 0) / part.data.length;
+                    break;
+                case 'median':
+                    const sorted = [...part.data].sort((a, b) => a - b);
+                    const mid = Math.floor(sorted.length / 2);
+                    correctAnswer = sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+                    break;
+                case 'mode':
+                    const counts = {};
+                    part.data.forEach(n => counts[n] = (counts[n] || 0) + 1);
+                    const maxCount = Math.max(...Object.values(counts));
+                    const modes = Object.keys(counts).filter(k => counts[k] === maxCount);
+                    correctAnswer = modes.length === 1 ? parseFloat(modes[0]) : 'none';
+                    break;
+            }
+            
+            if (Math.abs(userAnswer - correctAnswer) < 0.01 || userAnswer === correctAnswer) {
+                const partElement = document.getElementById(`creature-${part.part}`);
+                partElement.classList.remove('locked');
+                partElement.classList.add('unlocked');
+                
+                showFeedback('creature-feedback', `✅ ${part.part.charAt(0).toUpperCase() + part.part.slice(1)} added!`, 'success');
+                creatureBuilt++;
+                currentCreature++;
+                updateCreatureProgress();
+                setTimeout(() => loadCreatureChallenge(), 1500);
+            } else {
+                showFeedback('creature-feedback', `❌ Incorrect. The ${part.type} is ${correctAnswer}`, 'error');
+            }
+        }
+
+        function updateCreatureProgress() {
+            const progress = (creatureBuilt / creatureParts.length) * 100;
+            document.getElementById('creature-progress').style.width = progress + '%';
+            document.getElementById('creature-progress-text').textContent = `${creatureBuilt}/10`;
+        }
+
+        // Utility Functions
+        function showFeedback(elementId, message, type) {
+            const feedback = document.getElementById(elementId);
+            feedback.innerHTML = `<div class="feedback ${type}">${message}</div>`;
+            setTimeout(() => {
+                feedback.innerHTML = '';
+            }, 3000);
+        }
+
+        // Initialize all games on load
+        window.onload = initGames;
+    </script>
+</body>
+</html>

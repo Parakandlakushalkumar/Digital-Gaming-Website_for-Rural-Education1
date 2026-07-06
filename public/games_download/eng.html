@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Engineering in Daily Life Hunt</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #fff7ed, #fef3c7);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      font-size: 36px;
+      color: #9a3412;
+    }
+    .score-box {
+      background: white;
+      padding: 12px;
+      border-radius: 12px;
+      display: inline-block;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      margin-top: 10px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 6px 10px rgba(0,0,0,0.1);
+    }
+    .title {
+      font-size: 22px;
+      font-weight: bold;
+      margin-top: 10px;
+      text-align: center;
+    }
+    .story {
+      background: #ffedd5;
+      padding: 15px;
+      border-radius: 12px;
+      margin: 15px 0;
+      color: #374151;
+    }
+    .options button {
+      width: 100%;
+      padding: 12px;
+      margin: 6px 0;
+      font-size: 16px;
+      background: #f9fafb;
+      border: 2px solid transparent;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+      text-align: left;
+    }
+    .options button:hover {
+      background: #ffedd5;
+      border-color: #fdba74;
+    }
+    .result {
+      text-align: center;
+      margin-top: 15px;
+    }
+    .correct {
+      color: green;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .wrong {
+      color: red;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .explanation {
+      background: #fef9c3;
+      padding: 10px;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+    .btn {
+      display: inline-block;
+      background: #ea580c;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      margin-top: 15px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .btn:hover {
+      background: #c2410c;
+    }
+    ul {
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔧 Engineering in Daily Life Hunt</h1>
+      <p>Discover how engineering shapes your everyday world!</p>
+      <div class="score-box">
+        <div id="score">Score: 0/100</div>
+        <div id="stageInfo">Stage 1 of 7</div>
+      </div>
+    </div>
+
+    <div id="game"></div>
+  </div>
+
+  <script>
+    const stages = [
+      {
+        title: "🏠 The Smart Home",
+        story: "You wake up in a house where lights turn on automatically, the temperature adjusts itself, and your coffee maker starts brewing before you get to the kitchen. Everything works together like magic!",
+        question: "The engineering that makes smart homes work involves:",
+        options: [
+          { id: "sensors", text: "Sensors, programming, and electrical systems", correct: true },
+          { id: "magic", text: "Magic spells and fairy dust", correct: false },
+          { id: "humans", text: "People hiding in the walls", correct: false }
+        ],
+        explanation: "Smart homes use sensors to detect conditions, programming to decide, and electrical systems to control devices."
+      },
+      {
+        title: "🌉 The Bridge to School",
+        story: "Walking to school, you cross a sturdy bridge that spans a wide river. Despite heavy trucks passing over it daily, the bridge remains strong and stable, safely carrying everyone across.",
+        question: "What type of engineering ensures bridges are safe?",
+        options: [
+          { id: "computer", text: "Computer Engineering", correct: false },
+          { id: "civil", text: "Civil Engineering", correct: true },
+          { id: "chemical", text: "Chemical Engineering", correct: false }
+        ],
+        explanation: "Civil engineers design bridges, roads, and buildings to be safe and strong."
+      },
+      {
+        title: "🚌 The School Bus Engine",
+        story: "Your school bus rumbles to life as the driver turns the key. The engine converts gasoline into motion, the brakes stop safely at every corner, and the steering responds perfectly.",
+        question: "Car engines demonstrate which engineering principle?",
+        options: [
+          { id: "energy", text: "Converting one form of energy to another", correct: true },
+          { id: "creating", text: "Creating energy from nothing", correct: false },
+          { id: "destroying", text: "Destroying energy completely", correct: false }
+        ],
+        explanation: "Car engines convert chemical energy (gasoline) into mechanical energy (motion)."
+      },
+      {
+        title: "📱 The Smartphone Lab",
+        story: "During lunch, you use your phone to video chat with a friend. The tiny device processes your voice, transmits it, and shows your friend's face in real time.",
+        question: "Smartphones combine multiple types of engineering including:",
+        options: [
+          { id: "one", text: "Only electrical engineering", correct: false },
+          { id: "multiple", text: "Electrical, computer, and materials engineering", correct: true },
+          { id: "none", text: "No engineering - they work naturally", correct: false }
+        ],
+        explanation: "Smartphones are marvels of multiple engineering fields working together."
+      },
+      {
+        title: "💧 The Water Treatment Plant",
+        story: "Turning on the tap at school, clean water flows out instantly. Engineers designed systems to remove harmful substances and make it safe to drink.",
+        question: "Water treatment plants use which engineering discipline?",
+        options: [
+          { id: "environmental", text: "Environmental Engineering", correct: true },
+          { id: "aerospace", text: "Aerospace Engineering", correct: false },
+          { id: "gaming", text: "Gaming Engineering", correct: false }
+        ],
+        explanation: "Environmental engineers design systems to clean water and protect the environment."
+      },
+      {
+        title: "🏥 The Medical Center",
+        story: "At the school nurse, you see an amazing X-ray machine and digital thermometer that instantly measures temperature.",
+        question: "Medical devices like X-ray machines represent:",
+        options: [
+          { id: "biomedical", text: "Biomedical Engineering", correct: true },
+          { id: "cooking", text: "Cooking Engineering", correct: false },
+          { id: "music", text: "Music Engineering", correct: false }
+        ],
+        explanation: "Biomedical engineers create devices that help doctors diagnose and treat patients."
+      },
+      {
+        title: "🛠 The Problem-Solving Workshop",
+        story: "In the final room, engineers explain that whether designing a phone or building a bridge, they all follow the same process: identify problems and design solutions!",
+        question: "The main goal of all engineering is to:",
+        options: [
+          { id: "money", text: "Make lots of money", correct: false },
+          { id: "solve", text: "Solve problems and improve life", correct: true },
+          { id: "complicated", text: "Make things more complicated", correct: false }
+        ],
+        explanation: "All engineers aim to solve problems to make life better, safer, and more convenient."
+      }
+    ];
+
+    let currentStage = 0;
+    let score = 0;
+
+    const gameDiv = document.getElementById("game");
+    const scoreDiv = document.getElementById("score");
+    const stageInfo = document.getElementById("stageInfo");
+
+    function renderStage() {
+      const stage = stages[currentStage];
+      stageInfo.textContent = `Stage ${currentStage+1} of ${stages.length}`;
+      gameDiv.innerHTML = `
+        <div class="card">
+          <div class="title">${stage.title}</div>
+          <div class="story">${stage.story}</div>
+          <h3>${stage.question}</h3>
+          <div class="options">
+            ${stage.options.map(o => `<button onclick="checkAnswer('${o.id}')">${o.text}</button>`).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function checkAnswer(id) {
+      const stage = stages[currentStage];
+      const correctOption = stage.options.find(o => o.correct);
+      let resultHtml = "";
+      if (stage.options.find(o => o.id === id).correct) {
+        score += Math.round(100/stages.length);
+        resultHtml = `<div class="result"><div class="correct">✅ Correct!</div></div>`;
+      } else {
+        resultHtml = `<div class="result"><div class="wrong">❌ Not quite!</div></div>`;
+      }
+      resultHtml += `<div class="explanation">${stage.explanation}</div>`;
+      if (currentStage < stages.length - 1) {
+        resultHtml += `<div class="btn" onclick="nextStage()">Next Location ➡️</div>`;
+      } else {
+        resultHtml += `<div class="btn" onclick="showSummary()">See Results 🎉</div>`;
+      }
+      gameDiv.innerHTML = `
+        <div class="card">
+          <div class="title">${stage.title}</div>
+          ${resultHtml}
+        </div>
+      `;
+      scoreDiv.textContent = `Score: ${score}/100`;
+    }
+
+    function nextStage() {
+      currentStage++;
+      renderStage();
+    }
+
+    function showSummary() {
+      gameDiv.innerHTML = `
+        <div class="card" style="text-align:center;">
+          <div style="font-size:50px;">🎉</div>
+          <h2>You are an Engineering Explorer!</h2>
+          <p>Final Score: ${score}/100</p>
+          <h3>What You Learned:</h3>
+          <ul>
+            <li>Smart homes use sensors and programming</li>
+            <li>Civil engineers design safe bridges and buildings</li>
+            <li>Car engines convert chemical energy to motion</li>
+            <li>Smartphones combine multiple engineering fields</li>
+            <li>Environmental engineers keep our water clean</li>
+            <li>Biomedical engineers create medical devices</li>
+            <li>All engineering aims to solve problems and help people</li>
+          </ul>
+          <div class="btn" onclick="restart()">Play Again 🔄</div>
+        </div>
+      `;
+    }
+
+    function restart() {
+      currentStage = 0;
+      score = 0;
+      scoreDiv.textContent = "Score: 0/100";
+      renderStage();
+    }
+
+    renderStage();
+  </script>
+</body>
+</html>

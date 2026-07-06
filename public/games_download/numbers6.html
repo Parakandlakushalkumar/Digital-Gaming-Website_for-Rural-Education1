@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Games Collection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--card-color);
+        }
+
+        .game-card.ninja::before { --card-color: linear-gradient(90deg, #ff6b6b, #ee5a24); }
+        .game-card.race::before { --card-color: linear-gradient(90deg, #4ecdc4, #44a08d); }
+        .game-card.treasure::before { --card-color: linear-gradient(90deg, #f7b731, #f0932b); }
+        .game-card.ladder::before { --card-color: linear-gradient(90deg, #a55eea, #8b5cf6); }
+        .game-card.duel::before { --card-color: linear-gradient(90deg, #26de81, #20bf6b); }
+
+        .game-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: var(--card-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+        }
+
+        .game-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .game-description {
+            text-align: center;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .game-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .game-content {
+            position: relative;
+            width: 90%;
+            max-width: 900px;
+            height: 90vh;
+            margin: 5vh auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: #ff6b6b;
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            transform: rotate(90deg);
+            background: #ee5a24;
+        }
+
+        /* Game-specific styles */
+        .game-area {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Number Ninja Styles */
+        .ninja-game {
+            background: linear-gradient(to bottom, #1e3c72, #2a5298);
+        }
+
+        .sum-display {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 20px 40px;
+            border-radius: 15px;
+            font-size: 2rem;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .falling-number {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: fall linear;
+        }
+
+        .falling-number:hover {
+            transform: scale(1.2);
+        }
+
+        @keyframes fall {
+            from { top: -60px; }
+            to { top: 100%; }
+        }
+
+        .life-bar {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 200px;
+            height: 30px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .life-fill {
+            height: 100%;
+            background: #26de81;
+            transition: width 0.3s ease;
+        }
+
+        /* Math Race Styles */
+        .race-game {
+            background: linear-gradient(to bottom, #56ab2f, #a8e063);
+            position: relative;
+        }
+
+        .road {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 200px;
+            background: #333;
+        }
+
+        .road-line {
+            position: absolute;
+            width: 100%;
+            height: 10px;
+            background: repeating-linear-gradient(
+                90deg,
+                white,
+                white 50px,
+                transparent 50px,
+                transparent 100px
+            );
+            animation: roadMove 1s linear infinite;
+        }
+
+        @keyframes roadMove {
+            from { transform: translateX(0); }
+            to { transform: translateX(-100px); }
+        }
+
+        .car {
+            position: absolute;
+            bottom: 50px;
+            left: 50px;
+            width: 80px;
+            height: 40px;
+            background: #ff6b6b;
+            border-radius: 10px;
+            transition: left 0.5s ease;
+        }
+
+        .car::before {
+            content: '🚗';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+        }
+
+        .race-question {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .answer-input {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            width: 150px;
+            text-align: center;
+        }
+
+        .submit-btn {
+            margin-left: 10px;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            background: #26de81;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: #20bf6b;
+            transform: scale(1.05);
+        }
+
+        /* Treasure Digits Styles */
+        .treasure-game {
+            background: linear-gradient(to bottom, #8b4513, #d2691e);
+            position: relative;
+        }
+
+        .treasure-chest {
+            position: absolute;
+            width: 100px;
+            height: 80px;
+            background: #8b4513;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .treasure-chest:hover {
+            transform: scale(1.1);
+        }
+
+        .treasure-chest.open {
+            animation: chestOpen 0.5s ease-out;
+        }
+
+        @keyframes chestOpen {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(5deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .treasure-puzzle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .feedback-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .feedback-message.error {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .feedback-message.success {
+            background: #26de81;
+            color: white;
+        }
+
+        /* Math Ladder Styles */
+        .ladder-game {
+            background: linear-gradient(to bottom, #667eea, #764ba2);
+            position: relative;
+        }
+
+        .ladder-container {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 400px;
+        }
+
+        .ladder-step {
+            position: absolute;
+            width: 100%;
+            height: 40px;
+            background: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .ladder-step:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .ladder-step.achieved {
+            background: #26de81;
+            color: white;
+            animation: stepGlow 0.5s ease-out;
+        }
+
+        @keyframes stepGlow {
+            0% { box-shadow: 0 0 5px #26de81; }
+            50% { box-shadow: 0 0 20px #26de81, 0 0 30px #26de81; }
+            100% { box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        }
+
+        .player-piece {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: bottom 0.5s ease;
+            z-index: 5;
+        }
+
+        .ladder-question {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: none;
+        }
+
+        /* Number Duel Styles */
+        .duel-game {
+            background: linear-gradient(to bottom, #fc466b, #3f5efb);
+            position: relative;
+        }
+
+        .battle-arena {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 300px;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .character {
+            position: absolute;
+            bottom: 50px;
+            width: 100px;
+            height: 150px;
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            transition: all 0.3s ease;
+        }
+
+        .character.player {
+            left: 100px;
+        }
+
+        .character.enemy {
+            right: 100px;
+        }
+
+        .health-bar {
+            position: absolute;
+            top: -30px;
+            width: 100%;
+            height: 20px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .health-fill {
+            height: 100%;
+            background: #26de81;
+            transition: width 0.3s ease;
+        }
+
+        .duel-question {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-content {
+                width: 95%;
+                height: 95vh;
+                margin: 2.5vh auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Math Games Collection 🎮</h1>
+        
+        <div class="games-grid">
+            <div class="game-card ninja" onclick="openGame('ninja')">
+                <div class="game-icon" style="background: linear-gradient(90deg, #ff6b6b, #ee5a24);">
+                    ⚔️
+                </div>
+                <h2 class="game-title">Number Ninja</h2>
+                <p class="game-description">Slash falling numbers that solve the given sum. Wrong slices reduce your life!</p>
+            </div>
+
+            <div class="game-card race" onclick="openGame('race')">
+                <div class="game-icon" style="background: linear-gradient(90deg, #4ecdc4, #44a08d);">
+                    🏎️
+                </div>
+                <h2 class="game-title">Math Race</h2>
+                <p class="game-description">Speed up your car by answering addition/subtraction problems correctly!</p>
+            </div>
+
+            <div class="game-card treasure" onclick="openGame('treasure')">
+                <div class="game-icon" style="background: linear-gradient(90deg, #f7b731, #f0932b);">
+                    💰
+                </div>
+                <h2 class="game-title">Treasure Digits</h2>
+                <p class="game-description">Solve multi-digit operations to open treasure chests and find clues!</p>
+            </div>
+
+            <div class="game-card ladder" onclick="openGame('ladder')">
+                <div class="game-icon" style="background: linear-gradient(90deg, #a55eea, #8b5cf6);">
+                    🪜
+                </div>
+                <h2 class="game-title">Math Ladder</h2>
+                <p class="game-description">Climb the ladder by answering multiplication/division questions!</p>
+            </div>
+
+            <div class="game-card duel" onclick="openGame('duel')">
+                <div class="game-icon" style="background: linear-gradient(90deg, #26de81, #20bf6b);">
+                    ⚡
+                </div>
+                <h2 class="game-title">Number Duel</h2>
+                <p class="game-description">Battle by solving calculation problems. Attack only works with correct answers!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Modals -->
+    <div id="ninja-modal" class="game-modal">
+        <div class="game-content">
+            <button class="close-btn" onclick="closeGame('ninja')">×</button>
+            <div class="game-area ninja-game" id="ninja-game">
+                <div class="sum-display" id="ninja-sum">5 + 3 = ?</div>
+                <div class="life-bar">
+                    <div class="life-fill" id="ninja-life" style="width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="race-modal" class="game-modal">
+        <div class="game-content">
+            <button class="close-btn" onclick="closeGame('race')">×</button>
+            <div class="game-area race-game" id="race-game">
+                <div class="road">
+                    <div class="road-line" style="top: 50px;"></div>
+                    <div class="road-line" style="top: 100px;"></div>
+                    <div class="road-line" style="top: 150px;"></div>
+                </div>
+                <div class="car" id="race-car"></div>
+                <div class="race-question" id="race-question">
+                    <h3>Question:</h3>
+                    <p id="race-problem">15 + 7 = ?</p>
+                    <input type="number" class="answer-input" id="race-answer" placeholder="Answer">
+                    <button class="submit-btn" onclick="checkRaceAnswer()">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="treasure-modal" class="game-modal">
+        <div class="game-content">
+            <button class="close-btn" onclick="closeGame('treasure')">×</button>
+            <div class="game-area treasure-game" id="treasure-game">
+                <div class="treasure-chest" style="top: 100px; left: 100px;" onclick="openChest(1)">📦</div>
+                <div class="treasure-chest" style="top: 100px; right: 100px;" onclick="openChest(2)">📦</div>
+                <div class="treasure-chest" style="bottom: 200px; left: 200px;" onclick="openChest(3)">📦</div>
+                <div class="treasure-chest" style="bottom: 200px; right: 200px;" onclick="openChest(4)">📦</div>
+                <div class="treasure-puzzle" id="treasure-puzzle" style="display: none;">
+                    <h3>Solve to Open:</h3>
+                    <p id="treasure-problem">123 + 456 = ?</p>
+                    <input type="number" class="answer-input" id="treasure-answer" placeholder="Answer">
+                    <button class="submit-btn" onclick="checkTreasureAnswer()">Submit</button>
+                    <div id="treasure-feedback" class="feedback-message" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="ladder-modal" class="game-modal">
+        <div class="game-content">
+            <button class="close-btn" onclick="closeGame('ladder')">×</button>
+            <div class="game-area ladder-game" id="ladder-game">
+                <div class="ladder-container">
+                    <div class="player-piece" id="ladder-player" style="bottom: 10px;"></div>
+                    <div class="ladder-step" style="bottom: 0;" onclick="climbLadder(0)">Start</div>
+                    <div class="ladder-step" style="bottom: 50px;" onclick="climbLadder(1)">1</div>
+                    <div class="ladder-step" style="bottom: 100px;" onclick="climbLadder(2)">2</div>
+                    <div class="ladder-step" style="bottom: 150px;" onclick="climbLadder(3)">3</div>
+                    <div class="ladder-step" style="bottom: 200px;" onclick="climbLadder(4)">4</div>
+                    <div class="ladder-step" style="bottom: 250px;" onclick="climbLadder(5)">5</div>
+                    <div class="ladder-step" style="bottom: 300px;" onclick="climbLadder(6)">6</div>
+                    <div class="ladder-step" style="bottom: 350px;" onclick="climbLadder(7)">Finish!</div>
+                </div>
+                <div class="ladder-question" id="ladder-question">
+                    <h3>Solve to Climb:</h3>
+                    <p id="ladder-problem">5 × 3 = ?</p>
+                    <input type="number" class="answer-input" id="ladder-answer" placeholder="Answer">
+                    <button class="submit-btn" onclick="checkLadderAnswer()">Submit</button>
+                    <div id="ladder-feedback" class="feedback-message" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="duel-modal" class="game-modal">
+        <div class="game-content">
+            <button class="close-btn" onclick="closeGame('duel')">×</button>
+            <div class="game-area duel-game" id="duel-game">
+                <div class="battle-arena">
+                    <div class="character player">
+                        <div class="health-bar">
+                            <div class="health-fill" id="player-health" style="width: 100%;"></div>
+                        </div>
+                        🦸
+                    </div>
+                    <div class="character enemy">
+                        <div class="health-bar">
+                            <div class="health-fill" id="enemy-health" style="width: 100%;"></div>
+                        </div>
+                        👹
+                    </div>
+                </div>
+                <div class="duel-question" id="duel-question">
+                    <h3>Attack Question:</h3>
+                    <p id="duel-problem">8 × 7 = ?</p>
+                    <input type="number" class="answer-input" id="duel-answer" placeholder="Answer">
+                    <button class="submit-btn" onclick="checkDuelAnswer()">Attack!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state variables
+        let currentGame = '';
+        let ninjaLife = 100;
+        let currentSum = { num1: 0, num2: 0, answer: 0 };
+        let racePosition = 50;
+        let ladderPosition = 0;
+        let playerHealth = 100;
+        let enemyHealth = 100;
+        let currentChest = 0;
+        let currentLadderStep = 0;
+        let ladderAnswer = 0;
+
+        // Open game function
+        function openGame(gameType) {
+            currentGame = gameType;
+            document.getElementById(`${gameType}-modal`).style.display = 'block';
+            initializeGame(gameType);
+        }
+
+        // Close game function
+        function closeGame(gameType) {
+            document.getElementById(`${gameType}-modal`).style.display = 'none';
+            resetGame(gameType);
+        }
+
+        // Initialize games
+        function initializeGame(gameType) {
+            switch(gameType) {
+                case 'ninja':
+                    generateNewSum();
+                    startNinjaGame();
+                    break;
+                case 'race':
+                    generateRaceProblem();
+                    break;
+                case 'treasure':
+                    // Treasure game initialized on chest click
+                    break;
+                case 'ladder':
+                    ladderPosition = 0;
+                    updateLadderPosition();
+                    // Reset all ladder steps to white
+                    document.querySelectorAll('.ladder-step').forEach(step => {
+                        step.classList.remove('achieved');
+                    });
+                    break;
+                case 'duel':
+                    playerHealth = 100;
+                    enemyHealth = 100;
+                    updateHealthBars();
+                    generateDuelProblem();
+                    break;
+            }
+        }
+
+        // Reset games
+        function resetGame(gameType) {
+            switch(gameType) {
+                case 'ninja':
+                    ninjaLife = 100;
+                    document.getElementById('ninja-life').style.width = '100%';
+                    break;
+                case 'race':
+                    racePosition = 50;
+                    document.getElementById('race-car').style.left = '50px';
+                    break;
+                case 'ladder':
+                    ladderPosition = 0;
+                    document.getElementById('ladder-question').style.display = 'none';
+                    // Reset all ladder steps to white
+                    document.querySelectorAll('.ladder-step').forEach(step => {
+                        step.classList.remove('achieved');
+                    });
+                    break;
+                case 'duel':
+                    playerHealth = 100;
+                    enemyHealth = 100;
+                    break;
+            }
+        }
+
+        // Number Ninja Game Logic
+        function generateNewSum() {
+            currentSum.num1 = Math.floor(Math.random() * 10) + 1;
+            currentSum.num2 = Math.floor(Math.random() * 10) + 1;
+            currentSum.answer = currentSum.num1 + currentSum.num2;
+            document.getElementById('ninja-sum').textContent = `${currentSum.num1} + ${currentSum.num2} = ?`;
+        }
+
+        function startNinjaGame() {
+            const gameArea = document.getElementById('ninja-game');
+            
+            setInterval(() => {
+                if (document.getElementById('ninja-modal').style.display === 'block') {
+                    createFallingNumber();
+                }
+            }, 2000);
+        }
+
+        function createFallingNumber() {
+            const gameArea = document.getElementById('ninja-game');
+            const number = document.createElement('div');
+            number.className = 'falling-number';
+            
+            const isCorrect = Math.random() > 0.5;
+            const value = isCorrect ? currentSum.answer : Math.floor(Math.random() * 20) + 1;
+            
+            number.textContent = value;
+            number.style.left = Math.random() * (gameArea.offsetWidth - 60) + 'px';
+            number.style.animationDuration = (Math.random() * 3 + 3) + 's';
+            
+            number.onclick = () => {
+                if (value === currentSum.answer) {
+                    number.remove();
+                    generateNewSum();
+                } else {
+                    number.remove();
+                    ninjaLife -= 10;
+                    document.getElementById('ninja-life').style.width = ninjaLife + '%';
+                    if (ninjaLife <= 0) {
+                        alert('Game Over! Try again.');
+                        closeGame('ninja');
+                    }
+                }
+            };
+            
+            gameArea.appendChild(number);
+            
+            setTimeout(() => {
+                if (number.parentNode) {
+                    number.remove();
+                }
+            }, 6000);
+        }
+
+        // Math Race Game Logic
+        function generateRaceProblem() {
+            const num1 = Math.floor(Math.random() * 50) + 1;
+            const num2 = Math.floor(Math.random() * 50) + 1;
+            const operation = Math.random() > 0.5 ? '+' : '-';
+            const problem = operation === '+' ? num1 + num2 : Math.max(num1, num2) - Math.min(num1, num2);
+            
+            document.getElementById('race-problem').textContent = 
+                operation === '+' ? `${num1} + ${num2} = ?` : `${Math.max(num1, num2)} - ${Math.min(num1, num2)} = ?`;
+            document.getElementById('race-problem').dataset.answer = problem;
+            document.getElementById('race-answer').value = '';
+        }
+
+        function checkRaceAnswer() {
+            const userAnswer = parseInt(document.getElementById('race-answer').value);
+            const correctAnswer = parseInt(document.getElementById('race-problem').dataset.answer);
+            
+            if (userAnswer === correctAnswer) {
+                racePosition += 50;
+                document.getElementById('race-car').style.left = racePosition + 'px';
+                if (racePosition > window.innerWidth - 150) {
+                    alert('You won the race!');
+                    closeGame('race');
+                } else {
+                    generateRaceProblem();
+                }
+            } else {
+                racePosition = Math.max(50, racePosition - 30);
+                document.getElementById('race-car').style.left = racePosition + 'px';
+            }
+        }
+
+        // Treasure Digits Game Logic
+        function openChest(chestNumber) {
+            currentChest = chestNumber;
+            const puzzle = document.getElementById('treasure-puzzle');
+            puzzle.style.display = 'block';
+            
+            const num1 = Math.floor(Math.random() * 900) + 100;
+            const num2 = Math.floor(Math.random() * 900) + 100;
+            const answer = num1 + num2;
+            
+            document.getElementById('treasure-problem').textContent = `${num1} + ${num2} = ?`;
+            document.getElementById('treasure-problem').dataset.answer = answer;
+            document.getElementById('treasure-answer').value = '';
+            document.getElementById('treasure-feedback').style.display = 'none';
+        }
+
+        function checkTreasureAnswer() {
+            const userAnswer = parseInt(document.getElementById('treasure-answer').value);
+            const correctAnswer = parseInt(document.getElementById('treasure-problem').dataset.answer);
+            const feedback = document.getElementById('treasure-feedback');
+            
+            if (userAnswer === correctAnswer) {
+                feedback.textContent = 'Correct! Treasure opened!';
+                feedback.className = 'feedback-message success';
+                feedback.style.display = 'block';
+                
+                const chests = document.querySelectorAll('.treasure-chest');
+                chests[currentChest - 1].classList.add('open');
+                chests[currentChest - 1].textContent = '💎';
+                
+                setTimeout(() => {
+                    document.getElementById('treasure-puzzle').style.display = 'none';
+                    
+                    if (currentChest === 4) {
+                        setTimeout(() => {
+                            alert('Congratulations! You found all the treasures!');
+                            closeGame('treasure');
+                        }, 500);
+                    }
+                }, 1500);
+            } else {
+                feedback.textContent = 'Wrong answer! Try again.';
+                feedback.className = 'feedback-message error';
+                feedback.style.display = 'block';
+                document.getElementById('treasure-answer').value = '';
+            }
+        }
+
+        // Math Ladder Game Logic
+        function climbLadder(step) {
+            if (step === ladderPosition + 1) {
+                currentLadderStep = step;
+                const questionBox = document.getElementById('ladder-question');
+                questionBox.style.display = 'block';
+                
+                const operation = Math.random() > 0.5 ? 'multiply' : 'divide';
+                let problem;
+                
+                if (operation === 'multiply') {
+                    const num1 = Math.floor(Math.random() * 10) + 1;
+                    const num2 = Math.floor(Math.random() * 10) + 1;
+                    problem = `${num1} × ${num2}`;
+                    ladderAnswer = num1 * num2;
+                } else {
+                    const num2 = Math.floor(Math.random() * 9) + 1;
+                    ladderAnswer = Math.floor(Math.random() * 10) + 1;
+                    const num1 = ladderAnswer * num2;
+                    problem = `${num1} ÷ ${num2}`;
+                }
+                
+                document.getElementById('ladder-problem').textContent = `${problem} = ?`;
+                document.getElementById('ladder-answer').value = '';
+                document.getElementById('ladder-feedback').style.display = 'none';
+            }
+        }
+
+        function checkLadderAnswer() {
+            const userAnswer = parseInt(document.getElementById('ladder-answer').value);
+            const feedback = document.getElementById('ladder-feedback');
+            
+            if (userAnswer === ladderAnswer) {
+                feedback.textContent = 'Correct! Climbing up!';
+                feedback.className = 'feedback-message success';
+                feedback.style.display = 'block';
+                
+                ladderPosition = currentLadderStep;
+                updateLadderPosition();
+                
+                // Make the achieved step green
+                const steps = document.querySelectorAll('.ladder-step');
+                steps[ladderPosition].classList.add('achieved');
+                
+                setTimeout(() => {
+                    document.getElementById('ladder-question').style.display = 'none';
+                    
+                    if (ladderPosition === 7) {
+                        setTimeout(() => {
+                            alert('Congratulations! You reached the top!');
+                            closeGame('ladder');
+                        }, 500);
+                    }
+                }, 1500);
+            } else {
+                feedback.textContent = 'Wrong answer! Try again.';
+                feedback.className = 'feedback-message error';
+                feedback.style.display = 'block';
+                document.getElementById('ladder-answer').value = '';
+            }
+        }
+
+        function updateLadderPosition() {
+            const player = document.getElementById('ladder-player');
+            player.style.bottom = (10 + ladderPosition * 50) + 'px';
+        }
+
+        // Number Duel Game Logic
+        function generateDuelProblem() {
+            const operation = Math.random();
+            let problem, answer;
+            
+            if (operation < 0.33) {
+                const num1 = Math.floor(Math.random() * 20) + 1;
+                const num2 = Math.floor(Math.random() * 20) + 1;
+                problem = `${num1} + ${num2}`;
+                answer = num1 + num2;
+            } else if (operation < 0.66) {
+                const num1 = Math.floor(Math.random() * 20) + 1;
+                const num2 = Math.floor(Math.random() * 20) + 1;
+                problem = `${Math.max(num1, num2)} - ${Math.min(num1, num2)}`;
+                answer = Math.max(num1, num2) - Math.min(num1, num2);
+            } else {
+                const num1 = Math.floor(Math.random() * 10) + 1;
+                const num2 = Math.floor(Math.random() * 10) + 1;
+                problem = `${num1} × ${num2}`;
+                answer = num1 * num2;
+            }
+            
+            document.getElementById('duel-problem').textContent = `${problem} = ?`;
+            document.getElementById('duel-problem').dataset.answer = answer;
+            document.getElementById('duel-answer').value = '';
+        }
+
+        function checkDuelAnswer() {
+            const userAnswer = parseInt(document.getElementById('duel-answer').value);
+            const correctAnswer = parseInt(document.getElementById('duel-problem').dataset.answer);
+            
+            if (userAnswer === correctAnswer) {
+                enemyHealth -= 20;
+                document.querySelector('.character.enemy').style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    document.querySelector('.character.enemy').style.animation = '';
+                }, 500);
+                
+                if (enemyHealth <= 0) {
+                    alert('Victory! You defeated the enemy!');
+                    closeGame('duel');
+                } else {
+                    // Enemy counter-attack
+                    setTimeout(() => {
+                        playerHealth -= 10;
+                        document.querySelector('.character.player').style.animation = 'shake 0.5s';
+                        setTimeout(() => {
+                            document.querySelector('.character.player').style.animation = '';
+                        }, 500);
+                        updateHealthBars();
+                        
+                        if (playerHealth <= 0) {
+                            alert('Defeat! The enemy was too strong.');
+                            closeGame('duel');
+                        }
+                    }, 1000);
+                }
+            } else {
+                playerHealth -= 10;
+                document.querySelector('.character.player').style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    document.querySelector('.character.player').style.animation = '';
+                }, 500);
+                
+                if (playerHealth <= 0) {
+                    alert('Defeat! The enemy was too strong.');
+                    closeGame('duel');
+                }
+            }
+            
+            updateHealthBars();
+            generateDuelProblem();
+        }
+
+        function updateHealthBars() {
+            document.getElementById('player-health').style.width = playerHealth + '%';
+            document.getElementById('enemy-health').style.width = enemyHealth + '%';
+        }
+
+        // Add shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('game-modal')) {
+                event.target.style.display = 'none';
+                resetGame(currentGame);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physics Adventure - Motion, Time & Electricity</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #8b5cf6;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #06b6d4;
+            --light-bg: #f8fafc;
+            --dark-text: #1e293b;
+        }
+
+        body {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px 0;
+        }
+
+        .game-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .game-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .game-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .game-content {
+            padding: 20px;
+            min-height: 400px;
+            display: none;
+        }
+
+        .game-preview {
+            padding: 20px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .play-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .play-btn:hover {
+            background: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Race the Object Styles */
+        .race-track {
+            background: #e5e7eb;
+            border-radius: 15px;
+            height: 100px;
+            position: relative;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .track-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: repeating-linear-gradient(90deg, #fff, #fff 20px, #ccc 20px, #ccc 40px);
+            transform: translateY(-50%);
+        }
+
+        .race-object {
+            position: absolute;
+            width: 60px;
+            height: 40px;
+            background: var(--danger-color);
+            border-radius: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: left 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .race-object.car {
+            background: var(--danger-color);
+        }
+
+        .race-object.ball {
+            background: var(--warning-color);
+            border-radius: 50%;
+        }
+
+        .finish-line {
+            position: absolute;
+            right: 20px;
+            top: 0;
+            bottom: 0;
+            width: 10px;
+            background: repeating-linear-gradient(0deg, #000, #000 10px, #fff 10px, #fff 20px);
+        }
+
+        /* Clock Puzzle Styles */
+        .clock-container {
+            width: 200px;
+            height: 200px;
+            border: 8px solid var(--dark-text);
+            border-radius: 50%;
+            position: relative;
+            margin: 20px auto;
+            background: white;
+        }
+
+        .clock-center {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--dark-text);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        .clock-hand {
+            position: absolute;
+            background: var(--dark-text);
+            transform-origin: bottom center;
+            bottom: 50%;
+            left: 50%;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .hour-hand {
+            width: 6px;
+            height: 60px;
+            margin-left: -3px;
+        }
+
+        .minute-hand {
+            width: 4px;
+            height: 80px;
+            margin-left: -2px;
+        }
+
+        .clock-number {
+            position: absolute;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .time-display {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+            color: var(--dark-text);
+        }
+
+        /* Circuit Builder Styles */
+        .circuit-board {
+            background: #2d3748;
+            border-radius: 15px;
+            padding: 30px;
+            position: relative;
+            height: 250px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .breadboard {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(0deg, #4a5568, #4a5568 10px, #2d3748 10px, #2d3748 20px),
+                        repeating-linear-gradient(90deg, #4a5568, #4a5568 10px, #2d3748 10px, #2d3748 20px);
+            border-radius: 10px;
+        }
+
+        .circuit-component {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: move;
+            transition: all 0.3s ease;
+            z-index: 5;
+        }
+
+        .circuit-component:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .circuit-component.placed {
+            cursor: default;
+        }
+
+        .component-slot {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            border: 3px dashed var(--warning-color);
+            border-radius: 10px;
+            background: rgba(245, 158, 11, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .component-slot.filled {
+            border-color: var(--success-color);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .component-slot.drag-over {
+            background: rgba(245, 158, 11, 0.3);
+            transform: scale(1.05);
+        }
+
+        .wire {
+            position: absolute;
+            height: 4px;
+            background: #718096;
+            transform-origin: left center;
+            z-index: 1;
+        }
+
+        .bulb {
+            width: 40px;
+            height: 40px;
+            background: #e2e8f0;
+            border-radius: 50%;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .bulb.lit {
+            background: #fef3c7;
+            box-shadow: 0 0 30px #f59e0b;
+            animation: glow 1s infinite alternate;
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 20px #f59e0b; }
+            to { box-shadow: 0 0 40px #f59e0b, 0 0 60px #f59e0b; }
+        }
+
+        /* Motion Quiz Race Styles */
+        .quiz-track {
+            background: linear-gradient(90deg, #e5e7eb 0%, #e5e7eb 48%, #000 48%, #000 52%, #e5e7eb 52%, #e5e7eb 100%);
+            border-radius: 15px;
+            height: 120px;
+            position: relative;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .track-lanes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .lane {
+            flex: 1;
+            border-bottom: 2px dashed #9ca3af;
+            position: relative;
+        }
+
+        .lane:last-child {
+            border-bottom: none;
+        }
+
+        .racer {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: left 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .racer.player {
+            background: var(--primary-color);
+            left: 10px;
+        }
+
+        .racer.computer {
+            background: var(--danger-color);
+            left: 10px;
+        }
+
+        /* Electric Current Puzzle Styles */
+        .circuit-diagram {
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 15px;
+            padding: 30px;
+            position: relative;
+            height: 250px;
+            margin: 20px 0;
+        }
+
+        .circuit-path {
+            position: absolute;
+            background: #e5e7eb;
+            z-index: 1;
+        }
+
+        .circuit-symbol {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: move;
+            transition: all 0.3s ease;
+            z-index: 5;
+        }
+
+        .circuit-symbol:hover {
+            transform: scale(1.1);
+        }
+
+        .symbol-slot {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border: 3px dashed var(--warning-color);
+            border-radius: 8px;
+            background: rgba(245, 158, 11, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .symbol-slot.filled {
+            border-color: var(--success-color);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .current-flow {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: var(--warning-color);
+            border-radius: 50%;
+            opacity: 0;
+            z-index: 10;
+        }
+
+        .current-flow.animate {
+            animation: flowCurrent 3s linear infinite;
+        }
+
+        @keyframes flowCurrent {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* Common Styles */
+        .question-box {
+            background: #f3f4f6;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .answer-input {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            width: 150px;
+            text-align: center;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 10px 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .option-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .option-btn.correct {
+            background: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+        }
+
+        .option-btn.incorrect {
+            background: var(--danger-color);
+            border-color: var(--danger-color);
+            color: white;
+        }
+
+        .feedback {
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            animation: slideIn 0.5s ease;
+            font-weight: 500;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feedback.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .feedback.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .feedback.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+
+        .progress-container {
+            background: #f3f4f6;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 15px 0;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.5s ease;
+            border-radius: 5px;
+        }
+
+        .score-display {
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            display: inline-block;
+            margin: 10px 0;
+        }
+
+        .timer {
+            background: var(--warning-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin: 0 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .game-card {
+                margin-bottom: 20px;
+            }
+            
+            .clock-container {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .hour-hand {
+                height: 45px;
+            }
+            
+            .minute-hand {
+                height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container game-container">
+        <h1 class="text-center text-white mb-5">
+            <i class="bi bi-lightning-charge"></i> Physics Adventure - Motion, Time & Electricity
+        </h1>
+        
+        <div class="row g-4">
+            <!-- Game 1: Race the Object -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game1">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(1)" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <i class="bi bi-speedometer2 game-icon"></i>
+                        <h3>Race the Object</h3>
+                        <p class="mb-0">Calculate speed, distance, or time to race!</p>
+                    </div>
+                    <div class="game-preview" id="preview1">
+                        <p>Solve physics problems to make your car or ball move forward. Fast answers earn bonus points!</p>
+                        <button class="play-btn" onclick="startGame(1)">Start Race</button>
+                    </div>
+                    <div class="game-content" id="content1">
+                        <div class="race-track">
+                            <div class="track-line"></div>
+                            <div class="race-object car" id="race-object">🚗</div>
+                            <div class="finish-line"></div>
+                        </div>
+                        <div class="question-box">
+                            <h5>Problem: <span id="race-problem"></span></h5>
+                            <div class="text-center mt-3">
+                                <input type="number" class="answer-input" id="race-answer" placeholder="Answer">
+                                <button class="btn btn-game ms-2" onclick="checkRaceAnswer()">Submit</button>
+                            </div>
+                        </div>
+                        <div id="race-feedback"></div>
+                        <div class="text-center">
+                            <div class="timer" id="race-timer">Time: 0s</div>
+                            <div class="score-display">Score: <span id="race-score">0</span></div>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <span>Progress</span>
+                                <span id="race-progress-text">0%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="race-progress"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 2: Clock Puzzle Adventure -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game2">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(2)" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <i class="bi bi-clock game-icon"></i>
+                        <h3>Clock Puzzle Adventure</h3>
+                        <p class="mb-0">Adjust clock hands to match the time!</p>
+                    </div>
+                    <div class="game-preview" id="preview2">
+                        <p>Set the clock hands to show the correct time. Includes both 12-hour and 24-hour formats!</p>
+                        <button class="play-btn" onclick="startGame(2)">Start Puzzle</button>
+                    </div>
+                    <div class="game-content" id="content2">
+                        <div class="clock-container" id="clock-container">
+                            <div class="clock-center"></div>
+                            <div class="clock-hand hour-hand" id="hour-hand"></div>
+                            <div class="clock-hand minute-hand" id="minute-hand"></div>
+                            <!-- Clock numbers -->
+                            <div class="clock-number" style="top: 5px; left: 50%; transform: translateX(-50%);">12</div>
+                            <div class="clock-number" style="top: 50%; right: 5px; transform: translateY(-50%);">3</div>
+                            <div class="clock-number" style="bottom: 5px; left: 50%; transform: translateX(-50%);">6</div>
+                            <div class="clock-number" style="top: 50%; left: 5px; transform: translateY(-50%);">9</div>
+                        </div>
+                        <div class="time-display" id="target-time">Target: 3:30</div>
+                        <div class="text-center">
+                            <button class="btn btn-game" onclick="checkClockTime()">Check Time</button>
+                            <button class="btn btn-game" onclick="nextClockPuzzle()">Next Puzzle</button>
+                        </div>
+                        <div id="clock-feedback"></div>
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <span>Puzzles Solved</span>
+                                <span id="clock-progress-text">0/10</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="clock-progress"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 3: Circuit Builder -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game3">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(3)" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <i class="bi bi-cpu game-icon"></i>
+                        <h3>Circuit Builder</h3>
+                        <p class="mb-0">Build working circuits with components!</p>
+                    </div>
+                    <div class="game-preview" id="preview3">
+                        <p>Drag components to build a working circuit. Make the bulb glow by connecting it correctly!</p>
+                        <button class="play-btn" onclick="startGame(3)">Start Building</button>
+                    </div>
+                    <div class="game-content" id="content3">
+                        <div class="circuit-board">
+                            <div class="breadboard"></div>
+                            <!-- Component slots -->
+                            <div class="component-slot" id="battery-slot" style="top: 30px; left: 50px;"></div>
+                            <div class="component-slot" id="bulb-slot" style="top: 30px; right: 50px;"></div>
+                            <div class="component-slot" id="switch-slot" style="bottom: 30px; left: 50px;"></div>
+                            <!-- Wires will be added dynamically -->
+                            <div class="wire" id="wire1" style="width: 100px; top: 60px; left: 120px; transform: rotate(0deg);"></div>
+                            <div class="wire" id="wire2" style="width: 100px; top: 60px; right: 120px; transform: rotate(0deg);"></div>
+                            <div class="wire" id="wire3" style="width: 200px; bottom: 60px; left: 120px; transform: rotate(0deg);"></div>
+                            <!-- Bulb -->
+                            <div class="bulb" id="circuit-bulb" style="top: 30px; right: 50px;">💡</div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <div class="circuit-component" id="battery-comp" draggable="true" style="position: relative; display: inline-block; margin: 5px;">🔋</div>
+                            <div class="circuit-component" id="switch-comp" draggable="true" style="position: relative; display: inline-block; margin: 5px;">🔌</div>
+                        </div>
+                        <div class="question-box">
+                            <h5>Connect the circuit so bulb glows. Is it series or parallel?</h5>
+                            <div class="options-grid">
+                                <button class="option-btn" onclick="checkCircuitType('series')">Series</button>
+                                <button class="option-btn" onclick="checkCircuitType('parallel')">Parallel</button>
+                            </div>
+                        </div>
+                        <div id="circuit-feedback"></div>
+                        <div class="text-center">
+                            <button class="btn btn-game" onclick="checkCircuit()">Test Circuit</button>
+                            <button class="btn btn-game" onclick="resetCircuit()">Reset</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 4: Motion Quiz Race -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game4">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(4)" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <i class="bi bi-trophy game-icon"></i>
+                        <h3>Motion Quiz Race</h3>
+                        <p class="mb-0">Race against the computer with physics questions!</p>
+                    </div>
+                    <div class="game-preview" id="preview4">
+                        <p>Answer motion questions to move your character. First to reach the finish line wins!</p>
+                        <button class="play-btn" onclick="startGame(4)">Start Race</button>
+                    </div>
+                    <div class="game-content" id="content4">
+                        <div class="quiz-track">
+                            <div class="track-lanes">
+                                <div class="lane">
+                                    <div class="racer player" id="player-racer">P</div>
+                                </div>
+                                <div class="lane">
+                                    <div class="racer computer" id="computer-racer">C</div>
+                                </div>
+                            </div>
+                            <div class="finish-line"></div>
+                        </div>
+                        <div class="question-box">
+                            <h5>Question: <span id="quiz-question"></span></h5>
+                            <div class="options-grid" id="quiz-options"></div>
+                        </div>
+                        <div id="quiz-feedback"></div>
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <span>Race Progress</span>
+                                <span id="quiz-progress-text">0%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="quiz-progress"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 5: Electric Current Puzzle -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game5">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(5)" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <i class="bi bi-puzzle game-icon"></i>
+                        <h3>Electric Current Puzzle</h5>
+                        <p class="mb-0">Complete the circuit and calculate current!</p>
+                    </div>
+                    <div class="game-preview" id="preview5">
+                        <p>Drag symbols to complete the circuit diagram and calculate current using I = V/R!</p>
+                        <button class="play-btn" onclick="startGame(5)">Start Puzzle</button>
+                    </div>
+                    <div class="game-content" id="content5">
+                        <div class="circuit-diagram">
+                            <!-- Circuit paths -->
+                            <div class="circuit-path" style="width: 200px; height: 4px; top: 100px; left: 50px;"></div>
+                            <div class="circuit-path" style="width: 200px; height: 4px; top: 100px; right: 50px;"></div>
+                            <div class="circuit-path" style="width: 4px; height: 100px; top: 50px; left: 50px;"></div>
+                            <div class="circuit-path" style="width: 4px; height: 100px; top: 50px; right: 50px;"></div>
+                            <div class="circuit-path" style="width: 200px; height: 4px; bottom: 50px; left: 50px;"></div>
+                            
+                            <!-- Symbol slots -->
+                            <div class="symbol-slot" id="battery-slot2" style="top: 70px; left: 50px;"></div>
+                            <div class="symbol-slot" id="resistor-slot" style="top: 70px; right: 50px;"></div>
+                            <div class="symbol-slot" id="switch-slot2" style="bottom: 70px; left: 150px;"></div>
+                            
+                            <!-- Current flow animation -->
+                            <div class="current-flow" id="current-flow1" style="top: 98px; left: 50px;"></div>
+                            <div class="current-flow" id="current-flow2" style="top: 98px; right: 50px;"></div>
+                            <div class="current-flow" id="current-flow3" style="top: 50px; left: 48px;"></div>
+                            <div class="current-flow" id="current-flow4" style="top: 50px; right: 48px;"></div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <div class="circuit-symbol" id="battery-symbol" draggable="true" style="position: relative; display: inline-block; margin: 5px;">🔋</div>
+                            <div class="circuit-symbol" id="resistor-symbol" draggable="true" style="position: relative; display: inline-block; margin: 5px;">⚡</div>
+                            <div class="circuit-symbol" id="switch-symbol" draggable="true" style="position: relative; display: inline-block; margin: 5px;">🔌</div>
+                        </div>
+                        <div class="question-box">
+                            <h5>Calculate current (I) if Voltage = 12V and Resistance = 4Ω</h5>
+                            <div class="text-center mt-3">
+                                <input type="number" class="answer-input" id="current-answer" placeholder="Current (A)">
+                                <button class="btn btn-game ms-2" onclick="checkCurrent()">Submit</button>
+                            </div>
+                        </div>
+                        <div id="current-feedback"></div>
+                        <div class="text-center">
+                            <button class="btn btn-game" onclick="checkCircuitPuzzle()">Check Circuit</button>
+                            <button class="btn btn-game" onclick="resetCurrentPuzzle()">Reset</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game Data
+        const raceProblems = [
+            { problem: "Distance = 60 m, Time = 5 s → find speed", answer: 12, unit: "m/s" },
+            { problem: "Speed = 15 m/s, Time = 4 s → find distance", answer: 60, unit: "m" },
+            { problem: "Distance = 120 m, Speed = 10 m/s → find time", answer: 12, unit: "s" },
+            { problem: "Speed = 20 km/h, Time = 3 h → find distance", answer: 60, unit: "km" },
+            { problem: "Distance = 300 km, Time = 5 h → find speed", answer: 60, unit: "km/h" }
+        ];
+
+        const clockPuzzles = [
+            { time: "3:30", hour: 105, minute: 180 },
+            { time: "9:15", hour: 277.5, minute: 90 },
+            { time: "12:00", hour: 0, minute: 0 },
+            { time: "6:45", hour: 202.5, minute: 270 },
+            { time: "2:20", hour: 70, minute: 120 },
+            { time: "7:50", hour: 235, minute: 300 },
+            { time: "4:10", hour: 125, minute: 60 },
+            { time: "10:25", hour: 312.5, minute: 150 },
+            { time: "1:40", hour: 50, minute: 240 },
+            { time: "8:55", hour: 267.5, minute: 330 }
+        ];
+
+        const quizQuestions = [
+            { question: "A train covers 120 km in 2 hours. Find its speed.", options: ["50 km/h", "60 km/h", "70 km/h", "80 km/h"], correct: 1 },
+            { question: "A car moves at 25 m/s for 10 seconds. Distance covered?", options: ["200 m", "250 m", "300 m", "350 m"], correct: 1 },
+            { question: "A cyclist travels 30 km in 1.5 hours. Speed?", options: ["15 km/h", "20 km/h", "25 km/h", "30 km/h"], correct: 1 },
+            { question: "A plane flies at 900 km/h for 3 hours. Distance?", options: ["2400 km", "2700 km", "3000 km", "3300 km"], correct: 1 },
+            { question: "A runner completes 400m in 50 seconds. Speed?", options: ["6 m/s", "8 m/s", "10 m/s", "12 m/s"], correct: 1 }
+        ];
+
+        // Game States
+        let currentRaceProblem = 0;
+        let raceScore = 0;
+        let raceTimer = 0;
+        let raceInterval;
+        let currentClockPuzzle = 0;
+        let clockSolved = 0;
+        let hourAngle = 0;
+        let minuteAngle = 0;
+        let isDraggingHour = false;
+        let isDraggingMinute = false;
+        let currentQuizQuestion = 0;
+        let playerPosition = 10;
+        let computerPosition = 10;
+        let computerInterval;
+
+        // Initialize Games
+        function initGames() {
+            setupClockDrag();
+            setupCircuitDrag();
+            setupCurrentPuzzleDrag();
+        }
+
+        // Game Navigation
+        function startGame(gameNum) {
+            document.getElementById(`preview${gameNum}`).style.display = 'none';
+            document.getElementById(`content${gameNum}`).style.display = 'block';
+            document.querySelector(`#game${gameNum} .back-btn`).style.display = 'block';
+            
+            // Initialize specific game
+            switch(gameNum) {
+                case 1:
+                    initRaceGame();
+                    break;
+                case 2:
+                    initClockGame();
+                    break;
+                case 3:
+                    initCircuitGame();
+                    break;
+                case 4:
+                    initQuizGame();
+                    break;
+                case 5:
+                    initCurrentGame();
+                    break;
+            }
+        }
+
+        function showPreview(gameNum) {
+            document.getElementById(`preview${gameNum}`).style.display = 'flex';
+            document.getElementById(`content${gameNum}`).style.display = 'none';
+            document.querySelector(`#game${gameNum} .back-btn`).style.display = 'none';
+            
+            // Clean up intervals
+            if (gameNum === 1 && raceInterval) {
+                clearInterval(raceInterval);
+            }
+            if (gameNum === 4 && computerInterval) {
+                clearInterval(computerInterval);
+            }
+        }
+
+        // Game 1: Race the Object
+        function initRaceGame() {
+            currentRaceProblem = 0;
+            raceScore = 0;
+            raceTimer = 0;
+            updateRaceScore();
+            loadRaceProblem();
+            startRaceTimer();
+        }
+
+        function loadRaceProblem() {
+            if (currentRaceProblem >= raceProblems.length) {
+                showFeedback('race-feedback', '🏆 Race Complete! Final Score: ' + raceScore, 'success');
+                clearInterval(raceInterval);
+                return;
+            }
+            
+            const problem = raceProblems[currentRaceProblem];
+            document.getElementById('race-problem').textContent = problem.problem;
+            document.getElementById('race-answer').value = '';
+            updateRaceProgress();
+        }
+
+        function checkRaceAnswer() {
+            const problem = raceProblems[currentRaceProblem];
+            const userAnswer = parseFloat(document.getElementById('race-answer').value);
+            
+            if (userAnswer === problem.answer) {
+                showFeedback('race-feedback', `✅ Correct! ${problem.answer} ${problem.unit}`, 'success');
+                
+                // Move object forward
+                const object = document.getElementById('race-object');
+                const currentLeft = parseFloat(object.style.left) || 10;
+                const newLeft = Math.min(currentLeft + 20, 85);
+                object.style.left = newLeft + '%';
+                
+                // Bonus points for fast answers
+                if (raceTimer < 10) {
+                    raceScore += 20;
+                } else {
+                    raceScore += 10;
+                }
+                updateRaceScore();
+                
+                currentRaceProblem++;
+                setTimeout(() => {
+                    loadRaceProblem();
+                }, 1500);
+            } else {
+                showFeedback('race-feedback', `❌ Incorrect. Try again!`, 'error');
+            }
+        }
+
+        function startRaceTimer() {
+            raceInterval = setInterval(() => {
+                raceTimer++;
+                document.getElementById('race-timer').textContent = `Time: ${raceTimer}s`;
+            }, 1000);
+        }
+
+        function updateRaceScore() {
+            document.getElementById('race-score').textContent = raceScore;
+        }
+
+        function updateRaceProgress() {
+            const progress = (currentRaceProblem / raceProblems.length) * 100;
+            document.getElementById('race-progress').style.width = progress + '%';
+            document.getElementById('race-progress-text').textContent = `${Math.round(progress)}%`;
+        }
+
+        // Game 2: Clock Puzzle Adventure
+        function initClockGame() {
+            currentClockPuzzle = 0;
+            clockSolved = 0;
+            hourAngle = 0;
+            minuteAngle = 0;
+            updateClockHands();
+            loadClockPuzzle();
+        }
+
+        function loadClockPuzzle() {
+            if (currentClockPuzzle >= clockPuzzles.length) {
+                showFeedback('clock-feedback', '🎉 All puzzles solved! You\'re a time master!', 'success');
+                return;
+            }
+            
+            const puzzle = clockPuzzles[currentClockPuzzle];
+            document.getElementById('target-time').textContent = `Target: ${puzzle.time}`;
+            updateClockProgress();
+        }
+
+        function setupClockDrag() {
+            const hourHand = document.getElementById('hour-hand');
+            const minuteHand = document.getElementById('minute-hand');
+            const clockContainer = document.getElementById('clock-container');
+            
+            hourHand.addEventListener('mousedown', (e) => {
+                isDraggingHour = true;
+                e.preventDefault();
+            });
+            
+            minuteHand.addEventListener('mousedown', (e) => {
+                isDraggingMinute = true;
+                e.preventDefault();
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (isDraggingHour || isDraggingMinute) {
+                    const rect = clockContainer.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI + 90;
+                    
+                    if (isDraggingHour) {
+                        hourAngle = (angle + 360) % 360;
+                        updateClockHands();
+                    }
+                    
+                    if (isDraggingMinute) {
+                        minuteAngle = (angle + 360) % 360;
+                        updateClockHands();
+                    }
+                }
+            });
+            
+            document.addEventListener('mouseup', () => {
+                isDraggingHour = false;
+                isDraggingMinute = false;
+            });
+        }
+
+        function updateClockHands() {
+            document.getElementById('hour-hand').style.transform = `rotate(${hourAngle}deg)`;
+            document.getElementById('minute-hand').style.transform = `rotate(${minuteAngle}deg)`;
+        }
+
+        function checkClockTime() {
+            const puzzle = clockPuzzles[currentClockPuzzle];
+            const hourTolerance = 15;
+            const minuteTolerance = 10;
+            
+            const hourDiff = Math.abs(hourAngle - puzzle.hour);
+            const minuteDiff = Math.abs(minuteAngle - puzzle.minute);
+            
+            if (hourDiff < hourTolerance && minuteDiff < minuteTolerance) {
+                showFeedback('clock-feedback', '✅ Correct time set!', 'success');
+                clockSolved++;
+                updateClockProgress();
+                
+                setTimeout(() => {
+                    nextClockPuzzle();
+                }, 1500);
+            } else {
+                showFeedback('clock-feedback', '❌ Incorrect. Hint: Pay attention to both hour and minute hands!', 'error');
+            }
+        }
+
+        function nextClockPuzzle() {
+            currentClockPuzzle++;
+            hourAngle = 0;
+            minuteAngle = 0;
+            updateClockHands();
+            loadClockPuzzle();
+        }
+
+        function updateClockProgress() {
+            const progress = (clockSolved / clockPuzzles.length) * 100;
+            document.getElementById('clock-progress').style.width = progress + '%';
+            document.getElementById('clock-progress-text').textContent = `${clockSolved}/10`;
+        }
+
+        // Game 3: Circuit Builder
+        function initCircuitGame() {
+            resetCircuit();
+        }
+
+        function setupCircuitDrag() {
+            const components = document.querySelectorAll('.circuit-component');
+            const slots = document.querySelectorAll('.component-slot');
+            
+            components.forEach(comp => {
+                comp.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text', comp.id);
+                    comp.classList.add('dragging');
+                });
+                
+                comp.addEventListener('dragend', () => {
+                    comp.classList.remove('dragging');
+                });
+            });
+            
+            slots.forEach(slot => {
+                slot.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    slot.classList.add('drag-over');
+                });
+                
+                slot.addEventListener('dragleave', () => {
+                    slot.classList.remove('drag-over');
+                });
+                
+                slot.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    slot.classList.remove('drag-over');
+                    
+                    const compId = e.dataTransfer.getData('text');
+                    const comp = document.getElementById(compId);
+                    
+                    if (slot.children.length === 0) {
+                        slot.appendChild(comp);
+                        slot.classList.add('filled');
+                        comp.classList.add('placed');
+                        comp.style.position = 'absolute';
+                        comp.style.top = '5px';
+                        comp.style.left = '5px';
+                    }
+                });
+            });
+        }
+
+        function checkCircuitType(type) {
+            // For this simple circuit, series is correct
+            if (type === 'series') {
+                showFeedback('circuit-feedback', '✅ Correct! This is a series circuit.', 'success');
+            } else {
+                showFeedback('circuit-feedback', '❌ Incorrect. This is a series circuit.', 'error');
+            }
+        }
+
+        function checkCircuit() {
+            const batterySlot = document.getElementById('battery-slot');
+            const switchSlot = document.getElementById('switch-slot');
+            const bulb = document.getElementById('circuit-bulb');
+            
+            if (batterySlot.children.length > 0 && switchSlot.children.length > 0) {
+                bulb.classList.add('lit');
+                showFeedback('circuit-feedback', '✅ Circuit complete! The bulb is glowing!', 'success');
+            } else {
+                showFeedback('circuit-feedback', '❌ Circuit incomplete. Add all components!', 'error');
+            }
+        }
+
+        function resetCircuit() {
+            const slots = document.querySelectorAll('.component-slot');
+            const container = document.querySelector('#content3 .text-center');
+            const bulb = document.getElementById('circuit-bulb');
+            
+            slots.forEach(slot => {
+                slot.classList.remove('filled');
+                while (slot.firstChild) {
+                    const comp = slot.firstChild;
+                    comp.classList.remove('placed');
+                    comp.style.position = 'relative';
+                    comp.style.top = 'auto';
+                    comp.style.left = 'auto';
+                    container.appendChild(comp);
+                }
+            });
+            
+            bulb.classList.remove('lit');
+        }
+
+        // Game 4: Motion Quiz Race
+        function initQuizGame() {
+            currentQuizQuestion = 0;
+            playerPosition = 10;
+            computerPosition = 10;
+            updateRacerPositions();
+            loadQuizQuestion();
+            startComputerRace();
+        }
+
+        function loadQuizQuestion() {
+            if (currentQuizQuestion >= quizQuestions.length) {
+                showFeedback('quiz-feedback', '🏁 Race Over!', 'info');
+                clearInterval(computerInterval);
+                return;
+            }
+            
+            const question = quizQuestions[currentQuizQuestion];
+            document.getElementById('quiz-question').textContent = question.question;
+            
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => checkQuizAnswer(index);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkQuizAnswer(selectedIndex) {
+            const question = quizQuestions[currentQuizQuestion];
+            const options = document.querySelectorAll('#quiz-options .option-btn');
+            
+            options.forEach(btn => btn.disabled = true);
+            
+            if (selectedIndex === question.correct) {
+                options[selectedIndex].classList.add('correct');
+                showFeedback('quiz-feedback', '✅ Correct! Move forward!', 'success');
+                
+                // Move player forward
+                playerPosition = Math.min(playerPosition + 20, 85);
+                updateRacerPositions();
+                
+                currentQuizQuestion++;
+                updateQuizProgress();
+                
+                setTimeout(() => {
+                    loadQuizQuestion();
+                }, 1500);
+            } else {
+                options[selectedIndex].classList.add('incorrect');
+                showFeedback('quiz-feedback', '❌ Incorrect. Try again!', 'error');
+                
+                setTimeout(() => {
+                    options.forEach(btn => {
+                        btn.disabled = false;
+                        btn.classList.remove('incorrect');
+                    });
+                }, 2000);
+            }
+            
+            // Check if player won
+            if (playerPosition >= 85) {
+                showFeedback('quiz-feedback', '🏆 You won the race!', 'success');
+                clearInterval(computerInterval);
+            }
+        }
+
+        function startComputerRace() {
+            computerInterval = setInterval(() => {
+                if (computerPosition < 85) {
+                    computerPosition += Math.random() * 10;
+                    updateRacerPositions();
+                    
+                    // Check if computer won
+                    if (computerPosition >= 85) {
+                        showFeedback('quiz-feedback', '💻 Computer won the race!', 'error');
+                        clearInterval(computerInterval);
+                    }
+                }
+            }, 3000);
+        }
+
+        function updateRacerPositions() {
+            document.getElementById('player-racer').style.left = playerPosition + '%';
+            document.getElementById('computer-racer').style.left = computerPosition + '%';
+        }
+
+        function updateQuizProgress() {
+            const progress = (currentQuizQuestion / quizQuestions.length) * 100;
+            document.getElementById('quiz-progress').style.width = progress + '%';
+            document.getElementById('quiz-progress-text').textContent = `${Math.round(progress)}%`;
+        }
+
+        // Game 5: Electric Current Puzzle
+        function initCurrentGame() {
+            resetCurrentPuzzle();
+        }
+
+        function setupCurrentPuzzleDrag() {
+            const symbols = document.querySelectorAll('.circuit-symbol');
+            const slots = document.querySelectorAll('.symbol-slot');
+            
+            symbols.forEach(symbol => {
+                symbol.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text', symbol.id);
+                    symbol.classList.add('dragging');
+                });
+                
+                symbol.addEventListener('dragend', () => {
+                    symbol.classList.remove('dragging');
+                });
+            });
+            
+            slots.forEach(slot => {
+                slot.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    slot.classList.add('drag-over');
+                });
+                
+                slot.addEventListener('dragleave', () => {
+                    slot.classList.remove('drag-over');
+                });
+                
+                slot.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    slot.classList.remove('drag-over');
+                    
+                    const symbolId = e.dataTransfer.getData('text');
+                    const symbol = document.getElementById(symbolId);
+                    
+                    if (slot.children.length === 0) {
+                        slot.appendChild(symbol);
+                        slot.classList.add('filled');
+                        symbol.style.position = 'absolute';
+                        symbol.style.top = '5px';
+                        symbol.style.left = '5px';
+                    }
+                });
+            });
+        }
+
+        function checkCurrent() {
+            const userAnswer = parseFloat(document.getElementById('current-answer').value);
+            
+            if (userAnswer === 3) {
+                showFeedback('current-feedback', '✅ Correct! I = V/R = 12V/4Ω = 3A', 'success');
+                animateCurrentFlow();
+            } else {
+                showFeedback('current-feedback', '❌ Incorrect. Remember: I = V/R', 'error');
+            }
+        }
+
+        function checkCircuitPuzzle() {
+            const batterySlot = document.getElementById('battery-slot2');
+            const resistorSlot = document.getElementById('resistor-slot');
+            const switchSlot = document.getElementById('switch-slot2');
+            
+            if (batterySlot.children.length > 0 && resistorSlot.children.length > 0 && switchSlot.children.length > 0) {
+                showFeedback('current-feedback', '✅ Circuit complete!', 'success');
+                animateCurrentFlow();
+            } else {
+                showFeedback('current-feedback', '❌ Circuit incomplete. Add all components!', 'error');
+            }
+        }
+
+        function animateCurrentFlow() {
+            const flows = document.querySelectorAll('.current-flow');
+            flows.forEach(flow => {
+                flow.classList.add('animate');
+            });
+        }
+
+        function resetCurrentPuzzle() {
+            const slots = document.querySelectorAll('.symbol-slot');
+            const container = document.querySelector('#content5 .text-center');
+            const flows = document.querySelectorAll('.current-flow');
+            
+            slots.forEach(slot => {
+                slot.classList.remove('filled');
+                while (slot.firstChild) {
+                    const symbol = slot.firstChild;
+                    symbol.style.position = 'relative';
+                    symbol.style.top = 'auto';
+                    symbol.style.left = 'auto';
+                    container.appendChild(symbol);
+                }
+            });
+            
+            flows.forEach(flow => {
+                flow.classList.remove('animate');
+            });
+            
+            document.getElementById('current-answer').value = '';
+        }
+
+        // Utility Functions
+        function showFeedback(elementId, message, type) {
+            const feedback = document.getElementById(elementId);
+            feedback.innerHTML = `<div class="feedback ${type}">${message}</div>`;
+            setTimeout(() => {
+                feedback.innerHTML = '';
+            }, 3000);
+        }
+
+        // Initialize all games on load
+        window.onload = initGames;
+    </script>
+</body>
+</html>

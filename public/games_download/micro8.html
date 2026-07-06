@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microbe Adventure - Explore the Tiny World!</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #059669;
+            --secondary-color: #7c3aed;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+            --light-bg: #f8fafc;
+            --dark-text: #1e293b;
+        }
+
+        body {
+            background: linear-gradient(135deg, #059669 0%, #7c3aed 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px 0;
+        }
+
+        .game-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .game-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .game-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .game-content {
+            padding: 20px;
+            min-height: 400px;
+            display: none;
+        }
+
+        .game-preview {
+            padding: 20px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .play-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .play-btn:hover {
+            background: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Microbe Quiz Styles */
+        .question-display {
+            background: #f3f4f6;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.2rem;
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .option-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .option-btn.correct {
+            background: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+        }
+
+        .option-btn.incorrect {
+            background: var(--danger-color);
+            border-color: var(--danger-color);
+            color: white;
+        }
+
+        /* Microbe Match Game Styles */
+        .match-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+
+        .microbe-list, .category-list {
+            width: 45%;
+        }
+
+        .microbe-item, .category-slot {
+            background: #f3f4f6;
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: center;
+            cursor: move;
+            transition: all 0.3s ease;
+        }
+
+        .microbe-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .microbe-item.dragging {
+            opacity: 0.5;
+        }
+
+        .category-slot {
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .category-slot.drag-over {
+            background: #e0f2fe;
+            border-color: var(--info-color);
+        }
+
+        .category-slot.filled {
+            background: #d1fae5;
+            border-color: var(--success-color);
+        }
+
+        /* Infection Race Styles */
+        .race-track {
+            background: linear-gradient(90deg, #e5e7eb 0%, #e5e7eb 48%, #000 48%, #000 52%, #e5e7eb 52%, #e5e7eb 100%);
+            border-radius: 15px;
+            height: 120px;
+            position: relative;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .track-lanes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .lane {
+            flex: 1;
+            border-bottom: 2px dashed #9ca3af;
+            position: relative;
+        }
+
+        .lane:last-child {
+            border-bottom: none;
+        }
+
+        .racer {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: left 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .racer.player {
+            background: var(--primary-color);
+            left: 10px;
+        }
+
+        .racer.computer {
+            background: var(--danger-color);
+            left: 10px;
+        }
+
+        /* Microbe Puzzle Styles */
+        .puzzle-container {
+            width: 300px;
+            height: 300px;
+            margin: 20px auto;
+            position: relative;
+            background: #f3f4f6;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .puzzle-piece {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: #e5e7eb;
+            border: 2px solid #9ca3af;
+            opacity: 0.3;
+            transition: all 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .puzzle-piece.revealed {
+            opacity: 1;
+            background: var(--success-color);
+            border-color: var(--success-color);
+            animation: revealPiece 0.5s ease;
+        }
+
+        @keyframes revealPiece {
+            0% { transform: scale(0) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+
+        /* Lab Experiment Styles */
+        .lab-container {
+            background: #f8fafc;
+            border: 3px solid var(--primary-color);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            position: relative;
+            min-height: 250px;
+        }
+
+        .lab-equipment {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .equipment-item {
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .equipment-item:hover {
+            transform: scale(1.1);
+        }
+
+        .equipment-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .test-tube {
+            width: 60px;
+            height: 120px;
+            background: linear-gradient(to bottom, #dbeafe 0%, #dbeafe 70%, #3b82f6 70%, #3b82f6 100%);
+            border: 3px solid #1e40af;
+            border-radius: 0 0 30px 30px;
+            position: relative;
+            margin: 0 auto;
+            transition: all 0.5s ease;
+        }
+
+        .test-tube.bubbling {
+            animation: bubble 2s infinite;
+        }
+
+        @keyframes bubble {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 20px; }
+        }
+
+        .bubble {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+            animation: rise 2s infinite;
+        }
+
+        @keyframes rise {
+            0% { 
+                bottom: 10px; 
+                opacity: 0;
+                transform: translateX(0);
+            }
+            10% {
+                opacity: 1;
+            }
+            100% { 
+                bottom: 100px; 
+                opacity: 0;
+                transform: translateX(20px);
+            }
+        }
+
+        /* Common Styles */
+        .feedback {
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            animation: slideIn 0.5s ease;
+            font-weight: 500;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feedback.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .feedback.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .feedback.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+
+        .hint-box {
+            background: #fef3c7;
+            border-left: 4px solid var(--warning-color);
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .score-display {
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            display: inline-block;
+            margin: 10px 0;
+        }
+
+        .question-counter {
+            background: var(--secondary-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin: 0 10px;
+        }
+
+        .progress-container {
+            background: #f3f4f6;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 15px 0;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.5s ease;
+            border-radius: 5px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .game-card {
+                margin-bottom: 20px;
+            }
+            
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .match-container {
+                flex-direction: column;
+            }
+            
+            .microbe-list, .category-list {
+                width: 100%;
+            }
+            
+            .puzzle-container {
+                width: 250px;
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container game-container">
+        <h1 class="text-center text-white mb-5">
+            <i class="bi bi-bug"></i> Microbe Adventure - Explore the Tiny World!
+        </h1>
+        
+        <div class="row g-4">
+            <!-- Game 1: Microbe Quiz Click -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game1">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(1)" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <i class="bi bi-virus game-icon"></i>
+                        <h3>Microbe Quiz Click</h3>
+                        <p class="mb-0">Test your microbe knowledge!</p>
+                    </div>
+                    <div class="game-preview" id="preview1">
+                        <p>Answer multiple-choice questions about microorganisms, their benefits, and the diseases they cause.</p>
+                        <button class="play-btn" onclick="startGame(1)">Start Quiz</button>
+                    </div>
+                    <div class="game-content" id="content1">
+                        <div class="question-display" id="quiz-question">
+                            Which microorganism is used in making curd?
+                        </div>
+                        <div class="options-grid" id="quiz-options">
+                            <!-- Options will be generated dynamically -->
+                        </div>
+                        <div id="quiz-feedback"></div>
+                        <div class="text-center">
+                            <div class="score-display">Score: <span id="quiz-score">0</span></div>
+                            <div class="question-counter">Question <span id="quiz-counter">1</span>/10</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 2: Microbe Match Game -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game2">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(2)" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <i class="bi bi-grid-3x3 game-icon"></i>
+                        <h3>Microbe Match Game</h3>
+                        <p class="mb-0">Match microbes to their categories!</p>
+                    </div>
+                    <div class="game-preview" id="preview2">
+                        <p>Drag and drop microorganisms to their correct categories: Bacteria, Virus, Fungi, or Protozoa.</p>
+                        <button class="play-btn" onclick="startGame(2)">Start Matching</button>
+                    </div>
+                    <div class="game-content" id="content2">
+                        <div class="match-container">
+                            <div class="microbe-list">
+                                <h5 class="text-center mb-3">Microorganisms</h5>
+                                <div class="microbe-item" draggable="true" data-microbe="lactobacillus">Lactobacillus</div>
+                                <div class="microbe-item" draggable="true" data-microbe="influenza">Influenza virus</div>
+                                <div class="microbe-item" draggable="true" data-microbe="penicillium">Penicillium</div>
+                                <div class="microbe-item" draggable="true" data-microbe="amoeba">Amoeba</div>
+                                <div class="microbe-item" draggable="true" data-microbe="ecoli">E. coli</div>
+                                <div class="microbe-item" draggable="true" data-microbe="yeast">Yeast</div>
+                            </div>
+                            <div class="category-list">
+                                <h5 class="text-center mb-3">Categories</h5>
+                                <div class="category-slot" data-category="bacteria">Bacteria</div>
+                                <div class="category-slot" data-category="virus">Virus</div>
+                                <div class="category-slot" data-category="fungi">Fungi</div>
+                                <div class="category-slot" data-category="protozoa">Protozoa</div>
+                            </div>
+                        </div>
+                        <div id="match-feedback"></div>
+                        <div class="text-center">
+                            <div class="score-display">Score: <span id="match-score">0</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 3: Infection Race -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game3">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(3)" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <i class="bi bi-speedometer2 game-icon"></i>
+                        <h3>Infection Race</h3>
+                        <p class="mb-0">Race by answering microbe questions!</p>
+                    </div>
+                    <div class="game-preview" id="preview3">
+                        <p>Answer questions about disease-causing microorganisms to move your character forward in the race!</p>
+                        <button class="play-btn" onclick="startGame(3)">Start Race</button>
+                    </div>
+                    <div class="game-content" id="content3">
+                        <div class="race-track">
+                            <div class="track-lanes">
+                                <div class="lane">
+                                    <div class="racer player" id="player-racer">P</div>
+                                </div>
+                                <div class="lane">
+                                    <div class="racer computer" id="computer-racer">C</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="question-display" id="race-question">
+                            Which microorganism causes malaria?
+                        </div>
+                        <div class="options-grid" id="race-options">
+                            <!-- Options will be generated dynamically -->
+                        </div>
+                        <div id="race-feedback"></div>
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <span>Race Progress</span>
+                                <span id="race-progress-text">0%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="race-progress"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 4: Microbe Puzzle -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game4">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(4)" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <i class="bi bi-puzzle game-icon"></i>
+                        <h3>Microbe Puzzle</h3>
+                        <p class="mb-0">Reveal the hidden microbe!</p>
+                    </div>
+                    <div class="game-preview" id="preview4">
+                        <p>Answer questions to reveal pieces of a hidden microbe image piece by piece.</p>
+                        <button class="play-btn" onclick="startGame(4)">Start Puzzle</button>
+                    </div>
+                    <div class="game-content" id="content4">
+                        <div class="puzzle-container" id="puzzle-container">
+                            <!-- Puzzle pieces will be generated dynamically -->
+                        </div>
+                        <div class="question-display" id="puzzle-question">
+                            Which microorganism helps in decomposing dead matter?
+                        </div>
+                        <div class="text-center">
+                            <input type="text" class="answer-input" id="puzzle-answer" placeholder="Answer">
+                            <button class="btn btn-game ms-2" onclick="revealPuzzlePiece()">Reveal</button>
+                        </div>
+                        <div id="puzzle-feedback"></div>
+                        <div class="text-center">
+                            <div class="question-counter">Pieces: <span id="puzzle-counter">0</span>/9</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 5: Lab Experiment Simulation -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game5">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(5)" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <i class="bi bi-cpu game-icon"></i>
+                        <h3>Lab Experiment Simulation</h3>
+                        <p class="mb-0">Virtual microbe experiments!</p>
+                    </div>
+                    <div class="game-preview" id="preview5">
+                        <p>Conduct virtual experiments by mixing microorganisms with substrates and observe the results!</p>
+                        <button class="play-btn" onclick="startGame(5)">Start Experiment</button>
+                    </div>
+                    <div class="game-content" id="content5">
+                        <div class="lab-container">
+                            <div class="lab-equipment">
+                                <div class="equipment-item" onclick="selectMicrobe('yeast')">
+                                    <div class="equipment-icon">🦠</div>
+                                    <div>Yeast</div>
+                                </div>
+                                <div class="equipment-item" onclick="selectSubstrate('sugar')">
+                                    <div class="equipment-icon">🍬</div>
+                                    <div>Sugar</div>
+                                </div>
+                                <div class="test-tube" id="test-tube">
+                                    <div class="bubble" style="left: 20px; animation-delay: 0s;"></div>
+                                    <div class="bubble" style="left: 40px; animation-delay: 0.5s;"></div>
+                                </div>
+                            </div>
+                            <div class="question-display" id="lab-question">
+                                What will be produced when yeast is mixed with sugar?
+                            </div>
+                            <div class="options-grid" id="lab-options">
+                                <!-- Options will be generated dynamically -->
+                            </div>
+                        </div>
+                        <div id="lab-feedback"></div>
+                        <div class="text-center">
+                            <div class="score-display">Score: <span id="lab-score">0</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game Data
+        const quizQuestions = [
+            {
+                question: "Which microorganism is used in making curd?",
+                options: ["Lactobacillus", "Yeast", "E. coli", "Penicillium"],
+                correct: 0,
+                hint: "It's a beneficial bacteria found in fermented foods"
+            },
+            {
+                question: "Which microorganism causes malaria?",
+                options: ["Plasmodium", "Salmonella", "Influenza virus", "Tuberculosis bacteria"],
+                correct: 0,
+                hint: "It's transmitted by female Anopheles mosquitoes"
+            },
+            {
+                question: "Which microorganism is used to produce antibiotics?",
+                options: ["Penicillium", "Rhizobium", "Amoeba", "Yeast"],
+                correct: 0,
+                hint: "It's a type of fungus discovered by Alexander Fleming"
+            },
+            {
+                question: "Which microorganism causes food poisoning?",
+                options: ["Salmonella", "Lactobacillus", "Yeast", "Rhizobium"],
+                correct: 0,
+                hint: "It's commonly found in raw chicken and eggs"
+            },
+            {
+                question: "Which microorganism is used in baking bread?",
+                options: ["Yeast", "Bacteria", "Virus", "Protozoa"],
+                correct: 0,
+                hint: "It produces carbon dioxide that makes bread rise"
+            },
+            {
+                question: "Which microorganism causes common cold?",
+                options: ["Rhinovirus", "Streptococcus", "E. coli", "Penicillium"],
+                correct: 0,
+                hint: "It's a type of virus that affects the respiratory system"
+            },
+            {
+                question: "Which microorganism fixes nitrogen in soil?",
+                options: ["Rhizobium", "Amoeba", "Influenza virus", "Salmonella"],
+                correct: 0,
+                hint: "It forms a symbiotic relationship with legume plants"
+            },
+            {
+                question: "Which microorganism causes tuberculosis?",
+                options: ["Mycobacterium", "Plasmodium", "Rhinovirus", "Yeast"],
+                correct: 0,
+                hint: "It's a type of bacteria that primarily affects the lungs"
+            },
+            {
+                question: "Which microorganism is used in production of alcohol?",
+                options: ["Yeast", "Lactobacillus", "Penicillium", "Rhizobium"],
+                correct: 0,
+                hint: "It performs fermentation to produce ethanol"
+            },
+            {
+                question: "Which microorganism causes amoebic dysentery?",
+                options: ["Entamoeba", "Salmonella", "Influenza virus", "Streptococcus"],
+                correct: 0,
+                hint: "It's a protozoan that infects the intestines"
+            }
+        ];
+
+        const microbeCategories = {
+            lactobacillus: "bacteria",
+            influenza: "virus",
+            penicillium: "fungi",
+            amoeba: "protozoa",
+            ecoli: "bacteria",
+            yeast: "fungi"
+        };
+
+        const raceQuestions = [
+            {
+                question: "Which microorganism causes malaria?",
+                options: ["Plasmodium", "Salmonella", "Influenza virus", "Tuberculosis bacteria"],
+                correct: 0
+            },
+            {
+                question: "Which microorganism causes cholera?",
+                options: ["Vibrio cholerae", "Salmonella typhi", "E. coli", "Shigella"],
+                correct: 0
+            },
+            {
+                question: "Which microorganism causes tuberculosis?",
+                options: ["Mycobacterium", "Streptococcus", "Staphylococcus", "Pneumococcus"],
+                correct: 0
+            },
+            {
+                question: "Which microorganism causes common cold?",
+                options: ["Rhinovirus", "Coronavirus", "Adenovirus", "Enterovirus"],
+                correct: 0
+            },
+            {
+                question: "Which microorganism causes typhoid?",
+                options: ["Salmonella typhi", "Vibrio cholerae", "Shigella", "E. coli"],
+                correct: 0
+            }
+        ];
+
+        const puzzleQuestions = [
+            {
+                question: "Which microorganism helps in decomposing dead matter?",
+                answer: "bacteria",
+                hint: "They are nature's recyclers"
+            },
+            {
+                question: "Which microorganism is used in making bread rise?",
+                answer: "yeast",
+                hint: "It produces carbon dioxide"
+            },
+            {
+                question: "Which microorganism causes COVID-19?",
+                answer: "virus",
+                hint: "It's a type of coronavirus"
+            },
+            {
+                question: "Which microorganism forms lichens with algae?",
+                answer: "fungi",
+                hint: "It's a symbiotic relationship"
+            },
+            {
+                question: "Which microorganism causes malaria?",
+                answer: "protozoa",
+                hint: "It's transmitted by mosquitoes"
+            },
+            {
+                question: "Which microorganism is used in making yogurt?",
+                answer: "bacteria",
+                hint: "It converts milk sugar to lactic acid"
+            },
+            {
+                question: "Which microorganism causes athlete's foot?",
+                answer: "fungi",
+                hint: "It grows in warm, moist environments"
+            },
+            {
+                question: "Which microorganism causes amoebic dysentery?",
+                answer: "protozoa",
+                hint: "It's found in contaminated water"
+            },
+            {
+                question: "Which microorganism is used in vaccine production?",
+                answer: "virus",
+                hint: "Weakened or killed forms are used"
+            }
+        ];
+
+        const labExperiments = [
+            {
+                question: "What will be produced when yeast is mixed with sugar?",
+                options: ["Carbon dioxide and alcohol", "Oxygen and water", "Methane and hydrogen", "Nitrogen and carbon monoxide"],
+                correct: 0,
+                animation: "bubbling"
+            },
+            {
+                question: "What happens when bacteria break down organic matter?",
+                options: ["Decomposition and nutrient release", "Photosynthesis", "Nitrogen fixation", "Alcohol production"],
+                correct: 0,
+                animation: "decomposition"
+            },
+            {
+                question: "What do viruses need to reproduce?",
+                options: ["Host cells", "Sugar and water", "Sunlight", "Oxygen"],
+                correct: 0,
+                animation: "infection"
+            },
+            {
+                question: "What do fungi produce during fermentation?",
+                options: ["Alcohol and carbon dioxide", "Oxygen", "Methane", "Nitrogen"],
+                correct: 0,
+                animation: "fermentation"
+            },
+            {
+                question: "What do protozoa use for movement?",
+                options: ["Pseudopodia, cilia, or flagella", "Cell walls", "Chlorophyll", "Spores"],
+                correct: 0,
+                animation: "movement"
+            }
+        ];
+
+        // Game States
+        let currentQuizQuestion = 0;
+        let quizScore = 0;
+        let matchScore = 0;
+        let currentRaceQuestion = 0;
+        let playerPosition = 10;
+        let computerPosition = 10;
+        let computerInterval;
+        let currentPuzzlePiece = 0;
+        let puzzleRevealed = 0;
+        let selectedMicrobe = null;
+        let selectedSubstrate = null;
+        let labScore = 0;
+        let currentLabExperiment = 0;
+
+        // Initialize Games
+        function initGames() {
+            // Initialize puzzle pieces
+            generatePuzzlePieces();
+        }
+
+        // Game Navigation
+        function startGame(gameNum) {
+            document.getElementById(`preview${gameNum}`).style.display = 'none';
+            document.getElementById(`content${gameNum}`).style.display = 'block';
+            document.querySelector(`#game${gameNum} .back-btn`).style.display = 'block';
+            
+            // Initialize specific game
+            switch(gameNum) {
+                case 1:
+                    initQuizGame();
+                    break;
+                case 2:
+                    initMatchGame();
+                    break;
+                case 3:
+                    initRaceGame();
+                    break;
+                case 4:
+                    initPuzzleGame();
+                    break;
+                case 5:
+                    initLabGame();
+                    break;
+            }
+        }
+
+        function showPreview(gameNum) {
+            document.getElementById(`preview${gameNum}`).style.display = 'flex';
+            document.getElementById(`content${gameNum}`).style.display = 'none';
+            document.querySelector(`#game${gameNum} .back-btn`).style.display = 'none';
+            
+            // Clean up intervals
+            if (gameNum === 3 && computerInterval) {
+                clearInterval(computerInterval);
+            }
+        }
+
+        // Game 1: Microbe Quiz Click
+        function initQuizGame() {
+            currentQuizQuestion = 0;
+            quizScore = 0;
+            updateQuizScore();
+            loadQuizQuestion();
+        }
+
+        function loadQuizQuestion() {
+            if (currentQuizQuestion >= quizQuestions.length) {
+                showFeedback('quiz-feedback', '🎉 Quiz Complete! Final Score: ' + quizScore, 'success');
+                return;
+            }
+            
+            const question = quizQuestions[currentQuizQuestion];
+            document.getElementById('quiz-question').textContent = question.question;
+            document.getElementById('quiz-counter').textContent = currentQuizQuestion + 1;
+            
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => checkQuizAnswer(index);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkQuizAnswer(selectedIndex) {
+            const question = quizQuestions[currentQuizQuestion];
+            const options = document.querySelectorAll('#quiz-options .option-btn');
+            
+            options.forEach(btn => btn.disabled = true);
+            
+            if (selectedIndex === question.correct) {
+                options[selectedIndex].classList.add('correct');
+                showFeedback('quiz-feedback', '✅ Correct! +10 points', 'success');
+                quizScore += 10;
+                updateQuizScore();
+                
+                currentQuizQuestion++;
+                setTimeout(() => {
+                    loadQuizQuestion();
+                }, 1500);
+            } else {
+                options[selectedIndex].classList.add('incorrect');
+                options[question.correct].classList.add('correct');
+                showFeedback('quiz-feedback', '❌ Incorrect!', 'error');
+                
+                // Show hint
+                setTimeout(() => {
+                    const hintBox = document.createElement('div');
+                    hintBox.className = 'hint-box';
+                    hintBox.innerHTML = '<i class="bi bi-lightbulb"></i> Hint: ' + question.hint;
+                    document.getElementById('quiz-feedback').appendChild(hintBox);
+                }, 500);
+                
+                setTimeout(() => {
+                    currentQuizQuestion++;
+                    loadQuizQuestion();
+                }, 3000);
+            }
+        }
+
+        function updateQuizScore() {
+            document.getElementById('quiz-score').textContent = quizScore;
+        }
+
+        // Game 2: Microbe Match Game
+        function initMatchGame() {
+            matchScore = 0;
+            updateMatchScore();
+            setupMatchDragDrop();
+        }
+
+        function setupMatchDragDrop() {
+            const microbeItems = document.querySelectorAll('.microbe-item');
+            const categorySlots = document.querySelectorAll('.category-slot');
+            
+            microbeItems.forEach(item => {
+                item.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text', item.dataset.microbe);
+                    item.classList.add('dragging');
+                });
+                
+                item.addEventListener('dragend', () => {
+                    item.classList.remove('dragging');
+                });
+            });
+            
+            categorySlots.forEach(slot => {
+                slot.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    slot.classList.add('drag-over');
+                });
+                
+                slot.addEventListener('dragleave', () => {
+                    slot.classList.remove('drag-over');
+                });
+                
+                slot.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    slot.classList.remove('drag-over');
+                    
+                    const microbe = e.dataTransfer.getData('text');
+                    const category = slot.dataset.category;
+                    
+                    if (microbeCategories[microbe] === category) {
+                        slot.appendChild(document.querySelector(`[data-microbe="${microbe}"]`));
+                        slot.classList.add('filled');
+                        matchScore += 10;
+                        updateMatchScore();
+                        showFeedback('match-feedback', '✅ Correct match! +10 points', 'success');
+                        
+                        // Check if all microbes are matched
+                        const filledSlots = document.querySelectorAll('.category-slot.filled');
+                        if (filledSlots.length === microbeItems.length) {
+                            setTimeout(() => {
+                                showFeedback('match-feedback', '🎉 All microbes matched! Perfect!', 'success');
+                            }, 1000);
+                        }
+                    } else {
+                        showFeedback('match-feedback', '❌ Wrong category! Try again.', 'error');
+                    }
+                });
+            });
+        }
+
+        function updateMatchScore() {
+            document.getElementById('match-score').textContent = matchScore;
+        }
+
+        // Game 3: Infection Race
+        function initRaceGame() {
+            currentRaceQuestion = 0;
+            playerPosition = 10;
+            computerPosition = 10;
+            updateRacerPositions();
+            loadRaceQuestion();
+            startComputerRace();
+        }
+
+        function loadRaceQuestion() {
+            if (currentRaceQuestion >= raceQuestions.length) {
+                showFeedback('race-feedback', '🏁 Race Complete!', 'info');
+                clearInterval(computerInterval);
+                return;
+            }
+            
+            const question = raceQuestions[currentRaceQuestion];
+            document.getElementById('race-question').textContent = question.question;
+            
+            const optionsContainer = document.getElementById('race-options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => checkRaceAnswer(index);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkRaceAnswer(selectedIndex) {
+            const question = raceQuestions[currentRaceQuestion];
+            const options = document.querySelectorAll('#race-options .option-btn');
+            
+            options.forEach(btn => btn.disabled = true);
+            
+            if (selectedIndex === question.correct) {
+                options[selectedIndex].classList.add('correct');
+                showFeedback('race-feedback', '✅ Correct! Move forward!', 'success');
+                
+                // Move player forward
+                playerPosition = Math.min(playerPosition + 20, 85);
+                updateRacerPositions();
+                
+                currentRaceQuestion++;
+                updateRaceProgress();
+                
+                setTimeout(() => {
+                    loadRaceQuestion();
+                }, 1500);
+            } else {
+                options[selectedIndex].classList.add('incorrect');
+                showFeedback('race-feedback', '❌ Incorrect. Try again!', 'error');
+                
+                setTimeout(() => {
+                    options.forEach(btn => {
+                        btn.disabled = false;
+                        btn.classList.remove('incorrect');
+                    });
+                }, 2000);
+            }
+            
+            // Check if player won
+            if (playerPosition >= 85) {
+                showFeedback('race-feedback', '🏆 You won the race!', 'success');
+                clearInterval(computerInterval);
+            }
+        }
+
+        function startComputerRace() {
+            computerInterval = setInterval(() => {
+                if (computerPosition < 85) {
+                    computerPosition += Math.random() * 15;
+                    updateRacerPositions();
+                    
+                    // Check if computer won
+                    if (computerPosition >= 85) {
+                        showFeedback('race-feedback', '💻 Computer won the race!', 'error');
+                        clearInterval(computerInterval);
+                    }
+                }
+            }, 3000);
+        }
+
+        function updateRacerPositions() {
+            document.getElementById('player-racer').style.left = playerPosition + '%';
+            document.getElementById('computer-racer').style.left = computerPosition + '%';
+        }
+
+        function updateRaceProgress() {
+            const progress = (currentRaceQuestion / raceQuestions.length) * 100;
+            document.getElementById('race-progress').style.width = progress + '%';
+            document.getElementById('race-progress-text').textContent = `${Math.round(progress)}%`;
+        }
+
+        // Game 4: Microbe Puzzle
+        function generatePuzzlePieces() {
+            const container = document.getElementById('puzzle-container');
+            container.innerHTML = '';
+            
+            // Create a 3x3 grid of pieces
+            for (let i = 0; i < 9; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'puzzle-piece';
+                piece.id = `puzzle-piece-${i}`;
+                
+                // Position pieces in a grid
+                const row = Math.floor(i / 3);
+                const col = i % 3;
+                piece.style.left = (col * 100) + 'px';
+                piece.style.top = (row * 100) + 'px';
+                
+                container.appendChild(piece);
+            }
+        }
+
+        function initPuzzleGame() {
+            currentPuzzlePiece = 0;
+            puzzleRevealed = 0;
+            loadPuzzleQuestion();
+        }
+
+        function loadPuzzleQuestion() {
+            if (currentPuzzlePiece >= puzzleQuestions.length) {
+                showFeedback('puzzle-feedback', '🎉 Puzzle completely revealed!', 'success');
+                return;
+            }
+            
+            const question = puzzleQuestions[currentPuzzlePiece];
+            document.getElementById('puzzle-question').textContent = question.question;
+            document.getElementById('puzzle-answer').value = '';
+            document.getElementById('puzzle-counter').textContent = puzzleRevealed;
+        }
+
+        function revealPuzzlePiece() {
+            const question = puzzleQuestions[currentPuzzlePiece];
+            const userAnswer = document.getElementById('puzzle-answer').value.toLowerCase().trim();
+            
+            if (userAnswer === question.answer) {
+                showFeedback('puzzle-feedback', '✅ Correct! Piece revealed!', 'success');
+                
+                // Reveal puzzle piece
+                const piece = document.getElementById(`puzzle-piece-${currentPuzzlePiece}`);
+                piece.classList.add('revealed');
+                
+                puzzleRevealed++;
+                currentPuzzlePiece++;
+                
+                if (puzzleRevealed === puzzleQuestions.length) {
+                    setTimeout(() => {
+                        showFeedback('puzzle-feedback', '🎉 All pieces revealed! You win!', 'success');
+                    }, 1000);
+                } else {
+                    setTimeout(() => {
+                        loadPuzzleQuestion();
+                    }, 1000);
+                }
+            } else {
+                showFeedback('puzzle-feedback', '❌ Incorrect!', 'error');
+                
+                // Show hint
+                setTimeout(() => {
+                    const hintBox = document.createElement('div');
+                    hintBox.className = 'hint-box';
+                    hintBox.innerHTML = '<i class="bi bi-lightbulb"></i> Hint: ' + question.hint;
+                    document.getElementById('puzzle-feedback').appendChild(hintBox);
+                }, 500);
+            }
+        }
+
+        // Game 5: Lab Experiment Simulation
+        function initLabGame() {
+            selectedMicrobe = null;
+            selectedSubstrate = null;
+            labScore = 0;
+            currentLabExperiment = 0;
+            updateLabScore();
+            loadLabExperiment();
+        }
+
+        function selectMicrobe(microbe) {
+            selectedMicrobe = microbe;
+            showFeedback('lab-feedback', `Selected: ${microbe}`, 'info');
+        }
+
+        function selectSubstrate(substrate) {
+            selectedSubstrate = substrate;
+            showFeedback('lab-feedback', `Selected: ${substrate}`, 'info');
+        }
+
+        function loadLabExperiment() {
+            if (currentLabExperiment >= labExperiments.length) {
+                showFeedback('lab-feedback', '🧪 All experiments completed!', 'success');
+                return;
+            }
+            
+            const experiment = labExperiments[currentLabExperiment];
+            document.getElementById('lab-question').textContent = experiment.question;
+            
+            const optionsContainer = document.getElementById('lab-options');
+            optionsContainer.innerHTML = '';
+            
+            experiment.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => checkLabAnswer(index);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkLabAnswer(selectedIndex) {
+            const experiment = labExperiments[currentLabExperiment];
+            const options = document.querySelectorAll('#lab-options .option-btn');
+            
+            options.forEach(btn => btn.disabled = true);
+            
+            if (selectedIndex === experiment.correct) {
+                options[selectedIndex].classList.add('correct');
+                showFeedback('lab-feedback', '✅ Correct! +10 points', 'success');
+                labScore += 10;
+                updateLabScore();
+                
+                // Show animation
+                if (experiment.animation === 'bubbling') {
+                    const testTube = document.getElementById('test-tube');
+                    testTube.classList.add('bubbling');
+                }
+                
+                currentLabExperiment++;
+                setTimeout(() => {
+                    loadLabExperiment();
+                }, 2000);
+            } else {
+                options[selectedIndex].classList.add('incorrect');
+                showFeedback('lab-feedback', '❌ Incorrect. Try again!', 'error');
+                
+                setTimeout(() => {
+                    options.forEach(btn => {
+                        btn.disabled = false;
+                        btn.classList.remove('incorrect');
+                    });
+                }, 2000);
+            }
+        }
+
+        function updateLabScore() {
+            document.getElementById('lab-score').textContent = labScore;
+        }
+
+        // Utility Functions
+        function showFeedback(elementId, message, type) {
+            const feedback = document.getElementById(elementId);
+            feedback.innerHTML = `<div class="feedback ${type}">${message}</div>`;
+            setTimeout(() => {
+                feedback.innerHTML = '';
+            }, 3000);
+        }
+
+        // Initialize all games on load
+        window.onload = initGames;
+    </script>
+</body>
+</html>

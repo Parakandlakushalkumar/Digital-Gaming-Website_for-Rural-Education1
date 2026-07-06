@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Geometry Games for Kids</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .games-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+        }
+
+        .game-card:nth-child(1)::before { background: linear-gradient(90deg, #fa709a 0%, #fee140 100%); }
+        .game-card:nth-child(2)::before { background: linear-gradient(90deg, #30cfd0 0%, #330867 100%); }
+        .game-card:nth-child(3)::before { background: linear-gradient(90deg, #a8edea 0%, #fed6e3 100%); }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .game-icon {
+            font-size: 4em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .game-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .game-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .play-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .play-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .game-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 1000;
+            overflow: auto;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: #ff5252;
+            transform: scale(1.05);
+        }
+
+        .success-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 5em;
+            z-index: 2000;
+            animation: successPop 1s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes successPop {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
+
+        .particle {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            z-index: 1500;
+            animation: particleFall 1.5s ease-out forwards;
+        }
+
+        @keyframes particleFall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(150px) rotate(360deg); opacity: 0; }
+        }
+
+        /* Shape Matcher Styles */
+        #shapeMatcherGame {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            padding: 60px 20px;
+        }
+
+        .shape-matcher-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .shapes-title {
+            text-align: center;
+            font-size: 1.8em;
+            margin-bottom: 30px;
+            color: #333;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .shapes-area {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 40px 0;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .shapes-panel {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            min-width: 300px;
+        }
+
+        .panel-title {
+            text-align: center;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: #495057;
+            font-weight: bold;
+        }
+
+        .shapes-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            justify-items: center;
+        }
+
+        .shape {
+            width: 90px;
+            height: 90px;
+            cursor: grab;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shape::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 100%);
+            border-radius: 10px;
+        }
+
+        .shape:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .shape.dragging {
+            cursor: grabbing;
+            opacity: 0.6;
+            transform: scale(0.9);
+        }
+
+        .circle {
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+        }
+
+        .triangle {
+            width: 0;
+            height: 0;
+            border-left: 45px solid transparent;
+            border-right: 45px solid transparent;
+            border-bottom: 78px solid #4ecdc4;
+            background: transparent;
+            border-radius: 0;
+        }
+
+        .square {
+            background: linear-gradient(135deg, #ffe66d 0%, #ffd93d 100%);
+        }
+
+        .rectangle {
+            width: 110px;
+            height: 70px;
+            background: linear-gradient(135deg, #a8e6cf 0%, #7fcdbb 100%);
+        }
+
+        .outlines-panel {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            min-width: 300px;
+            border: 2px dashed #dee2e6;
+        }
+
+        .outlines-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            justify-items: center;
+        }
+
+        .outline {
+            width: 100px;
+            height: 100px;
+            border: 4px dashed #adb5bd;
+            position: relative;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            background: rgba(248, 249, 250, 0.5);
+        }
+
+        .outline.circle {
+            border-radius: 50%;
+        }
+
+        .outline.triangle {
+            width: 0;
+            height: 0;
+            border-left: 50px solid transparent;
+            border-right: 50px solid transparent;
+            border-bottom: 87px solid #adb5bd;
+            background: transparent;
+            border-radius: 0;
+        }
+
+        .outline.hover {
+            border-color: #28a745;
+            background: rgba(40, 167, 69, 0.1);
+            transform: scale(1.05);
+        }
+
+        .outline.filled {
+            border: none;
+            background: transparent;
+        }
+
+        .outline .shape-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.9em;
+            color: #6c757d;
+            font-weight: bold;
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 30px 0;
+            font-size: 1.3em;
+            display: none;
+            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
+        }
+
+        /* Angle Guesser Styles */
+        #angleGuesserGame {
+            background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+            padding: 60px 20px;
+        }
+
+        .angle-guesser-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .angle-title {
+            text-align: center;
+            font-size: 1.8em;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .angle-display {
+            height: 350px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 40px 0;
+            position: relative;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .angle-svg {
+            width: 350px;
+            height: 350px;
+        }
+
+        .angle-controls {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .angle-button {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border: 3px solid #333;
+            padding: 18px 35px;
+            border-radius: 15px;
+            font-size: 1.3em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .angle-button:hover {
+            background: linear-gradient(135deg, #333 0%, #495057 100%);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        /* Perimeter Puzzle Styles */
+        #perimeterPuzzleGame {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 60px 20px;
+        }
+
+        .perimeter-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .perimeter-title {
+            text-align: center;
+            font-size: 1.8em;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .shape-display {
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 40px 0;
+            position: relative;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .rectangle-shape {
+            width: 240px;
+            height: 160px;
+            border: 4px solid #333;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.4em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .dimension-label {
+            position: absolute;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+            font-size: 1.1em;
+        }
+
+        .width-label {
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .height-label {
+            right: -80px;
+            top: 50%;
+            transform: translateY(-50%) rotate(90deg);
+        }
+
+        .answer-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .answer-input {
+            padding: 18px;
+            border: 3px solid #ddd;
+            border-radius: 12px;
+            font-size: 1.3em;
+            width: 180px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .answer-input:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+        }
+
+        .submit-button {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 18px 35px;
+            border-radius: 12px;
+            font-size: 1.3em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(40,167,69,0.3);
+        }
+
+        .submit-button:hover {
+            background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(40,167,69,0.4);
+        }
+
+        .feedback {
+            text-align: center;
+            font-size: 1.4em;
+            margin: 25px 0;
+            font-weight: bold;
+            min-height: 35px;
+            padding: 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .feedback.correct {
+            color: #155724;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            box-shadow: 0 4px 12px rgba(40,167,69,0.2);
+        }
+
+        .feedback.incorrect {
+            color: #721c24;
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            box-shadow: 0 4px 12px rgba(220,53,69,0.2);
+        }
+
+        .next-button {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 30px auto;
+            display: none;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,123,255,0.3);
+        }
+
+        .next-button:hover {
+            background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,123,255,0.4);
+        }
+
+        .score-display {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 20px 0;
+            color: #495057;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .games-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-card {
+                padding: 20px;
+            }
+            
+            .shapes-area {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .shapes-panel, .outlines-panel {
+                min-width: 100%;
+                margin: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔺 Simple Geometry Games 🔺</h1>
+        <p>Learn shapes, angles, and perimeter calculations in a fun way!</p>
+    </div>
+
+    <div class="games-container">
+        <div class="game-card">
+            <div class="game-icon">🔵</div>
+            <h2 class="game-title">Shape Matcher</h2>
+            <p class="game-description">Drag shapes to their matching outlines. Learn to recognize circles, triangles, squares, and rectangles!</p>
+            <button class="play-button" onclick="openGame('shapeMatcher')">Play Now</button>
+        </div>
+
+        <div class="game-card">
+            <div class="game-icon">📐</div>
+            <h2 class="game-title">Angle Guesser</h2>
+            <p class="game-description">Look at different angles and guess if they're acute, right, or obtuse. Master angle types!</p>
+            <button class="play-button" onclick="openGame('angleGuesser')">Play Now</button>
+        </div>
+
+        <div class="game-card">
+            <div class="game-icon">📏</div>
+            <h2 class="game-title">Perimeter Puzzle</h2>
+            <p class="game-description">Calculate the perimeter of rectangles and squares. Practice your measurement skills!</p>
+            <button class="play-button" onclick="openGame('perimeterPuzzle')">Play Now</button>
+        </div>
+    </div>
+
+    <!-- Shape Matcher Game -->
+    <div id="shapeMatcherGame" class="game-screen">
+        <button class="back-button" onclick="closeGame()">← Back to Games</button>
+        <h2 style="text-align: center; color: white; margin-bottom: 30px; font-size: 2.5em;">Shape Matcher</h2>
+        
+        <div class="shape-matcher-container">
+            <h3 class="shapes-title">🎯 Drag each shape to its matching outline!</h3>
+            
+            <div class="shapes-area">
+                <div class="shapes-panel">
+                    <h4 class="panel-title">🎨 Shapes</h4>
+                    <div class="shapes-grid" id="shapesContainer">
+                        <!-- Shapes will be generated here -->
+                    </div>
+                </div>
+                
+                <div class="outlines-panel">
+                    <h4 class="panel-title">📋 Outlines</h4>
+                    <div class="outlines-grid" id="outlinesContainer">
+                        <!-- Outlines will be generated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="success-message" id="shapeMatcherSuccess">
+                🎉 Fantastic! You matched all the shapes perfectly! 🎉
+            </div>
+        </div>
+    </div>
+
+    <!-- Angle Guesser Game -->
+    <div id="angleGuesserGame" class="game-screen">
+        <button class="back-button" onclick="closeGame()">← Back to Games</button>
+        <h2 style="text-align: center; color: white; margin-bottom: 30px; font-size: 2.5em;">Angle Guesser</h2>
+        
+        <div class="angle-guesser-container">
+            <h3 class="angle-title">📐 Is this angle acute, right, or obtuse?</h3>
+            
+            <div class="angle-display">
+                <svg class="angle-svg" id="angleSvg" viewBox="0 0 350 350">
+                    <!-- Angle will be drawn here -->
+                </svg>
+            </div>
+            
+            <div class="score-display" id="angleScore">Score: 0/5</div>
+            
+            <div class="angle-controls">
+                <button class="angle-button" onclick="guessAngle('acute')">🔺 Acute</button>
+                <button class="angle-button" onclick="guessAngle('right')">📐 Right</button>
+                <button class="angle-button" onclick="guessAngle('obtuse')">🔻 Obtuse</button>
+            </div>
+            
+            <div class="feedback" id="angleFeedback"></div>
+            
+            <button class="next-button" id="angleNextButton" onclick="nextAngle()">➡️ Next Angle</button>
+            
+            <div class="success-message" id="angleGuesserSuccess">
+                🎯 Outstanding! You've mastered all the angles! 🎯
+            </div>
+        </div>
+    </div>
+
+    <!-- Perimeter Puzzle Game -->
+    <div id="perimeterPuzzleGame" class="game-screen">
+        <button class="back-button" onclick="closeGame()">← Back to Games</button>
+        <h2 style="text-align: center; color: white; margin-bottom: 30px; font-size: 2.5em;">Perimeter Puzzle</h2>
+        
+        <div class="perimeter-container">
+            <h3 class="perimeter-title">📏 Calculate the perimeter of this shape!</h3>
+            
+            <div class="shape-display" id="shapeDisplay">
+                <!-- Shape will be displayed here -->
+            </div>
+            
+            <div class="score-display" id="perimeterScore">Score: 0/5</div>
+            
+            <div class="answer-container">
+                <input type="number" class="answer-input" id="perimeterInput" placeholder="Enter perimeter">
+                <button class="submit-button" onclick="checkPerimeter()">✓ Submit</button>
+            </div>
+            
+            <div class="feedback" id="perimeterFeedback"></div>
+            
+            <button class="next-button" id="perimeterNextButton" onclick="nextPerimeter()">➡️ Next Puzzle</button>
+            
+            <div class="success-message" id="perimeterPuzzleSuccess">
+                📏 Excellent! You solved all the perimeter puzzles! 📏
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game Management
+        function openGame(gameId) {
+            document.getElementById(gameId + 'Game').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            // Initialize game-specific functionality
+            if (gameId === 'shapeMatcher') initShapeMatcher();
+            if (gameId === 'angleGuesser') initAngleGuesser();
+            if (gameId === 'perimeterPuzzle') initPerimeterPuzzle();
+        }
+
+        function closeGame() {
+            const gameScreens = document.querySelectorAll('.game-screen');
+            gameScreens.forEach(screen => {
+                screen.style.display = 'none';
+            });
+            document.body.style.overflow = 'auto';
+        }
+
+        // Utility function to create particles
+        function createParticles(x, y, count = 10) {
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                document.body.appendChild(particle);
+                
+                setTimeout(() => {
+                    particle.remove();
+                }, 1500);
+            }
+        }
+
+        // Utility function to show success animation
+        function showSuccessAnimation(emoji = '🎉') {
+            const successEl = document.createElement('div');
+            successEl.className = 'success-animation';
+            successEl.textContent = emoji;
+            document.body.appendChild(successEl);
+            
+            setTimeout(() => {
+                successEl.remove();
+            }, 1000);
+        }
+
+        // Shape Matcher Game Logic
+        function initShapeMatcher() {
+            const shapesContainer = document.getElementById('shapesContainer');
+            const outlinesContainer = document.getElementById('outlinesContainer');
+            const successMessage = document.getElementById('shapeMatcherSuccess');
+            
+            // Reset
+            shapesContainer.innerHTML = '';
+            outlinesContainer.innerHTML = '';
+            successMessage.style.display = 'none';
+            
+            // Create shapes with enhanced styling
+            const shapeTypes = [
+                { type: 'circle', icon: '🔵', label: 'Circle' },
+                { type: 'triangle', icon: '🔺', label: 'Triangle' },
+                { type: 'square', icon: '🟨', label: 'Square' },
+                { type: 'rectangle', icon: '🟩', label: 'Rectangle' }
+            ];
+            
+            // Shuffle shapes
+            const shuffledShapes = [...shapeTypes].sort(() => Math.random() - 0.5);
+            
+            shuffledShapes.forEach((shapeData, index) => {
+                const shapeWrapper = document.createElement('div');
+                shapeWrapper.style.position = 'relative';
+                
+                const shape = document.createElement('div');
+                shape.className = `shape ${shapeData.type}`;
+                shape.draggable = true;
+                shape.dataset.shape = shapeData.type;
+                
+                // Add icon overlay for better visual appeal
+                const icon = document.createElement('div');
+                icon.style.position = 'absolute';
+                icon.style.top = '50%';
+                icon.style.left = '50%';
+                icon.style.transform = 'translate(-50%, -50%)';
+                icon.style.fontSize = '1.5em';
+                icon.style.zIndex = '2';
+                icon.textContent = shapeData.icon;
+                
+                shape.appendChild(icon);
+                shapeWrapper.appendChild(shape);
+                shapesContainer.appendChild(shapeWrapper);
+            });
+            
+            // Create outlines (in original order)
+            shapeTypes.forEach((shapeData, index) => {
+                const outlineWrapper = document.createElement('div');
+                outlineWrapper.style.position = 'relative';
+                
+                const outline = document.createElement('div');
+                outline.className = `outline ${shapeData.type}`;
+                outline.dataset.shape = shapeData.type;
+                
+                // Add label
+                const label = document.createElement('div');
+                label.className = 'shape-label';
+                label.textContent = shapeData.label;
+                
+                outline.appendChild(label);
+                outlineWrapper.appendChild(outline);
+                outlinesContainer.appendChild(outlineWrapper);
+            });
+            
+            // Initialize drag and drop with enhanced feedback
+            const shapes = document.querySelectorAll('.shape');
+            const outlines = document.querySelectorAll('.outline');
+            let draggedShape = null;
+            
+            shapes.forEach(shape => {
+                shape.addEventListener('dragstart', (e) => {
+                    draggedShape = e.target.closest('.shape');
+                    draggedShape.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'copy';
+                });
+                
+                shape.addEventListener('dragend', (e) => {
+                    draggedShape.classList.remove('dragging');
+                });
+            });
+            
+            outlines.forEach(outline => {
+                outline.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'copy';
+                    outline.classList.add('hover');
+                });
+                
+                outline.addEventListener('dragleave', () => {
+                    outline.classList.remove('hover');
+                });
+                
+                outline.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    outline.classList.remove('hover');
+                    
+                    if (draggedShape && draggedShape.dataset.shape === outline.dataset.shape) {
+                        // Create a copy of the shape in the outline
+                        const shapeCopy = draggedShape.cloneNode(true);
+                        shapeCopy.draggable = false;
+                        shapeCopy.style.position = 'absolute';
+                        shapeCopy.style.top = '0';
+                        shapeCopy.style.left = '0';
+                        shapeCopy.style.width = '100%';
+                        shapeCopy.style.height = '100%';
+                        shapeCopy.style.margin = '0';
+                        shapeCopy.style.transform = 'none';
+                        
+                        // Adjust specific shapes
+                        if (shapeCopy.dataset.shape === 'triangle') {
+                            shapeCopy.style.borderLeftWidth = '50px';
+                            shapeCopy.style.borderRightWidth = '50px';
+                            shapeCopy.style.borderBottomWidth = '87px';
+                        } else if (shapeCopy.dataset.shape === 'rectangle') {
+                            shapeCopy.style.width = '110px';
+                            shapeCopy.style.height = '70px';
+                        }
+                        
+                        // Clear outline and add shape
+                        const label = outline.querySelector('.shape-label');
+                        outline.innerHTML = '';
+                        outline.appendChild(shapeCopy);
+                        outline.appendChild(label);
+                        outline.classList.add('filled');
+                        
+                        // Hide the original shape with animation
+                        draggedShape.style.opacity = '0';
+                        draggedShape.style.transform = 'scale(0)';
+                        setTimeout(() => {
+                            draggedShape.style.display = 'none';
+                        }, 300);
+                        
+                        // Create particles effect
+                        const rect = outline.getBoundingClientRect();
+                        createParticles(rect.left + rect.width/2, rect.top + rect.height/2, 8);
+                        
+                        // Check if all shapes are matched
+                        checkShapeMatcherComplete();
+                    }
+                });
+            });
+        }
+
+        function checkShapeMatcherComplete() {
+            const filledOutlines = document.querySelectorAll('.outline.filled');
+            const successMessage = document.getElementById('shapeMatcherSuccess');
+            
+            if (filledOutlines.length === 4) {
+                successMessage.style.display = 'block';
+                showSuccessAnimation('🔵');
+                createParticles(window.innerWidth / 2, window.innerHeight / 2, 20);
+            }
+        }
+
+        // Angle Guesser Game Logic
+        let currentAngleType = '';
+        let correctAnswers = 0;
+        let totalQuestions = 5;
+
+        function initAngleGuesser() {
+            const angleSvg = document.getElementById('angleSvg');
+            const feedback = document.getElementById('angleFeedback');
+            const nextButton = document.getElementById('angleNextButton');
+            const scoreDisplay = document.getElementById('angleScore');
+            const successMessage = document.getElementById('angleGuesserSuccess');
+            
+            // Reset
+            feedback.textContent = '';
+            feedback.className = 'feedback';
+            nextButton.style.display = 'none';
+            successMessage.style.display = 'none';
+            correctAnswers = 0;
+            scoreDisplay.textContent = 'Score: 0/5';
+            
+            // Generate first angle
+            nextAngle();
+        }
+
+        function nextAngle() {
+            const angleSvg = document.getElementById('angleSvg');
+            const feedback = document.getElementById('angleFeedback');
+            const nextButton = document.getElementById('angleNextButton');
+            const scoreDisplay = document.getElementById('angleScore');
+            
+            // Hide next button and clear feedback
+            nextButton.style.display = 'none';
+            feedback.textContent = '';
+            feedback.className = 'feedback';
+            
+            // Generate random angle
+            const angleTypes = ['acute', 'right', 'obtuse'];
+            currentAngleType = angleTypes[Math.floor(Math.random() * angleTypes.length)];
+            
+            let angle = 0;
+            let angleColor = '#333';
+            
+            if (currentAngleType === 'acute') {
+                angle = Math.floor(Math.random() * 60) + 10; // 10-70 degrees
+                angleColor = '#28a745';
+            } else if (currentAngleType === 'right') {
+                angle = 90; // Exactly 90 degrees
+                angleColor = '#007bff';
+            } else if (currentAngleType === 'obtuse') {
+                angle = Math.floor(Math.random() * 60) + 100; // 100-160 degrees
+                angleColor = '#dc3545';
+            }
+            
+            // Draw angle with proper SVG
+            const centerX = 175;
+            const centerY = 250;
+            const radius = 100;
+            
+            // Calculate end point
+            const angleRad = (angle - 90) * Math.PI / 180;
+            const endX = centerX + radius * Math.cos(angleRad);
+            const endY = centerY + radius * Math.sin(angleRad);
+            
+            angleSvg.innerHTML = `
+                <!-- Base line -->
+                <line x1="${centerX}" y1="${centerY}" x2="${centerX}" y2="${centerY - radius}" 
+                      stroke="#333" stroke-width="4" stroke-linecap="round"/>
+                
+                <!-- Angle line -->
+                <line x1="${centerX}" y1="${centerY}" x2="${endX}" y2="${endY}" 
+                      stroke="${angleColor}" stroke-width="4" stroke-linecap="round"/>
+                
+                <!-- Angle arc -->
+                <path d="M ${centerX} ${centerY - 20} A 20 20 0 0 1 ${centerX + 20 * Math.cos(angleRad)} ${centerY + 20 * Math.sin(angleRad)}" 
+                      fill="none" stroke="${angleColor}" stroke-width="3" stroke-linecap="round"/>
+                
+                <!-- Angle label -->
+                <text x="${centerX + 40}" y="${centerY - 40}" font-size="20" fill="${angleColor}" 
+                      font-weight="bold" text-anchor="middle">${angle}°</text>
+                
+                <!-- Vertex point -->
+                <circle cx="${centerX}" cy="${centerY}" r="6" fill="#333"/>
+                
+                <!-- End point -->
+                <circle cx="${endX}" cy="${endY}" r="5" fill="${angleColor}"/>
+            `;
+        }
+
+        function guessAngle(guess) {
+            const feedback = document.getElementById('angleFeedback');
+            const nextButton = document.getElementById('angleNextButton');
+            const scoreDisplay = document.getElementById('angleScore');
+            
+            if (guess === currentAngleType) {
+                feedback.textContent = `✅ Correct! This is a ${currentAngleType} angle.`;
+                feedback.className = 'feedback correct';
+                correctAnswers++;
+                scoreDisplay.textContent = `Score: ${correctAnswers}/${totalQuestions}`;
+                
+                showSuccessAnimation('✓');
+                createParticles(window.innerWidth / 2, window.innerHeight / 2, 10);
+            } else {
+                feedback.textContent = `❌ Not quite. This is a ${currentAngleType} angle.`;
+                feedback.className = 'feedback incorrect';
+            }
+            
+            nextButton.style.display = 'block';
+            
+            // Check if all questions are answered
+            if (correctAnswers >= totalQuestions) {
+                setTimeout(() => {
+                    document.getElementById('angleGuesserSuccess').style.display = 'block';
+                    showSuccessAnimation('🎯');
+                    createParticles(window.innerWidth / 2, window.innerHeight / 2, 25);
+                }, 1000);
+            }
+        }
+
+        // Perimeter Puzzle Game Logic
+        let currentPerimeter = 0;
+        let perimeterCorrect = 0;
+        let perimeterTotal = 5;
+
+        function initPerimeterPuzzle() {
+            const shapeDisplay = document.getElementById('shapeDisplay');
+            const perimeterInput = document.getElementById('perimeterInput');
+            const feedback = document.getElementById('perimeterFeedback');
+            const nextButton = document.getElementById('perimeterNextButton');
+            const scoreDisplay = document.getElementById('perimeterScore');
+            const successMessage = document.getElementById('perimeterPuzzleSuccess');
+            
+            // Reset
+            perimeterInput.value = '';
+            feedback.textContent = '';
+            feedback.className = 'feedback';
+            nextButton.style.display = 'none';
+            successMessage.style.display = 'none';
+            perimeterCorrect = 0;
+            scoreDisplay.textContent = 'Score: 0/5';
+            
+            // Generate first puzzle
+            nextPerimeter();
+        }
+
+        function nextPerimeter() {
+            const shapeDisplay = document.getElementById('shapeDisplay');
+            const perimeterInput = document.getElementById('perimeterInput');
+            const feedback = document.getElementById('perimeterFeedback');
+            const nextButton = document.getElementById('perimeterNextButton');
+            const scoreDisplay = document.getElementById('perimeterScore');
+            
+            // Hide next button and clear input/feedback
+            nextButton.style.display = 'none';
+            perimeterInput.value = '';
+            feedback.textContent = '';
+            feedback.className = 'feedback';
+            
+            // Generate random rectangle
+            const isSquare = Math.random() > 0.5;
+            let width, height;
+            
+            if (isSquare) {
+                const side = Math.floor(Math.random() * 8) + 5; // 5-12
+                width = height = side;
+            } else {
+                width = Math.floor(Math.random() * 10) + 5; // 5-14
+                height = Math.floor(Math.random() * 10) + 5; // 5-14
+            }
+            
+            // Calculate perimeter
+            currentPerimeter = 2 * (width + height);
+            
+            // Display shape
+            shapeDisplay.innerHTML = `
+                <div class="rectangle-shape">
+                    <span class="dimension-label width-label">${width} units</span>
+                    <span class="dimension-label height-label">${height} units</span>
+                    ${isSquare ? '<div style="position: absolute; top: -30px; left: 50%; transform: translateX(-50%); font-size: 1.2em; color: #007bff; font-weight: bold;">SQUARE</div>' : ''}
+                </div>
+            `;
+        }
+
+        function checkPerimeter() {
+            const perimeterInput = document.getElementById('perimeterInput');
+            const feedback = document.getElementById('perimeterFeedback');
+            const nextButton = document.getElementById('perimeterNextButton');
+            const scoreDisplay = document.getElementById('perimeterScore');
+            const userAnswer = parseInt(perimeterInput.value);
+            
+            if (isNaN(userAnswer)) {
+                feedback.textContent = '⚠️ Please enter a number!';
+                feedback.className = 'feedback incorrect';
+                return;
+            }
+            
+            if (userAnswer === currentPerimeter) {
+                feedback.textContent = `✅ Correct! The perimeter is ${currentPerimeter} units.`;
+                feedback.className = 'feedback correct';
+                perimeterCorrect++;
+                scoreDisplay.textContent = `Score: ${perimeterCorrect}/${perimeterTotal}`;
+                
+                showSuccessAnimation('✓');
+                createParticles(window.innerWidth / 2, window.innerHeight / 2, 10);
+            } else {
+                feedback.textContent = `❌ Not quite. The perimeter is ${currentPerimeter} units.`;
+                feedback.className = 'feedback incorrect';
+            }
+            
+            nextButton.style.display = 'block';
+            
+            // Check if all puzzles are solved
+            if (perimeterCorrect >= perimeterTotal) {
+                setTimeout(() => {
+                    document.getElementById('perimeterPuzzleSuccess').style.display = 'block';
+                    showSuccessAnimation('📏');
+                    createParticles(window.innerWidth / 2, window.innerHeight / 2, 25);
+                }, 1000);
+            }
+        }
+    </script>
+</body>
+</html>

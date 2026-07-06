@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Series & Sequences MCQ Quiz Cards</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0; padding: 20px;
+    font-family: 'Fredoka One', cursive, sans-serif;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+  h1 {
+    width: 100%;
+    text-align: center;
+    font-size: 2.8rem;
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 6px #0008;
+  }
+  .card {
+    background: #0b1e3d;
+    border-radius: 20px;
+    width: 320px;
+    padding: 25px 30px 40px;
+    box-shadow: 0 0 30px #ffd700aa;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  .card:hover {
+    transform: translateY(-6px);
+  }
+  .card h2 {
+    margin: 0 0 15px;
+    font-size: 1.8rem;
+    color: #ffd700;
+    text-align: center;
+    text-shadow: 1px 1px 3px #0008;
+  }
+  .scoreboard {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    font-weight: 700;
+    color: #ffd700;
+    text-align: center;
+    text-shadow: 1px 1px 3px #0008;
+  }
+  .question-number {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    color: #ffdd55;
+    text-align: center;
+  }
+  .question-text {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    line-height: 1.3;
+    min-height: 70px;
+    text-align: center;
+  }
+  .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .option-btn {
+    background: #1a3a6d;
+    border-radius: 15px;
+    padding: 12px 15px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #ffd700;
+    border: 3px solid transparent;
+    cursor: pointer;
+    box-shadow: 0 0 10px #ffd70044;
+    transition: background 0.3s, border-color 0.3s;
+    user-select: none;
+  }
+  .option-btn:hover:not(.disabled) {
+    background: #2a4a8d;
+  }
+  .option-btn.correct {
+    background: #4caf50;
+    border-color: #a5d6a7;
+    color: #003300;
+    box-shadow: 0 0 15px #4caf50cc;
+  }
+  .option-btn.incorrect {
+    background: #e53935;
+    border-color: #ef9a9a;
+    color: #330000;
+    box-shadow: 0 0 15px #e53935cc;
+  }
+  .option-btn.disabled {
+    cursor: default;
+    pointer-events: none;
+    opacity: 0.7;
+  }
+  .feedback {
+    margin-top: 15px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    min-height: 1.3em;
+    text-align: center;
+    color: #ffd700;
+    text-shadow: 1px 1px 3px #0008;
+  }
+  .next-btn {
+    margin-top: 20px;
+    background: #ffd700;
+    color: #1a1a1a;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 15px;
+    padding: 10px 0;
+    cursor: pointer;
+    box-shadow: 0 0 20px #ffd700cc;
+    transition: background 0.3s;
+    user-select: none;
+    width: 100%;
+  }
+  .next-btn:disabled {
+    background: #999;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  /* Shake animation for wrong answer */
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-10px); }
+    40%, 80% { transform: translateX(10px); }
+  }
+  .shake {
+    animation: shake 0.4s;
+  }
+  /* Result card */
+  .result-card {
+    background: linear-gradient(135deg, #ffd700, #ff6f00);
+    color: #1a1a1a;
+    border-radius: 20px;
+    padding: 20px 15px;
+    text-align: center;
+    box-shadow: 0 0 40px #ff6f00cc;
+    font-size: 1.3rem;
+    font-weight: 700;
+    user-select: none;
+    margin-top: 15px;
+  }
+  .result-card span {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 10px;
+  }
+  /* Hide quiz content initially */
+  .quiz-content {
+    display: none;
+    flex-direction: column;
+  }
+  .card.active {
+    cursor: default;
+  }
+  .card.active .quiz-content {
+    display: flex;
+  }
+  @media (max-width: 700px) {
+    body {
+      justify-content: center;
+    }
+  }
+</style>
+</head>
+<body>
+<h1>Series & Sequences Quiz Cards</h1>
+
+<div class="card" id="card-treasure" aria-label="AP Treasure Hunt Quiz Card" tabindex="0">
+  <h2>AP Treasure Hunt 🪙</h2>
+  <div class="quiz-content">
+    <div class="scoreboard" id="scoreboard-treasure">Score: 0 / 2</div>
+    <div class="question-number" id="qnum-treasure">Question 1 of 2</div>
+    <div class="question-text" id="question-treasure"></div>
+    <div class="options" id="options-treasure"></div>
+    <div class="feedback" id="feedback-treasure"></div>
+    <button class="next-btn" id="next-treasure" disabled>Next Question</button>
+  </div>
+</div>
+
+<div class="card" id="card-space" aria-label="GP Space Explorer Quiz Card" tabindex="0">
+  <h2>GP Space Explorer 🚀</h2>
+  <div class="quiz-content">
+    <div class="scoreboard" id="scoreboard-space">Score: 0 / 2</div>
+    <div class="question-number" id="qnum-space">Question 1 of 2</div>
+    <div class="question-text" id="question-space"></div>
+    <div class="options" id="options-space"></div>
+    <div class="feedback" id="feedback-space"></div>
+    <button class="next-btn" id="next-space" disabled>Next Question</button>
+  </div>
+</div>
+
+<div class="card" id="card-puzzle" aria-label="Missing Term Puzzle Quiz Card" tabindex="0">
+  <h2>Missing Term Puzzle 🧩</h2>
+  <div class="quiz-content">
+    <div class="scoreboard" id="scoreboard-puzzle">Score: 0 / 2</div>
+    <div class="question-number" id="qnum-puzzle">Question 1 of 2</div>
+    <div class="question-text" id="question-puzzle"></div>
+    <div class="options" id="options-puzzle"></div>
+    <div class="feedback" id="feedback-puzzle"></div>
+    <button class="next-btn" id="next-puzzle" disabled>Next Question</button>
+  </div>
+</div>
+
+<div class="card" id="card-gems" aria-label="Sum Quest Quiz Card" tabindex="0">
+  <h2>Sum Quest 🏆</h2>
+  <div class="quiz-content">
+    <div class="scoreboard" id="scoreboard-gems">Score: 0 / 2</div>
+    <div class="question-number" id="qnum-gems">Question 1 of 2</div>
+    <div class="question-text" id="question-gems"></div>
+    <div class="options" id="options-gems"></div>
+    <div class="feedback" id="feedback-gems"></div>
+    <button class="next-btn" id="next-gems" disabled>Next Question</button>
+  </div>
+</div>
+
+<div class="card" id="card-ball" aria-label="Real-Life Challenge Quiz Card" tabindex="0">
+  <h2>Real-Life Challenge 🌍</h2>
+  <div class="quiz-content">
+    <div class="scoreboard" id="scoreboard-ball">Score: 0 / 2</div>
+    <div class="question-number" id="qnum-ball">Question 1 of 2</div>
+    <div class="question-text" id="question-ball"></div>
+    <div class="options" id="options-ball"></div>
+    <div class="feedback" id="feedback-ball"></div>
+    <button class="next-btn" id="next-ball" disabled>Next Question</button>
+  </div>
+</div>
+
+<script>
+  // Questions grouped by card
+  const quizData = {
+    treasure: [
+      {
+        question: "Find the 10th term of the sequence: 3, 7, 11, …",
+        options: ["37", "41", "43", "47"],
+        answer: 1
+      },
+      {
+        question: "What is the common difference in the AP: 5, 9, 13, 17, ...?",
+        options: ["2", "3", "4", "5"],
+        answer: 2
+      }
+    ],
+    space: [
+      {
+        question: "If the first term = 2, common ratio = 3, find the 5th term.",
+        options: ["54", "162", "243", "486"],
+        answer: 1
+      },
+      {
+        question: "What is the 4th term of the GP: 5, 10, 20, ...?",
+        options: ["30", "40", "50", "80"],
+        answer: 3
+      }
+    ],
+    puzzle: [
+      {
+        question: "Find the missing term in the GP: 2, 6, __, 54.",
+        options: ["12", "18", "24", "36"],
+        answer: 1
+      },
+      {
+        question: "Find the missing term in the AP: 7, __, 15, 19.",
+        options: ["9", "10", "11", "12"],
+        answer: 2
+      }
+    ],
+    gems: [
+      {
+        question: "Find sum of first 15 terms of 2 + 5 + 8 + …",
+        options: ["345", "360", "375", "390"],
+        answer: 2
+      },
+      {
+        question: "Sum of first 5 terms of GP: 3, 6, 12, ... is?",
+        options: ["93", "120", "189", "240"],
+        answer: 0
+      }
+    ],
+    ball: [
+      {
+        question: "A ball bounces back to 3/4 of its height each time. If dropped from 64m, how high will it bounce the 3rd time?",
+        options: ["27", "36", "48", "64"],
+        answer: 1
+      },
+      {
+        question: "If a ball bounces to half its previous height, what is height after 4th bounce from 80m?",
+        options: ["10", "12.5", "15", "20"],
+        answer: 1
+      }
+    ]
+  };
+
+  // Initialize each card quiz on demand
+  function initQuiz(cardId, data) {
+    let currentIndex = 0;
+    let score = 0;
+
+    const cardEl = document.getElementById(`card-${cardId}`);
+    const quizContent = cardEl.querySelector('.quiz-content');
+    const questionNumberEl = document.getElementById(`qnum-${cardId}`);
+    const questionTextEl = document.getElementById(`question-${cardId}`);
+    const optionsEl = document.getElementById(`options-${cardId}`);
+    const feedbackEl = document.getElementById(`feedback-${cardId}`);
+    const nextBtn = document.getElementById(`next-${cardId}`);
+    const scoreboard = document.getElementById(`scoreboard-${cardId}`);
+
+    function loadQuestion() {
+      feedbackEl.textContent = '';
+      nextBtn.disabled = true;
+      nextBtn.setAttribute('aria-disabled', 'true');
+      const q = data[currentIndex];
+      questionNumberEl.textContent = `Question ${currentIndex + 1} of ${data.length}`;
+      questionTextEl.textContent = q.question;
+      optionsEl.innerHTML = '';
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = opt;
+        btn.setAttribute('role', 'button');
+        btn.setAttribute('tabindex', '0');
+        btn.addEventListener('click', () => selectOption(i, btn));
+        btn.addEventListener('keydown', e => {
+          if(e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            selectOption(i, btn);
+          }
+        });
+        optionsEl.appendChild(btn);
+      });
+      scoreboard.textContent = `Score: ${score} / ${data.length}`;
+    }
+
+    function selectOption(index, btn) {
+      if(nextBtn.disabled === false) return; // already answered
+      const q = data[currentIndex];
+      const buttons = optionsEl.querySelectorAll('button');
+      buttons.forEach(b => {
+        b.classList.add('disabled');
+        b.disabled = true;
+      });
+      if(index === q.answer) {
+        btn.classList.add('correct');
+        feedbackEl.textContent = 'Correct! 🎉';
+        score++;
+        scoreboard.textContent = `Score: ${score} / ${data.length}`;
+      } else {
+        btn.classList.add('incorrect');
+        buttons[q.answer].classList.add('correct');
+        feedbackEl.textContent = 'Wrong! Try the next one.';
+        cardEl.classList.add('shake');
+        setTimeout(() => cardEl.classList.remove('shake'), 400);
+      }
+      nextBtn.disabled = false;
+      nextBtn.setAttribute('aria-disabled', 'false');
+    }
+
+    nextBtn.addEventListener('click', () => {
+      currentIndex++;
+      if(currentIndex >= data.length) {
+        showResult();
+      } else {
+        loadQuestion();
+      }
+    });
+
+    function showResult() {
+      questionNumberEl.textContent = '';
+      questionTextEl.textContent = '';
+      optionsEl.innerHTML = '';
+      feedbackEl.textContent = '';
+      nextBtn.style.display = 'none';
+      scoreboard.style.display = 'none';
+
+      const resultCard = document.createElement('div');
+      resultCard.className = 'result-card';
+      let emoji = '🎉';
+      let msg = 'Excellent work!';
+      if(score <= data.length / 2) {
+        emoji = '🤔';
+        msg = 'Good try! Keep practicing!';
+      } else if(score < data.length) {
+        emoji = '👍';
+        msg = 'Well done! Almost perfect!';
+      }
+      resultCard.innerHTML = `<span>${emoji}</span>Your Score: ${score} / ${data.length}<br>${msg}`;
+      cardEl.appendChild(resultCard);
+    }
+
+    // Load first question
+    loadQuestion();
+
+    return {
+      showQuiz: () => {
+        quizContent.style.display = 'flex';
+        cardEl.classList.add('active');
+      }
+    };
+  }
+
+  // Store quiz instances
+  const quizzes = {};
+
+  // Setup cards to show quiz on click
+  document.querySelectorAll('.card').forEach(card => {
+    const id = card.id.replace('card-', '');
+    card.addEventListener('click', () => {
+      if (!quizzes[id]) {
+        quizzes[id] = initQuiz(id, quizData[id]);
+      }
+      // Hide all other quizzes
+      document.querySelectorAll('.quiz-content').forEach(qc => {
+        if (qc.parentElement.id !== `card-${id}`) {
+          qc.style.display = 'none';
+          qc.parentElement.classList.remove('active');
+          // Reset next button display if hidden
+          const nextBtn = qc.querySelector('.next-btn');
+          if(nextBtn) nextBtn.style.display = 'block';
+          // Reset scoreboard display
+          const scoreboard = qc.querySelector('.scoreboard');
+          if(scoreboard) scoreboard.style.display = 'block';
+          // Remove any result cards
+          const resultCard = qc.parentElement.querySelector('.result-card');
+          if(resultCard) resultCard.remove();
+        }
+      });
+      quizzes[id].showQuiz();
+    });
+    // Also allow keyboard enter/space to open quiz
+    card.addEventListener('keydown', e => {
+      if(e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        card.click();
+      }
+    });
+  });
+</script>
+</body>
+</html>

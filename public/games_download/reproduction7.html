@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pollination & Reproduction Science Games</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    background: linear-gradient(135deg,#f3f8ff 60%,#d9f0e7 110%);
+    min-height: 100vh;
+    user-select:none;
+  }
+  h1 {
+    margin: 40px 0 30px;
+    text-align: center;
+    font-size: 2.4em;
+    color: #396a4b;
+    text-shadow: 0 2px 14px #d1e7dc;
+  }
+  .cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.8rem;
+    justify-content: center;
+    max-width: 1200px;
+    margin: 0 auto 56px;
+    padding: 0 10px;
+  }
+  .game-card {
+    width: 210px;
+    height: 340px;
+    background: linear-gradient(140deg,#fffcf8 75%,#def9f9 110%);
+    border-radius: 28px;
+    box-shadow: 0 8px 26px #b5ebd7cc, 0 2px 10px #a3c5b557;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    filter: drop-shadow(0 3px 10px #b1d7cb9c);
+    position: relative;
+  }
+  .game-card:hover {
+    transform: scale(1.07) translateY(-10px);
+    box-shadow: 0 18px 35px #a5e0c5dd, 0 8px 22px #ade9c277;
+    background: linear-gradient(140deg,#f0fff7 75%,#e1fffb 120%);
+    z-index: 4;
+  }
+  .card-icon {
+    font-size: 56px;
+    margin: 44px 0 18px;
+    filter: drop-shadow(0 2px 6px #acdabeef);
+    user-select:none;
+  }
+  .game-title {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #2a6652;
+    text-align: center;
+    line-height: 1.1;
+  }
+  .game-desc {
+    font-size: 1rem;
+    color: #3c7a66;
+    margin-top: 6px;
+    padding: 0 14px;
+    text-align:center;
+    line-height: 1.15;
+  }
+  .modal-bg {
+    display: none;
+    position: fixed;
+    z-index: 1100;
+    left: 0; top: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(36, 80, 58, 0.15);
+    backdrop-filter: blur(8px);
+    justify-content: center;
+    align-items: center;
+    padding: 14px;
+  }
+  .modal-content {
+    background: #f6fcf7;
+    border-radius: 25px;
+    width: 98%;
+    max-width: 700px;
+    max-height: 95vh;
+    overflow-y: auto;
+    box-shadow: 0 0 40px 12px #9ddeaf88;
+    padding: 32px 28px 38px 28px;
+    position: relative;
+    user-select:none;
+  }
+  .close-modal {
+    position: absolute;
+    right: 18px; top: 18px;
+    font-size: 2.1em;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #338e51cc;
+    transition: color 0.2s;
+    padding: 0 8px 4px 0;
+    user-select:none;
+    outline:none;
+  }
+  .close-modal:hover { color: #e24962; }
+  h2 {
+    margin-top: 0;
+    color: #2e5939;
+    font-weight: 900;
+    font-size: 1.48em;
+    letter-spacing: .03em;
+    user-select:none;
+  }
+  button, .option-btn {
+    cursor: pointer;
+    border-radius: 9px;
+    border: none;
+    font-weight: 700;
+    color: #32633a;
+    font-size: 1.07em;
+    background: linear-gradient(135deg, #b5f4b9 40%, #8dd38c 130%);
+    box-shadow: 0 3px 11px #a6d6a56e;
+    margin: 7px 8px 7px 0;
+    padding: 10px 18px;
+    transition: background 0.18s ease, color 0.18s ease;
+    outline:none;
+    user-select:none;
+  }
+  button:hover, .option-btn:hover {
+    background: linear-gradient(135deg, #8bce7e 40%, #66a840 130%);
+    color: #daf1ae;
+  }
+  .question-text {
+    font-size: 1.25em;
+    font-weight: 700;
+    margin: 22px 0 18px;
+    color: #25612f;
+    user-select:none;
+  }
+  .feedback {
+    font-size: 1.15em;
+    font-weight: 700;
+    min-height: 28px;
+    padding: 8px 0;
+    text-align: center;
+    color: #2a4f26;
+    user-select:none;
+  }
+  /* === Specific game styles === */
+  /* Game 1 - Pollination Path */
+  .pollination-area {
+    position: relative;
+    height: 320px;
+    background: linear-gradient(135deg,#f7fff5 0%, #d7f0c9 100%);
+    border-radius: 20px;
+    box-shadow: 0 5px 28px #b7e5af9a;
+    margin-bottom: 20px;
+    padding: 10px;
+  }
+  .flower {
+    width: 70px;
+    height: 70px;
+    margin: 11px;
+    border-radius: 50%;
+    background: #fee9fa;
+    box-shadow: 0 0 12px #ffc7eecc;
+    color: #d0518f;
+    font-size: 48px;
+    line-height: 70px;
+    text-align: center;
+    user-select:none;
+    cursor: default;
+    position: absolute;
+    user-select:none;
+  }
+  .bee {
+    position: absolute;
+    font-size: 46px;
+    color: #d04f23;
+    transition: top 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select:none;
+  }
+  .flower-label {
+    position: absolute;
+    width: 140px;
+    font-weight: 600;
+    color: #336623;
+    font-size: 0.89em;
+    font-family: Arial, sans-serif;
+    user-select:none;
+  }
+  .pollination-questions {
+    margin-top: 14px;
+    user-select:none;
+  }
+  .pollination-answers {
+    margin: 12px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 11px;
+  }
+  /* Game 2 - Seed Dispersal */
+  .dispersal-map {
+    position: relative;
+    height: 300px;
+    background: linear-gradient(135deg,#cef5f9, #e0fff4);
+    border-radius: 20px;
+    box-shadow: 0 6px 34px #a2e8d3cc;
+    margin-bottom: 20px;
+    padding: 10px;
+    user-select:none;
+  }
+  .seed {
+    position: absolute;
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg,#f8f9ff 90%,#d2f0fa 120%);
+    border-radius: 50%;
+    box-shadow: 0 2px 12px #bed7e2;
+    cursor: grab;
+    font-size: 32px;
+    line-height: 52px;
+    text-align: center;
+    color: #336f9a;
+  }
+  .dispersal-zone {
+    position: absolute;
+    width: 120px;
+    height: 62px;
+    border-radius: 20px;
+    border: 2px dashed #2e82b4cc;
+    color: #2e82b4;
+    font-weight: 700;
+    text-align: center;
+    line-height: 60px;
+    user-select:none;
+  }
+  .dispersal-feedback {
+    margin-top: 14px;
+    font-weight: 700;
+    text-align: center;
+    user-select:none;
+  }
+  /* Game 3 - Flower Parts Match */
+  .flowermatch-area {
+    background: #e8f9f3;
+    border-radius: 18px;
+    padding: 18px 14px;
+    box-shadow: 0 3px 15px #cdefd781;
+    margin-bottom: 20px;
+  }
+  .fm-card {
+    width: 110px;
+    height: 52px;
+    background: linear-gradient(135deg,#fffef5 75%,#bff8da 110%);
+    border-radius: 12px;
+    box-shadow: 0 0 7px #adefb06b;
+    margin: 7px 12px 8px 0;
+    font-size: 1.04em;
+    font-weight: 700;
+    display: inline-block;
+    text-align: center;
+    line-height: 52px;
+    cursor: grab;
+    user-select:none;
+  }
+  .fm-slot {
+    width: 126px;
+    height: 62px;
+    border-radius: 13px;
+    border: 2px dashed #83c49e88;
+    margin: 10px 8px 10px 2px;
+    vertical-align: top;
+    display: inline-block;
+    font-weight: 700;
+    font-size: 1.07em;
+    line-height: 62px;
+    text-align: center;
+    color: #317158;
+    user-select:none;
+  }
+  .fm-slot.filled {
+    border-style: solid;
+    background: #daf8e3;
+    box-shadow: 0 0 12px #73aa8fdd;
+  }
+  .fm-feedback {
+    margin: 14px 0 6px;
+    font-weight: 700;
+    font-size: 1.12em;
+    text-align: center;
+    user-select:none;
+  }
+  /* Game 4 - Fertilization Puzzle */
+  .fertilization-area {
+    position: relative;
+    padding-bottom: 10px;
+  }
+  .flower-diagram {
+    max-width: 100%;
+    width: 320px;
+    margin: 0 auto 18px;
+    position: relative;
+    user-select:none;
+  }
+  .label-slot {
+    position: absolute;
+    width: 120px;
+    height: 28px;
+    background: #e0f1e9;
+    border-radius: 12px;
+    border: 2px dashed #8bcf9e;
+    text-align: center;
+    font-weight: 700;
+    line-height: 28px;
+    color: #338346;
+    user-select:none;
+  }
+  .label-slot.filled {
+    border-style: solid;
+    box-shadow: 0 0 14px #7fc17ecc;
+    background: #d8f7e5;
+  }
+  /* Position labels in the flower diagram */
+  .label-positions {
+    --size: 120px;
+  }
+  .label-slot#slot-pollen-tube { top: 164px; left: 140px; }
+  .label-slot#slot-ovule { top: 208px; left: 86px; }
+  .label-slot#slot-zygote { top: 292px; left: 128px; }
+  .label-source {
+    background: linear-gradient(90deg,#e0f7ff 70%,#cfecff 120%);
+    border-radius: 28px;
+    margin-bottom: 14px;
+    padding: 7px 14px;
+    font-weight: 700;
+    font-size: 1.14em;
+    cursor: grab;
+  }
+  .fertilization-feedback {
+    font-weight: 700;
+    text-align: center;
+    margin-top: 12px;
+    min-height: 32px;
+    user-select:none;
+  }
+  /* Game 5 - Reproduction Quiz Race */
+  .race-area {
+    background: linear-gradient(90deg,#f1fdf7,#d6f9df);
+    border-radius: 22px;
+    padding: 24px 20px 32px;
+    margin-bottom: 0;
+    box-shadow: 0 3px 22px #9ad6a68b;
+  }
+  .track {
+    position: relative;
+    background: #dbf4e8;
+    border-radius: 22px;
+    height: 52px;
+    margin: 18px auto 20px;
+    width: 280px;
+    box-shadow: 0 3px 20px #beecca96;
+  }
+  .runner {
+    font-size: 46px;
+    position: absolute;
+    top: 4px;
+    transition: left 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select:none;
+  }
+  .runner.player {
+    color: #2c8855;
+    left: 0;
+  }
+  .runner.cpu {
+    color: #a0bb9f;
+    left: 0;
+    top: 28px;
+  }
+  .race-question {
+    text-align: center;
+    font-weight: 900;
+    font-size: 1.29em;
+    color: #276338;
+    margin-bottom: 16px;
+    user-select:none;
+  }
+  .race-options {
+    text-align: center;
+  }
+  .race-option {
+    padding: 12px 28px;
+    font-weight: 800;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(120deg,#a8ddab 0%,#7fc16b 150%);
+    color: #194f22;
+    box-shadow: 0 3px 15px #94de9817;
+    margin: 0 14px 18px 14px;
+    cursor: pointer;
+    transition: filter 0.25s ease;
+    user-select:none;
+  }
+  .race-option:hover {
+    filter: brightness(1.3);
+  }
+  .race-feedback {
+    font-weight: 700;
+    font-size: 1.12em;
+    margin-top: 8px;
+    text-align:center;
+    min-height: 24px;
+    user-select:none;
+  }
+</style>
+</head>
+<body>
+<h1>Pollination & Reproduction Mini-Games!</h1>
+<div class="cards-container">
+  <div class="game-card" onclick="openGame(0)">
+    <div class="card-icon">🌸🐝</div>
+    <span class="game-title">Pollination Path</span>
+    <span class="game-desc">Guide the bee from flower to flower transferring pollen! Multiple questions.</span>
+  </div>
+  <div class="game-card" onclick="openGame(1)">
+    <div class="card-icon">🌱🍃</div>
+    <span class="game-title">Seed Dispersal Adventure</span>
+    <span class="game-desc">Drag seeds to the correct dispersal modes and plant new growth.</span>
+  </div>
+  <div class="game-card" onclick="openGame(2)">
+    <div class="card-icon">🔗🌺</div>
+    <span class="game-title">Flower Parts Match</span>
+    <span class="game-desc">Drag cards to match flower parts and functions!</span>
+  </div>
+  <div class="game-card" onclick="openGame(3)">
+    <div class="card-icon">🧩🌼</div>
+    <span class="game-title">Fertilization Puzzle</span>
+    <span class="game-desc">Complete the flower diagram with correct labels!</span>
+  </div>
+  <div class="game-card" onclick="openGame(4)">
+    <div class="card-icon">🏁🍎</div>
+    <span class="game-title">Reproduction Quiz Race</span>
+    <span class="game-desc">Answer correctly to move forward and win the race!</span>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="gameModal" class="modal-bg" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1">
+  <div class="modal-content">
+    <button class="close-modal" aria-label="Close" onclick="closeModal()">&times;</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+  function shuffle(arr) {
+    for(let i = arr.length - 1; i > 0; i--) {
+      let j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+  const modal = document.getElementById('gameModal');
+  const modalBody = document.getElementById('modalBody');
+  function openGame(idx){
+    if(idx === 0) pollinationGame.start();
+    else if(idx === 1) seedDispersalGame.start();
+    else if(idx === 2) flowerMatchGame.start();
+    else if(idx === 3) fertilizationPuzzle.start();
+    else if(idx === 4) reproductionRace.start();
+    modal.style.display = 'flex';
+    modal.focus();
+  }
+  function closeModal(){
+    modal.style.display = 'none';
+    modalBody.innerHTML = '';
+  }
+  window.onclick = (e) => { if(e.target === modal) closeModal(); }
+
+  /*** 1. Pollination Path 🌸🐝 ***/
+  const pollinationGame = {
+    flowers: [
+      {id:0,emoji:'🌹',label:'Rose',x:80,y:45,pollenPart:'Anther'},
+      {id:1,emoji:'🌻',label:'Sunflower',x:260,y:55,pollenPart:'Anther'},
+      {id:2,emoji:'🌷',label:'Tulip',x:440,y:48,pollenPart:'Anther'},
+      {id:3,emoji:'🌼',label:'Daisy',x:600,y:55,pollenPart:'Anther'}
+    ],
+    questions: [
+      {q:"Which part produces pollen?", ans:"Anther", hint:"It's a male part that holds pollen."},
+      {q:"What does pollen help with?", ans:"Fertilization", hint:"It's needed for reproduction."},
+      {q:"The bee helps transport pollen to which female part?", ans:"Stigma", hint:"Where pollen sticks on the flower."}
+    ],
+    currFlowerIdx: 0,
+    currQidx: 0,
+    beePos: { x: 80, y: 45 },
+    start() {
+      this.currFlowerIdx = 0;
+      this.currQidx = 0;
+      this.beePos = { x: this.flowers[0].x, y: this.flowers[0].y };
+      this._render();
+    },
+    _render() {
+      modalBody.innerHTML = `
+        <h2 id="modalTitle">Pollination Path</h2>
+        <div class="pollination-area" aria-label="Pollination flower map" tabindex="0" role="img">
+          ${this.flowers.map((f, i) =>
+            `<div class="flower" id="flower_${i}" style="top:${f.y}px; left:${f.x}px;" aria-label="${f.label}">${f.emoji}</div>`
+          ).join('')}
+          <div class="bee" id="bee" style="top:${this.beePos.y}px; left:${this.beePos.x}px;">🐝</div>
+        </div>
+        <div class="pollination-questions" aria-live="polite" aria-atomic="true" tabindex="0">
+          <div class="question-text" id="pollQ">${this.questions[this.currQidx].q}</div>
+          <div class="pollination-answers" id="pollAnswers"></div>
+          <div class="feedback" id="pollFeedback"></div>
+        </div>
+      `;
+      this._renderAnswers();
+    },
+    _renderAnswers() {
+      let answerBox = modalBody.querySelector('#pollAnswers');
+      let options = [this.questions[this.currQidx].ans, "Stigma", "Style", "Ovary", "Photosynthesis", "Pollen tube"];
+      options = shuffle(options).slice(0,4);
+      if (!options.includes(this.questions[this.currQidx].ans)) options[0] = this.questions[this.currQidx].ans;
+      answerBox.innerHTML = options.map(opt => `<button class="option-btn" type="button">${opt}</button>`).join('');
+      answerBox.querySelectorAll('button').forEach(btn => {
+        btn.onclick = () => this._checkAnswer(btn.textContent);
+      });
+    },
+    _checkAnswer(selected) {
+      const feedback = modalBody.querySelector('#pollFeedback');
+      if (selected === this.questions[this.currQidx].ans) {
+        feedback.textContent = "Correct!";
+        feedback.style.color = "#1f7e34";
+        this._moveBeeNext();
+      } else {
+        feedback.textContent = `Wrong! Hint: ${this.questions[this.currQidx].hint}`;
+        feedback.style.color = "#b42a3d";
+      }
+    },
+    _moveBeeNext() {
+      this.currQidx++;
+      if (this.currQidx >= this.questions.length) {
+        this.currQidx = 0;
+        this.currFlowerIdx++;
+        if (this.currFlowerIdx >= this.flowers.length) {
+          modalBody.innerHTML = `
+            <h2 id="modalTitle">Pollination Path</h2>
+            <div style="min-height:180px; text-align:center; font-size:1.6em; color:#26783f; padding-top:60px;">
+              Congratulations! 🐝 Pollination complete!
+            </div>
+            <button onclick="openGame(0)" style="margin-top:20px; font-size:1.1em;">Play Again</button>
+          `;
+          return;
+        }
+        this.beePos = { x: this.flowers[this.currFlowerIdx].x, y: this.flowers[this.currFlowerIdx].y };
+      } else {
+        this.beePos = { x: this.flowers[this.currFlowerIdx].x, y: this.flowers[this.currFlowerIdx].y };
+      }
+      const bee = modalBody.querySelector('#bee');
+      bee.style.left = this.beePos.x + 'px';
+      bee.style.top = this.beePos.y + 'px';
+      modalBody.querySelector('#pollFeedback').textContent = "";
+      modalBody.querySelector('#pollQ').textContent = this.questions[this.currQidx].q;
+      this._renderAnswers();
+    }
+  };
+
+  /*** 2. Seed Dispersal Adventure 🌱 ***/
+  const seedDispersalGame = {
+    seeds: [
+      {name: "Maple Seed", emoji: "🍁", dispersal: "Wind", x: 20, y: 180},
+      {name: "Coconut", emoji: "🥥", dispersal: "Water", x: 520, y: 200},
+      {name: "Berry", emoji: "🍓", dispersal: "Animal", x: 260, y: 60}
+    ],
+    dispersalZones: [
+      {name: "Wind", x: 60, y: 270},
+      {name: "Water", x: 440, y: 270},
+      {name: "Animal", x: 260, y: 270}
+    ],
+    collected: [],
+    start() {
+      this.collected = [];
+      this._render();
+    },
+    _render() {
+      modalBody.innerHTML = `
+        <h2>Seed Dispersal Adventure</h2>
+        <div class="dispersal-map" aria-label="Seed dispersal map" tabindex="0" role="img" style="position:relative; height:320px;">
+          ${this.seeds.map((seed, idx) => `
+            <div class="seed" draggable="true" tabindex="0" role="button" aria-grabbed="false" 
+              id="seed_${idx}" style="left:${seed.x}px; top:${seed.y}px;" aria-label="${seed.name}">
+              ${seed.emoji}
+            </div>`).join('')}
+          ${this.dispersalZones.map((zone, idx) => `
+            <div class="dispersal-zone" id="zone_${idx}" style="top:${zone.y}px; left:${zone.x}px;">
+            ${zone.name}</div>`).join('')}
+          <div id="dispFeedback" class="dispersal-feedback" aria-live="polite" style="position:absolute;bottom:-38px;left:10px;right:10px;"></div>
+        </div>`;
+      this._setupDragDrop();
+    },
+    _setupDragDrop() {
+      const seeds = this.seeds;
+      const zones = this.dispersalZones;
+      const game = this;
+      seeds.forEach((seed, idx) => {
+        let el = document.getElementById(`seed_${idx}`);
+        el.setAttribute('aria-grabbed', "false");
+        el.addEventListener('dragstart', e => {
+          e.dataTransfer.setData('seedIndex', idx.toString());
+          setTimeout(() => el.style.visibility = 'hidden', 10);
+          el.setAttribute('aria-grabbed', "true");
+        });
+        el.addEventListener('dragend', e => {
+          el.style.visibility = 'visible';
+          el.setAttribute('aria-grabbed', "false");
+          game._render(); // Reset after drag ends for simplicity
+        });
+      });
+      zones.forEach((zone, idx) => {
+        let zEl = document.getElementById(`zone_${idx}`);
+        zEl.addEventListener('dragover', e => e.preventDefault());
+        zEl.addEventListener('drop', e => {
+          e.preventDefault();
+          const seedIdx = +e.dataTransfer.getData('seedIndex');
+          const seed = seeds[seedIdx];
+          const feedback = document.getElementById("dispFeedback");
+          if(zone.name === seed.dispersal){
+            if(game.collected.indexOf(seedIdx) === -1){
+              game.collected.push(seedIdx);
+              feedback.innerHTML = `Correct! ${seed.emoji} disperses by ${seed.dispersal}.`;
+              zEl.textContent = zone.name + ' ✅';
+              zEl.style.background = '#b0e9bf';
+              zEl.style.borderColor = '#2e8c45';
+              const sEl = document.getElementById(`seed_${seedIdx}`);
+              sEl.remove();
+              if(game.collected.length === seeds.length){
+                setTimeout(() => game._win(), 900);
+              }
+            }
+          } else {
+            feedback.innerHTML = `Wrong! Try dispersing the ${seed.name} differently.`;
+          }
+        });
+      });
+    },
+    _win() {
+      modalBody.innerHTML = `
+        <h2>Seed Dispersal Adventure</h2>
+        <div style="min-height: 140px; text-align: center; color: #238635; font-weight: 700; font-size: 1.6em; padding-top:60px;">
+          All seeds dispersed successfully! 🎉🌱
+        </div>
+        <button onclick="seedDispersalGame.start()" style="margin-top: 20px; font-size:1.1em;">Play Again</button>
+      `;
+    }
+  };
+
+  /*** 3. Flower Parts Match 🔗 ***/
+  const flowerMatchGame = {
+    triples: [
+      {part: 'Stigma', func: 'Receives pollen', nutr: 'Sticky surface'},
+      {part: 'Style', func: 'Supports stigma', nutr: 'Passage for pollen'},
+      {part: 'Anther', func: 'Produces pollen', nutr: 'Holds pollen sacs'},
+      {part: 'Ovary', func: 'Contains ovules', nutr: 'Develops into fruit'}
+    ],
+    matches: [false, false, false, false],
+    start() {
+      this.matches = [false, false, false, false];
+      this._render();
+    },
+    _render() {
+      if (this.matches.every(m => m)) {
+        modalBody.innerHTML = `
+          <h2>Flower Parts Match</h2>
+          <div style="min-height:180px; align-items: center; justify-content: center; display:flex; flex-direction: column; text-align:center;">
+            <div style="font-size: 2em; color: #3e8139; margin-bottom: 10px;">All matches done! 🌺🎉</div>
+            <button onclick="flowerMatchGame.start()" style="font-size:1.1em; padding:8px 14px;">Play Again</button>  
+          </div>`;
+        return;
+      }
+      const triples = this.triples;
+      const parts = triples.map((t, i) => ({ type: "part", text: t.part, idx: i }));
+      const funcs = triples.map((t, i) => ({ type: "func", text: t.func, idx: i }));
+      const nuts = triples.map((t, i) => ({ type: "nutr", text: t.nutr, idx: i }));
+      const shuffledCards = shuffle([...parts, ...funcs, ...nuts]);
+      modalBody.innerHTML = `
+        <h2>Flower Parts Match</h2>
+        <div style="margin-bottom:12px;">
+          Matches found: ${this.matches.filter(Boolean).length} / ${this.matches.length}
+        </div>
+        <div style="user-select:none;">
+          ${shuffledCards.map(c => `<div class="fm-card" draggable="true" data-idx="${c.idx}" data-type="${c.type}">${c.text}</div>`).join('')}
+        </div>
+        <div style="margin-top: 20px;">
+          ${triples.map((t, i) => `<div class="fm-slot" data-idx="${i}" id="fm_slot_${i}">${t.part}</div>`).join('')}
+        </div>
+        <div class="fm-feedback" id="fmFeedback"></div>
+      `;
+      this._setupDnD();
+    },
+    _setupDnD() {
+      const self = this;
+      const cards = modalBody.querySelectorAll('.fm-card');
+      const slots = modalBody.querySelectorAll('.fm-slot');
+      cards.forEach(card => {
+        card.addEventListener('dragstart', e => {
+          e.dataTransfer.setData('type', card.dataset.type);
+          e.dataTransfer.setData('idx', card.dataset.idx);
+          e.dataTransfer.setData('txt', card.textContent);
+          card.classList.add('dragging');
+        });
+        card.addEventListener('dragend', e => card.classList.remove('dragging'));
+      });
+      slots.forEach(slot => {
+        slot.addEventListener('dragover', e => {
+          if(!slot.classList.contains('filled')) {
+            e.preventDefault();
+            slot.style.boxShadow = "0 0 16px 4px #88c285cc";
+          }
+        });
+        slot.addEventListener('dragleave', e => slot.style.boxShadow = "");
+        slot.addEventListener('drop', e => {
+          e.preventDefault();
+          slot.style.boxShadow = "";
+          if(slot.classList.contains('filled')) return;
+          const type = e.dataTransfer.getData('type');
+          const idx = +e.dataTransfer.getData('idx');
+          const txt = e.dataTransfer.getData('txt');
+          const slotIdx = +slot.dataset.idx;
+          if (idx === slotIdx && (type === 'func' || type === 'nutr')) {
+            const div = document.createElement('div');
+            div.style.fontSize = '.96em';
+            div.style.color = '#2a462f';
+            div.style.marginTop = '3px';
+            div.textContent = txt;
+            slot.appendChild(div);
+            const card = [...cards].find(c => c.dataset.idx == idx && c.dataset.type == type && c.textContent == txt);
+            if(card) card.remove();
+            if(slot.querySelectorAll('div').length === 2) {
+              slot.classList.add('filled');
+              self.matches[slotIdx] = true;
+              document.getElementById('fmFeedback').textContent = "Correct match! (+1pt)";
+              setTimeout(() => self._render(), 900);
+            }
+          } else {
+            document.getElementById('fmFeedback').textContent = "Wrong slot or card! Keep trying.";
+          }
+        });
+      });
+    }
+  };
+
+  /*** 4. Fertilization Puzzle 🧩 ***/
+  const fertilizationLabels = [
+    {id:'pollen-tube', text: 'Pollen Tube', top: 125, left: 150},
+    {id:'ovule', text: 'Ovule', top: 205, left: 92},
+    {id:'zygote', text: 'Zygote', top: 290, left: 140},
+  ];
+  const fertilizationPuzzle = {
+    slotsIds: ['pollen-tube', 'ovule', 'zygote'],
+    draggedLabelId: null,
+    labels: ['Pollen Tube', 'Ovule', 'Zygote'],
+    placed: new Set(),
+    start() {
+      this.placed.clear();
+      this._render();
+    },
+    _render() {
+      modalBody.innerHTML = `
+        <h2>Fertilization Puzzle</h2>
+        <div class="fertilization-area" aria-label="Flower fertilization diagram" tabindex="0" style="text-align:center;">
+          <img src="https://i.imgur.com/Ze6bXCH.png" alt="Flower fertilization diagram" style="max-width:100%;border-radius:16px;user-select:none;">
+          ${fertilizationLabels.map(label => `
+            <div id="slot-${label.id}" class="label-slot" style="top:${label.top}px; left:${label.left}px;" aria-label="Drop zone for ${label.text}"></div>
+          `).join('')}
+          <div style="margin-top: 24px;">
+            ${this.labels.map(l => `<div draggable="true" class="label-source" id="label-${l.toLowerCase().replace(/\s/g,'-')}" role="button" tabindex="0" aria-grabbed="false">${l}</div>`).join('')}
+          </div>
+          <div class="fertilization-feedback" id="fertFeedback" aria-live="polite"></div>
+        </div>
+      `;
+      this._setupDnD();
+    },
+    _setupDnD() {
+      const puzzle = this;
+      const labels = modalBody.querySelectorAll('.label-source');
+      const slots = fertilizationLabels.map(l => document.getElementById('slot-'+l.id));
+      labels.forEach(label => {
+        label.addEventListener('dragstart', (e) => {
+          puzzle.draggedLabelId = label.id;
+          label.setAttribute('aria-grabbed', 'true');
+        });
+        label.addEventListener('dragend', (e) => {
+          puzzle.draggedLabelId = null;
+          label.setAttribute('aria-grabbed', 'false');
+        });
+      });
+      slots.forEach(slot => {
+        slot.addEventListener('dragover', e => {
+          e.preventDefault();
+          if (!slot.classList.contains('filled')) {
+            slot.style.boxShadow = "0 0 20px #72be63ff";
+          }
+        });
+        slot.addEventListener('dragleave', e => slot.style.boxShadow = '');
+        slot.addEventListener('drop', e => {
+          e.preventDefault();
+          slot.style.boxShadow = '';
+          if (slot.classList.contains('filled')) return;
+          const labelId = fertilizationPuzzle.draggedLabelId;
+          if (!labelId) return;
+          // Map labelId and slot id to correct pairs
+          const correctMap = {
+            'label-pollen-tube': 'slot-pollen-tube',
+            'label-ovule': 'slot-ovule',
+            'label-zygote': 'slot-zygote',
+          };
+          if (correctMap[labelId] === slot.id) {
+            slot.textContent = document.getElementById(labelId).textContent;
+            slot.classList.add('filled');
+            document.getElementById(labelId).remove();
+            document.getElementById('fertFeedback').textContent = "Correct placement!";
+            fertilizationPuzzle.placed.add(labelId);
+            if (fertilizationPuzzle.placed.size === fertilizationPuzzle.labels.length) {
+              setTimeout(() => fertilizationPuzzle._showSuccess(), 700);
+            }
+          } else {
+            document.getElementById('fertFeedback').textContent = "Wrong placement! Try again.";
+          }
+        });
+      });
+    },
+    _showSuccess() {
+      modalBody.innerHTML = `
+        <h2>Fertilization Puzzle</h2>
+        <div style="min-height:150px; display:flex; flex-direction: column; align-items: center; justify-content: center; font-weight:bold; font-size:1.6em; color:#2f7f32;">
+          Fertilization completed! 🎉🌸
+        </div>
+        <button onclick="fertilizationPuzzle.start()" style="margin-top: 14px; font-weight:700; padding: 8px 14px;">Play Again</button>
+      `;
+    }
+  };
+
+  /*** 5. Reproduction Quiz Race 🏁 ***/
+  const reproductionRace = {
+    questions: [
+      {q: "Which part develops into fruit after fertilization?", opts: ["Ovary","Pollen", "Petal"], ans: 0},
+      {q: "Which part contains the ovules?", opts: ["Stigma","Ovary","Style"], ans: 1},
+      {q: "What does fertilization produce?", opts: ["Seed","Leaf", "Stem"], ans: 0},
+      {q: "Which part is male in flower reproduction?", opts: ["Stigma","Anther","Ovary"], ans: 1},
+      {q: "Which structure transfers pollen to the stigma?", opts: ["Style","Petal","Pollen Tube"], ans: 2}
+    ],
+    currQidx: 0,
+    playerPos: 0,
+    cpuPos: 0,
+    start() {
+      this.currQidx = 0;
+      this.playerPos = 0;
+      this.cpuPos = 0;
+      this._render();
+    },
+    _render() {
+      if(this.currQidx >= this.questions.length) {
+        modalBody.innerHTML = `
+          <h2>Reproduction Quiz Race</h2>
+          <div style="min-height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight:bold; font-size:1.6em; color:#247631; padding-top:40px;">
+            Race finished! <br>${this.playerPos > this.cpuPos ? "You won! 🎉" : "Computer won! Try again!"}
+          </div>
+          <button onclick="reproductionRace.start()" style="margin-top: 20px; font-weight:700; padding: 8px 14px;">Play Again</button>
+        `;
+        return;
+      }
+      let q = this.questions[this.currQidx];
+      modalBody.innerHTML = `
+        <h2>Reproduction Quiz Race</h2>
+        <div class="race-area" aria-label="Race track">
+          <div class="track" role="list" aria-live="polite" style="position: relative;">
+            <div class="runner player" id="runner-player" style="left:${this.playerPos}px;" role="listitem" aria-label="Player car">&#x1F3CE;&#xFE0F;</div>
+            <div class="runner cpu" id="runner-cpu" style="left:${this.cpuPos}px;" role="listitem" aria-label="Computer car">&#x1F697;</div>
+          </div>
+          <div class="race-question">${q.q}</div>
+          <div class="race-options" role="radiogroup" aria-labelledby="raceQuestion">
+            ${q.opts.map((opt, i) =>
+              `<button class="race-option" type="button" data-ans="${i}" aria-pressed="false">${opt}</button>`
+            ).join('')}
+          </div>
+          <div class="race-feedback" id="raceFeedback" aria-live="polite"></div>
+        </div>
+      `;
+      this._setupOptions(q);
+    },
+    _setupOptions(q) {
+      modalBody.querySelectorAll('.race-option').forEach(btn => {
+        btn.onclick = () => {
+          const idx = +btn.getAttribute('data-ans');
+          const feedback = modalBody.querySelector('#raceFeedback');
+          if (idx === q.ans) {
+            this.playerPos += 75;
+            modalBody.querySelector('#runner-player').style.left = this.playerPos + 'px';
+            feedback.textContent = 'Correct! You advance.';
+          } else {
+            this.cpuPos += 65;
+            modalBody.querySelector('#runner-cpu').style.left = this.cpuPos + 'px';
+            feedback.textContent = 'Wrong! Computer advances.';
+          }
+          this.currQidx++;
+          setTimeout(() => this._render(), 800);
+        };
+      });
+    }
+  };
+</script>
+</body>
+</html>

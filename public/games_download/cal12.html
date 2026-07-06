@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Translation</title>
+<!-- ORIGINAL GAME CONTENT STARTS HERE -->
+<h1 class="quiz-title">Calculus</h1>
+            <p class="quiz-subtitle">Limits, Derivatives, Integrals & Applications</p><div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div><div id="quizContent">
+            <div class="question-container">
+                <div class="question-number" id="questionNumber"></div>
+                <div class="question-text" id="questionText"></div>
+                <div class="options" id="optionsContainer"></div><div class="button-container">
+                <button class="button" id="nextButton" onclick="nextQuestion()" disabled>Next Question</button><div id="resultsContainer" class="hidden">
+            <div class="quiz-header">
+                <h2>Quiz Complete!</h2>
+                <div class="final-score" id="finalScore"></div>
+                <div class="score-display" id="scoreBreakdown"></div><div class="button-container">
+                <button class="button" onclick="restartQuiz()">Try Again</button><script>
+        const questions = [
+            {
+                question: "What is the limit of (x² - 1)/(x - 1) as x approaches 1?",
+                options: [
+                    "2",
+                    "1",
+                    "0",
+                    "∞"
+                ],
+                correct: 0
+            },
+            {
+                question: "What is the derivative of f(x) = x³ + 2x² - 5x + 3?",
+                options: [
+                    "3x² + 4x - 5",
+                    "x⁴ + 2x³ - 5x² + 3x",
+                    "3x² + 4x - 5x",
+                    "3x² + 2x - 5"
+                ],
+                correct: 0
+            },
+            {
+                question: "What is the derivative of sin(x)?",
+                options: [
+                    "cos(x)",
+                    "-cos(x)",
+                    "sin(x)",
+                    "-sin(x)"
+                ],
+                correct: 0
+            },
+            {
+                question: "What is ∫ x² dx?",
+                options: [
+                    "x³/3 + C",
+                    "2x + C",
+                    "x³ + C",
+                    "3x² + C"
+                ],
+                correct: 0
+            },
+            {
+                question: "What is the chain rule for differentiation?",
+                options: [
+                    "(f(g(x)))' = f'(g(x)) · g'(x)",
+                    "(f(g(x)))' = f'(x) · g'(x)",
+                    "(f(g(x)))' = f(x) · g'(x)",
+                    "(f(g(x)))' = f'(g(x)) · g(x)"
+                ],
+                correct: 0
+            },
+            {
+                question: "What is the fundamental theorem of calculus?",
+                options: [
+                    "∫ᵃᵇ f'(x) dx = f(b) - f(a)",
+                    "d/dx ∫ f(x) dx = f(x)",
+                    "Both A and B",
+                    "∫ f(x) dx = F(x) + C"
+                ],
+                correct: 2
+            },
+            {
+                question: "What is the derivative of ln(x)?",
+                options: [
+                    "1/x",
+                    "ln(x)",
+                    "x",
+                    "e^x"
+                ],
+                correct: 0
+            },
+            {
+                question: "What is ∫ eˣ dx?",
+                options: [
+                    "eˣ + C",
+                    "xeˣ + C",
+                    "eˣ/x + C",
+                    "ln(x) + C"
+                ],
+                correct: 0
+            },
+            {
+                question: "What is the product rule for differentiation?",
+                options: [
+                    "(uv)' = u'v + uv'",
+                    "(uv)' = u'v'",
+                    "(uv)' = u'v - uv'",
+                    "(uv)' = uv' + u'v'"
+                ],
+                correct: 0
+            },
+            {
+                question: "What does it mean for a function to be continuous at x = a?",
+                options: [
+                    "lim(x→a) f(x) = f(a)",
+                    "f(a) exists",
+                    "lim(x→a) f(x) exists",
+                    "All of the above"
+                ],
+                correct: 3
+            }
+        ];
+        
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedAnswer = null;
+        
+        function loadQuestion() {
+            const question = questions[currentQuestion];
+            document.getElementById('questionNumber').textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+            document.getElementById('questionText').innerHTML = question.question;
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.innerHTML = option;
+                optionDiv.onclick = () => selectOption(index, optionDiv);
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            document.getElementById('nextButton').disabled = true;
+            selectedAnswer = null;
+            
+            updateProgress();
+        }
+        
+        function selectOption(index, optionElement) {
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            optionElement.classList.add('selected');
+            selectedAnswer = index;
+            document.getElementById('nextButton').disabled = false;
+        }
+        
+        function nextQuestion() {
+            if (selectedAnswer === null) return;
+            
+            const question = questions[currentQuestion];
+            const options = document.querySelectorAll('.option');
+            
+            options.forEach((option, index) => {
+                if (index === question.correct) {
+                    option.classList.add('correct');
+                } else if (index === selectedAnswer && selectedAnswer !== question.correct) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedAnswer === question.correct) {
+                score++;
+            }
+            
+            options.forEach(option => {
+                option.onclick = null;
+            });
+            
+            setTimeout(() => {
+                currentQuestion++;
+                if (currentQuestion < questions.length) {
+                    loadQuestion();
+                } else {
+                    showResults();
+                }
+            }, 2000);
+        }
+        
+        function updateProgress() {
+            const progress = (currentQuestion / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+        
+        function showResults() {
+            document.getElementById('quizContent').classList.add('hidden');
+            document.getElementById('resultsContainer').classList.remove('hidden');
+            
+            const percentage = Math.round((score / questions.length) * 100);
+            document.getElementById('finalScore').textContent = percentage + '%';
+            document.getElementById('scoreBreakdown').textContent = `You scored ${score} out of ${questions.length} questions correctly!`;
+            
+            document.getElementById('progressFill').style.width = '100%';
+        }
+        
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            selectedAnswer = null;
+            
+            document.getElementById('quizContent').classList.remove('hidden');
+            document.getElementById('resultsContainer').classList.add('hidden');
+            
+            loadQuestion();
+        }
+        
+        loadQuestion();
+    </script></html>

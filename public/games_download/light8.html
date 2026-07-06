@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physics Adventure - Light, Sound, Force & Friction</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #7c3aed;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #06b6d4;
+            --light-bg: #f8fafc;
+            --dark-text: #1e293b;
+        }
+
+        body {
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px 0;
+        }
+
+        .game-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .game-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .game-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .game-content {
+            padding: 20px;
+            min-height: 400px;
+            display: none;
+        }
+
+        .game-preview {
+            padding: 20px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .play-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .play-btn:hover {
+            background: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Quiz Click Styles */
+        .question-display {
+            background: #f3f4f6;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.2rem;
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .option-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .option-btn.correct {
+            background: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+        }
+
+        .option-btn.incorrect {
+            background: var(--danger-color);
+            border-color: var(--danger-color);
+            color: white;
+        }
+
+        /* Drag & Match Styles */
+        .match-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+
+        .phenomena-list, .category-list {
+            width: 45%;
+        }
+
+        .phenomenon-item, .category-slot {
+            background: #f3f4f6;
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: center;
+            cursor: move;
+            transition: all 0.3s ease;
+        }
+
+        .phenomenon-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .phenomenon-item.dragging {
+            opacity: 0.5;
+        }
+
+        .category-slot {
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .category-slot.drag-over {
+            background: #e0f2fe;
+            border-color: var(--info-color);
+        }
+
+        .category-slot.filled {
+            background: #d1fae5;
+            border-color: var(--success-color);
+        }
+
+        /* Virtual Lab Styles */
+        .lab-container {
+            background: #f8fafc;
+            border: 3px solid var(--primary-color);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            position: relative;
+            min-height: 300px;
+        }
+
+        .experiment-area {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 20px 0;
+            min-height: 200px;
+        }
+
+        .experiment-item {
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .experiment-item:hover {
+            transform: scale(1.1);
+        }
+
+        .experiment-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .mirror {
+            width: 150px;
+            height: 100px;
+            background: linear-gradient(to bottom, #e5e7eb 0%, #e5e7eb 50%, #9ca3af 50%, #9ca3af 100%);
+            border: 2px solid #6b7280;
+            border-radius: 5px;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .light-ray {
+            position: absolute;
+            height: 2px;
+            background: #fbbf24;
+            transform-origin: left center;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .light-ray.visible {
+            opacity: 1;
+        }
+
+        .tuning-fork {
+            width: 20px;
+            height: 100px;
+            background: #6b7280;
+            border-radius: 5px;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .tuning-fork.vibrating {
+            animation: vibrate 0.5s infinite;
+        }
+
+        @keyframes vibrate {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
+
+        .sound-wave {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--info-color);
+            border-radius: 50%;
+            opacity: 0;
+            animation: wave 2s infinite;
+        }
+
+        @keyframes wave {
+            0% {
+                transform: scale(0.5);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        .force-object {
+            width: 80px;
+            height: 80px;
+            background: var(--warning-color);
+            border-radius: 10px;
+            position: relative;
+            margin: 0 auto;
+            transition: transform 0.5s ease;
+        }
+
+        .force-arrow {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .force-arrow.visible {
+            opacity: 1;
+        }
+
+        .friction-surface {
+            width: 200px;
+            height: 20px;
+            background: #9ca3af;
+            border-radius: 5px;
+            position: relative;
+            margin: 20px auto;
+        }
+
+        .sliding-object {
+            width: 40px;
+            height: 40px;
+            background: var(--danger-color);
+            border-radius: 5px;
+            position: absolute;
+            top: -10px;
+            transition: left 2s ease;
+        }
+
+        /* Force & Motion Race Styles */
+        .race-track {
+            background: linear-gradient(90deg, #e5e7eb 0%, #e5e7eb 48%, #000 48%, #000 52%, #e5e7eb 52%, #e5e7eb 100%);
+            border-radius: 15px;
+            height: 120px;
+            position: relative;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .track-lanes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .lane {
+            flex: 1;
+            border-bottom: 2px dashed #9ca3af;
+            position: relative;
+        }
+
+        .lane:last-child {
+            border-bottom: none;
+        }
+
+        .racer {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: left 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .racer.player {
+            background: var(--primary-color);
+            left: 10px;
+        }
+
+        .racer.computer {
+            background: var(--danger-color);
+            left: 10px;
+        }
+
+        /* Mystery Puzzle Styles */
+        .puzzle-container {
+            width: 300px;
+            height: 300px;
+            margin: 20px auto;
+            position: relative;
+            background: #f3f4f6;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .puzzle-piece {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: #e5e7eb;
+            border: 2px solid #9ca3af;
+            opacity: 0.3;
+            transition: all 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .puzzle-piece.revealed {
+            opacity: 1;
+            background: var(--success-color);
+            border-color: var(--success-color);
+            animation: revealPiece 0.5s ease;
+        }
+
+        @keyframes revealPiece {
+            0% { transform: scale(0) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+
+        /* Common Styles */
+        .feedback {
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            animation: slideIn 0.5s ease;
+            font-weight: 500;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feedback.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .feedback.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .feedback.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+
+        .hint-box {
+            background: #fef3c7;
+            border-left: 4px solid var(--warning-color);
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .score-display {
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            display: inline-block;
+            margin: 10px 0;
+        }
+
+        .question-counter {
+            background: var(--secondary-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin: 0 10px;
+        }
+
+        .progress-container {
+            background: #f3f4f6;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 15px 0;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.5s ease;
+            border-radius: 5px;
+        }
+
+        .experiment-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .experiment-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .experiment-btn:hover {
+            background: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .game-card {
+                margin-bottom: 20px;
+            }
+            
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .match-container {
+                flex-direction: column;
+            }
+            
+            .phenomena-list, .category-list {
+                width: 100%;
+            }
+            
+            .puzzle-container {
+                width: 250px;
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container game-container">
+        <h1 class="text-center text-white mb-5">
+            <i class="bi bi-lightbulb"></i> Physics Adventure - Light, Sound, Force & Friction
+        </h1>
+        
+        <div class="row g-4">
+            <!-- Game 1: Quiz Click Game -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game1">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(1)" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <i class="bi bi-mouse game-icon"></i>
+                        <h3>Quiz Click Game</h3>
+                        <p class="mb-0">Test your physics knowledge!</p>
+                    </div>
+                    <div class="game-preview" id="preview1">
+                        <p>Answer multiple-choice questions about light, sound, force, and friction concepts.</p>
+                        <button class="play-btn" onclick="startGame(1)">Start Quiz</button>
+                    </div>
+                    <div class="game-content" id="content1">
+                        <div class="question-display" id="quiz-question">
+                            Which surface produces more friction?
+                        </div>
+                        <div class="options-grid" id="quiz-options">
+                            <!-- Options will be generated dynamically -->
+                        </div>
+                        <div id="quiz-feedback"></div>
+                        <div class="text-center">
+                            <div class="score-display">Score: <span id="quiz-score">0</span></div>
+                            <div class="question-counter">Question <span id="quiz-counter">1</span>/10</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 2: Drag & Match Game -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game2">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(2)" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <i class="bi bi-link-45deg game-icon"></i>
+                        <h3>Drag & Match Game</h3>
+                        <p class="mb-0">Match phenomena to categories!</p>
+                    </div>
+                    <div class="game-preview" id="preview2">
+                        <p>Drag physics phenomena to their correct categories: Light, Sound, Force, or Friction.</p>
+                        <button class="play-btn" onclick="startGame(2)">Start Matching</button>
+                    </div>
+                    <div class="game-content" id="content2">
+                        <div class="match-container">
+                            <div class="phenomena-list">
+                                <h5 class="text-center mb-3">Phenomena</h5>
+                                <div class="phenomenon-item" draggable="true" data-phenomenon="echo">Echo</div>
+                                <div class="phenomenon-item" draggable="true" data-phenomenon="mirror">Mirror</div>
+                                <div class="phenomenon-item" draggable="true" data-phenomenon="push">Push</div>
+                                <div class="phenomenon-item" draggable="true" data-phenomenon="sandpaper">Sandpaper</div>
+                                <div class="phenomenon-item" draggable="true" data-phenomenon="rainbow">Rainbow</div>
+                                <div class="phenomenon-item" draggable="true" data-phenomenon="gravity">Gravity</div>
+                            </div>
+                            <div class="category-list">
+                                <h5 class="text-center mb-3">Categories</h5>
+                                <div class="category-slot" data-category="light">Light</div>
+                                <div class="category-slot" data-category="sound">Sound</div>
+                                <div class="category-slot" data-category="force">Force</div>
+                                <div class="category-slot" data-category="friction">Friction</div>
+                            </div>
+                        </div>
+                        <div id="match-feedback"></div>
+                        <div class="text-center">
+                            <div class="score-display">Score: <span id="match-score">0</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 3: Virtual Lab Simulation -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game3">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(3)" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <i class="bi bi-cpu game-icon"></i>
+                        <h3>Virtual Lab Simulation</h3>
+                        <p class="mb-0">Explore physics concepts!</p>
+                    </div>
+                    <div class="game-preview" id="preview3">
+                        <p>Simulate experiments with light reflection, sound vibrations, forces, and friction!</p>
+                        <button class="play-btn" onclick="startGame(3)">Start Lab</button>
+                    </div>
+                    <div class="game-content" id="content3">
+                        <div class="lab-container">
+                            <div class="experiment-area" id="experiment-area">
+                                <!-- Experiments will be loaded dynamically -->
+                            </div>
+                            <div class="experiment-controls">
+                                <button class="experiment-btn" onclick="runExperiment('reflection')">Light Reflection</button>
+                                <button class="experiment-btn" onclick="runExperiment('sound')">Sound Vibration</button>
+                                <button class="experiment-btn" onclick="runExperiment('force')">Push/Pull Force</button>
+                                <button class="experiment-btn" onclick="runExperiment('friction')">Friction Test</button>
+                            </div>
+                        </div>
+                        <div id="lab-feedback"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 4: Force & Motion Race -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game4">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(4)" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <i class="bi bi-speedometer2 game-icon"></i>
+                        <h3>Force & Motion Race</h3>
+                        <p class="mb-0">Race with physics knowledge!</p>
+                    </div>
+                    <div class="game-preview" id="preview4">
+                        <p>Answer questions about forces and motion to move your character forward in the race!</p>
+                        <button class="play-btn" onclick="startGame(4)">Start Race</button>
+                    </div>
+                    <div class="game-content" id="content4">
+                        <div class="race-track">
+                            <div class="track-lanes">
+                                <div class="lane">
+                                    <div class="racer player" id="player-racer">P</div>
+                                </div>
+                                <div class="lane">
+                                    <div class="racer computer" id="computer-racer">C</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="question-display" id="race-question">
+                            Which force slows down a moving object?
+                        </div>
+                        <div class="options-grid" id="race-options">
+                            <!-- Options will be generated dynamically -->
+                        </div>
+                        <div id="race-feedback"></div>
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <span>Race Progress</span>
+                                <span id="race-progress-text">0%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="race-progress"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 5: Mystery Experiment Puzzle -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game5">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(5)" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <i class="bi bi-puzzle game-icon"></i>
+                        <h3>Mystery Experiment Puzzle</h3>
+                        <p class="mb-0">Reveal hidden diagrams!</p>
+                    </div>
+                    <div class="game-preview" id="preview5">
+                        <p>Solve physics questions to reveal hidden diagrams of light paths, sound waves, or forces!</p>
+                        <button class="play-btn" onclick="startGame(5)">Start Puzzle</button>
+                    </div>
+                    <div class="game-content" id="content5">
+                        <div class="puzzle-container" id="puzzle-container">
+                            <!-- Puzzle pieces will be generated dynamically -->
+                        </div>
+                        <div class="question-display" id="puzzle-question">
+                            Which diagram shows reflection of light?
+                        </div>
+                        <div class="options-grid" id="puzzle-options">
+                            <!-- Options will be generated dynamically -->
+                        </div>
+                        <div id="puzzle-feedback"></div>
+                        <div class="text-center">
+                            <div class="question-counter">Pieces: <span id="puzzle-counter">0</span>/9</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game Data
+        const quizQuestions = [
+            {
+                question: "Which surface produces more friction?",
+                options: ["Sandpaper", "Glass", "Ice", "Teflon"],
+                correct: 0,
+                hint: "Rough surfaces create more friction"
+            },
+            {
+                question: "What type of mirror produces a virtual image?",
+                options: ["Convex mirror", "Concave mirror", "Plane mirror", "All of the above"],
+                correct: 3,
+                hint: "Think about which mirrors always produce virtual images"
+            },
+            {
+                question: "Sound travels fastest in which medium?",
+                options: ["Air", "Water", "Steel", "Vacuum"],
+                correct: 2,
+                hint: "Sound needs a medium to travel and travels faster in solids"
+            },
+            {
+                question: "Which force pulls objects towards Earth?",
+                options: ["Magnetic force", "Friction", "Gravity", "Buoyant force"],
+                correct: 2,
+                hint: "This force keeps us on the ground"
+            },
+            {
+                question: "What happens when light passes from air to glass?",
+                options: ["It reflects", "It refracts", "It diffracts", "It disappears"],
+                correct: 1,
+                hint: "Light bends when it passes from one medium to another"
+            },
+            {
+                question: "Which of these reduces friction?",
+                options: ["Making surfaces rougher", "Adding weight", "Using lubricants", "Increasing surface area"],
+                correct: 2,
+                hint: "Lubricants make surfaces smoother"
+            },
+            {
+                question: "Echo is an example of?",
+                options: ["Refraction of light", "Reflection of sound", "Diffraction of sound", "Absorption of sound"],
+                correct: 1,
+                hint: "Echo is sound bouncing back"
+            },
+            {
+                question: "Which force opposes motion?",
+                options: ["Applied force", "Friction", "Normal force", "Tension"],
+                correct: 1,
+                hint: "This force tries to stop moving objects"
+            },
+            {
+                question: "A rainbow is formed due to?",
+                options: ["Reflection of light", "Refraction and dispersion of light", "Diffraction of light", "Scattering of light"],
+                correct: 1,
+                hint: "Light splits into its component colors"
+            },
+            {
+                question: "Which surface would allow an object to slide the farthest?",
+                options: ["Carpet", "Concrete", "Ice", "Grass"],
+                correct: 2,
+                hint: "Think about which surface has the least friction"
+            }
+        ];
+
+        const phenomenaCategories = {
+            echo: "sound",
+            mirror: "light",
+            push: "force",
+            sandpaper: "friction",
+            rainbow: "light",
+            gravity: "force"
+        };
+
+        const raceQuestions = [
+            {
+                question: "Which force slows down a moving object?",
+                options: ["Applied force", "Friction", "Normal force", "Tension"],
+                correct: 1
+            },
+            {
+                question: "What causes objects to fall?",
+                options: ["Magnetism", "Gravity", "Friction", "Air resistance"],
+                correct: 1
+            },
+            {
+                question: "Which force makes it hard to push a heavy box?",
+                options: ["Gravity", "Friction", "Magnetic force", "Buoyant force"],
+                correct: 1
+            },
+            {
+                question: "What force keeps planets in orbit?",
+                options: ["Friction", "Gravity", "Magnetic force", "Nuclear force"],
+                correct: 1
+            },
+            {
+                question: "Which force helps birds fly?",
+                options: ["Gravity", "Friction", "Lift force", "Thrust"],
+                correct: 2
+            }
+        ];
+
+        const puzzleQuestions = [
+            {
+                question: "Which diagram shows reflection of light?",
+                options: ["Diagram A", "Diagram B", "Diagram C", "Diagram D"],
+                correct: 0,
+                emoji: "🪞"
+            },
+            {
+                question: "Which shows sound waves traveling?",
+                options: ["Diagram A", "Diagram B", "Diagram C", "Diagram D"],
+                correct: 1,
+                emoji: "🔊"
+            },
+            {
+                question: "Which shows balanced forces?",
+                options: ["Diagram A", "Diagram B", "Diagram C", "Diagram D"],
+                correct: 2,
+                emoji: "⚖️"
+            },
+            {
+                question: "Which shows refraction of light?",
+                options: ["Diagram A", "Diagram B", "Diagram C", "Diagram D"],
+                correct: 3,
+                emoji: "💧"
+            },
+            {
+                question: "Which shows friction opposing motion?",
+                options: ["Diagram A", "Diagram B", "Diagram C", "Diagram D"],
+                correct: 0,
+                emoji: "🛑"
+            },
+            {
+                question: "Which shows a concave mirror?",
+                options: ["Diagram A", "Diagram B", "Diagram C", "Diagram D"],
+                correct: 1,
+                emoji: "🥄"
+            },
+            {
+                question: "Which shows a lever in action?",
+                options: ["Diagram A", "Diagram B", "Diagram C", "Diagram D"],
+                correct: 2,
+                emoji: "🔧"
+            },
+            {
+                question: "Which shows dispersion of light?",
+                options: ["Diagram A", "Diagram B", "Diagram C", "Diagram D"],
+                correct: 3,
+                emoji: "🌈"
+            },
+            {
+                question: "Which shows magnetic force?",
+                options: ["Diagram A", "Diagram B", "Diagram C", "Diagram D"],
+                correct: 0,
+                emoji: "🧲"
+            }
+        ];
+
+        // Game States
+        let currentQuizQuestion = 0;
+        let quizScore = 0;
+        let matchScore = 0;
+        let currentRaceQuestion = 0;
+        let playerPosition = 10;
+        let computerPosition = 10;
+        let computerInterval;
+        let currentPuzzlePiece = 0;
+        let puzzleRevealed = 0;
+
+        // Initialize Games
+        function initGames() {
+            // Initialize puzzle pieces
+            generatePuzzlePieces();
+        }
+
+        // Game Navigation
+        function startGame(gameNum) {
+            document.getElementById(`preview${gameNum}`).style.display = 'none';
+            document.getElementById(`content${gameNum}`).style.display = 'block';
+            document.querySelector(`#game${gameNum} .back-btn`).style.display = 'block';
+            
+            // Initialize specific game
+            switch(gameNum) {
+                case 1:
+                    initQuizGame();
+                    break;
+                case 2:
+                    initMatchGame();
+                    break;
+                case 3:
+                    initLabGame();
+                    break;
+                case 4:
+                    initRaceGame();
+                    break;
+                case 5:
+                    initPuzzleGame();
+                    break;
+            }
+        }
+
+        function showPreview(gameNum) {
+            document.getElementById(`preview${gameNum}`).style.display = 'flex';
+            document.getElementById(`content${gameNum}`).style.display = 'none';
+            document.querySelector(`#game${gameNum} .back-btn`).style.display = 'none';
+            
+            // Clean up intervals
+            if (gameNum === 4 && computerInterval) {
+                clearInterval(computerInterval);
+            }
+        }
+
+        // Game 1: Quiz Click Game
+        function initQuizGame() {
+            currentQuizQuestion = 0;
+            quizScore = 0;
+            updateQuizScore();
+            loadQuizQuestion();
+        }
+
+        function loadQuizQuestion() {
+            if (currentQuizQuestion >= quizQuestions.length) {
+                showFeedback('quiz-feedback', '🎉 Quiz Complete! Final Score: ' + quizScore, 'success');
+                return;
+            }
+            
+            const question = quizQuestions[currentQuizQuestion];
+            document.getElementById('quiz-question').textContent = question.question;
+            document.getElementById('quiz-counter').textContent = currentQuizQuestion + 1;
+            
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => checkQuizAnswer(index);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkQuizAnswer(selectedIndex) {
+            const question = quizQuestions[currentQuizQuestion];
+            const options = document.querySelectorAll('#quiz-options .option-btn');
+            
+            options.forEach(btn => btn.disabled = true);
+            
+            if (selectedIndex === question.correct) {
+                options[selectedIndex].classList.add('correct');
+                showFeedback('quiz-feedback', '✅ Correct! +10 points', 'success');
+                quizScore += 10;
+                updateQuizScore();
+                
+                currentQuizQuestion++;
+                setTimeout(() => {
+                    loadQuizQuestion();
+                }, 1500);
+            } else {
+                options[selectedIndex].classList.add('incorrect');
+                options[question.correct].classList.add('correct');
+                showFeedback('quiz-feedback', '❌ Incorrect!', 'error');
+                
+                // Show hint
+                setTimeout(() => {
+                    const hintBox = document.createElement('div');
+                    hintBox.className = 'hint-box';
+                    hintBox.innerHTML = '<i class="bi bi-lightbulb"></i> Hint: ' + question.hint;
+                    document.getElementById('quiz-feedback').appendChild(hintBox);
+                }, 500);
+                
+                setTimeout(() => {
+                    currentQuizQuestion++;
+                    loadQuizQuestion();
+                }, 3000);
+            }
+        }
+
+        function updateQuizScore() {
+            document.getElementById('quiz-score').textContent = quizScore;
+        }
+
+        // Game 2: Drag & Match Game
+        function initMatchGame() {
+            matchScore = 0;
+            updateMatchScore();
+            setupMatchDragDrop();
+        }
+
+        function setupMatchDragDrop() {
+            const phenomenonItems = document.querySelectorAll('.phenomenon-item');
+            const categorySlots = document.querySelectorAll('.category-slot');
+            
+            phenomenonItems.forEach(item => {
+                item.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text', item.dataset.phenomenon);
+                    item.classList.add('dragging');
+                });
+                
+                item.addEventListener('dragend', () => {
+                    item.classList.remove('dragging');
+                });
+            });
+            
+            categorySlots.forEach(slot => {
+                slot.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    slot.classList.add('drag-over');
+                });
+                
+                slot.addEventListener('dragleave', () => {
+                    slot.classList.remove('drag-over');
+                });
+                
+                slot.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    slot.classList.remove('drag-over');
+                    
+                    const phenomenon = e.dataTransfer.getData('text');
+                    const category = slot.dataset.category;
+                    
+                    if (phenomenaCategories[phenomenon] === category) {
+                        slot.appendChild(document.querySelector(`[data-phenomenon="${phenomenon}"]`));
+                        slot.classList.add('filled');
+                        matchScore += 10;
+                        updateMatchScore();
+                        showFeedback('match-feedback', '✅ Correct match! +10 points', 'success');
+                        
+                        // Check if all phenomena are matched
+                        const filledSlots = document.querySelectorAll('.category-slot.filled');
+                        if (filledSlots.length === phenomenonItems.length) {
+                            setTimeout(() => {
+                                showFeedback('match-feedback', '🎉 All phenomena matched! Perfect!', 'success');
+                            }, 1000);
+                        }
+                    } else {
+                        showFeedback('match-feedback', '❌ Wrong category! Try again.', 'error');
+                    }
+                });
+            });
+        }
+
+        function updateMatchScore() {
+            document.getElementById('match-score').textContent = matchScore;
+        }
+
+        // Game 3: Virtual Lab Simulation
+        function initLabGame() {
+            runExperiment('reflection');
+        }
+
+        function runExperiment(type) {
+            const experimentArea = document.getElementById('experiment-area');
+            experimentArea.innerHTML = '';
+            
+            switch(type) {
+                case 'reflection':
+                    experimentArea.innerHTML = `
+                        <div class="experiment-item">
+                            <div class="mirror">
+                                <div class="light-ray" id="incident-ray" style="width: 100px; top: 20px; left: -50px; transform: rotate(30deg);"></div>
+                                <div class="light-ray" id="reflected-ray" style="width: 100px; top: 20px; right: -50px; transform: rotate(-30deg);"></div>
+                            </div>
+                            <p>Light Reflection</p>
+                        </div>
+                    `;
+                    showFeedback('lab-feedback', 'Click "Show Reflection" to see light rays!', 'info');
+                    break;
+                    
+                case 'sound':
+                    experimentArea.innerHTML = `
+                        <div class="experiment-item">
+                            <div class="tuning-fork" id="tuning-fork">
+                                <div class="sound-wave" style="top: 20px; left: 25px;"></div>
+                                <div class="sound-wave" style="top: 40px; left: 25px; animation-delay: 0.5s;"></div>
+                                <div class="sound-wave" style="top: 60px; left: 25px; animation-delay: 1s;"></div>
+                            </div>
+                            <p>Sound Vibration</p>
+                        </div>
+                    `;
+                    showFeedback('lab-feedback', 'Click "Vibrate Fork" to see sound waves!', 'info');
+                    break;
+                    
+                case 'force':
+                    experimentArea.innerHTML = `
+                        <div class="experiment-item">
+                            <div class="force-object" id="force-object">
+                                <div class="force-arrow" id="force-arrow" style="width: 0; height: 0; border-left: 30px solid transparent; border-right: 30px solid transparent; border-bottom: 40px solid var(--danger-color); top: -50px; left: 25px;"></div>
+                            </div>
+                            <p>Push Force</p>
+                        </div>
+                    `;
+                    showFeedback('lab-feedback', 'Click "Apply Force" to see the object move!', 'info');
+                    break;
+                    
+                case 'friction':
+                    experimentArea.innerHTML = `
+                        <div class="experiment-item">
+                            <div class="friction-surface">
+                                <div class="sliding-object" id="sliding-object"></div>
+                            </div>
+                            <p>Friction Test</p>
+                        </div>
+                    `;
+                    showFeedback('lab-feedback', 'Click "Slide Object" to see friction in action!', 'info');
+                    break;
+            }
+        }
+
+        // Game 4: Force & Motion Race
+        function initRaceGame() {
+            currentRaceQuestion = 0;
+            playerPosition = 10;
+            computerPosition = 10;
+            updateRacerPositions();
+            loadRaceQuestion();
+            startComputerRace();
+        }
+
+        function loadRaceQuestion() {
+            if (currentRaceQuestion >= raceQuestions.length) {
+                showFeedback('race-feedback', '🏁 Race Complete!', 'info');
+                clearInterval(computerInterval);
+                return;
+            }
+            
+            const question = raceQuestions[currentRaceQuestion];
+            document.getElementById('race-question').textContent = question.question;
+            
+            const optionsContainer = document.getElementById('race-options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => checkRaceAnswer(index);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkRaceAnswer(selectedIndex) {
+            const question = raceQuestions[currentRaceQuestion];
+            const options = document.querySelectorAll('#race-options .option-btn');
+            
+            options.forEach(btn => btn.disabled = true);
+            
+            if (selectedIndex === question.correct) {
+                options[selectedIndex].classList.add('correct');
+                showFeedback('race-feedback', '✅ Correct! Move forward!', 'success');
+                
+                // Move player forward
+                playerPosition = Math.min(playerPosition + 20, 85);
+                updateRacerPositions();
+                
+                currentRaceQuestion++;
+                updateRaceProgress();
+                
+                setTimeout(() => {
+                    loadRaceQuestion();
+                }, 1500);
+            } else {
+                options[selectedIndex].classList.add('incorrect');
+                showFeedback('race-feedback', '❌ Incorrect. Try again!', 'error');
+                
+                setTimeout(() => {
+                    options.forEach(btn => {
+                        btn.disabled = false;
+                        btn.classList.remove('incorrect');
+                    });
+                }, 2000);
+            }
+            
+            // Check if player won
+            if (playerPosition >= 85) {
+                showFeedback('race-feedback', '🏆 You won the race!', 'success');
+                clearInterval(computerInterval);
+            }
+        }
+
+        function startComputerRace() {
+            computerInterval = setInterval(() => {
+                if (computerPosition < 85) {
+                    computerPosition += Math.random() * 15;
+                    updateRacerPositions();
+                    
+                    // Check if computer won
+                    if (computerPosition >= 85) {
+                        showFeedback('race-feedback', '💻 Computer won the race!', 'error');
+                        clearInterval(computerInterval);
+                    }
+                }
+            }, 3000);
+        }
+
+        function updateRacerPositions() {
+            document.getElementById('player-racer').style.left = playerPosition + '%';
+            document.getElementById('computer-racer').style.left = computerPosition + '%';
+        }
+
+        function updateRaceProgress() {
+            const progress = (currentRaceQuestion / raceQuestions.length) * 100;
+            document.getElementById('race-progress').style.width = progress + '%';
+            document.getElementById('race-progress-text').textContent = `${Math.round(progress)}%`;
+        }
+
+        // Game 5: Mystery Experiment Puzzle
+        function generatePuzzlePieces() {
+            const container = document.getElementById('puzzle-container');
+            container.innerHTML = '';
+            
+            // Create a 3x3 grid of pieces
+            for (let i = 0; i < 9; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'puzzle-piece';
+                piece.id = `puzzle-piece-${i}`;
+                
+                // Position pieces in a grid
+                const row = Math.floor(i / 3);
+                const col = i % 3;
+                piece.style.left = (col * 100) + 'px';
+                piece.style.top = (row * 100) + 'px';
+                
+                container.appendChild(piece);
+            }
+        }
+
+        function initPuzzleGame() {
+            currentPuzzlePiece = 0;
+            puzzleRevealed = 0;
+            loadPuzzleQuestion();
+        }
+
+        function loadPuzzleQuestion() {
+            if (currentPuzzlePiece >= puzzleQuestions.length) {
+                showFeedback('puzzle-feedback', '🎉 Puzzle completely revealed!', 'success');
+                return;
+            }
+            
+            const question = puzzleQuestions[currentPuzzlePiece];
+            document.getElementById('puzzle-question').textContent = question.question;
+            document.getElementById('puzzle-counter').textContent = puzzleRevealed;
+            
+            const optionsContainer = document.getElementById('puzzle-options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => checkPuzzleAnswer(index);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkPuzzleAnswer(selectedIndex) {
+            const question = puzzleQuestions[currentPuzzlePiece];
+            const options = document.querySelectorAll('#puzzle-options .option-btn');
+            
+            options.forEach(btn => btn.disabled = true);
+            
+            if (selectedIndex === question.correct) {
+                options[selectedIndex].classList.add('correct');
+                showFeedback('puzzle-feedback', '✅ Correct! Piece revealed!', 'success');
+                
+                // Reveal puzzle piece
+                const piece = document.getElementById(`puzzle-piece-${currentPuzzlePiece}`);
+                piece.classList.add('revealed');
+                piece.textContent = question.emoji;
+                
+                puzzleRevealed++;
+                currentPuzzlePiece++;
+                
+                if (puzzleRevealed === puzzleQuestions.length) {
+                    setTimeout(() => {
+                        showFeedback('puzzle-feedback', '🎉 All pieces revealed! You win!', 'success');
+                    }, 1000);
+                } else {
+                    setTimeout(() => {
+                        loadPuzzleQuestion();
+                    }, 1000);
+                }
+            } else {
+                options[selectedIndex].classList.add('incorrect');
+                showFeedback('puzzle-feedback', '❌ Incorrect. Try again!', 'error');
+                
+                setTimeout(() => {
+                    options.forEach(btn => {
+                        btn.disabled = false;
+                        btn.classList.remove('incorrect');
+                    });
+                }, 2000);
+            }
+        }
+
+        // Utility Functions
+        function showFeedback(elementId, message, type) {
+            const feedback = document.getElementById(elementId);
+            feedback.innerHTML = `<div class="feedback ${type}">${message}</div>`;
+            setTimeout(() => {
+                feedback.innerHTML = '';
+            }, 3000);
+        }
+
+        // Initialize all games on load
+        window.onload = initGames;
+    </script>
+</body>
+</html>

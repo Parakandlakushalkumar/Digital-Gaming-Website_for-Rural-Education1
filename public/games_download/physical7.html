@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Physical vs Chemical Change Games</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg,#f0f9ff 60%,#cbf1f5 100%);
+    margin: 0;
+    padding: 30px 10px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    align-items: center;
+  }
+  h1 {
+    color: #1273de;
+    margin-bottom: 24px;
+    text-align: center;
+    font-size: 2.4em;
+  }
+  .cards-container {
+    max-width: 960px;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    justify-content: center;
+  }
+  .game-card {
+    width: 180px;
+    height: 220px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    user-select:none;
+  }
+  .game-card:hover {
+    transform: scale(1.07);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+  }
+  .game-icon {
+    font-size: 5rem;
+    margin-bottom: 12px;
+  }
+  .game-title {
+    font-weight: 700;
+    font-size: 1.15em;
+    color: #064273;
+    margin-bottom: 8px;
+    text-align: center;
+    line-height: 1.2em;
+  }
+  .game-desc {
+    font-size: 0.9em;
+    color: #4078a1;
+    text-align: center;
+    padding: 0 10px;
+    user-select:none;
+  }
+  /* Modal styles */
+  .modal-bg {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    top: 0; left: 0; height: 100vh; width: 100vw;
+    background: rgba(0,0,0,0.45);
+    align-items: center; justify-content: center;
+  }
+  .modal-content {
+    background: white;
+    border-radius: 18px;
+    width: 95%;
+    max-width: 660px;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 18px 24px 28px 24px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+    position: relative;
+  }
+  .close-modal {
+    position: absolute;
+    top: 12px; right: 18px;
+    border: none;
+    background: none;
+    font-size: 2em;
+    color: #666;
+    cursor: pointer;
+    font-weight: 600;
+    user-select:none;
+  }
+  .close-modal:hover {
+    color: #d33;
+  }
+  h2 {
+    color: #1464a7;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  button.choice-btn {
+    margin: 6px 6px 12px 6px;
+    border: 2px solid #1273de;
+    background: white;
+    color: #1273de;
+    font-weight: 700;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-size: 1em;
+    cursor: pointer;
+    user-select:none;
+    transition: background 0.18s, color 0.18s;
+  }
+  button.choice-btn:hover {
+    background: #1273de;
+    color: white;
+  }
+  .feedback {
+    min-height: 38px;
+    margin-top: 12px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.1em;
+    text-align: center;
+  }
+  .feedback.correct {
+    background: #d6f5d6;
+    color: #217821;
+    border: 1.5px solid #22a422;
+  }
+  .feedback.wrong {
+    background: #f7d8d8;
+    color: #b63939;
+    border: 1.5px solid #d04040;
+  }
+  .clue {
+    background: #ebf5f7;
+    color: #134a74;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-top: 14px;
+    font-weight: 600;
+  }
+  .drag-item {
+    display: inline-block;
+    background: #a8d1ff;
+    border-radius: 10px;
+    padding: 8px 14px;
+    margin: 10px 14px 14px 0;
+    cursor: grab;
+    user-select:none;
+    font-weight: 600;
+    color: #054a91;
+    transition: background 0.2s;
+  }
+  .drag-item:active {
+    cursor: grabbing;
+    background: #559be6;
+    color: white;
+  }
+  .drop-box {
+    min-height: 80px;
+    border: 2px dashed #8dbce3;
+    border-radius: 14px;
+    margin: 0 10px;
+    padding: 14px 10px;
+    overflow-wrap: break-word;
+    font-weight: 600;
+    color: #143f7b;
+    user-select:none;
+  }
+  .drop-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 14px;
+  }
+  #conveyor-belt {
+    background: #c4dbfd;
+    border-radius: 18px;
+    padding: 18px;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 12px;
+  }
+  #conveyor-belt::-webkit-scrollbar {
+    height: 10px;
+  }
+  #conveyor-belt::-webkit-scrollbar-thumb {
+    background: #719add;
+    border-radius: 5px;
+  }
+  .puzzle-piece {
+    width: 110px;
+    border-radius: 14px;
+    padding: 14px;
+    background: #e6f0fa;
+    user-select:none;
+    cursor: pointer;
+    color: #14519a;
+    font-weight: 600;
+    text-align: center;
+    box-shadow: 0 5px 12px #a2bce2;
+    margin: 5px;
+    transition: box-shadow 0.18s;
+  }
+  .puzzle-piece:hover {
+    box-shadow: 0 6px 16px #719add;
+  }
+  .puzzle-board {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 12px;
+  }
+  .puzzle-slot {
+    width: 140px;
+    min-height: 120px;
+    border: 2.5px solid #7ea7d9;
+    border-radius: 14px;
+    padding: 12px 8px;
+    background: #e8f1fb;
+    color: #1b417a;
+    font-weight: 600;
+  }
+  .race-track {
+    position: relative;
+    width: 90%;
+    height: 60px;
+    background: #c8dbfc;
+    border-radius: 18px;
+    margin: 20px auto 10px auto;
+    box-shadow: inset 0 1px 8px #a5bcf6;
+  }
+  .race-character {
+    position: absolute;
+    font-size: 3rem;
+    top: 4px;
+    left: 0;
+    transition: left 0.5s ease;
+    user-select:none;
+  }
+  .race-question {
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.15em;
+    color: #0c3e70;
+    margin-bottom: 14px;
+  }
+  .race-btn {
+    margin: 6px 10px;
+    padding: 10px 26px;
+    border-radius: 18px;
+    font-weight: 700;
+    font-size: 1.05em;
+    border: 2px solid #1262db;
+    background: white;
+    color: #1262db;
+    cursor: pointer;
+    user-select:none;
+    transition: background 0.2s, color 0.2s;
+  }
+  .race-btn:hover {
+    background: #1262db;
+    color: white;
+  }
+</style>
+</head>
+<body>
+  <h1>Explore Physical & Chemical Changes</h1>
+  <div class="cards-container">
+    <div class="game-card" onclick="openGame(0)">
+      <div class="game-icon">🕵️‍♂️</div>
+      <div class="game-title">Detective 🕵️</div>
+      <div class="game-desc">Examine objects: Physical or Chemical change?</div>
+    </div>
+    <div class="game-card" onclick="openGame(1)">
+      <div class="game-icon">⚗️</div>
+      <div class="game-title">Reaction Lab Adventure ⚗️</div>
+      <div class="game-desc">Mix chemicals, observe results & classify changes!</div>
+    </div>
+    <div class="game-card" onclick="openGame(2)">
+      <div class="game-icon">📦</div>
+      <div class="game-title">Change Sorter Game 📦</div>
+      <div class="game-desc">Drag objects to Physical or Chemical box quickly.</div>
+    </div>
+    <div class="game-card" onclick="openGame(3)">
+      <div class="game-icon">🧩</div>
+      <div class="game-title">Mystery Change Puzzle 🧩</div>
+      <div class="game-desc">Solve quizzes to place puzzle pieces.</div>
+    </div>
+    <div class="game-card" onclick="openGame(4)">
+      <div class="game-icon">🏁</div>
+      <div class="game-title">Change Race 🏁</div>
+      <div class="game-desc">Answer fast to move your character to the finish.</div>
+    </div>
+  </div>
+
+  <div class="modal-bg" id="gameModal">
+    <div class="modal-content" id="modalContent">
+      <button class="close-modal" onclick="closeModal()">&times;</button>
+    </div>
+  </div>
+
+<script>
+const modal = document.getElementById('gameModal');
+const modalContent = document.getElementById('modalContent');
+
+function openGame(idx) {
+  modal.style.display = 'flex';
+  modalContent.scrollTop = 0;
+  if(idx === 0) detectiveGame.start();
+  else if(idx === 1) reactionLabGame.start();
+  else if(idx === 2) changeSorterGame.start();
+  else if(idx === 3) mysteryPuzzleGame.start();
+  else if(idx === 4) changeRaceGame.start();
+}
+
+function closeModal(){
+  modal.style.display = 'none';
+}
+
+/* --- 1. Detective Game --- */
+const detectiveGame = {
+  scenarios:[
+    {obj:"Ice melting", type:"Physical", hint:"No new substance is formed."},
+    {obj:"Rusting iron", type:"Chemical", hint:"New substance rust forms."},
+    {obj:"Paper tearing", type:"Physical", hint:"Only shape changes."},
+    {obj:"Baking a cake", type:"Chemical", hint:"New substances form."},
+    {obj:"Boiling water", type:"Physical", hint:"It's a change of state only."},
+    {obj:"Burning wood", type:"Chemical", hint:"Produces new gases and ash."},
+    {obj:"Dissolving sugar in water", type:"Physical", hint:"Sugar can be recovered."},
+    {obj:"Souring milk", type:"Chemical", hint:"New compounds make it sour."}
+  ],
+  current:0,
+  points:0,
+  start(){
+    this.current=0;
+    this.points=0;
+    this.render();
+  },
+  render(){
+    const s = this.scenarios[this.current];
+    modalContent.innerHTML = `
+      <button class="close-modal" onclick="closeModal()">&times;</button>
+      <h2>Detective 🕵️</h2>
+      <p style="font-size:1.2em; font-weight:700; text-align:center; margin-bottom:15px;">
+        Examine this object:<br><span style="font-size:1.7em;">${s.obj}</span>
+      </p>
+      <div style="text-align:center;">
+        <button class="choice-btn" data-choice="Physical">Physical</button>
+        <button class="choice-btn" data-choice="Chemical">Chemical</button>
+      </div>
+      <div id="feedback" class="feedback"></div>
+      <div id="clue" class="clue" style="display:none;"></div>
+    `;
+    modalContent.querySelectorAll('button.choice-btn').forEach(btn=>{
+      btn.onclick = () => this.checkAnswer(btn.dataset.choice);
+    });
+  },
+  checkAnswer(choice){
+    const s = this.scenarios[this.current];
+    const feedback = modalContent.querySelector('#feedback');
+    const clue = modalContent.querySelector('#clue');
+    if(choice === s.type){
+      this.points++;
+      feedback.textContent = "Correct! 🎉";
+      feedback.className = "feedback correct";
+      clue.style.display = "block";
+      clue.textContent = `Clue to next mystery: "${s.hint}"`;
+      setTimeout(()=>{
+        this.current++;
+        if(this.current < this.scenarios.length){
+          this.render();
+          clue.style.display = "none";
+          feedback.textContent = "";
+        } else {
+          modalContent.innerHTML = `<button class="close-modal" onclick="closeModal()">&times;</button>
+            <h2>Detective 🕵️</h2>
+            <p style="text-align:center; font-weight:700; font-size:1.3em;">All mysteries solved! Total correct: ${this.points}/${this.scenarios.length} 🎉</p>`;
+        }
+      }, 1800);
+    } else {
+      feedback.textContent = `Wrong! Hint: ${s.hint}`;
+      feedback.className = "feedback wrong";
+    }
+  }
+};
+
+/* --- 2. Reaction Lab Adventure --- */
+const reactionLabGame = {
+  reactions:[
+    {a:"Hydrogen Peroxide", b:"Potato", result:"Bubbles form", change:"Chemical"},
+    {a:"Water", b:"Sand", result:"No change", change:"Physical"},
+    {a:"Vinegar", b:"Baking Soda", result:"Gas and fizz", change:"Chemical"},
+    {a:"Ice", b:"Heat", result:"Melts to water", change:"Physical"},
+    {a:"Iron", b:"Water & air", result:"Rust forms", change:"Chemical"},
+    {a:"Alcohol", b:"Water", result:"Mixes evenly", change:"Physical"}
+  ],
+  selectedA: null,
+  selectedB: null,
+  points:0,
+  start(){
+    this.points=0;
+    this.prepare();
+  },
+  prepare(){
+    modalContent.innerHTML = `
+      <button class="close-modal" onclick="closeModal()">&times;</button>
+      <h2>Reaction Lab Adventure ⚗️</h2>
+      <p style="text-align:center; font-weight:700; font-size:1.1em; margin-bottom: 12px;">
+        Drag two substances to mix, then decide if the change is Physical or Chemical.
+      </p>
+      <div style="display:flex; justify-content: center; gap: 30px; flex-wrap:wrap;" id="chem-substances">
+      </div>
+      <div style="margin-top:16px; text-align:center;">
+        <button class="choice-btn" id="btnPhysical">Physical</button>
+        <button class="choice-btn" id="btnChemical">Chemical</button>
+      </div>
+      <p id="reactionResult" style="margin-top: 14px; min-height: 40px; font-weight:700; color:#1273de;"></p>
+      <p id="feedback" class="feedback" style="margin-top: 8px; min-height: 36px;"></p>
+      <p style="margin-top: 16px; text-align: center; font-weight: 600;">Points: <span id="pointsLab">0</span></p>
+    `;
+    this.renderSubstances();
+    this.selectedA = null;
+    this.selectedB = null;
+
+    document.getElementById('btnPhysical').onclick = () => this.checkAnswer("Physical");
+    document.getElementById('btnChemical').onclick = () => this.checkAnswer("Chemical");
+  },
+  renderSubstances(){
+    const div = modalContent.querySelector('#chem-substances');
+    const items = [];
+    this.reactions.forEach(r=>{
+      items.push(`<div class="drag-item" data-name="${r.a}" draggable="true">${r.a}</div>`);
+      items.push(`<div class="drag-item" data-name="${r.b}" draggable="true">${r.b}</div>`);
+    });
+    // Remove duplicates with Set
+    const unique = [...new Set(items)];
+    div.innerHTML = unique.join("");
+    div.querySelectorAll('.drag-item').forEach(el => {
+      el.ondragstart = e => {
+        e.dataTransfer.setData("text", el.dataset.name);
+      };
+      el.onclick = e => {
+        this.selectSubstance(el.dataset.name);
+      };
+    });
+  },
+  selectSubstance(name){
+    if(this.selectedA === null) {
+      this.selectedA = name;
+      this.highlightSelected(name);
+      this.updateReactionResult();
+    } else if(this.selectedB === null && name !== this.selectedA) {
+      this.selectedB = name;
+      this.highlightSelected(name);
+      this.updateReactionResult();
+    } else {
+      // Reset selections if clicking already selected twice
+      this.selectedA = name;
+      this.selectedB = null;
+      this.highlightSelected(name);
+      this.updateReactionResult();
+    }
+  },
+  highlightSelected(name){
+    modalContent.querySelectorAll('.drag-item').forEach(el=>{
+      if(el.dataset.name === name) {
+        el.style.backgroundColor = "#5588ff";
+        el.style.color = "white";
+      } else {
+        el.style.backgroundColor = "#a8d1ff";
+        el.style.color = "#054a91";
+      }
+    });
+  },
+  updateReactionResult(){
+    if(this.selectedA && this.selectedB){
+      // Find matching reaction ignoring order
+      let reaction = this.reactions.find(r=>{
+        return (r.a===this.selectedA && r.b===this.selectedB) || (r.a===this.selectedB && r.b===this.selectedA);
+      });
+      if(reaction){
+        document.getElementById('reactionResult').textContent = `Result: ${reaction.result}`;
+      } else {
+        document.getElementById('reactionResult').textContent = `No visible reaction.`;
+      }
+    } else {
+      document.getElementById('reactionResult').textContent = '';
+    }
+    document.getElementById('feedback').textContent = '';
+  },
+  checkAnswer(ans){
+    if(!this.selectedA || !this.selectedB){
+      alert("Select two substances first!");
+      return;
+    }
+    let reaction = this.reactions.find(r=>{
+      return (r.a===this.selectedA && r.b===this.selectedB) || (r.a===this.selectedB && r.b===this.selectedA);
+    });
+    const feedback = document.getElementById('feedback');
+    if(!reaction){
+      feedback.textContent = "No reaction known for those substances.";
+      feedback.className = "feedback wrong";
+      return;
+    }
+    if(ans === reaction.change){
+      feedback.textContent = "Correct! Well observed!";
+      feedback.className = "feedback correct";
+      this.points++;
+      document.getElementById('pointsLab').textContent = this.points;
+      // Animate reaction (basic)
+      this.animateReaction(reaction);
+      setTimeout(() => {
+        this.selectedA = null;
+        this.selectedB = null;
+        this.highlightSelected('');
+        document.getElementById('reactionResult').textContent = '';
+        document.getElementById('feedback').textContent = '';
+      }, 2200);
+    } else {
+      feedback.textContent = `Incorrect! Try again.`;
+      feedback.className = "feedback wrong";
+    }
+  },
+  animateReaction(reaction){
+    const res = document.getElementById('reactionResult');
+    res.style.color = "#d05a17";
+    res.style.fontWeight = "900";
+    setTimeout(() => {
+      res.style.color = "#1273de";
+      res.style.fontWeight = "700";
+    }, 1800);
+  }
+};
+
+/* --- 3. Change Sorter Game --- */
+const changeSorterGame = {
+  conveyorItems:[
+    {name:"Melting Ice", type:"Physical"},
+    {name:"Burning Paper", type:"Chemical"},
+    {name:"Cutting Wood", type:"Physical"},
+    {name:"Cooking Egg", type:"Chemical"},
+    {name:"Boiling Water", type:"Physical"},
+    {name:"Rusting Nail", type:"Chemical"},
+    {name:"Shredding Paper", type:"Physical"},
+    {name:"Baking Bread", type:"Chemical"}
+  ],
+  score:0,
+  shuffled:[],
+  start(){
+    this.score=0;
+    this.shuffled = shuffle(this.conveyorItems.slice());
+    this.render();
+  },
+  render(){
+    modalContent.innerHTML = `
+      <button class="close-modal" onclick="closeModal()">&times;</button>
+      <h2>Change Sorter Game 📦</h2>
+      <p style="text-align:center; font-weight:700;">Drag objects to the correct box (Physical or Chemical change)</p>
+      <div id="conveyor-belt"></div>
+      <div class="drop-container">
+        <div style="flex:1; margin-right: 10px;">
+          <p style="text-align:center; font-weight:700;">Physical Change Box</p>
+          <div class="drop-box" id="physicalBox">Drop here</div>
+        </div>
+        <div style="flex:1; margin-left: 10px;">
+          <p style="text-align:center; font-weight:700;">Chemical Change Box</p>
+          <div class="drop-box" id="chemicalBox">Drop here</div>
+        </div>
+      </div>
+      <p style="text-align:center; margin-top:14px; font-weight:700;">Score: <span id="sortScore">0</span></p>
+      <div id="feedback" class="feedback" style="min-height:48px;"></div>
+    `;
+    this.renderConveyor();
+    this.setupDnd();
+  },
+  renderConveyor(){
+    const belt = modalContent.querySelector('#conveyor-belt');
+    belt.innerHTML = this.shuffled.map(item => `
+      <div class="drag-item" draggable="true" data-type="${item.type}" data-name="${item.name}" style="margin:5px;">
+        ${item.name}
+      </div>
+    `).join('');
+  },
+  setupDnd(){
+    const self = this;
+    modalContent.querySelectorAll('.drag-item').forEach(el=>{
+      el.ondragstart = e => {
+        e.dataTransfer.setData('text/plain', JSON.stringify({
+          name: el.dataset.name,
+          type: el.dataset.type
+        }));
+        setTimeout(() => el.style.visibility = 'hidden', 50);
+      };
+      el.ondragend = e => {
+        e.target.style.visibility = 'visible';
+      };
+    });
+    // Setup droppables
+    const physicalBox = modalContent.querySelector('#physicalBox');
+    const chemicalBox = modalContent.querySelector('#chemicalBox');
+    [physicalBox, chemicalBox].forEach(box=>{
+      box.ondragover = e => {
+        e.preventDefault();
+        box.style.borderColor = "#1262db";
+        box.style.backgroundColor = "#e1edfb";
+      };
+      box.ondragleave = e => {
+        box.style.borderColor = "#8dbce3";
+        box.style.backgroundColor = "white";
+      };
+      box.ondrop = e => {
+        e.preventDefault();
+        const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+        box.style.borderColor = "#8dbce3";
+        box.style.backgroundColor = "white";
+        self.processDrop(data, box);
+      };
+    });
+  },
+  processDrop(data, box){
+    const feedback = modalContent.querySelector('#feedback');
+    if((data.type === "Physical" && box.id === "physicalBox") || (data.type === "Chemical" && box.id === "chemicalBox")){
+      // Correct
+      this.score++;
+      modalContent.querySelector('#sortScore').textContent = this.score;
+      feedback.textContent = "Correct!";
+      feedback.className = "feedback correct";
+      // Remove from conveyor
+      this.shuffled = this.shuffled.filter(item=>item.name !== data.name);
+      this.renderConveyor();
+      this.setupDnd();
+      if(this.shuffled.length === 0){
+        setTimeout(()=>{
+          modalContent.innerHTML = `<button class="close-modal" onclick="closeModal()">&times;</button>
+            <h2>Change Sorter Game 📦</h2>
+            <p style="text-align:center; font-weight:700; font-size:1.3em;">
+              All items sorted! Final Score: ${this.score}
+            </p>`;
+        }, 1000);
+      }
+    } else {
+      feedback.textContent = "Wrong box - try again!";
+      feedback.className = "feedback wrong";
+    }
+  }
+};
+
+/* --- 4. Mystery Change Puzzle --- */
+const mysteryPuzzleGame = {
+  puzzlePieces:[
+    {text:"Melting ice", type:"Physical", quiz:"What kind of change is melting ice?", opts:["Physical","Chemical"], ans:"Physical"},
+    {text:"Burning paper", type:"Chemical", quiz:"What kind of change is burning paper?", opts:["Physical","Chemical"], ans:"Chemical"},
+    {text:"Cutting hair", type:"Physical", quiz:"What kind of change is cutting hair?", opts:["Physical","Chemical"], ans:"Physical"},
+    {text:"Rusting nail", type:"Chemical", quiz:"What kind of change is rusting nail?", opts:["Physical","Chemical"], ans:"Chemical"},
+    {text:"Dissolving sugar", type:"Physical", quiz:"Is dissolving sugar a physical or chemical change?", opts:["Physical","Chemical"], ans:"Physical"},
+    {text:"Cooking egg", type:"Chemical", quiz:"Is cooking an egg a physical or chemical change?", opts:["Physical","Chemical"], ans:"Chemical"}
+  ],
+  solved: 0,
+  selectedPiece: null,
+  placedPieces: [],
+  start(){
+    this.solved=0;
+    this.selectedPiece=null;
+    this.placedPieces = [];
+    this.render();
+  },
+  render(){
+    modalContent.innerHTML = `
+      <button class="close-modal" onclick="closeModal()">&times;</button>
+      <h2>Mystery Change Puzzle 🧩</h2>
+      <p style="text-align:center; font-weight:700;">Select a puzzle piece and answer the question to place it!</p>
+      <div id="piecesArea" style="display:flex;flex-wrap:wrap; justify-content:center; gap:12px; margin-top:18px;">
+      </div>
+      <div id="quizArea" style="margin-top: 20px; min-height: 120px; text-align:center;"></div>
+      <div class="puzzle-board" style="margin-top:26px;">
+        <div class="puzzle-slot" id="slotPhysical">
+          <h3 style="color:#136aaf;">Physical Changes</h3>
+        </div>
+        <div class="puzzle-slot" id="slotChemical">
+          <h3 style="color:#b33e3e;">Chemical Changes</h3>
+        </div>
+      </div>
+      <div id="finalResult" style="margin-top:26px; text-align:center; font-weight:700; font-size:1.2em; color:#118911;"></div>
+    `;
+    this.renderPieces();
+  },
+  renderPieces(){
+    const piecesArea = modalContent.querySelector('#piecesArea');
+    const piecesHtml = this.puzzlePieces.map((p,idx)=>{
+      if(this.placedPieces.includes(idx)) return '';
+      return `<div class="puzzle-piece" data-id="${idx}">${p.text}</div>`;
+    }).join('');
+    piecesArea.innerHTML = piecesHtml;
+    piecesArea.querySelectorAll('.puzzle-piece').forEach(el=>{
+      el.onclick = () => this.selectPiece(Number(el.dataset.id));
+    });
+    modalContent.querySelector('#quizArea').textContent = "Select a puzzle piece to see its question.";
+    modalContent.querySelector('#finalResult').textContent = "";
+  },
+  selectPiece(idx){
+    if(this.placedPieces.includes(idx)) return;
+    this.selectedPiece = idx;
+    const piece = this.puzzlePieces[idx];
+    const quizArea = modalContent.querySelector('#quizArea');
+    const optsHtml = piece.opts.map(opt=>`<button class="choice-btn">${opt}</button>`).join("");
+    quizArea.innerHTML = `
+      <p style="font-weight:700; font-size:1.1em; margin-bottom:12px;">${piece.quiz}</p>
+      ${optsHtml}
+      <div id="quizFeedback" class="feedback" style="min-height:40px; margin-top:14px;"></div>
+    `;
+    quizArea.querySelectorAll('button.choice-btn').forEach(btn=>{
+      btn.onclick = () => this.checkAnswer(btn.textContent);
+    });
+  },
+  checkAnswer(choice){
+    const piece = this.puzzlePieces[this.selectedPiece];
+    const feedback = modalContent.querySelector('#quizFeedback');
+    if(choice === piece.ans){
+      feedback.textContent = "Correct! Puzzle piece placed.";
+      feedback.className = 'feedback correct';
+      this.placedPieces.push(this.selectedPiece);
+      // Place in correct slot visually
+      const slot = (piece.ans === "Physical") ? modalContent.querySelector('#slotPhysical') : modalContent.querySelector('#slotChemical');
+      const newElem = document.createElement('div');
+      newElem.className = 'puzzle-piece';
+      newElem.textContent = piece.text;
+      newElem.style.cursor = 'default';
+      newElem.style.backgroundColor = piece.ans === "Physical" ? "#add4ff" : "#ffb7b7";
+      newElem.style.margin = "6px auto";
+      newElem.style.width = "120px";
+      slot.appendChild(newElem);
+      this.selectedPiece = null;
+      setTimeout(() => {
+        this.renderPieces();
+        if(this.placedPieces.length === this.puzzlePieces.length){
+          modalContent.querySelector('#finalResult').textContent = "Puzzle complete! You mastered change classifications! 🎉";
+          modalContent.querySelector('#quizArea').innerHTML = "";
+        }
+      }, 1500);
+    } else {
+      feedback.textContent = "Wrong answer. Try again.";
+      feedback.className = 'feedback wrong';
+    }
+  }
+};
+
+/* --- 5. Change Race Game --- */
+const changeRaceGame = {
+  trackLength: 500,
+  currentPos: 0,
+  questions:[
+    {q:"Melting wax: Physical or Chemical?", opts:["Physical","Chemical"], ans:"Physical"},
+    {q:"Rusting iron: Physical or Chemical?", opts:["Physical","Chemical"], ans:"Chemical"},
+    {q:"Freezing water: Physical or Chemical?", opts:["Physical","Chemical"], ans:"Physical"},
+    {q:"Burning paper: Physical or Chemical?", opts:["Physical","Chemical"], ans:"Chemical"},
+    {q:"Boiling water: Physical or Chemical?", opts:["Physical","Chemical"], ans:"Physical"},
+    {q:"Baking bread: Physical or Chemical?", opts:["Physical","Chemical"], ans:"Chemical"},
+  ],
+  score:0,
+  start(){
+    this.currentPos = 0;
+    this.score = 0;
+    this.render();
+  },
+  render(){
+    modalContent.innerHTML = `
+      <button class="close-modal" onclick="closeModal()">&times;</button>
+      <h2>Change Race 🏁</h2>
+      <div class="race-track">
+        <div id="raceChar" class="race-character" style="left:0;">🏃‍♂️</div>
+      </div>
+      <p class="race-question" id="raceQuestion"></p>
+      <div style="text-align:center; margin-top: 12px;" id="raceOptions"></div>
+      <p style="text-align:center; font-weight:700; margin-top: 20px;">Score: <span id="raceScore">0</span></p>
+      <div id="raceFeedback" class="feedback" style="min-height: 42px; margin-top: 12px;"></div>
+    `;
+    this.showQuestion();
+  },
+  showQuestion(){
+    if(this.score >= this.questions.length){
+      modalContent.querySelector('.race-question').textContent = "Race finished! Great job! 🎉";
+      modalContent.querySelector('#raceOptions').innerHTML = "";
+      return;
+    }
+    const q = this.questions[this.score];
+    modalContent.querySelector('#raceQuestion').textContent = q.q;
+    const optsDiv = modalContent.querySelector('#raceOptions');
+    optsDiv.innerHTML = q.opts.map(opt => `<button class="race-btn">${opt}</button>`).join("");
+    optsDiv.querySelectorAll('button').forEach(btn=>{
+      btn.onclick = () => this.checkAnswer(btn.textContent);
+    });
+    modalContent.querySelector('#raceFeedback').textContent = "";
+  },
+  checkAnswer(choice){
+    const q = this.questions[this.score];
+    const feedback = modalContent.querySelector('#raceFeedback');
+    if(choice === q.ans){
+      this.score++;
+      this.currentPos += 85;
+      modalContent.querySelector('#raceScore').textContent = this.score;
+      feedback.textContent = "Correct! You move forward. 🏃‍♂️";
+      feedback.className = "feedback correct";
+      const char = modalContent.querySelector('#raceChar');
+      char.style.left = this.currentPos + "px";
+      setTimeout(() => {
+        if(this.score < this.questions.length){
+          this.showQuestion();
+        } else {
+          modalContent.querySelector('.race-question').textContent = `Race completed! Score: ${this.score}/${this.questions.length} 🎉`;
+          modalContent.querySelector('#raceOptions').innerHTML = "";
+          feedback.textContent = "";
+        }
+      }, 1400);
+    } else {
+      feedback.textContent = "Wrong answer, try again!";
+      feedback.className = "feedback wrong";
+    }
+  }
+};
+
+// Utility shuffle function
+function shuffle(array) {
+  let currentIndex = array.length, randomIndex;
+  while(currentIndex !== 0){
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+    [array[currentIndex],array[randomIndex]] = [array[randomIndex],array[currentIndex]];
+  }
+  return array;
+}
+
+</script>
+</body>
+</html>

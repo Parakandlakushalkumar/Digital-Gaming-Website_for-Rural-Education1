@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Translation</title>
+<!-- ORIGINAL GAME CONTENT STARTS HERE -->
+<h1>🧬 Biology Treasure Hunt 🧬</h1>
+        <div class="treasure-count">
+            <span class="treasure-icon">🌿</span>
+            <span>DNA Treasures Found: <span id="score">0</span>/10</span><div id="game-area">
+            <div class="question-container">
+                <div class="question" id="question"></div>
+                <div class="options" id="options"></div>
+                <div class="result" id="result"></div>
+                <button class="next-btn" id="next-btn" onclick="nextQuestion()" style="display: none;">Next Evolution</button><script>
+        const questions = [
+            {
+                question: "Which process produces genetically identical offspring?",
+                options: ["Sexual reproduction", "Asexual reproduction", "Fertilization", "Meiosis"],
+                correct: 1,
+                explanation: "Asexual reproduction produces genetically identical clones without genetic recombination."
+            },
+            {
+                question: "What is the basic unit of heredity?",
+                options: ["Chromosome", "Gene", "Allele", "DNA"],
+                correct: 1,
+                explanation: "A gene is the basic unit of heredity that codes for specific traits."
+            },
+            {
+                question: "Who proposed the theory of evolution by natural selection?",
+                options: ["Gregor Mendel", "Charles Darwin", "Watson & Crick", "Louis Pasteur"],
+                correct: 1,
+                explanation: "Charles Darwin proposed the theory of evolution by natural selection in 'On the Origin of Species'."
+            },
+            {
+                question: "What is the probability of getting a heterozygous offspring from Aa × Aa cross?",
+                options: ["25%", "50%", "75%", "100%"],
+                correct: 1,
+                explanation: "In Aa × Aa cross: AA(25%), Aa(50%), aa(25%). So heterozygous probability is 50%."
+            },
+            {
+                question: "Which type of reproduction involves gamete formation?",
+                options: ["Binary fission", "Budding", "Sexual reproduction", "Fragmentation"],
+                correct: 2,
+                explanation: "Sexual reproduction involves formation and fusion of male and female gametes."
+            },
+            {
+                question: "What causes variation in sexually reproducing organisms?",
+                options: ["Mitosis", "Binary fission", "Crossing over", "Vegetative propagation"],
+                correct: 2,
+                explanation: "Crossing over during meiosis creates genetic variation by exchanging genetic material."
+            },
+            {
+                question: "Which evidence supports evolution?",
+                options: ["Fossil records", "Comparative anatomy", "Molecular biology", "All of the above"],
+                correct: 3,
+                explanation: "Evolution is supported by multiple lines of evidence including fossils, anatomy, and molecular data."
+            },
+            {
+                question: "What is the result of independent assortment?",
+                options: ["Linked genes", "Genetic variation", "Chromosome doubling", "Gene deletion"],
+                correct: 1,
+                explanation: "Independent assortment of chromosomes during meiosis increases genetic variation."
+            },
+            {
+                question: "Which process reduces chromosome number by half?",
+                options: ["Mitosis", "Meiosis", "Fertilization", "Binary fission"],
+                correct: 1,
+                explanation: "Meiosis is the reductive division that halves chromosome number to form gametes."
+            },
+            {
+                question: "What is natural selection based on?",
+                options: ["Survival of the fittest", "Inheritance of acquired traits", "Random mutations", "Genetic drift"],
+                correct: 0,
+                explanation: "Natural selection is based on 'survival of the fittest' - organisms best adapted to their environment."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question').textContent = q.question;
+            
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            
+            q.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => selectAnswer(index);
+                optionsDiv.appendChild(btn);
+            });
+            
+            document.getElementById('result').textContent = '';
+            document.getElementById('next-btn').style.display = 'none';
+            answered = false;
+        }
+
+        function selectAnswer(selected) {
+            if (answered) return;
+            
+            answered = true;
+            const q = questions[currentQuestion];
+            const options = document.querySelectorAll('.option-btn');
+            
+            options.forEach((btn, index) => {
+                if (index === q.correct) {
+                    btn.classList.add('correct');
+                } else if (index === selected && index !== q.correct) {
+                    btn.classList.add('incorrect');
+                }
+                btn.onclick = null;
+            });
+            
+            const resultDiv = document.getElementById('result');
+            if (selected === q.correct) {
+                score++;
+                resultDiv.innerHTML = `<span style="color: #FFD700;">🌟 Excellent! DNA Treasure acquired! 🌟</span><br>${q.explanation}`;
+                document.getElementById('score').textContent = score;
+            } else {
+                resultDiv.innerHTML = `<span style="color: #DC143C;">🔬 Not quite right!</span><br>${q.explanation}`;
+            }
+            
+            if (currentQuestion < questions.length - 1) {
+                document.getElementById('next-btn').style.display = 'inline-block';
+            } else {
+                setTimeout(showFinalScore, 2000);
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            loadQuestion();
+        }
+
+        function showFinalScore() {
+            const gameArea = document.getElementById('game-area');
+            let message, celebration;
+            
+            if (score === questions.length) {
+                message = "🏆 Perfect Evolution! You're a Biology Master! 🏆";
+                celebration = "🧬";
+            } else if (score >= questions.length * 0.8) {
+                message = "🌟 Outstanding! Darwin would be proud! 🌟";
+                celebration = "🦋";
+            } else if (score >= questions.length * 0.6) {
+                message = "🌱 Good growth! Keep evolving your knowledge! 🌱";
+                celebration = "🌿";
+            } else {
+                message = "🔬 Keep exploring the wonders of life! 🔬";
+                celebration = "🧪";
+            }
+            
+            gameArea.innerHTML = `
+                <div class="final-score">
+                    <div class="celebration">${celebration}</div>
+                    <h2>${message}</h2>
+                    <p style="font-size: 1.5rem; margin: 1rem 0;">Final Score: ${score}/${questions.length} DNA treasures</p>
+                    <p style="margin: 1rem 0;">You've mastered Reproduction, Genetics, and Evolution!</p>
+                    <button class="restart-btn" onclick="restartGame()">New Species Adventure</button>`;
+        }
+
+        function restartGame() {
+            currentQuestion = 0;
+            score = 0;
+            document.getElementById('score').textContent = '0';
+            document.getElementById('game-area').innerHTML = `
+                <div class="question-container">
+                    <div class="question" id="question"></div>
+                    <div class="options" id="options"></div>
+                    <div class="result" id="result"></div>
+                    <button class="next-btn" id="next-btn" onclick="nextQuestion()" style="display: none;">Next Evolution</button>`;
+            loadQuestion();
+        }
+
+        // Initialize the game
+        loadQuestion();
+    </script></html>

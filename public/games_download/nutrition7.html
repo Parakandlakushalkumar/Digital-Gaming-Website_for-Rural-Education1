@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Nutrition & Food Chain Science Games</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg,#eafff3 55%,#fffde7 120%,#e8e2fe 100%);
+      min-height: 100vh;
+    }
+    h1 {
+      margin: 40px 0 30px;
+      text-align: center;
+      font-size: 2.35em;
+      letter-spacing: .01em;
+      color: #357e4a;
+      text-shadow: 0 2px 12px #f3f8ed;
+    }
+    .cards-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      margin: 16px auto 48px;
+      max-width: 1200px;
+    }
+    .game-card {
+      width: 215px;
+      height: 345px;
+      background: linear-gradient(135deg,#fffefa 70%,#e1f0dc 110%);
+      border-radius: 24px;
+      box-shadow: 0 8px 28px #b5eae5bb, 0 2px 8px #dee8cb5c;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: transform .19s, box-shadow .19s;
+      overflow: hidden;
+      animation: floatCard 2.6s ease-in-out infinite;
+    }
+    .game-card:hover {
+      transform: scale(1.09) rotate(-2deg) translateY(-6px);
+      box-shadow: 0 12px 37px #b5eae5db, 0 2px 20px #fafecb89;
+      background: linear-gradient(135deg,#f7fff6 60%,#fffadc 120%);
+      z-index: 2;
+    }
+    @keyframes floatCard {
+      0%, 100% { transform: translateY(0); }
+      55% { transform: translateY(-14px); }
+    }
+    .card-icon {
+      font-size: 54px;
+      margin-top: 40px;
+      margin-bottom: 14px;
+      animation: iconPop 1.25s alternate infinite;
+      filter: drop-shadow(0 2px 10px #f6b3cb77);
+    }
+    @keyframes iconPop {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.13); }
+    }
+    .game-title { font-size: 1.23em; font-weight: 700; color: #357a52; margin-bottom: 8px; }
+    .game-desc { font-size: 1.03em; color: #519b6a; text-align: center; margin: 0 16px; }
+    .modal-bg {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(44, 73, 101, .18);
+      justify-content: center;
+      align-items: center;
+      transition: background .2s;
+    }
+    .modal-content {
+      background: linear-gradient(120deg,#fffafc 80%,#daf0ec 100%);
+      border-radius: 28px;
+      padding: 32px 18px 38px 18px;
+      min-width: 320px;
+      min-height: 310px;
+      max-width: 97vw;
+      max-height: 96vh;
+      overflow-y: auto;
+      box-shadow: 0 6px 44px #93e2e2b7;
+      position: relative;
+      animation: popScale .32s ease;
+    }
+    @keyframes popScale { 0% { transform: scale(.84); } 100% { transform: scale(1); } }
+    .close-modal {
+      position: absolute;
+      top: 14px; right: 20px;
+      font-size: 2em;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #6fb38a;
+      opacity: .78;
+      transition: color .18s;
+      z-index: 30;
+    }
+    .close-modal:hover { color: #ff8585; }
+    @media (max-width: 768px) {
+      .cards-container { gap: 1.1rem; }
+      .game-card { width: 170px; height: 255px; }
+      .modal-content { min-width: 96vw; }
+    }
+
+    /* -------- Food Chain -------- */
+    .foodchain-area {
+      background: linear-gradient(90deg,#ecffe9 75%,#f4f8ff 100%);
+      border-radius: 22px;
+      box-shadow: 0 3px 18px #d1ffd6a7;
+      padding: 19px 17px 12px;
+      min-height: 220px;
+      margin-bottom: 9px;
+      user-select:none;
+    }
+    .food-slot {
+      width: 95px; height: 84px; display: inline-block; vertical-align: top;
+      background: #edfff2be;
+      border-radius: 18px; box-shadow: 0 2px 10px #d2f6e6ad;
+      margin: 0 8px 10px 8px;
+      font-size: 2.1em; text-align: center; line-height: 80px;
+      border: 2px dashed #a8e5ca;
+      transition: box-shadow .16s;
+      position: relative;
+      overflow: hidden;
+    }
+    .food-slot.filled {
+      background: #dfffd9; border: 2px solid #87d197;
+    }
+    .foodchain-drags {
+      display: flex; justify-content: center; gap: 10px; margin: 18px 0 6px;
+    }
+    .food-draggable {
+      width: 52px; height: 52px; border-radius: 50%;
+      box-shadow: 0 2px 12px #c9e6c9b7, 0 1px 8px #ffe1a9;
+      background: linear-gradient(120deg, #fffce5 80%, #cafcd0 100%);
+      font-size: 2em; text-align: center; line-height: 52px;
+      cursor: grab; border: 2px solid #e9efa0;
+      transition: box-shadow .16s, background .13s;
+      position: relative; user-select: none;
+    }
+    .food-draggable:active { cursor: grabbing; }
+    .food-chain-info { margin: 10px 0 7px; font-size: 1em; color: #346a3a; }
+    .foodchain-feedback {
+      font-size: 1.12em; font-weight: 600; text-align: center;
+      margin: 13px 0 3px 0; min-height: 32px;
+    }
+
+    /* -------- Digestion Adventure -------- */
+    .digest-stage { font-size: 1.13em; font-weight: 700; color: #3a4c63; margin-top: 8px; }
+    .digest-question {
+      margin: 14px 0;
+      font-size: 1.18em;
+      font-weight: 700;
+      color: #6a4c1e;
+      background: #fff4edb2;
+      padding: 8px 14px 7px 14px;
+      border-radius: 7px;
+    }
+    .digest-options {
+      display: flex; justify-content: center; gap: 14px; margin-bottom: 10px;
+    }
+    .digest-btn {
+      padding: 7px 13px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 700;
+      font-size: 1.07em;
+      background: linear-gradient(90deg,#f1feea 70%,#fff7c1 130%);
+      color: #416d2c;
+      box-shadow: 0 1px 7px #b7edfc53;
+      cursor: pointer;
+      transition: background .13s, color .13s;
+      outline: none;
+    }
+    .digest-btn:hover {
+      background: linear-gradient(90deg,#cdfde7 80%,#fd99d6 160%);
+      color: #18a07d;
+    }
+    .digest-feedback {
+      margin-top: 10px;
+      font-weight: 700;
+      min-height: 27px;
+      text-align: center;
+      font-size: 1.17em;
+    }
+
+    /* -------- Plant Nutrition Match -------- */
+    
+    /* -------- Carnivore-Herbivore Race -------- */
+    .race-area {
+      background: linear-gradient(90deg,#fffefd,#e8fff2 100%);
+      border-radius: 18px;
+      box-shadow: 0 3px 18px #c8edffad;
+      padding: 19px 14px;
+      user-select:none;
+    }
+    .racetrack {
+      position: relative;
+      width: 280px;
+      height: 50px;
+      background: #fafefa;
+      border-radius: 16px;
+      box-shadow: 0 2px 10px #c9e6c9b7;
+      margin: 10px auto 25px;
+    }
+    .race-animal {
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      top: 1px;
+      font-size: 2.2em;
+      filter: drop-shadow(0 3px 11px #bafffc);
+      transition: left .3s ease;
+    }
+    .race-animal:nth-child(2) {
+      top: 27px;
+    }
+    .race-btn {
+      padding: 7px 17px; margin: 0 10px 0 0;
+      font-size: 1.1em; font-weight: 700;
+      border-radius: 7px;
+      border: none;
+      background: linear-gradient(90deg,#eae7fa 60%,#f8a6c1 120%);
+      color: #424482;
+      box-shadow: 0 2px 9px #fdb7e431;
+      cursor: pointer;
+      transition: background .15s, color .12s;
+      user-select:none;
+    }
+    .race-btn:hover {
+      background: linear-gradient(90deg,#cdfde7 80%,#fd99d6 160%);
+      color: #18a07d;
+    }
+    .raceq {
+      font-size: 1.16em;
+      font-weight: 800;
+      color: #316c48;
+      background: linear-gradient(90deg,#eafee9,#fefed7);
+      padding: 7px 15px;
+      border-radius: 16px;
+      user-select:none;
+    }
+    .race-feedback {
+      margin-top: 9px;
+      font-size: 1.08em;
+      min-height: 27px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    /* -------- Nutrition Puzzle Hunt -------- */
+    .hunt-area {
+      background: linear-gradient(90deg,#f2fff1 70%,#ffe1eb 110%);
+      border-radius: 17px;
+      box-shadow: 0 2px 11px #c8edffbb;
+      padding: 18px 11px 9px;
+      min-height: 210px;
+      user-select:none;
+    }
+    .hunt-item {
+      display: inline-block;
+      padding: 11px 17px;
+      border-radius: 12px;
+      background: linear-gradient(135deg,#f1feea 80%,#fff7c1 120%);
+      box-shadow: 0 1px 7px #b7edfc53;
+      margin: 7px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 1.14em;
+      color: #417d4e;
+      transition: background .17s, color .12s;
+      user-select:none;
+    }
+    .hunt-item.collected {
+      background: linear-gradient(120deg,#fac6fb 90%,#d5ffd9 110%);
+      color: #a25baa;
+      cursor: default;
+      box-shadow: 0 0 20px #deaafcff;
+    }
+    .hunt-feedback {
+      margin: 9px 0 2px 0;
+      font-size: 1.11em;
+      font-weight: 700;
+      text-align: center;
+      min-height: 29px;
+    }
+    .hunt-tokens {
+      margin: 13px 0;
+      font-size: 1em;
+      font-weight: 700;
+      color: #224755;
+      text-align: center;
+      background: #edffa7b6;
+      border-radius: 8px;
+      padding: 4px 11px;
+      display: inline-block;
+      user-select:none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Nutrition & Food Chain Mini-Games!</h1>
+  <div class="cards-container">
+    <div class="game-card" onclick="openGame(0)">
+      <div class="card-icon">🌿🐅</div>
+      <span class="game-title">Food Chain Builder</span>
+      <span class="game-desc">Drag animals/plants to build the food chain!</span>
+    </div>
+    <div class="game-card" onclick="openGame(1)">
+      <div class="card-icon">🥗</div>
+      <span class="game-title">Digestion Adventure</span>
+      <span class="game-desc">Guide food through the digestive system journey.</span>
+    </div>
+       <div class="game-card" onclick="openGame(3)">
+      <div class="card-icon">🏁</div>
+      <span class="game-title">Carnivore-Herbivore Quiz Race</span>
+      <span class="game-desc">Race to win by answering animal diet questions!</span>
+    </div>
+    <div class="game-card" onclick="openGame(4)">
+      <div class="card-icon">🔍</div>
+      <span class="game-title">Nutrition Puzzle Hunt</span>
+      <span class="game-desc">Solve food/nutrition puzzles to collect tokens!</span>
+    </div>
+  </div>
+  <div class="modal-bg" id="gameModal">
+    <div class="modal-content" id="modalContent">
+      <button class="close-modal" onclick="closeModal()">&times;</button>
+    </div>
+  </div>
+  <script>
+    function shuffle(arr){
+      for(let i=arr.length-1;i>0;i--){
+        let j=Math.floor(Math.random()*(i+1));
+        [arr[i],arr[j]]=[arr[j],arr[i]];
+      }
+      return arr;
+    }
+    function openGame(idx){
+      const modal=document.getElementById("gameModal");
+      const content=document.getElementById("modalContent");
+      if(idx===0) foodChainGame.start(content);
+      else if(idx===1) digestionGame.start(content);
+      else if(idx===2) plantMatchGame.start(content);
+      else if(idx===3) carnQuizGame.start(content);
+      else if(idx===4) puzzleHuntGame.start(content);
+      modal.style.display="flex";
+    }
+    function closeModal(){
+      document.getElementById("gameModal").style.display="none";
+    }
+    window.onclick=function(e){
+      if(e.target===document.getElementById("gameModal")) closeModal();
+    }
+
+    /* --- Food Chain Builder --- */
+    const foodChainGame={
+      slots:['Producer','Herbivore','Carnivore'],
+      animals:[
+        {name:'Grass',emoji:'🌿',type:'Producer'},
+        {name:'Deer',emoji:'🦌',type:'Herbivore'},
+        {name:'Tiger',emoji:'🐅',type:'Carnivore'},
+        {name:'Grain',emoji:'🌾',type:'Producer'},
+        {name:'Rabbit',emoji:'🐇',type:'Herbivore'},
+        {name:'Fox',emoji:'🦊',type:'Carnivore'}
+      ],
+      order:[],currSet:0,
+      start(cont){
+        this.order=shuffle([
+          ['Grass','Deer','Tiger'],
+          ['Grain','Rabbit','Fox']
+        ]);
+        this.currSet=0;
+        this.renderRound(cont);
+      },
+      renderRound(cont){
+        if(this.currSet>=this.order.length){
+          cont.innerHTML=`
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+            <div style="min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+              <div style="font-size:2.2em;color:#4cb558;">All food chains built!<br>🌿 🐇 🦊 🐅 🎉</div>
+              <div style="font-size:1.22em;color:#357e4a;margin-top:16px;">Great understanding of energy flow!</div>
+            </div>`;
+          return;
+        }
+        let animals=this.order[this.currSet];
+        let drags=shuffle(animals.map(n=>this.animals.find(a=>a.name===n)));
+        this.chainState=[null,null,null]; this.points=0;
+        cont.innerHTML=`
+          <button class="close-modal" onclick="closeModal()">&times;</button>
+          <div class="foodchain-area" id="foodchainArea">
+            <div style="text-align:center;font-size:1.12em;font-weight:700;color:#368c35; margin-bottom:7px;">
+              Drag animals/plants into their correct position to build the food chain:
+            </div>
+            <div style="text-align:center; margin-bottom:3px;">
+              <span style="font-weight:700;color:#548a3a;font-size:.96em;">(${this.currSet+1}/${this.order.length})</span>
+            </div>
+            <div style="text-align:center;" id="foodchainSlots">
+              ${this.slots.map((slot,i)=>`<div class="food-slot" data-slot="${slot}" id="fc_slot_${i}">
+                <div style="font-size:.88em;position:absolute;top:5px;left:5px;color:#497b2a;">${slot}</div>
+              </div>`).join('')}
+            </div>
+            <div class="food-chain-info">Producer ➔ Herbivore ➔ Carnivore</div>
+            <div class="foodchain-drags" id="foodchainDrags">
+              ${drags.map((a,i)=>`<div class="food-draggable" draggable="true" data-name="${a.name}" id="fdrag_${i}" style="margin-right:2px;">
+                ${a.emoji}<span style="font-size:.92em;vertical-align:middle;margin-left:2px;">${a.name}</span>
+              </div>`).join('')}
+            </div>
+            <div class="foodchain-feedback" id="foodchainFeedback"></div>
+          </div>
+        `;
+        setTimeout(()=>this.setupHandlers(cont,drags),60);
+      },
+      setupHandlers(cont,drags){
+        // Drag start
+        document.querySelectorAll('.food-draggable').forEach(item=>{
+          item.ondragstart=function(ev){
+            ev.dataTransfer.setData('text/plain', this.getAttribute('data-name'));
+            // To allow dragging this element info for drop target processing
+            ev.dataTransfer.effectAllowed='move';
+            // Mark dragging card for style
+            this.classList.add('dragging');
+          };
+          item.ondragend=function(ev){
+            this.classList.remove('dragging');
+          };
+        });
+        // Drop slots allow only one draggable at a time per slot
+        this.slots.forEach((slot,i)=>{
+          let el=document.getElementById('fc_slot_'+i);
+          el.ondragover=function(ev){ ev.preventDefault(); el.style.boxShadow = "0 2px 20px #bafffc"; };
+          el.ondragleave=function(ev){ el.style.boxShadow = ""; };
+          el.ondrop=ev=>{
+            ev.preventDefault();
+            el.style.boxShadow = "";
+            let dropped=ev.dataTransfer.getData('text/plain');
+            let found=drags.find(a=>a.name===dropped);
+            if(found.type===slot){
+              // Remove old draggable from this slot if any
+              if(el.classList.contains('filled')){
+                // Remove old draggable to drags area
+                let prevName = foodChainGame.chainState[i];
+                if(prevName){
+                  let dragArea = document.getElementById('foodchainDrags');
+                  // Only add back if not present
+                  if(!document.querySelector(`.food-draggable[data-name="${prevName}"]`)){
+                    let prevDrag=foodChainGame.animals.find(a=>a.name===prevName);
+                    let newDrag=document.createElement('div');
+                    newDrag.className = 'food-draggable';
+                    newDrag.draggable = true;
+                    newDrag.setAttribute('data-name', prevDrag.name);
+                    newDrag.id = 'fdrag_readd_'+prevDrag.name;
+                    newDrag.style.marginRight = '2px';
+                    newDrag.textContent = prevDrag.emoji;
+                    let sp = document.createElement('span');
+                    sp.style.cssText = "font-size:.92em;vertical-align:middle;margin-left:2px;";
+                    sp.textContent = prevDrag.name;
+                    newDrag.appendChild(sp);
+                    dragArea.appendChild(newDrag);
+                    // Add drag handlers for this recreated draggable
+                    newDrag.addEventListener('dragstart', foodChainGame._dragStartHandler);
+                    newDrag.addEventListener('dragend', foodChainGame._dragEndHandler);
+                  }
+                }
+              }
+              // Update slot content
+              el.innerHTML = `<div style="font-size:.88em;position:absolute;top:5px;left:5px;color:#497b2a;">${slot}</div>
+                <div style="font-size:2.25em;margin:7px 0;">${found.emoji}</div>
+                <div style="font-size:.99em;color:#417d4e">${found.name}</div>`;
+              el.classList.add('filled');
+              foodChainGame.chainState[i] = found.name;
+              // Remove draggable from drag area
+              let dragToRemove = document.querySelector(`.food-draggable[data-name='${found.name}']`);
+              if(dragToRemove) dragToRemove.remove();
+
+              document.getElementById("foodchainFeedback").innerHTML =
+                `<span style='color:#20a290;background:#edfdfff0;border-radius:7px;padding:4px 14px;'>Placed correctly! (+1pt)</span>`;
+              foodChainGame.points++;
+              // Check completion
+              if(foodChainGame.chainState.filter(Boolean).length === foodChainGame.slots.length){
+                setTimeout(()=>{
+                  foodChainGame.currSet++;
+                  foodChainGame.renderRound(cont);
+                }, 900);
+              }
+            } else {
+              document.getElementById("foodchainFeedback").innerHTML =
+                `<span style='color:#da3b2a;background:#fff5e7;border-radius:7px;padding:4px 14px;'>Try again! ${slot} here means ${slot==='Producer'?'a plant':slot==='Herbivore'? 'an animal that eats plants':'an animal that eats other animals'}.</span>`;
+              el.classList.remove('filled');
+            }
+          };
+        });
+        // Store handlers to re-assign on new draggable creations
+        this._dragStartHandler = function(ev){
+          ev.dataTransfer.setData('text/plain', this.getAttribute('data-name'));
+          ev.dataTransfer.effectAllowed = 'move';
+          this.classList.add('dragging');
+        };
+        this._dragEndHandler = function(ev){
+          this.classList.remove('dragging');
+        };
+      }
+    };
+
+    /* --- Digestion Adventure --- */
+    const digestionGame = {
+      stages:[
+        {name:"Mouth",question:"Which enzyme breaks down starch?",opts:["Pepsin","Salivary amylase","Lipase"],ans:1,hint:"It's found in saliva."},
+        {name:"Stomach",question:"Which enzyme digests proteins?",opts:["Pepsin","Amylase","Trypsin"],ans:0,hint:"Starts with 'P'."},
+        {name:"Small Intestine",question:"Which enzyme digests fats?",opts:["Lipase","Amylase","Pepsin"],ans:0,hint:"Sounds like 'lipid'."},
+        {name:"Large Intestine",question:"Main function of large intestine?",opts:["Absorption of water","Digestion of proteins","Production of bile"],ans:0,hint:"Think about what is left at the end."},
+      ],
+      currStage:0,
+      start(cont){
+        this.currStage=0;
+        this.renderStage(cont);
+      },
+      renderStage(cont){
+        if(this.currStage>=this.stages.length){
+          cont.innerHTML = `<button class="close-modal" onclick="closeModal()">&times;</button>
+              <div style="min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                <div style="font-size:2.2em;color:#26829a;">Journey completed!<br>🥗 🏁 🎉</div>
+                <div style="font-size:1.19em;color:#357e4a;margin-top:13px;">Congratulations—you guided food through the digestive system!</div>
+              </div>`;
+          return;
+        }
+        let stg=this.stages[this.currStage];
+        cont.innerHTML =
+          `<button class="close-modal" onclick="closeModal()">&times;</button>
+           <div style="max-width:470px;margin:0 auto">
+            <h2 style="color:#367c6f;font-weight:800;font-size:1.24em;text-align:center;">
+              Digestion Adventure: ${stg.name}
+              <span style="float:right;font-size:.82em;color:#709eaf;">(${this.currStage+1}/${this.stages.length})</span>
+            </h2>
+            <div class="digest-question">${stg.question}</div>
+            <div class="digest-options">
+              ${stg.opts.map((o,j)=> `<button class="digest-btn" data-idx="${j}">${o}</button>`).join('')}
+            </div>
+            <div class="digest-feedback" id="digestFeedback"></div>
+            <div style="margin-top:14px;font-size:.98em;color:#517785;text-align:center;">
+              <span style="border-bottom:1.2px dotted #e5f49c;">Journey:</span> Mouth → Stomach → Small intestine → Large intestine
+            </div>
+           </div>`;
+        setTimeout(()=>this.setupStage(cont),64);
+      },
+      setupStage(cont){
+        let stg=this.stages[this.currStage];
+        Array.from(document.getElementsByClassName('digest-btn')).forEach(b=>{
+          b.onclick=function(){
+            let idx=Number(this.getAttribute('data-idx'));
+            if(idx===stg.ans){
+              document.getElementById("digestFeedback").innerHTML =
+                "<span style='color:#08754f;background:#e9ffeca2;padding:5px 15px;border-radius:7px;'>Correct! 🚀</span>";
+              setTimeout(()=>{digestionGame.currStage++;digestionGame.renderStage(cont)},800);
+            }else{
+              document.getElementById("digestFeedback").innerHTML =
+                `<span style='color:#c72e37;background:#fffceda2;padding:5px 11px;border-radius:7px;'>Wrong! Hint: ${stg.hint}</span>`;
+            }
+          }
+        });
+      }
+    };
+
+
+
+    /* --- Carnivore-Herbivore Race --- */
+    const carnQuizGame = {
+      races:[
+        {q:"Which animal eats grass?",opts:["Cow 🐄","Tiger 🐅"],ans:0},
+        {q:"Which animal is a carnivore?",opts:["Deer 🦌","Lion 🦁"],ans:1},
+        {q:"Which is an omnivore?",opts:["Bear 🐻","Rabbit 🐇"],ans:0},
+        {q:"Which animal eats meat?",opts:["Eagle 🦅","Goat 🐐"],ans:0},
+        {q:"Which is a herbivore?",opts:["Horse 🐎","Wolf 🐺"],ans:0}
+      ], racePos:[0,0], qidx:0,
+      start(cont){
+        this.racePos=[0,0]; this.qidx=0;
+        this.render(cont);
+      },
+      render(cont){
+        if(this.qidx>=this.races.length){
+          cont.innerHTML =
+            `<button class="close-modal" onclick="closeModal()">&times;</button>
+              <div style="min-height:180px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+              <div style="font-size:2.1em;color:#4cb558;">Race completed! <span style="font-size:1.3em;">🏁</span></div>
+              <div style="font-size:1.21em;color:#2f7c47;margin-top:9px;">
+                ${this.racePos[0]>this.racePos[1]?"You won the race!":"The computer won. Try again?"}</div>
+              </div>`;
+          return;
+        }
+        let race=this.races[this.qidx];
+        cont.innerHTML =
+          `<button class="close-modal" onclick="closeModal()">&times;</button>
+            <div class="race-area">
+              <h2 style="text-align:center;font-size:1.14em;font-weight:800;color:#357a52;">
+                Carnivore-Herbivore Quiz Race <span style="float:right;font-size:.95em;color:#709eaf;">(${this.qidx+1}/${this.races.length})</span>
+              </h2>
+              <div class="racetrack">
+                <div class="race-animal" id="race_animal_0" style="left:${this.racePos[0]}px;">🐾</div>
+                <div class="race-animal" id="race_animal_1" style="left:${this.racePos[1]}px;top:27px;">🐾</div>
+              </div>
+              <div class="raceq">${race.q}</div>
+              <div style="text-align:center;margin-top:8px;">
+                ${race.opts.map((o,i)=>`<button class="race-btn" data-ans="${i}">${o}</button>`).join('')}
+              </div>
+              <div class="race-feedback" id="raceFeedback"></div>
+            </div>`;
+        setTimeout(()=>this.setupQuiz(cont,race),46);
+      },
+      setupQuiz(cont,race){
+        document.querySelectorAll('.race-btn').forEach(btn=>{
+          btn.onclick=()=>{
+            let idx=Number(btn.getAttribute("data-ans"));
+            if(idx===race.ans){
+              carnQuizGame.racePos[0]+=60;
+              document.getElementById("race_animal_0").style.left=carnQuizGame.racePos[0]+"px";
+              document.getElementById("raceFeedback").innerHTML =
+                "<span style='color:#20a290;background:#edfdfff0;border-radius:7px;padding:4px 14px;'>Correct! Your animal moves ahead.</span>";
+            }else{
+              document.getElementById("raceFeedback").innerHTML =
+                "<span style='color:#da3b2a;background:#ffe9eba2;border-radius:7px;padding:4px 14px;'>Wrong answer. Your animal stops.</span>";
+              carnQuizGame.racePos[1]+=60; // computer moves
+              document.getElementById("race_animal_1").style.left=carnQuizGame.racePos[1]+"px";
+            }
+            setTimeout(()=>{carnQuizGame.qidx++;carnQuizGame.render(cont);},700);
+          };
+        });
+      }
+    };
+
+    /* --- Nutrition Puzzle Hunt --- */
+    const puzzleHuntGame = {
+      items:[
+        {q:"Grass 🌿 - Autotroph or Heterotroph?",opts:["Autotroph","Heterotroph"],ans:0,desc:"Makes own food via photosynthesis."},
+        {q:"Tiger 🐅 - Autotroph or Heterotroph?",opts:["Autotroph","Heterotroph"],ans:1,desc:"Gets food by hunting animals."},
+        {q:"Mushroom 🍄 - Autotroph or Heterotroph?",opts:["Autotroph","Heterotroph"],ans:1,desc:"Absorbs nutrients from decaying matter."},
+        {q:"Leaf 🌱 - What process produces glucose?",opts:["Photosynthesis","Respiration"],ans:0,desc:"Sunlight powers glucose formation in leaves."},
+        {q:"Cow 🐄 - Herbivore or Carnivore?",opts:["Herbivore","Carnivore"],ans:0,desc:"Eats only plants."}
+      ],
+      collected: [],
+      idx: 0,
+      start(cont) {
+        this.collected = [];
+        this.idx = 0;
+        this.render(cont);
+      },
+      render(cont){
+        if(this.collected.length === this.items.length){
+          cont.innerHTML = `
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+            <div style="min-height:180px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+              <div style="font-size:2.25em;color:#541bc7;">Treasure Unlocked!<br>🗝️🏅🌳</div>
+              <div style="margin-top:13px;color:#357e4a;font-size:1.14em;">All nutrition tokens collected!</div>
+            </div>`;
+          return;
+        }
+        const item = this.items[this.idx];
+        cont.innerHTML = `
+          <button class="close-modal" onclick="closeModal()">&times;</button>
+          <div class="hunt-area">
+            <h2 style="text-align:center;font-size:1.16em;font-weight:800;color:#65624e;">
+              Nutrition Puzzle Hunt
+              <span style="float:right;font-size:.95em;color:#709eaf;">(${this.collected.length + 1}/${this.items.length})</span>
+            </h2>
+            <div class="hunt-tokens">Tokens Collected: ${this.collected.length}/${this.items.length}</div>
+            <div class="hunt-item" id="hunt_q">${item.q}</div>
+            <div style="text-align:center;margin:14px 0;">
+              ${item.opts.map((o, i) => `<button class="hunt-item" style="padding:7px 22px;font-size:1.06em;" data-ans="${i}">${o}</button>`).join('')}
+            </div>
+            <div class="hunt-feedback" id="huntFeedback"></div>
+          </div>`;
+        setTimeout(() => this.setupHandlers(cont), 44);
+      },
+      setupHandlers(cont){
+        const item = this.items[this.idx];
+        document.querySelectorAll('.hunt-item[data-ans]').forEach(btn => {
+          btn.onclick = () => {
+            let ans = Number(btn.getAttribute('data-ans'));
+            if (ans === item.ans) {
+              this.collected.push(this.idx);
+              document.getElementById("huntFeedback").innerHTML =
+                `<span style="color:#0dac80;background:#e9ffe9a2;padding:4px 12px;border-radius:7px;">Correct! ${item.desc}</span>`;
+              setTimeout(() => {
+                this.idx++;
+                this.render(cont);
+              }, 700);
+            } else {
+              document.getElementById("huntFeedback").innerHTML =
+                `<span style="color:#d94c5d;background:#ffe9eb96;padding:4px 12px;border-radius:7px;">Try again: ${item.desc}</span>`;
+            }
+          };
+        });
+      }
+    };
+  </script>
+</body>
+</html>

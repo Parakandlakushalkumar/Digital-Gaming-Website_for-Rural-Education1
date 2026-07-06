@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Light & Electricity Educational Games - MCQ</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0061a8, #002b5c);
+    color: #fff;
+    margin: 0; padding: 20px;
+    min-height: 100vh;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2.8rem;
+    background: linear-gradient(90deg, #ffcc00, #ff9900);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(300px,1fr));
+    gap: 25px;
+    max-width: 1200px;
+    margin: 0 auto 40px;
+  }
+  .game-card {
+    background: linear-gradient(145deg, #1b3a6a, #2a5298);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    height: 280px;
+    transition: transform 0.3s ease;
+  }
+  .game-card:hover {
+    transform: translateY(-8px);
+  }
+  .game-icon {
+    font-size: 2.8rem;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+  .game-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #ffcc00;
+  }
+  .game-type {
+    font-size: 0.9rem;
+    color: #88d6ff;
+    margin-bottom: 15px;
+    font-weight: 600;
+  }
+  .game-description {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #e0f0ff;
+    margin-bottom: 15px;
+    flex-grow: 1;
+  }
+  .game-goal {
+    font-size: 0.85rem;
+    font-style: italic;
+    color: #c9e9ff;
+    padding-top: 10px;
+    border-top: 1px dashed #4a72b5;
+  }
+  /* Modal */
+  .modal {
+    display: none;
+    position: fixed;
+    top:0; left:0; right:0; bottom:0;
+    background: rgba(0,0,0,0.85);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+    padding: 20px;
+  }
+  .modal.active {
+    display: flex;
+  }
+  .modal-content {
+    background: linear-gradient(to bottom, #3a7bd5, #2c3e50);
+    width: 90%;
+    max-width: 700px;
+    border-radius: 15px;
+    padding: 25px;
+    position: relative;
+    box-shadow: 0 0 40px rgba(0,0,140,0.5);
+    color: #fff;
+  }
+  .close-button {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    cursor: pointer;
+    color: #ffcc00;
+    transition: color 0.3s;
+  }
+  .close-button:hover {
+    color: #ff9900;
+  }
+  .question {
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    color: #ffcc00;
+  }
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  .option {
+    background: rgba(255,255,255,0.1);
+    padding: 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  .option:hover {
+    background: rgba(255,204,0,0.2);
+  }
+  .option.correct {
+    background: #4caf50 !important;
+    color: #000;
+  }
+  .option.incorrect {
+    background: #ff5722 !important;
+    color: #000;
+  }
+  .feedback {
+    margin-top: 20px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    min-height: 1.5em;
+  }
+  .score {
+    margin-top: 15px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #ffcc00;
+  }
+  button.next-btn {
+    margin-top: 25px;
+    background: #ffcc00;
+    border: none;
+    padding: 10px 20px;
+    font-weight: 700;
+    border-radius: 10px;
+    cursor: pointer;
+    color: #000;
+    font-size: 1rem;
+  }
+  button.next-btn:disabled {
+    background: #999;
+    cursor: not-allowed;
+  }
+  @media (max-width: 600px) {
+    .game-card {
+      height: auto;
+    }
+  }
+</style>
+</head>
+<body>
+<h1>Light & Electricity Educational Games - MCQ</h1>
+<div class="cards-container">
+  <div class="game-card" data-game="shadowMatch" tabindex="0" role="button" aria-pressed="false" aria-label="Play Shadow Match quiz">
+    <div class="game-icon">🎭</div>
+    <div class="game-title">Shadow Match</div>
+    <div class="game-type">Matching Puzzle</div>
+    <div class="game-description">MCQs about how light creates shadows and shadow shapes depend on the object.</div>
+    <div class="game-goal">Understand light and shadow relationships</div>
+  </div>
+  <div class="game-card" data-game="shadowDirection" tabindex="0" role="button" aria-pressed="false" aria-label="Play Shadow Direction quiz">
+    <div class="game-icon">🌞➡️👤</div>
+    <div class="game-title">Shadow Direction Game</div>
+    <div class="game-type">Simulation</div>
+    <div class="game-description">MCQs about how shadows change with light direction and time of day.</div>
+    <div class="game-goal">Learn shadow behavior with sun position</div>
+  </div>
+  <div class="game-card" data-game="bulbConnection" tabindex="0" role="button" aria-pressed="false" aria-label="Play Bulb Connection quiz">
+    <div class="game-icon">⚡💡</div>
+    <div class="game-title">Bulb Connection</div>
+    <div class="game-type">Circuit-Building Game</div>
+    <div class="game-description">MCQs about closed circuits, conductors, and insulators.</div>
+    <div class="game-goal">Learn about electrical circuits</div>
+  </div>
+  <div class="game-card" data-game="lightMaze" tabindex="0" role="button" aria-pressed="false" aria-label="Play Light Maze quiz">
+    <div class="game-icon">🔦</div>
+    <div class="game-title">Light Maze</div>
+    <div class="game-type">Puzzle</div>
+    <div class="game-description">MCQs about light reflection and direction.</div>
+    <div class="game-goal">Learn light reflection principles</div>
+  </div>
+  <div class="game-card" data-game="electricityQuiz" tabindex="0" role="button" aria-pressed="false" aria-label="Play Electricity Quiz Buzzer">
+    <div class="game-icon">🛎️</div>
+    <div class="game-title">Electricity Quiz Buzzer</div>
+    <div class="game-type">Quiz Game</div>
+    <div class="game-description">Rapid-fire MCQs about electricity basics.</div>
+    <div class="game-goal">Reinforce electricity basics</div>
+  </div>
+</div>
+
+<div class="modal" id="quizModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1">
+  <div class="modal-content">
+    <span class="close-button" id="closeModalBtn" aria-label="Close quiz">&times;</span>
+    <h2 id="modalTitle">Quiz</h2>
+    <div class="question" id="questionText"></div>
+    <div class="options" id="optionsContainer"></div>
+    <div class="feedback" id="feedback"></div>
+    <div class="score" id="scoreDisplay"></div>
+    <button class="next-btn" id="nextBtn" disabled>Next Question</button>
+  </div>
+</div>
+
+<script>
+  const cards = document.querySelectorAll('.game-card');
+  const modal = document.getElementById('quizModal');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  const modalTitle = document.getElementById('modalTitle');
+  const questionText = document.getElementById('questionText');
+  const optionsContainer = document.getElementById('optionsContainer');
+  const feedback = document.getElementById('feedback');
+  const scoreDisplay = document.getElementById('scoreDisplay');
+  const nextBtn = document.getElementById('nextBtn');
+
+  // MCQ data for each game
+  const quizzes = {
+    shadowMatch: {
+      title: "Shadow Match Quiz",
+      questions: [
+        {
+          question: "What causes a shadow to form?",
+          options: ["Light passing through an object", "Light being blocked by an object", "Reflection of light", "Refraction of light"],
+          answer: 1
+        },
+        {
+          question: "How does the shape of a shadow relate to the object?",
+          options: ["It is always circular", "It matches the shape of the object", "It is always larger", "It is always smaller"],
+          answer: 1
+        },
+        {
+          question: "What happens to a shadow if the object moves closer to the light source?",
+          options: ["Shadow becomes smaller", "Shadow disappears", "Shadow becomes larger", "Shadow changes color"],
+          answer: 2
+        }
+      ]
+    },
+    shadowDirection: {
+      title: "Shadow Direction Quiz",
+      questions: [
+        {
+          question: "When the sun is low in the sky, shadows are:",
+          options: ["Short", "Long", "Invisible", "Blue"],
+          answer: 1
+        },
+        {
+          question: "If the sun is to your right, your shadow will fall:",
+          options: ["To your left", "To your right", "Behind you", "In front of you"],
+          answer: 0
+        },
+        {
+          question: "At noon, shadows are usually:",
+          options: ["Long and to the east", "Short and under the object", "Long and to the west", "Nonexistent"],
+          answer: 1
+        }
+      ]
+    },
+    bulbConnection: {
+      title: "Bulb Connection Quiz",
+      questions: [
+        {
+          question: "What is needed to make a bulb glow in a circuit?",
+          options: ["An open circuit", "A closed circuit", "No wires", "A broken battery"],
+          answer: 1
+        },
+        {
+          question: "Which material is a good conductor of electricity?",
+          options: ["Plastic", "Wood", "Copper", "Rubber"],
+          answer: 2
+        },
+        {
+          question: "What happens if the circuit is broken?",
+          options: ["Bulb glows brighter", "Bulb glows dimmer", "Bulb does not glow", "Battery explodes"],
+          answer: 2
+        }
+      ]
+    },
+    lightMaze: {
+      title: "Light Maze Quiz",
+      questions: [
+        {
+          question: "What happens when light hits a mirror?",
+          options: ["It is absorbed", "It is reflected", "It disappears", "It bends"],
+          answer: 1
+        },
+        {
+          question: "The angle of incidence equals the angle of:",
+          options: ["Reflection", "Refraction", "Absorption", "Diffusion"],
+          answer: 0
+        },
+        {
+          question: "Mirrors can be used to:",
+          options: ["Change light direction", "Make light disappear", "Create shadows", "Make light slower"],
+          answer: 0
+        }
+      ]
+    },
+    electricityQuiz: {
+      title: "Electricity Quiz Buzzer",
+      questions: [
+        {
+          question: "Which of these is an insulator?",
+          options: ["Copper", "Plastic", "Aluminum", "Gold"],
+          answer: 1
+        },
+        {
+          question: "Electricity flows through:",
+          options: ["Conductors", "Insulators", "Both", "None"],
+          answer: 0
+        },
+        {
+          question: "A battery is a source of:",
+          options: ["Light", "Electricity", "Heat", "Sound"],
+          answer: 1
+        }
+      ]
+    }
+  };
+
+  let currentQuiz = null;
+  let currentQuestionIndex = 0;
+  let score = 0;
+  let answered = false;
+
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      const game = card.getAttribute('data-game');
+      startQuiz(game);
+    });
+    card.addEventListener('keydown', e => {
+      if(e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const game = card.getAttribute('data-game');
+        startQuiz(game);
+      }
+    });
+  });
+
+  closeModalBtn.addEventListener('click', closeQuiz);
+  nextBtn.addEventListener('click', () => {
+    currentQuestionIndex++;
+    if(currentQuestionIndex < currentQuiz.questions.length) {
+      showQuestion();
+    } else {
+      showFinalScore();
+    }
+  });
+
+  function startQuiz(game) {
+    currentQuiz = quizzes[game];
+    currentQuestionIndex = 0;
+    score = 0;
+    answered = false;
+    modalTitle.textContent = currentQuiz.title;
+    scoreDisplay.textContent = `Score: ${score}`;
+    feedback.textContent = '';
+    nextBtn.disabled = true;
+    showQuestion();
+    modal.classList.add('active');
+    modal.focus();
+  }
+
+  function showQuestion() {
+    answered = false;
+    nextBtn.disabled = true;
+    feedback.textContent = '';
+    scoreDisplay.textContent = `Score: ${score}`;
+    const q = currentQuiz.questions[currentQuestionIndex];
+    questionText.textContent = q.question;
+    optionsContainer.innerHTML = '';
+    q.options.forEach((opt, i) => {
+      const div = document.createElement('div');
+      div.className = 'option';
+      div.textContent = opt;
+      div.tabIndex = 0;
+      div.setAttribute('role', 'button');
+      div.setAttribute('aria-pressed', 'false');
+      div.addEventListener('click', () => selectOption(i, div));
+      div.addEventListener('keydown', e => {
+        if(e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          selectOption(i, div);
+        }
+      });
+      optionsContainer.appendChild(div);
+    });
+  }
+
+  function selectOption(index, element) {
+    if(answered) return;
+    answered = true;
+    const q = currentQuiz.questions[currentQuestionIndex];
+    const options = optionsContainer.querySelectorAll('.option');
+    options.forEach((opt, i) => {
+      opt.setAttribute('aria-pressed', 'false');
+      opt.classList.remove('correct', 'incorrect');
+      opt.style.pointerEvents = 'none';
+    });
+    element.setAttribute('aria-pressed', 'true');
+    if(index === q.answer) {
+      element.classList.add('correct');
+      feedback.textContent = 'Correct! 🎉';
+      score++;
+      scoreDisplay.textContent = `Score: ${score}`;
+    } else {
+      element.classList.add('incorrect');
+      options[q.answer].classList.add('correct');
+      feedback.textContent = 'Incorrect. Try the next one!';
+    }
+    nextBtn.disabled = false;
+  }
+
+  function showFinalScore() {
+    questionText.textContent = `Quiz completed! Your final score is ${score} out of ${currentQuiz.questions.length}.`;
+    optionsContainer.innerHTML = '';
+    feedback.textContent = '';
+    nextBtn.disabled = true;
+  }
+
+  function closeQuiz() {
+    modal.classList.remove('active');
+  }
+</script>
+</body>
+</html>

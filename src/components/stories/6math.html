@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Mathematical Adventure of Maya and Arjun</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .title {
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #f0f0f0;
+            margin-bottom: 20px;
+        }
+
+        .language-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .lang-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .lang-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .lang-btn.active {
+            background: #ff6b6b;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .story-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .story-section:hover {
+            transform: translateY(-5px);
+        }
+
+        .topic-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .topic-number {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+
+        .topic-title {
+            font-size: 1.8rem;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .story-content {
+            line-height: 1.8;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .interactive-element {
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px dashed #ff6b6b;
+        }
+
+        .math-problem {
+            background: #e8f4fd;
+            border-left: 5px solid #2196F3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .solution-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .solution-btn:hover {
+            background: #45a049;
+            transform: scale(1.05);
+        }
+
+        .solution {
+            display: none;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .character {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .maya {
+            background: #ffeb3b;
+            color: #333;
+        }
+
+        .arjun {
+            background: #4caf50;
+            color: white;
+        }
+
+        .visual-aid {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .chart-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .story-section {
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .story-section {
+                padding: 20px;
+            }
+            
+            .language-selector {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">The Mathematical Adventure of Maya and Arjun</h1>
+            <p class="subtitle">मया और अर्जुन का गणितीय साहसिक कार्य | మాయ మరియు అర్జున్ యొక్క గణిత సాహసం</p>
+            
+            <div class="language-selector">
+                <button class="lang-btn active" onclick="switchLanguage('en')">English</button>
+                <button class="lang-btn" onclick="switchLanguage('hi')">हिंदी</button>
+                <button class="lang-btn" onclick="switchLanguage('te')">తెలుగు</button>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Topic 1: Numbers & Operations -->
+        <div class="story-section" data-topic="1">
+            <div class="topic-header">
+                <div class="topic-number">1</div>
+                <h2 class="topic-title" data-en="Numbers & Operations: The Magic Number Kingdom" 
+                    data-hi="संख्याएं और संक्रियाएं: जादुई संख्या राज्य" 
+                    data-te="సంఖ్యలు మరియు కార్యకలాపాలు: మాయా సంఖ్య రాజ్యం">Numbers & Operations: The Magic Number Kingdom</h2>
+            </div>
+            
+            <div class="story-content" data-en="Once upon a time, Maya and Arjun discovered a magical portal that led them to the Number Kingdom. The wise King Fraction welcomed them with a puzzle involving his treasure chest." 
+                 data-hi="एक बार, मया और अर्जुन ने एक जादुई पोर्टल की खोज की जो उन्हें संख्या राज्य में ले गया। बुद्धिमान राजा भिन्न ने अपने खजाने की पेटी से जुड़ी एक पहेली के साथ उनका स्वागत किया।" 
+                 data-te="ఒకప్పుడు, మాయ మరియు అర్జున్ వారిని సంఖ్య రాజ్యానికి తీసుకెళ్ళే మాయా పోర్టల్‌ను కనుగొన్నారు. తెలివైన రాజు భిన్నం వారిని తన నిధిపెట్టెతో సంబంధం ఉన్న పజిల్‌తో స్వాగతించాడు।">Once upon a time, Maya and Arjun discovered a magical portal that led them to the Number Kingdom. The wise King Fraction welcomed them with a puzzle involving his treasure chest.</div>
+
+            <div class="interactive-element">
+                <p class="character maya" data-en="Maya: Look! The treasure chest is divided into parts!" data-hi="मया: देखो! खजाने की पेटी भागों में बंटी है!" data-te="మాయ: చూడు! నిధిపెట్టె భాగాలుగా విభజించబడింది!">Maya: Look! The treasure chest is divided into parts!</p>
+                <p class="character arjun" data-en="Arjun: We need to find 3/4 of 240 gold coins to unlock it!" data-hi="अर्जुन: इसे खोलने के लिए हमें 240 सोने के सिक्कों का 3/4 भाग ढूंढना होगा!" data-te="అర్జున్: దాన్ని అన్‌లాక్ చేయడానికి మనం 240 బంగారు నాణేలలో 3/4 కనుగొనాలి!">Arjun: We need to find 3/4 of 240 gold coins to unlock it!</p>
+            </div>
+
+            <div class="math-problem">
+                <strong data-en="Problem:" data-hi="समस्या:" data-te="సమస్య:">Problem:</strong> <span data-en="Find 3/4 of 240 gold coins" data-hi="240 सोने के सिक्कों का 3/4 भाग ज्ञात करें" data-te="240 బంగారు నాణేలలో 3/4 కనుగొనండి">Find 3/4 of 240 gold coins</span>
+                <br><button class="solution-btn" onclick="toggleSolution('sol1')" data-en="Show Solution" data-hi="समाधान दिखाएं" data-te="పరిష్కారం చూపించు">Show Solution</button>
+                <div id="sol1" class="solution">
+                    <strong data-en="Solution:" data-hi="समाधान:" data-te="పరిష్కారం:">Solution:</strong><br>
+                    <span data-en="3/4 × 240 = (3 × 240) ÷ 4 = 720 ÷ 4 = 180 gold coins" data-hi="3/4 × 240 = (3 × 240) ÷ 4 = 720 ÷ 4 = 180 सोने के सिक्के" data-te="3/4 × 240 = (3 × 240) ÷ 4 = 720 ÷ 4 = 180 బంగారు నాణేలు">3/4 × 240 = (3 × 240) ÷ 4 = 720 ÷ 4 = 180 gold coins</span>
+                </div>
+            </div>
+
+            <div class="visual-aid">
+                <div data-en="Visual: Fraction Circle showing 3/4 shaded" data-hi="दृश्य: भिन्न वृत्त में 3/4 भाग रंगा हुआ" data-te="విజువల్: 3/4 షేడ్ చేసిన భిన్న వృత్తం">Visual: Fraction Circle showing 3/4 shaded</div>
+                <div style="width: 200px; height: 200px; border-radius: 50%; background: conic-gradient(#4CAF50 0deg 270deg, #e0e0e0 270deg 360deg); margin: 0 auto;"></div>
+            </div>
+        </div>
+
+        <!-- Topic 2: Factors & Multiples -->
+        <div class="story-section" data-topic="2">
+            <div class="topic-header">
+                <div class="topic-number">2</div>
+                <h2 class="topic-title" data-en="Factors & Multiples: The Secret Garden" 
+                    data-hi="गुणक और गुणज: गुप्त बगीचा" 
+                    data-te="కారకాలు మరియు గుణకాలు: రహస్య తోట">Factors & Multiples: The Secret Garden</h2>
+            </div>
+            
+            <div class="story-content" data-en="After solving the treasure chest puzzle, Maya and Arjun found themselves in a beautiful garden where flowers were arranged in perfect rectangular patterns. The Garden Keeper challenged them to understand the secret behind these arrangements." 
+                 data-hi="खजाने की पेटी की पहेली हल करने के बाद, मया और अर्जुन खुद को एक सुंदर बगीचे में पाया जहाँ फूल पूर्ण आयताकार पैटर्न में व्यवस्थित थे। बगीचे के रखवाले ने उन्हें इन व्यवस्थाओं के पीछे के रहस्य को समझने की चुनौती दी।" 
+                 data-te="నిధిపెట్టె పజిల్‌ను పరిష్కరించిన తర్వాత, మాయ మరియు అర్జున్ పూలు పరిపూర్ణ దీర్ఘచతురస్రాకార నమూనాలలో అమర్చబడిన అందమైన తోటలో తమను తాము కనుగొన్నారు. గార్డెన్ కీపర్ ఈ అమరికల వెనుక ఉన్న రహస్యాన్ని అర్థం చేసుకోవాలని వారిని సవాలు చేశాడు.">After solving the treasure chest puzzle, Maya and Arjun found themselves in a beautiful garden where flowers were arranged in perfect rectangular patterns. The Garden Keeper challenged them to understand the secret behind these arrangements.</div>
+
+            <div class="interactive-element">
+                <p class="character maya" data-en="Maya: These 24 roses are arranged in rows and columns!" data-hi="मया: ये 24 गुलाब पंक्तियों और स्तंभों में व्यवस्थित हैं!" data-te="మాయ: ఈ 24 గులాబీలు వరుసలు మరియు నిలువు వరుసలలో అమర్చబడ్డాయి!">Maya: These 24 roses are arranged in rows and columns!</p>
+                <p class="character arjun" data-en="Arjun: Let's find all the ways we can arrange them in rectangles!" data-hi="अर्जुन: आइए सभी तरीकों को खोजें जिनसे हम उन्हें आयतों में व्यवस्थित कर सकते हैं!" data-te="అర్జున్: వాటిని దీర్ఘచతురస్రాకారాలలో అమర్చగల అన్ని మార్గాలను కనుగొందాం!">Arjun: Let's find all the ways we can arrange them in rectangles!</p>
+            </div>
+
+            <div class="math-problem">
+                <strong data-en="Problem:" data-hi="समस्या:" data-te="సమస్య:">Problem:</strong> <span data-en="Find all factor pairs of 24" data-hi="24 के सभी गुणक जोड़े ज्ञात करें" data-te="24 యొక్క అన్ని కారక జతలను కనుగొనండి">Find all factor pairs of 24</span>
+                <br><button class="solution-btn" onclick="toggleSolution('sol2')" data-en="Show Solution" data-hi="समाधान दिखाएं" data-te="పరిష్కారం చూపించు">Show Solution</button>
+                <div id="sol2" class="solution">
+                    <strong data-en="Solution:" data-hi="समाधान:" data-te="పరిష్కారం:">Solution:</strong><br>
+                    <span data-en="Factor pairs of 24: (1,24), (2,12), (3,8), (4,6)" data-hi="24 के गुणक जोड़े: (1,24), (2,12), (3,8), (4,6)" data-te="24 యొక్క కారక జతలు: (1,24), (2,12), (3,8), (4,6)">Factor pairs of 24: (1,24), (2,12), (3,8), (4,6)</span><br>
+                    <span data-en="So we can arrange 24 roses in 4 different rectangular patterns!" data-hi="तो हम 24 गुलाबों को 4 अलग आयताकार पैटर्न में व्यवस्थित कर सकते हैं!" data-te="కాబట్టి మనం 24 గులాబీలను 4 వేర్వేరు దీర్ఘచతురస్రాకార నమూనాలలో అమర్చవచ్చు!">So we can arrange 24 roses in 4 different rectangular patterns!</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Topic 3: Ratio & Proportion -->
+        <div class="story-section" data-topic="3">
+            <div class="topic-header">
+                <div class="topic-number">3</div>
+                <h2 class="topic-title" data-en="Ratio & Proportion: The Cooking Challenge" 
+                    data-hi="अनुपात और समानुपात: खाना बनाने की चुनौती" 
+                    data-te="నిష్పత్తి మరియు అనుపాతం: వంట సవాలు">Ratio & Proportion: The Cooking Challenge</h2>
+            </div>
+            
+            <div class="story-content" data-en="The garden adventure led Maya and Arjun to the Royal Kitchen, where the Head Chef was preparing for a grand feast. She needed help adjusting her recipes for different numbers of guests using ratios and proportions." 
+                 data-hi="बगीचे के साहसिक कार्य ने मया और अर्जुन को शाही रसोई में पहुंचाया, जहाँ मुख्य रसोइया एक भव्य भोज की तैयारी कर रही थी। उसे अनुपात और समानुपात का उपयोग करके अलग संख्या में मेहमानों के लिए अपनी व्यंजन विधियों को समायोजित करने में मदद की ज़रूरत थी।" 
+                 data-te="గార్డెన్ అడ్వెంచర్ మాయ మరియు అర్జున్‌ను రాయల్ కిచెన్‌కు తీసుకువెళ్లింది, అక్కడ హెడ్ చెఫ్ గ్రాండ్ ఫీస్ట్ కోసం తయారవుతున్నాడు. వేర్వేరు సంఖ్యలో అతిథుల కోసం నిష్పత్తులు మరియు అనుపాతాలను ఉపయోగించి ఆమె వంటకాలను సర్దుబాటు చేయడంలో ఆమెకు సహాయం కావాలి.">The garden adventure led Maya and Arjun to the Royal Kitchen, where the Head Chef was preparing for a grand feast. She needed help adjusting her recipes for different numbers of guests using ratios and proportions.</div>
+
+            <div class="interactive-element">
+                <p class="character maya" data-en="Maya: The recipe says 2 cups flour for 3 cups sugar!" data-hi="मया: व्यंजन विधि में कहा गया है कि 3 कप चीनी के लिए 2 कप आटा!" data-te="మాయ: రెసిపీలో 3 కప్పుల చక్కెరకు 2 కప్పుల పిండి అని చెప్పింది!">Maya: The recipe says 2 cups flour for 3 cups sugar!</p>
+                <p class="character arjun" data-en="Arjun: But we need to make it for 15 cups of sugar instead!" data-hi="अर्जुन: लेकिन हमें इसे 15 कप चीनी के लिए बनाना है!" data-te="అర్జున్: కానీ మనం దానిని 15 కప్పుల చక్కెర కోసం చేయాలి!">Arjun: But we need to make it for 15 cups of sugar instead!</p>
+            </div>
+
+            <div class="math-problem">
+                <strong data-en="Problem:" data-hi="समस्या:" data-te="సమస్య:">Problem:</strong> <span data-en="If 2 cups flour : 3 cups sugar, how much flour for 15 cups sugar?" data-hi="यदि 2 कप आटा : 3 कप चीनी, तो 15 कप चीनी के लिए कितना आटा?" data-te="2 కప్పుల పిండి : 3 కప్పుల చక్కెర అయితే, 15 కప్పుల చక్కెరకు ఎంత పిండి?">If 2 cups flour : 3 cups sugar, how much flour for 15 cups sugar?</span>
+                <br><button class="solution-btn" onclick="toggleSolution('sol3')" data-en="Show Solution" data-hi="समाधान दिखाएं" data-te="పరిష్కారం చూపించు">Show Solution</button>
+                <div id="sol3" class="solution">
+                    <strong data-en="Solution:" data-hi="समाधान:" data-te="పరిష్కారం:">Solution:</strong><br>
+                    <span data-en="Ratio = 2:3, Scale factor = 15÷3 = 5" data-hi="अनुपात = 2:3, स्केल फैक्टर = 15÷3 = 5" data-te="నిష్పత్తి = 2:3, స్కేల్ ఫ్యాక్టర్ = 15÷3 = 5">Ratio = 2:3, Scale factor = 15÷3 = 5</span><br>
+                    <span data-en="Required flour = 2 × 5 = 10 cups" data-hi="आवश्यक आटा = 2 × 5 = 10 कप" data-te="అవసరమైన పిండి = 2 × 5 = 10 కప్పులు">Required flour = 2 × 5 = 10 cups</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Topic 4: Geometry Basics -->
+        <div class="story-section" data-topic="4">
+            <div class="topic-header">
+                <div class="topic-number">4</div>
+                <h2 class="topic-title" data-en="Geometry Basics: The Crystal Palace" 
+                    data-hi="ज्यामिति की मूल बातें: क्रिस्टल महल" 
+                    data-te="జ్యామితి ప్రాథమికాలు: క్రిస్టల్ ప్యాలెస్">Geometry Basics: The Crystal Palace</h2>
+            </div>
+            
+            <div class="story-content" data-en="After helping in the kitchen, Maya and Arjun were invited to visit the magnificent Crystal Palace. The palace was built using perfect geometric shapes, and each room demonstrated different properties of lines, angles, and shapes." 
+                 data-hi="रसोई में मदद करने के बाद, मया और अर्जुन को शानदार क्रिस्टल महल देखने के लिए आमंत्रित किया गया। महल पूर्ण ज्यामितीय आकृतियों का उपयोग करके बनाया गया था, और हर कमरा रेखाओं, कोणों और आकृतियों के अलग गुणों को प्रदर्शित करता था।" 
+                 data-te="వంటగదిలో సహాయం చేసిన తర్వాత, మాయ మరియు అర్జున్ అద్భుతమైన క్రిస్టల్ ప్యాలెస్‌ను సందర్శించడానికి ఆహ్వానించబడ్డారు. ప్యాలెస్ పరిపూర్ణ జ్యామితీయ ఆకారాలను ఉపయోగించి నిర్మించబడింది, మరియు ప్రతి గది రేఖలు, కోణాలు మరియు ఆకారాల వేర్వేరు లక్షణాలను ప్రదర్శించింది.">After helping in the kitchen, Maya and Arjun were invited to visit the magnificent Crystal Palace. The palace was built using perfect geometric shapes, and each room demonstrated different properties of lines, angles, and shapes.</div>
+
+            <div class="interactive-element">
+                <p class="character maya" data-en="Maya: Look at these amazing triangular windows!" data-hi="मया: इन अद्भुत त्रिकोणीय खिड़कियों को देखो!" data-te="మాయ: ఈ అద్భుతమైన త్రిభుజాకార కిటికీలను చూడు!">Maya: Look at these amazing triangular windows!</p>
+                <p class="character arjun" data-en="Arjun: The angles in each triangle add up to exactly 180 degrees!" data-hi="अर्जुन: हर त्रिकोण में कोण ठीक 180 डिग्री तक जोड़े जाते हैं!" data-te="అర్జున్: ప్రతి త్రిభుజంలోని కోణాలు సరిగ్గా 180 డిగ్రీలకు జోడించబడుతాయి!">Arjun: The angles in each triangle add up to exactly 180 degrees!</p>
+            </div>
+
+            <div class="math-problem">
+                <strong data-en="Problem:" data-hi="समस्या:" data-te="సమస్య:">Problem:</strong> <span data-en="In a triangle, two angles are 65° and 45°. Find the third angle." data-hi="एक त्रिकोण में, दो कोण 65° और 45° हैं। तीसरा कोण ज्ञात करें।" data-te="ఒక త్రిభుజంలో, రెండు కోణాలు 65° మరియు 45°. మూడవ కోణాన్ని కనుగొనండి.">In a triangle, two angles are 65° and 45°. Find the third angle.</span>
+                <br><button class="solution-btn" onclick="toggleSolution('sol4')" data-en="Show Solution" data-hi="समाधान दिखाएं" data-te="పరిష్కారం చూపించు">Show Solution</button>
+                <div id="sol4" class="solution">
+                    <strong data-en="Solution:" data-hi="समाधान:" data-te="పరిష్కారం:">Solution:</strong><br>
+                    <span data-en="Sum of angles in triangle = 180°" data-hi="त्रिकोण में कोणों का योग = 180°" data-te="త్రిభుజంలో కోణాల మొత్తం = 180°">Sum of angles in triangle = 180°</span><br>
+                    <span data-en="Third angle = 180° - 65° - 45° = 70°" data-hi="तीसरा कोण = 180° - 65° - 45° = 70°" data-te="మూడవ కోణం = 180° - 65° - 45° = 70°">Third angle = 180° - 65° - 45° = 70°</span>
+                </div>
+            </div>
+
+            <div class="visual-aid">
+                <div data-en="Visual: Triangle with angles marked" data-hi="दृश्य: कोणों के साथ चिह्नित त्रिकोण" data-te="విజువల్: కోణాలతో గుర్తించబడిన త్రిభుజం">Visual: Triangle with angles marked</div>
+                <svg width="200" height="150" style="margin: 0 auto;">
+                    <polygon points="100,20 50,120 150,120" fill="#e3f2fd" stroke="#2196F3" stroke-width="2"/>
+                    <text x="85" y="35" font-size="12" fill="#d32f2f">70°</text>
+                    <text x="35" y="115" font-size="12" fill="#d32f2f">65°</text>
+                    <text x="140" y="115" font-size="12" fill="#d32f2f">45°</text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Topic 5: Mensuration -->
+        <div class="story-section" data-topic="5">
+            <div class="topic-header">
+                <div class="topic-number">5</div>
+                <h2 class="topic-title" data-en="Mensuration: The Royal Swimming Pool" 
+                    data-hi="क्षेत्रमिति: शाही तैराकी पूल" 
+                    data-te="క్షేత్రమితి: రాజ స్విమ్మింగ్ పూల్">Mensuration: The Royal Swimming Pool</h2>
+            </div>
+            
+            <div class="story-content" data-en="The palace grounds featured a beautiful swimming pool that needed renovation. The Royal Engineer asked Maya and Arjun to help calculate how much water the pool could hold and how much tile would be needed to cover its surface." 
+                 data-hi="महल के मैदान में एक सुंदर तैराकी पूल था जिसकी मरम्मत की आवश्यकता थी। शाही अभियंता ने मया और अर्जुन से पूल में कितना पानी आ सकता है और इसकी सतह को ढकने के लिए कितनी टाइल की जरूरत होगी, इसकी गणना करने में मदद माँगी।" 
+                 data-te="ప్యాలెస్ మైదానంలో పునరుద్ధరణ అవసరమైన అందమైన స్విమ్మింగ్ పూల్ ఉంది. రాయల్ ఇంజనీర్ పూల్‌లో ఎంత నీరు ఉంచగలదో మరియు దాని ఉపరితలాన్ని కవర్ చేయడానికి ఎంత టైల్ అవసరమో లెక్కించడంలో మాయ మరియు అర్జున్‌ను సహాయం చేయమని అడిగాడు.">The palace grounds featured a beautiful swimming pool that needed renovation. The Royal Engineer asked Maya and Arjun to help calculate how much water the pool could hold and how much tile would be needed to cover its surface.</div>
+
+            <div class="interactive-element">
+                <p class="character maya" data-en="Maya: The pool is rectangular with length 20m and width 10m!" data-hi="मया: पूल आयताकार है जिसकी लंबाई 20मी और चौड़ाई 10मी है!" data-te="మాయ: పూల్ దీర్ఘచతురస్రాకారంగా 20మీ పొడవు మరియు 10మీ వెడల్పుతో ఉంది!">Maya: The pool is rectangular with length 20m and width 10m!</p>
+                <p class="character arjun" data-en="Arjun: And it's 2 meters deep. Let's calculate the volume!" data-hi="अर्जुन: और यह 2 मीटर गहरा है। आइए आयतन की गणना करें!" data-te="అర్జున్: మరియు ఇది 2 మీటర్ల లోతు. వాల్యూమ్‌ను లెక్కిస్దాం!">Arjun: And it's 2 meters deep. Let's calculate the volume!</p>
+            </div>
+
+            <div class="math-problem">
+                <strong data-en="Problem:" data-hi="समस्या:" data-te="సమస్య:">Problem:</strong> <span data-en="Find the volume and surface area of the pool (L=20m, W=10m, H=2m)" data-hi="पूल का आयतन और सतह क्षेत्र ज्ञात करें (L=20मी, W=10मी, H=2मी)" data-te="పూల్ యొక్క వాల్యూమ్ మరియు ఉపరితల వైశాల్యాన్ని కనుగొనండి (L=20మీ, W=10మీ, H=2మీ)">Find the volume and surface area of the pool (L=20m, W=10m, H=2m)</span>
+                <br><button class="solution-btn" onclick="toggleSolution('sol5')" data-en="Show Solution" data-hi="समाधान दिखाएं" data-te="పరిష్కారం చూపించు">Show Solution</button>
+                <div id="sol5" class="solution">
+                    <strong data-en="Solution:" data-hi="समाधान:" data-te="పరిష్కారం:">Solution:</strong><br>
+                    <span data-en="Volume = Length × Width × Height = 20 × 10 × 2 = 400 cubic meters" data-hi="आयतन = लंबाई × चौड़ाई × ऊंचाई = 20 × 10 × 2 = 400 घन मीटर" data-te="వాల్యూమ్ = పొడవు × వెడల్పు × ఎత్తు = 20 × 10 × 2 = 400 క్యూబిక్ మీటర్లు">Volume = Length × Width × Height = 20 × 10 × 2 = 400 cubic meters</span><br>
+                    <span data-en="Surface Area (top) = Length × Width = 20 × 10 = 200 square meters" data-hi="सतह क्षेत्र (शीर्ष) = लंबाई × चौड़ाई = 20 × 10 = 200 वर्ग मीटर" data-te="ఉపరితల వైశాల్యం (పై) = పొడవు × వెడల్పు = 20 × 10 = 200 చదరపు మీటర్లు">Surface Area (top) = Length × Width = 20 × 10 = 200 square meters</span>
+                </div>
+            </div>
+
+            <div class="visual-aid">
+                <div data-en="Visual: 3D Pool Diagram" data-hi="दृश्य: 3D पूल आरेख" data-te="విజువల్: 3D పూల్ డయాగ్రామ్">Visual: 3D Pool Diagram</div>
+                <div style="width: 300px; height: 200px; margin: 0 auto; background: linear-gradient(45deg, #81c784, #4fc3f7); border-radius: 10px; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.1);">
+                    <div style="position: absolute; top: 10px; left: 10px; color: white; font-weight: bold;">20m × 10m × 2m</div>
+                    <div style="position: absolute; bottom: 10px; right: 10px; color: white; font-size: 12px;">Volume: 400 m³</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Topic 6: Data Handling -->
+        <div class="story-section" data-topic="6">
+            <div class="topic-header">
+                <div class="topic-number">6</div>
+                <h2 class="topic-title" data-en="Data Handling: The Royal Survey" 
+                    data-hi="डेटा हैंडलिंग: शाही सर्वेक्षण" 
+                    data-te="డేటా హ్యాండ్లింగ్: రాజ సర్వే">Data Handling: The Royal Survey</h2>
+            </div>
+            
+            <div class="story-content" data-en="Before leaving the Number Kingdom, the King asked Maya and Arjun to help analyze the results of a survey about the favorite activities of the kingdom's children. They needed to create charts and interpret the data to help plan future events." 
+                 data-hi="संख्या राज्य छोड़ने से पहले, राजा ने मया और अर्जुन से राज्य के बच्चों की पसंदीदा गतिविधियों के बारे में एक सर्वेक्षण के परिणामों का विश्लेषण करने में मदद माँगी। उन्हें भविष्य की घटनाओं की योजना बनाने में मदद के लिए चार्ट बनाने और डेटा की व्याख्या करने की आवश्यकता थी।" 
+                 data-te="నంబర్ కింగ్‌డమ్ నుండి బయలుదేరే ముందు, రాజ్యంలోని పిల్లల అభిమాన కార్యకలాపాలపై సర్వే ఫలితాలను విశ్లేషించడంలో రాజు మాయ మరియు అర్జున్‌లను సహాయం చేయమని అడిగాడు. భవిష్యత్ ఈవెంట్‌లను ప్లాన్ చేయడంలో సహాయపడటానికి వారు చార్ట్‌లను సృష్టించి డేటాను అర్థం చేసుకోవాల్సి వచ్చింది.">Before leaving the Number Kingdom, the King asked Maya and Arjun to help analyze the results of a survey about the favorite activities of the kingdom's children. They needed to create charts and interpret the data to help plan future events.</div>
+
+            <div class="interactive-element">
+                <p class="character maya" data-en="Maya: Let's organize this data about 100 children's favorite activities!" data-hi="मया: आइए 100 बच्चों की पसंदीदा गतिविधियों के बारे में इस डेटा को व्यवस्थित करें!" data-te="మాయ: 100 పిల్లల అభిమాన కార్యకలాపాలపై ఈ డేటాను నిర్వహిస్తాం!">Maya: Let's organize this data about 100 children's favorite activities!</p>
+                <p class="character arjun" data-en="Arjun: Reading: 30, Sports: 25, Music: 20, Art: 15, Games: 10" data-hi="अर्जुन: पढ़ना: 30, खेल: 25, संगीत: 20, कला: 15, खेल: 10" data-te="అర్జున్: చదవడం: 30, క్రీడలు: 25, సంగీతం: 20, కళ: 15, ఆటలు: 10">Arjun: Reading: 30, Sports: 25, Music: 20, Art: 15, Games: 10</p>
+            </div>
+
+            <div class="math-problem">
+                <strong data-en="Problem:" data-hi="समस्या:" data-te="సమస్య:">Problem:</strong> <span data-en="What percentage of children prefer Reading?" data-hi="कितने प्रतिशत बच्चे पढ़ना पसंद करते हैं?" data-te="ఎంత శాతం పిల్లలు చదవడాన్ని ఇష్టపడతారు?">What percentage of children prefer Reading?</span>
+                <br><button class="solution-btn" onclick="toggleSolution('sol6')" data-en="Show Solution" data-hi="समाधान दिखाएं" data-te="పరిష్కారం చూపించు">Show Solution</button>
+                <div id="sol6" class="solution">
+                    <strong data-en="Solution:" data-hi="समाधान:" data-te="పరిష్కారం:">Solution:</strong><br>
+                    <span data-en="Percentage = (30/100) × 100% = 30%" data-hi="प्रतिशत = (30/100) × 100% = 30%" data-te="శాతం = (30/100) × 100% = 30%">Percentage = (30/100) × 100% = 30%</span><br>
+                    <span data-en="30% of children prefer reading!" data-hi="30% बच्चे पढ़ना पसंद करते हैं!" data-te="30% పిల్లలు చదవడాన్ని ఇష్టపడతారు!">30% of children prefer reading!</span>
+                </div>
+            </div>
+
+            <div class="visual-aid">
+                <div data-en="Visual: Bar Chart of Favorite Activities" data-hi="दृश्य: पसंदीदा गतिविधियों का बार चार्ट" data-te="విజువల్: అభిమాన కార్యకలాపాల బార్ చార్ట్">Visual: Bar Chart of Favorite Activities</div>
+                <div class="chart-container">
+                    <svg width="400" height="300" style="background: white; border-radius: 10px;">
+                        <!-- Bars -->
+                        <rect x="50" y="90" width="40" height="150" fill="#4CAF50"/>
+                        <rect x="110" y="115" width="40" height="125" fill="#2196F3"/>
+                        <rect x="170" y="140" width="40" height="100" fill="#FF9800"/>
+                        <rect x="230" y="165" width="40" height="75" fill="#E91E63"/>
+                        <rect x="290" y="190" width="40" height="50" fill="#9C27B0"/>
+                        
+                        <!-- Labels -->
+                        <text x="65" y="255" font-size="10" text-anchor="middle">Reading</text>
+                        <text x="125" y="255" font-size="10" text-anchor="middle">Sports</text>
+                        <text x="185" y="255" font-size="10" text-anchor="middle">Music</text>
+                        <text x="245" y="255" font-size="10" text-anchor="middle">Art</text>
+                        <text x="305" y="255" font-size="10" text-anchor="middle">Games</text>
+                        
+                        <!-- Values -->
+                        <text x="65" y="85" font-size="12" text-anchor="middle" fill="#333">30</text>
+                        <text x="125" y="110" font-size="12" text-anchor="middle" fill="#333">25</text>
+                        <text x="185" y="135" font-size="12" text-anchor="middle" fill="#333">20</text>
+                        <text x="245" y="160" font-size="12" text-anchor="middle" fill="#333">15</text>
+                        <text x="305" y="185" font-size="12" text-anchor="middle" fill="#333">10</text>
+                        
+                        <!-- Axes -->
+                        <line x1="40" y1="240" x2="350" y2="240" stroke="#333" stroke-width="2"/>
+                        <line x1="40" y1="240" x2="40" y2="80" stroke="#333" stroke-width="2"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conclusion -->
+        <div class="story-section" data-topic="conclusion">
+            <div class="topic-header">
+                <div class="topic-number">✨</div>
+                <h2 class="topic-title" data-en="The Journey's End" 
+                    data-hi="यात्रा का अंत" 
+                    data-te="ప్రయాణ ముగింపు">The Journey's End</h2>
+            </div>
+            
+            <div class="story-content" data-en="Maya and Arjun had successfully completed all the mathematical challenges in the Number Kingdom. The wise King thanked them and presented them with golden medals shaped like mathematical symbols. As they stepped back through the magical portal, they realized that mathematics was everywhere around them - in cooking, building, nature, and even in organizing their daily activities!" 
+                 data-hi="मया और अर्जुन ने संख्या राज्य में सभी गणितीय चुनौतियों को सफलतापूर्वक पूरा किया था। बुद्धिमान राजा ने उनका धन्यवाद किया और उन्हें गणितीय प्रतीकों के आकार के सुनहरे पदक भेंट किए। जैसे ही वे जादुई पोर्टल से वापस गए, उन्होंने महसूस किया कि गणित उनके चारों ओर हर जगह था - खाना पकाने में, निर्माण में, प्रकृति में, और यहाँ तक कि उनकी दैनिक गतिविधियों को व्यवस्थित करने में भी!" 
+                 data-te="మాయ మరియు అర్జున్ నంబర్ కింగ్‌డమ్‌లోని అన్ని గణిత సవాళ్లను విజయవంతంగా పూర్తి చేశారు. తెలివైన రాజు వారికి కృతజ్ఞతలు తెలిపి గణిత చిహ్నాల ఆకారంలో బంగారు పతకాలను అందించాడు. వారు మాయా పోర్టల్ ద్వారా తిరిగి వెళ్లినప్పుడు, గణితం తమ చుట్టూ ప్రతిచోటా ఉందని వారు గ్రహించారు - వంటలో, నిర్మాణంలో, ప్రకృతిలో మరియు వారి దైనందిన కార్యకలాపాలను నిర్వహించడంలో కూడా!">Maya and Arjun had successfully completed all the mathematical challenges in the Number Kingdom. The wise King thanked them and presented them with golden medals shaped like mathematical symbols. As they stepped back through the magical portal, they realized that mathematics was everywhere around them - in cooking, building, nature, and even in organizing their daily activities!</div>
+
+            <div class="interactive-element">
+                <p class="character maya" data-en="Maya: What an amazing adventure! I never knew math could be so exciting!" data-hi="मया: क्या शानदार साहसिक कार्य था! मुझे नहीं पता था कि गणित इतना रोमांचक हो सकता है!" data-te="మాయ: ఎంత అద్భుతమైన సాహసం! గణితం ఇంత ఉత్తేజకరమైనదని నాకు తెలియదు!">Maya: What an amazing adventure! I never knew math could be so exciting!</p>
+                <p class="character arjun" data-en="Arjun: Now I can see math in everything - from sharing pizza to measuring our garden!" data-hi="अर्जुन: अब मैं हर चीज़ में गणित देख सकता हूँ - पिज़्ज़ा बाँटने से लेकर अपने बगीचे को मापने तक!" data-te="అర్జున్: ఇప్పుడు నేను ప్రతిదానిలో గణితాన్ని చూడగలను - పిజ్జా పంచుకోవడం నుండి మా తోటను కొలవడం వరకు!">Arjun: Now I can see math in everything - from sharing pizza to measuring our garden!</p>
+            </div>
+
+            <div class="visual-aid" style="background: linear-gradient(45deg, #ff9a9e, #fecfef); padding: 30px;">
+                <h3 data-en="🎉 Congratulations! You've completed the Mathematical Adventure! 🎉" data-hi="🎉 बधाई हो! आपने गणितीय साहसिक कार्य पूरा कर लिया! 🎉" data-te="🎉 అభినందనలు! మీరు గణిత సాహసాన్ని పూర్తి చేసారు! 🎉">🎉 Congratulations! You've completed the Mathematical Adventure! 🎉</h3>
+                <p style="margin-top: 15px; font-size: 1.1rem;" data-en="You've mastered: Numbers & Operations, Factors & Multiples, Ratios & Proportions, Geometry Basics, Mensuration, and Data Handling!" data-hi="आपने महारत हासिल की है: संख्याएं और संक्रियाएं, गुणक और गुणज, अनुपात और समानुपात, ज्यामिति की मूल बातें, क्षेत्रमिति, और डेटा हैंडलिंग!" data-te="మీరు నైపుణ్యం సాధించారు: సంఖ్యలు మరియు కార్యకలాపాలు, కారకాలు మరియు గుణకాలు, నిష్పత్తులు మరియు అనుపాతాలు, జ్యామితి ప్రాథమికాలు, క్షేత్రమితి మరియు డేటా హ్యాండ్లింగ్!">You've mastered: Numbers & Operations, Factors & Multiples, Ratios & Proportions, Geometry Basics, Mensuration, and Data Handling!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'en';
+        let currentSection = 0;
+        const totalSections = 6;
+
+        function switchLanguage(lang) {
+            currentLanguage = lang;
+            
+            // Update active button
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update all translatable content
+            document.querySelectorAll('[data-en]').forEach(element => {
+                const translation = element.getAttribute(`data-${lang}`);
+                if (translation) {
+                    element.textContent = translation;
+                }
+            });
+
+            // Update solution button text
+            document.querySelectorAll('.solution-btn').forEach(btn => {
+                if (lang === 'hi') {
+                    btn.textContent = 'समाधान दिखाएं';
+                } else if (lang === 'te') {
+                    btn.textContent = 'పరిష్కారం చూపించు';
+                } else {
+                    btn.textContent = 'Show Solution';
+                }
+            });
+        }
+
+        function toggleSolution(id) {
+            const solution = document.getElementById(id);
+            const button = solution.previousElementSibling;
+            
+            if (solution.style.display === 'none' || solution.style.display === '') {
+                solution.style.display = 'block';
+                if (currentLanguage === 'hi') {
+                    button.textContent = 'समाधान छुपाएं';
+                } else if (currentLanguage === 'te') {
+                    button.textContent = 'పరిష్కారాన్ని దాచు';
+                } else {
+                    button.textContent = 'Hide Solution';
+                }
+            } else {
+                solution.style.display = 'none';
+                if (currentLanguage === 'hi') {
+                    button.textContent = 'समाधान दिखाएं';
+                } else if (currentLanguage === 'te') {
+                    button.textContent = 'పరిష్కారం చూపించు';
+                } else {
+                    button.textContent = 'Show Solution';
+                }
+            }
+        }
+
+        // Intersection Observer for progress tracking
+        const observerOptions = {
+            root: null,
+            rootMargin: '-50% 0px -50% 0px',
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const topic = entry.target.getAttribute('data-topic');
+                    if (topic && topic !== 'conclusion') {
+                        const progress = (parseInt(topic) / totalSections) * 100;
+                        document.getElementById('progressFill').style.width = progress + '%';
+                    } else if (topic === 'conclusion') {
+                        document.getElementById('progressFill').style.width = '100%';
+                    }
+                }
+            });
+        }, observerOptions);
+
+        // Observe all story sections
+        document.querySelectorAll('.story-section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Add smooth scrolling to internal links
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize progress bar
+            document.getElementById('progressFill').style.width = '0%';
+            
+            // Add animation delays to sections
+            const sections = document.querySelectorAll('.story-section');
+            sections.forEach((section, index) => {
+                section.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+
+        // Add floating animation to mathematical symbols
+        function createFloatingMath() {
+            const symbols = ['÷', '×', '+', '−', '=', '%', '∠', '△', '□', '○'];
+            const container = document.body;
+            
+            setInterval(() => {
+                const symbol = document.createElement('div');
+                symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                symbol.style.position = 'fixed';
+                symbol.style.left = Math.random() * 100 + 'vw';
+                symbol.style.top = '100vh';
+                symbol.style.fontSize = '2rem';
+                symbol.style.color = 'rgba(255, 255, 255, 0.1)';
+                symbol.style.pointerEvents = 'none';
+                symbol.style.zIndex = '-1';
+                symbol.style.transition = 'all 10s linear';
+                
+                container.appendChild(symbol);
+                
+                setTimeout(() => {
+                    symbol.style.transform = 'translateY(-120vh) rotate(360deg)';
+                }, 100);
+                
+                setTimeout(() => {
+                    symbol.remove();
+                }, 10000);
+            }, 3000);
+        }
+
+        // Start floating animation
+        createFloatingMath();
+    </script>
+</body>
+</html>

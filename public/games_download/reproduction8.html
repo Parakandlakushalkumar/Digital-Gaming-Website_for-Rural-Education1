@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Human Reproduction & Adolescence Mini-Games</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    background: linear-gradient(135deg, #f2f9fb 90%, #d9eefa 120%);
+    min-height: 100vh;
+    user-select:none;
+    color: #27475d;
+  }
+  h1 {
+    text-align: center;
+    font-weight: 900;
+    font-size: 2.5em;
+    margin: 48px 0 34px;
+    color: #1e3e50;
+    text-shadow: 0 1px 5px #b6d6e3;
+  }
+  .cards-container {
+    max-width: 1200px;
+    margin: 0 auto 60px;
+    display: flex;
+    gap: 1.8rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 0 16px;
+  }
+  .game-card {
+    background: #def0f5;
+    border-radius: 24px;
+    width: 230px;
+    height: 345px;
+    box-shadow: 0 7px 26px #5a91a5aa;
+    cursor: pointer;
+    padding: 44px 24px 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.22s ease;
+  }
+  .game-card:hover {
+    background: #c1dfeb;
+    transform: scale(1.07) translateY(-10px);
+    box-shadow: 0 16px 46px #306a8dba;
+    z-index: 10;
+  }
+  .card-icon {
+    font-size: 60px;
+    margin-bottom: 22px;
+    user-select:none;
+  }
+  .game-title {
+    font-weight: 900;
+    font-size: 1.28rem;
+    color: #1a374e;
+    margin-bottom: 8px;
+    user-select:none;
+    text-align: center;
+  }
+  .game-desc {
+    font-size: 1.05rem;
+    color: #32647a;
+    user-select:none;
+    text-align: center;
+  }
+  /* Modal */
+  .modal-bg {
+    display: none;
+    position: fixed;
+    left: 0; top: 0; width: 100vw; height: 100vh;
+    background: rgba(20, 45, 70, 0.15);
+    backdrop-filter: blur(7px);
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+  }
+  .modal-content {
+    background: #e9f6fbdd;
+    border-radius: 24px;
+    max-width: 700px;
+    width: 95vw;
+    max-height: 92vh;
+    overflow-y: auto;
+    box-shadow: 0 0 50px #72a4beaa;
+    padding: 36px 30px 44px;
+    position: relative;
+    font-size: 1rem;
+    user-select:none;
+  }
+  .close-modal {
+    position: absolute;
+    top: 18px; right: 22px;
+    font-size: 2.3em;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #255570bb;
+    transition: color 0.2s ease;
+    padding: 0 10px 5px 0;
+    user-select:none;
+    outline:none;
+  }
+  .close-modal:hover { color: #d63a46; }
+  h2 {
+    font-weight: 900;
+    font-size: 1.55em;
+    color: #1c3550;
+    margin-top: 0;
+    user-select:none;
+  }
+  /* MCQ styles */
+  .question-container {
+    margin-top: 18px;
+    background: #d2e7f7af;
+    border-radius: 14px;
+    border: 2px solid #5a91ae;
+    padding: 18px 22px 20px;
+    user-select:none;
+  }
+  .question-text {
+    font-weight: 700;
+    font-size: 1.25em;
+    margin-bottom: 14px;
+  }
+  .options-list {
+    list-style: none;
+    padding-left: 0;
+  }
+  .option-item {
+    margin-bottom: 10px;
+  }
+  .option-item label {
+    cursor: pointer;
+    font-size: 1.07em;
+  }
+  button#submitAnswer, button#nextQuestion {
+    margin-top: 20px;
+    padding: 10px 28px;
+    font-weight: 700;
+    font-size: 1.15em;
+    border-radius: 14px;
+    border: none;
+    cursor: pointer;
+    color: #124b74;
+    background: linear-gradient(120deg, #9ecbf4 40%, #4978bb 140%);
+    box-shadow: 0 3px 12px #6594c717;
+    user-select:none;
+  }
+  button#submitAnswer:hover, button#nextQuestion:hover {
+    background: linear-gradient(120deg,#3f67b1 40%, #294a80 130%);
+    color: #e0ebfc;
+    outline:none;
+  }
+  .feedback {
+    margin-top: 16px;
+    font-weight: 700;
+    font-size: 1.2em;
+    min-height: 32px;
+    text-align: center;
+  }
+  /* drag and drop styles for Match the Stage */
+  .farm-match-container {
+    margin-top: 18px;
+  }
+  .drag-list, .drop-list {
+    background: #bee3f1cc;
+    padding: 14px 12px;
+    border-radius: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 12px;
+    user-select:none;
+  }
+  .drag-item {
+    background: #5a8fe4;
+    padding: 10px 18px;
+    border-radius: 14px;
+    color: #eef6ff;
+    font-weight: 700;
+    cursor: grab;
+  }
+  .drag-item:active {
+    cursor: grabbing;
+  }
+  .drop-item {
+    background: #8ab6dd99;
+    color: #0f3e85;
+    font-weight: 700;
+    border-radius: 14px;
+    padding: 10px 22px;
+    flex: 1 1 140px;
+    min-height: 34px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px dashed transparent;
+    transition: border-color 0.22s ease;
+  }
+  .drop-item.drag-over {
+    border-color: #25487e;
+  }
+  .drop-item.filled {
+    border-style: solid;
+    background: #24599ccc;
+    color: #e0e8fb;
+    cursor: default;
+  }
+  /* Puzzle styles for Body System Puzzle and Crop Puzzle */
+  .puzzle-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 12px auto;
+    max-width: 440px;
+  }
+  .puzzle-piece {
+    background: #97bae1cc;
+    border-radius: 14px;
+    width: 120px;
+    height: 120px;
+    background-size: cover;
+    box-shadow: 0 0 12px #3a649baa;
+    user-select:none;
+  }
+  .puzzle-placeholder {
+    background: #596f92aa;
+    border-radius: 14px;
+    width: 120px;
+    height: 120px;
+    box-shadow: inset 0 0 18px #354765;
+  }
+  /* Life Cycle Race */
+  .life-race-area {
+    position: relative;
+    padding: 24px 12px 28px;
+    max-width: 400px;
+    margin: 0 auto 16px;
+  }
+  .life-track {
+    background: #d5e7cd;
+    border-radius: 36px;
+    height: 54px;
+    box-shadow: inset 0 2px 12px #a5c098aa;
+  }
+  .life-runner {
+    font-size: 48px;
+    position: absolute;
+    bottom: 5px;
+    transition: left 0.4s ease;
+    user-select:none;
+  }
+  .life-player {
+    left: 0;
+    color: #245b1e;
+  }
+  .life-feedback {
+    margin-top: 10px;
+    font-weight: 700;
+    font-size: 1.16em;
+    min-height: 28px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<h1>Human Reproduction & Adolescence Mini-Games</h1>
+<div class="cards-container" role="list" aria-label="Human reproduction and adolescence games">
+  <div class="game-card" role="listitem" tabindex="0" aria-describedby="desc-0" onclick="openGame(0)">
+    <div class="card-icon">🖱️</div>
+    <span class="game-title">Quiz Click Game</span>
+    <span class="game-desc" id="desc-0">Answer questions on puberty and adolescence correctly.</span>
+  </div>
+  <div class="game-card" role="listitem" tabindex="0" aria-describedby="desc-1" onclick="openGame(1)">
+    <div class="card-icon">🔗</div>
+    <span class="game-title">Match the Stage Game</span>
+    <span class="game-desc" id="desc-1">Drag and drop terms to match life stages.</span>
+  </div>
+  <div class="game-card" role="listitem" tabindex="0" aria-describedby="desc-2" onclick="openGame(2)">
+    <div class="card-icon">🧩</div>
+    <span class="game-title">Body System Puzzle</span>
+    <span class="game-desc" id="desc-2">Reveal body parts by answering questions.</span>
+  </div>
+  <div class="game-card" role="listitem" tabindex="0" aria-describedby="desc-3" onclick="openGame(3)">
+    <div class="card-icon">🏁</div>
+    <span class="game-title">Life Cycle Race</span>
+    <span class="game-desc" id="desc-3">Answer questions and move the character forward.</span>
+  </div>
+  <div class="game-card" role="listitem" tabindex="0" aria-describedby="desc-4" onclick="openGame(4)">
+    <div class="card-icon">🚑</div>
+    <span class="game-title">Hormone Rescue Game</span>
+    <span class="game-desc" id="desc-4">Solve hormone and health questions to rescue.</span>
+  </div>
+</div>
+
+<div id="gameModal" class="modal-bg" role="dialog" aria-modal="true" tabindex="-1">
+  <div class="modal-content">
+    <button class="close-modal" aria-label="Close game" onclick="closeModal()">&times;</button>
+    <div id="modalBody" tabindex="0"></div>
+  </div>
+</div>
+
+<script>
+  const modal = document.getElementById('gameModal');
+  const modalBody = document.getElementById('modalBody');
+  let gameState = null;
+
+  function openGame(idx){
+    switch(idx){
+      case 0: quizClickGame.start(); break;
+      case 1: matchStageGame.start(); break;
+      case 2: bodyPuzzleGame.start(); break;
+      case 3: lifeCycleRace.start(); break;
+      case 4: hormoneRescueGame.start(); break;
+    }
+    modal.style.display = 'flex';
+    setTimeout(() => modalBody.focus(), 300);
+  }
+  function closeModal(){
+    modal.style.display = 'none';
+    modalBody.innerHTML = '';
+    gameState = null;
+  }
+  window.onclick = e => { if(e.target === modal) closeModal(); };
+
+  // Utility shuffle
+  function shuffle(arr){
+    for(let i=arr.length-1; i>0; i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [arr[i],arr[j]]=[arr[j],arr[i]];
+    }
+    return arr;
+  }
+
+  // 1. Quiz Click Game 🖱️
+  const quizClickGame = {
+    questions:[
+      {q:"At what age does adolescence usually begin?", options:["8-12 years","10-14 years","15-18 years","6-10 years"], ans:1, hint:"Typically roughly a decade after childhood"},
+      {q:"Which hormone triggers puberty in girls?", options:["Testosterone","Estrogen","Adrenaline","Insulin"], ans:1, hint:"Common female sex hormone"},
+      {q:"Common physical change during puberty?", options:["Voice deepening","Bone growth","Menstrual cycle","All"], ans:3, hint:"Multiple bodily changes happen"},
+      {q:"Adolescence ends at roughly what age?", options:["18","21","15","25"], ans:0, hint:"Legal adulthood marks transition"},
+      {q:"Secondary sexual characteristics include?", options:["Body hair","Brain size","Height","All"], ans:0, hint:"Visible sexual traits"},
+      {q:"Puberty causes increased production of?", options:["Growth hormone","Reproductive hormones","Fat","Cholesterol"], ans:1, hint:"Hormones related to reproduction"},
+      {q:"First stage of life after infancy?", options:["Childhood","Adolescence","Adulthood","Senescence"], ans:0, hint:"Early stage of growth"},
+      {q:"Which organ produces sperm?", options:["Ovary","Testes","Uterus","Kidneys"], ans:1, hint:"Male reproductive organ"},
+      {q:"Puberty is controlled primarily by?", options:["Brain","Heart","Liver","Skin"], ans:0, hint:"Central in hormone control"},
+      {q:"Menstruation happens in which life stage?", options:["Childhood","Adulthood","Adolescence","Old age"], ans:2, hint:"A feature of female puberty"}
+    ],
+    currentQ:0,
+    score:0,
+    start() {
+      this.currentQ = 0;
+      this.score = 0;
+      this._renderQuestion();
+    },
+    _renderQuestion() {
+      const q = this.questions[this.currentQ];
+      modalBody.innerHTML = `
+        <h2>Quiz Click Game</h2>
+        <div class="question-container" aria-live="polite" aria-atomic="true">
+          <div class="question-text">${q.q}</div>
+          <ul class="options-list">
+            ${q.options.map((opt,i)=>`
+              <li class="option-item">
+                <label>
+                  <input type="radio" name="answer" value="${i}" />
+                  ${opt}
+                </label>
+              </li>`).join('')}
+          </ul>
+          <button id="submitAnswer" disabled>Submit</button>
+          <div class="feedback" id="quizFeedback"></div>
+        </div>
+      `;
+      const radios = modalBody.querySelectorAll('input[type=radio]');
+      const submitBtn = modalBody.querySelector('#submitAnswer');
+      radios.forEach(r => r.addEventListener('change', () => submitBtn.disabled = false));
+      submitBtn.onclick = () => this._submitAnswer();
+    },
+    _submitAnswer() {
+      const selected = modalBody.querySelector('input[type=radio]:checked');
+      if(!selected) return;
+      const idx = +selected.value;
+      const q = this.questions[this.currentQ];
+      const fb = modalBody.querySelector('#quizFeedback');
+      if(idx === q.ans) {
+        this.score++;
+        fb.style.color = "#2f7f33";
+        fb.textContent = "Correct! +1 point";
+      } else {
+        fb.style.color = "#b53232";
+        fb.textContent = `Wrong! Hint: ${q.hint}`;
+      }
+      [...modalBody.querySelectorAll('input[type=radio]')].forEach(i => i.disabled = true);
+      modalBody.querySelector('#submitAnswer').disabled = true;
+      this.currentQ++;
+      if (this.currentQ >= this.questions.length) {
+        setTimeout(() => this._showResult(), 1200);
+      } else {
+        setTimeout(() => this._renderQuestion(), 1200);
+      }
+    },
+    _showResult() {
+      modalBody.innerHTML = `
+        <h2>Quiz Click Game</h2>
+        <div style="font-size:1.5em; font-weight:700; color:#246023; text-align:center; margin-top: 50px;">
+          Quiz completed!<br>Your score: ${this.score} / ${this.questions.length}
+        </div>
+        <button onclick="quizClickGame.start()" style="margin-top: 30px; padding: 10px 28px; font-weight:700;">Play Again</button>
+      `;
+    }
+  };
+
+  // 2. Match the Stage Game 🔗
+  const matchStageGame = {
+    items: [
+      {name: "Toddler", stage: "Childhood"},
+      {name: "Puberty", stage: "Adolescence"},
+      {name: "Graduate", stage: "Adulthood"},
+      {name: "Baby", stage: "Childhood"},
+      {name: "Teenager", stage: "Adolescence"},
+      {name: "Parent", stage: "Adulthood"}
+    ],
+    stages: ["Childhood", "Adolescence", "Adulthood"],
+    matchedCount: 0,
+    start() {
+      this.matchedCount = 0;
+      this._render();
+    },
+    _render() {
+      modalBody.innerHTML = `
+        <h2>Match the Stage Game</h2>
+        <div>Drag the term/image to its correct life stage.</div>
+        <div style="display: flex; justify-content: space-around; margin-top: 14px;">
+          <div>
+            <h3>Drag Items</h3>
+            <div class="drag-list" id="dragList" aria-label="Draggable items" role="list" tabindex="0">
+              ${shuffle(this.items).map(item => `<div class="drag-item" draggable="true" id="drag-${item.name.replace(/\s/g,'')}" data-name="${item.name}">${item.name}</div>`).join('')}
+            </div>
+          </div>
+          <div>
+            <h3>Stages</h3>
+            <div class="drop-list" id="dropStages" aria-label="Drop areas" role="list" tabindex="0">
+              ${this.stages.map(stage => `<div class="drop-item" data-stage="${stage}">${stage}</div>`).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="feedback" id="matchStageFeedback"></div>
+      `;
+      this._setupDragDrop();
+    },
+    _setupDragDrop() {
+      let dragged = null;
+      const dragItems = modalBody.querySelectorAll('.drag-item');
+      const dropZones = modalBody.querySelectorAll('.drop-item');
+      const feedback = modalBody.querySelector('#matchStageFeedback');
+      dragItems.forEach(drag => {
+        drag.addEventListener('dragstart', e => { dragged = drag; });
+        drag.addEventListener('dragend', e => { dragged = null; });
+      });
+      function allowDrop(e) { e.preventDefault(); }
+      function handleDrop(e) {
+        e.preventDefault();
+        if(!dragged) return;
+        const dropZone = e.target.closest('.drop-item');
+        if(!dropZone || dropZone.classList.contains('filled')) return;
+        const itemName = dragged.dataset.name;
+        const expectedStage = matchStageGame.items.find(i => i.name === itemName).stage;
+        if(expectedStage === dropZone.dataset.stage) {
+          dropZone.classList.add('filled');
+          dropZone.textContent = `${dragged.textContent} ✓`;
+          dragged.remove();
+          feedback.style.color = '#276829';
+          feedback.textContent = 'Correct match!';
+          matchStageGame.matchedCount++;
+          if(matchStageGame.matchedCount === matchStageGame.items.length) {
+            setTimeout(() => {
+              modalBody.innerHTML = `
+                <h2>Match the Stage Game</h2>
+                <div style="font-size:1.5em; font-weight:700; color:#1f5026; text-align:center; margin-top: 40px;">
+                  All matches correct! 🎉
+                </div>
+                <button onclick="matchStageGame.start()" style="margin-top: 30px; padding: 10px 28px; font-weight:700;">Play Again</button>
+              `;
+            }, 1100);
+          }
+        } else {
+          feedback.style.color = '#a62c2c';
+          feedback.textContent = 'Wrong match! Try again.';
+        }
+        dragged = null;
+      }
+      dropZones.forEach(zone => {
+        zone.addEventListener('dragover', allowDrop);
+        zone.addEventListener('drop', handleDrop);
+      });
+    }
+  };
+
+  /* 3. Body System Puzzle 🧩 */
+  const bodyPuzzleGame = {
+    puzzleSize: 9,
+    revealed: 0,
+    questions: [
+      {q:"Which hormone triggers puberty in boys?", a:"Testosterone", options:["Estrogen","Testosterone","Progesterone","Oxytocin"]},
+      {q:"Which organ produces eggs in females?", a:"Ovaries", options:["Ovaries","Testes","Uterus","Liver"]},
+      {q:"Menstruation is a sign of?", a:"Adolescence", options:["Childhood","Adolescence","Adulthood","Old age"]},
+      {q:"Which hormone controls menstrual cycle?", a:"Estrogen", options:["Testosterone","Estrogen","Adrenaline","Insulin"]},
+      {q:"Changes in voice during puberty are caused by?", a:"Testosterone", options:["Estrogen","Testosterone","Progesterone","Thyroxine"]},
+      {q:"During adolescence, brain development is?", a:"Rapid", options:["Rapid","Slow","Stops","None"]},
+      {q:"Growth of body hair occurs in?", a:"Adolescence", options:["Childhood","Adolescence","Adulthood","Senior"]},
+      {q:"Male puberty starts approximately at age?", a:"12-16", options:["8-10","12-16","18-20","6-8"]},
+      {q:"Secondary sexual characteristics develop due to?", a:"Sex Hormones", options:["Growth Hormones","Sex Hormones","Vitamin D","Insulin"]},
+      {q:"Females typically begin puberty at?", a:"10-14", options:["8-10","10-14","14-18","18-22"]}
+    ],
+    start() {
+      this.revealed = 0;
+      this._render();
+    },
+    _render() {
+      modalBody.innerHTML = `
+        <h2>Body System Puzzle</h2>
+        <div>Answer questions correctly to reveal puzzle pieces.</div>
+        <div class="puzzle-grid" aria-label="Body puzzle area">
+          ${Array(this.puzzleSize).fill(0).map((_,i)=>`
+            <div class="puzzle-piece" style="background-image: url('${i < this.revealed ? 'https://i.imgur.com/4A3CGAa.jpg' : ''}')"></div>
+          `).join('')}
+        </div>
+        <div style="margin-top:16px;">
+          <div class="question-text">${this.questions[this.revealed].q}</div>
+          <div>
+            ${this.questions[this.revealed].options.map(opt => `<button class="btn-option">${opt}</button>`).join('')}
+          </div>
+          <div class="feedback" id="bpFeedback"></div>
+        </div>
+      `;
+      modalBody.querySelectorAll('button.btn-option').forEach(btn => {
+        btn.onclick = () => {
+          const fb = document.getElementById('bpFeedback');
+          if(btn.textContent === this.questions[this.revealed].a){
+            this.revealed++;
+            fb.style.color = '#327a28';
+            fb.textContent = "Correct! Puzzle piece revealed.";
+            if(this.revealed >= this.puzzleSize || this.revealed >= this.questions.length){
+              setTimeout(() => {
+                modalBody.innerHTML = `
+                  <h2>Body System Puzzle</h2>
+                  <div style="font-weight:700; font-size:1.5em; color:#266b27; text-align:center; margin-top: 40px;">
+                    All puzzle pieces revealed! 🎉🧩
+                  </div>
+                  <button onclick="bodyPuzzleGame.start()" style="margin-top: 30px; padding: 10px 26px;">Play Again</button>
+                `;
+              }, 1100);
+            } else {
+              setTimeout(() => this._render(), 900);
+            }
+          }else{
+            fb.style.color = '#b23232';
+            fb.textContent = "Wrong answer. Try again.";
+          }
+        };
+      });
+    }
+  };
+
+  /* 4. Life Cycle Race 🏁 */
+  const lifeCycleRace = {
+    questions:[
+      {q:"Which stage is adolescence?", options:["Birth","Childhood","Adolescence","Adulthood"], ans:2},
+      {q:"Puberty happens in which life phase?", options:["Adulthood","Childhood","Adolescence","Elderly"], ans:2},
+      {q:"At what stage does puberty usually end?", options:["13","15","18","21"], ans:2},
+      {q:"Adult stage begins approximately at age?", options:["18","21","25","30"], ans:0},
+      {q:"Childhood is before age?", options:["7","14","21","10"], ans:3},
+      {q:"Changes in hormones occur during?", options:["Childhood","Adolescence","Adulthood","Old age"], ans:1},
+      {q:"Main reproductive age is?", options:["10-15","15-25","25-40","40-55"], ans:2},
+      {q:"Puberty causes development of?", options:["Secondary sex characteristics","Bones only","Height only","Muscles only"], ans:0},
+      {q:"Emotional changes take place primarily in?", options:["Adolescence","Childhood","Adulthood","Seniors"], ans:0},
+      {q:"Parents are part of?", options:["Childhood","Adolescence","Adulthood","None"], ans:2}
+    ],
+    currQIdx: 0,
+    playerPos: 0,
+    pathLen: 320,
+    start() {
+      this.currQIdx = 0;
+      this.playerPos = 0;
+      this._render();
+    },
+    _render() {
+      if(this.currQIdx >= this.questions.length){
+        modalBody.innerHTML = `
+          <h2>Life Cycle Race</h2>
+          <div style="min-height: 180px; color: #276a2f; font-weight:700; font-size: 1.5em; text-align:center; padding-top: 50px;">
+            Race finished! You moved through all stages!
+          </div>
+          <button onclick="lifeCycleRace.start()" style="margin-top: 28px; padding: 10px 26px; font-weight: 700;">Play Again</button>
+        `;
+        return;
+      }
+      const q = this.questions[this.currQIdx];
+      modalBody.innerHTML = `
+        <h2>Life Cycle Race</h2>
+        <div class="life-race-area">
+          <div class="life-track" aria-label="Life cycle path"></div>
+          <div class="life-runner life-player" aria-label="Player character" style="left:${this.playerPos}px;">👦</div>
+          <div class="question-text">${q.q}</div>
+          <div>
+            ${q.options.map((opt,i) => `<button class="btn-option" data-ans="${i}">${opt}</button>`).join(' ')}
+          </div>
+          <div class="life-feedback" id="lifeRaceFeedback"></div>
+        </div>
+      `;
+      modalBody.querySelectorAll('button.btn-option').forEach(btn => {
+        btn.onclick = () => {
+          const fb = document.getElementById('lifeRaceFeedback');
+          if(+btn.dataset.ans === q.ans) {
+            this.playerPos = Math.min(this.playerPos + 60, this.pathLen);
+            fb.style.color = '#2e7932';
+            fb.textContent = "Correct! You move forward.";
+            modalBody.querySelector('.life-runner').style.left = this.playerPos + "px";
+          } else {
+            fb.style.color = '#a92c2c';
+            fb.textContent = "Wrong! You stay put.";
+          }
+          this.currQIdx++;
+          setTimeout(() => this._render(),900);
+        };
+      });
+    }
+  };
+
+  /* 5. Hormone Rescue Game 🚑 */
+  const hormoneRescueGame = {
+    questions:[
+      {q:"Which hormone is responsible for male secondary sexual characteristics?", options:["Estrogen","Testosterone","Insulin","Progesterone"], ans:1, hint:"Produced mainly in testes"},
+      {q:"Hormone that regulates menstrual cycle?", options:["Estrogen","Adrenaline","Cortisol","Thyroxine"], ans:0, hint:"Important female hormone"},
+      {q:"A lack of which hormone causes delayed puberty?", options:["Growth hormone","Insulin","Testosterone","Thyroxine"], ans:2, hint:"Male sex hormone"},
+      {q:"Hormones control?", options:["Growth and development","Digestion","Breathing","Blood circulation"], ans:0, hint:"They regulate body processes"},
+      {q:"Which gland starts puberty process?", options:["Pancreas","Pituitary","Thyroid","Adrenal"], ans:1, hint:"Master gland"},
+      {q:"Progesterone plays a major role in?", options:["Pregnancy","Digestion","Metabolism","Muscle growth"], ans:0, hint:"Fetal development"},
+      {q:"Which hormone increases during stress?", options:["Adrenaline","Estrogen","Testosterone","Insulin"], ans:0, hint:"Fight or flight"},
+      {q:"Insulin regulates?", options:["Blood sugar","Reproduction","Growth","Sleep"], ans:0, hint:"Blood glucose control"},
+      {q:"Menopause hormonal change affects?", options:["Estrogen","Insulin","Testosterone","Adrenaline"], ans:0, hint:"Cessation of menstruation"},
+      {q:"Thyroxine affects?", options:["Metabolism","Oxygen transport","Water balance","Digestion"], ans:0, hint:"Regulation of metabolic rate"}
+    ],
+    currentQ:0,
+    healthPoints: 5,
+    start() {
+      this.currentQ = 0;
+      this.healthPoints = 5;
+      this._render();
+    },
+    _render() {
+      const q = this.questions[this.currentQ];
+      modalBody.innerHTML = `
+        <h2>Hormone Rescue Game</h2>
+        <div>Health points: <strong>${this.healthPoints}</strong></div>
+        <div class="question-container" aria-live="polite" aria-atomic="true">
+          <div class="question-text">${q.q}</div>
+          <ul class="options-list">
+            ${q.options.map((opt,i)=>`
+              <li class="option-item">
+                <label>
+                  <input type="radio" name="answer" value="${i}" />
+                  ${opt}
+                </label>
+              </li>`).join('')}
+          </ul>
+          <button id="submitAnswer" disabled>Submit</button>
+          <div class="feedback" id="hormoneFeedback"></div>
+        </div>
+      `;
+      const radios = modalBody.querySelectorAll('input[type=radio]');
+      const submitBtn = modalBody.querySelector('#submitAnswer');
+      radios.forEach(r => r.addEventListener('change', () => submitBtn.disabled = false));
+      submitBtn.onclick = () => this._submitAnswer();
+    },
+    _submitAnswer() {
+      const selected = modalBody.querySelector('input[type=radio]:checked');
+      if(!selected) return;
+      const idx = +selected.value;
+      const q = this.questions[this.currentQ];
+      const fb = modalBody.querySelector('#hormoneFeedback');
+      if(idx === q.ans) {
+        fb.style.color = "#28712d";
+        fb.textContent = "Correct! Health improves.";
+        this.healthPoints++;
+      } else {
+        fb.style.color = "#b83333";
+        fb.textContent = `Wrong! Hint: ${q.hint}`;
+        this.healthPoints--;
+      }
+      [...modalBody.querySelectorAll('input[type=radio]')].forEach(i => i.disabled = true);
+      modalBody.querySelector('#submitAnswer').disabled = true;
+      this.currentQ++;
+
+      if(this.healthPoints <= 0) {
+        setTimeout(() => {
+          modalBody.innerHTML = `
+            <h2>Hormone Rescue Game</h2>
+            <div style="font-weight:700; font-size:1.5em; color:#b22b27; text-align:center; padding-top: 50px;">
+              Health lost! Try again.
+            </div>
+            <button onclick="hormoneRescueGame.start()" style="margin-top: 30px; padding: 10px 28px;">Restart Game</button>
+          `;
+        }, 1000);
+        return;
+      }
+      if (this.currentQ >= this.questions.length) {
+        setTimeout(() => {
+          modalBody.innerHTML = `
+            <h2>Hormone Rescue Game</h2>
+            <div style="font-weight:700; font-size:1.5em; color:#236829; text-align:center; padding-top: 50px;">
+              Game over! Your health points: ${this.healthPoints}
+            </div>
+            <button onclick="hormoneRescueGame.start()" style="margin-top: 30px; padding: 10px 28px;">Play Again</button>
+          `;
+        }, 1200);
+      } else {
+        setTimeout(() => this._render(), 1100);
+      }
+    }
+  };
+
+</script>
+</body>
+</html>

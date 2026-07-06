@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Translation</title>
+<!-- ORIGINAL GAME CONTENT STARTS HERE -->
+<h1>🫀 Life Processes Simulator</h1>
+        <div class="game-info">
+            <span>Score: <span id="score">0</span></span>
+            <span>System: <span id="current-system">Respiratory</span></span>
+            <span>Questions: <span id="correct-answers">0</span>/10</span><div class="system-tabs">
+            <button class="tab active" onclick="switchSystem('respiratory')">🫁 Respiratory</button>
+            <button class="tab" onclick="switchSystem('circulatory')">❤️ Circulatory</button>
+            <button class="tab" onclick="switchSystem('digestive')">🍎 Digestive</button>
+            <button class="tab" onclick="switchSystem('excretory')">💧 Excretory</button>
+            <button class="tab" onclick="switchSystem('nervous')">🧠 Nervous</button><div class="simulation-area" id="simulationArea">
+            <div class="body-outline">
+                <div class="organ brain" onclick="organClicked('brain')" title="Brain">🧠</div>
+                <div class="organ heart" onclick="organClicked('heart')" title="Heart">❤️</div>
+                <div class="organ lungs lung-left" onclick="organClicked('lungs')" title="Left Lung">🫁</div>
+                <div class="organ lungs lung-right" onclick="organClicked('lungs')" title="Right Lung">🫁</div>
+                <div class="organ stomach" onclick="organClicked('stomach')" title="Stomach">🍎</div>
+                <div class="organ kidneys kidney-left" onclick="organClicked('kidneys')" title="Left Kidney">💧</div>
+                <div class="organ kidneys kidney-right" onclick="organClicked('kidneys')" title="Right Kidney">💧</div><div class="flow-particles" id="particles"></div><div class="process-controls">
+            <button class="process-btn" onclick="startProcess('breathing')">Start Breathing</button>
+            <button class="process-btn" onclick="startProcess('circulation')">Blood Flow</button>
+            <button class="process-btn" onclick="startProcess('digestion')">Digestion</button>
+            <button class="process-btn" onclick="startProcess('excretion')">Excretion</button><div class="info-panel" id="infoPanel">
+            <h3>🫁 Respiratory System</h3>
+            <p><strong>Function:</strong> Takes in oxygen and removes carbon dioxide from the body.</p>
+            <p><strong>Key Organs:</strong> Nose, trachea, bronchi, lungs, diaphragm</p>
+            <p><strong>Process:</strong> Air enters through nose → trachea → bronchi → alveoli where gas exchange occurs</p><div class="quiz-section" id="quizSection">
+            <div class="question" id="questionText">
+                Which organ is primarily responsible for gas exchange in the respiratory system?<div class="options" id="optionsContainer">
+                <div class="option" onclick="selectOption(this, false)">Heart</div>
+                <div class="option" onclick="selectOption(this, true)">Lungs</div>
+                <div class="option" onclick="selectOption(this, false)">Stomach</div>
+                <div class="option" onclick="selectOption(this, false)">Kidneys</div><div class="controls">
+            <button class="btn btn-simulate" onclick="runSimulation()">Run Simulation</button>
+            <button class="btn btn-quiz" onclick="checkQuizAnswer()">Submit Answer</button>
+            <button class="btn btn-next" onclick="nextQuestion()">Next Question</button><div id="result" class="result" style="display: none;"></div><script>
+        const systems = {
+            respiratory: {
+                name: "Respiratory System",
+                icon: "🫁",
+                function: "Takes in oxygen and removes carbon dioxide from the body.",
+                organs: "Nose, trachea, bronchi, lungs, diaphragm",
+                process: "Air enters through nose → trachea → bronchi → alveoli where gas exchange occurs"
+            },
+            circulatory: {
+                name: "Circulatory System",
+                icon: "❤️",
+                function: "Transports blood, nutrients, oxygen, and waste throughout the body.",
+                organs: "Heart, blood vessels (arteries, veins, capillaries), blood",
+                process: "Heart pumps blood → arteries carry oxygenated blood → capillaries exchange nutrients → veins return blood to heart"
+            },
+            digestive: {
+                name: "Digestive System",
+                icon: "🍎",
+                function: "Breaks down food into nutrients that can be absorbed by the body.",
+                organs: "Mouth, esophagus, stomach, small intestine, large intestine, liver, pancreas",
+                process: "Food is chewed → swallowed → digested in stomach → nutrients absorbed in small intestine"
+            },
+            excretory: {
+                name: "Excretory System",
+                icon: "💧",
+                function: "Removes waste products and excess water from the body.",
+                organs: "Kidneys, ureters, bladder, urethra, skin, lungs",
+                process: "Kidneys filter blood → waste forms urine → stored in bladder → expelled from body"
+            },
+            nervous: {
+                name: "Nervous System",
+                icon: "🧠",
+                function: "Controls and coordinates body activities through electrical signals.",
+                organs: "Brain, spinal cord, nerves, sensory organs",
+                process: "Sensory input → brain processes → sends signals → body responds"
+            }
+        };
+        
+        const questions = [
+            {
+                system: "respiratory",
+                question: "Which organ is primarily responsible for gas exchange in the respiratory system?",
+                options: ["Heart", "Lungs", "Stomach", "Kidneys"],
+                correct: 1
+            },
+            {
+                system: "circulatory",
+                question: "What is the main function of the heart?",
+                options: ["Digest food", "Pump blood", "Filter waste", "Produce hormones"],
+                correct: 1
+            },
+            {
+                system: "digestive",
+                question: "Where does most nutrient absorption occur?",
+                options: ["Stomach", "Large intestine", "Small intestine", "Liver"],
+                correct: 2
+            },
+            {
+                system: "excretory",
+                question: "Which organs filter waste from the blood?",
+                options: ["Lungs", "Kidneys", "Heart", "Brain"],
+                correct: 1
+            },
+            {
+                system: "nervous",
+                question: "What is the control center of the nervous system?",
+                options: ["Heart", "Lungs", "Brain", "Stomach"],
+                correct: 2
+            },
+            {
+                system: "respiratory",
+                question: "What gas do we breathe in?",
+                options: ["Carbon dioxide", "Nitrogen", "Oxygen", "Hydrogen"],
+                correct: 2
+            },
+            {
+                system: "circulatory",
+                question: "Which blood vessels carry blood away from the heart?",
+                options: ["Veins", "Arteries", "Capillaries", "Nerves"],
+                correct: 1
+            },
+            {
+                system: "digestive",
+                question: "Which organ produces bile to help digest fats?",
+                options: ["Pancreas", "Stomach", "Liver", "Kidney"],
+                correct: 2
+            },
+            {
+                system: "excretory",
+                question: "What is the main waste product filtered by kidneys?",
+                options: ["Oxygen", "Glucose", "Urea", "Protein"],
+                correct: 2
+            },
+            {
+                system: "nervous",
+                question: "What carries messages between the brain and body parts?",
+                options: ["Blood vessels", "Nerves", "Muscles", "Bones"],
+                correct: 1
+            }
+        ];
+        
+        let currentSystem = 'respiratory';
+        let currentQuestion = 0;
+        let score = 0;
+        let correctAnswers = 0;
+        let selectedOption = null;
+        let animationId = null;
+        
+        function switchSystem(system) {
+            currentSystem = system;
+            
+            // Update tabs
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update info panel
+            updateInfoPanel();
+            
+            // Update display
+            document.getElementById('current-system').textContent = systems[system].name;
+            
+            // Stop any running animations
+            stopAllProcesses();
+        }
+        
+        function updateInfoPanel() {
+            const system = systems[currentSystem];
+            const infoPanel = document.getElementById('infoPanel');
+            infoPanel.innerHTML = `
+                <h3>${system.icon} ${system.name}</h3>
+                <p><strong>Function:</strong> ${system.function}</p>
+                <p><strong>Key Organs:</strong> ${system.organs}</p>
+                <p><strong>Process:</strong> ${system.process}</p>
+            `;
+        }
+        
+        function organClicked(organType) {
+            const organInfo = {
+                brain: "Brain: Control center that processes information and sends signals throughout the body.",
+                heart: "Heart: Muscular organ that pumps blood throughout the circulatory system.",
+                lungs: "Lungs: Organs where oxygen and carbon dioxide are exchanged between air and blood.",
+                stomach: "Stomach: Organ that begins protein digestion using acids and enzymes.",
+                kidneys: "Kidneys: Filter waste products and excess water from the blood to form urine."
+            };
+            
+            const infoPanel = document.getElementById('infoPanel');
+            infoPanel.innerHTML = `<h3>🔍 Organ Information</h3><p>${organInfo[organType]}</p>`;
+        }
+        
+        function startProcess(processType) {
+            stopAllProcesses();
+            
+            const btn = event.target;
+            btn.classList.add('active');
+            
+            switch(processType) {
+                case 'breathing':
+                    simulateBreathing();
+                    break;
+                case 'circulation':
+                    simulateCirculation();
+                    break;
+                case 'digestion':
+                    simulateDigestion();
+                    break;
+                case 'excretion':
+                    simulateExcretion();
+                    break;
+            }
+        }
+        
+        function stopAllProcesses() {
+            document.querySelectorAll('.process-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('particles').innerHTML = '';
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+        }
+        
+        function simulateBreathing() {
+            const particles = document.getElementById('particles');
+            
+            function createBreathingParticle() {
+                const particle = document.createElement('div');
+                particle.className = 'particle oxygen';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = '0px';
+                particles.appendChild(particle);
+                
+                // Animate to lungs
+                let pos = 0;
+                function animateParticle() {
+                    pos += 2;
+                    particle.style.top = pos + 'px';
+                    
+                    if (pos > 150) {
+                        particle.remove();
+                    } else {
+                        requestAnimationFrame(animateParticle);
+                    }
+                }
+                animateParticle();
+            }
+            
+            setInterval(createBreathingParticle, 500);
+        }
+        
+        function simulateCirculation() {
+            const particles = document.getElementById('particles');
+            
+            function createBloodParticle() {
+                const particle = document.createElement('div');
+                particle.className = 'particle blood';
+                particle.style.left = '150px';
+                particle.style.top = '120px';
+                particles.appendChild(particle);
+                
+                // Animate circulation path
+                let angle = 0;
+                function animateCirculation() {
+                    angle += 0.1;
+                    const radius = 80;
+                    const x = 150 + radius * Math.cos(angle);
+                    const y = 120 + radius * Math.sin(angle);
+                    
+                    particle.style.left = x + 'px';
+                    particle.style.top = y + 'px';
+                    
+                    if (angle < Math.PI * 2) {
+                        requestAnimationFrame(animateCirculation);
+                    } else {
+                        particle.remove();
+                    }
+                }
+                animateCirculation();
+            }
+            
+            setInterval(createBloodParticle, 800);
+        }
+        
+        function simulateDigestion() {
+            const particles = document.getElementById('particles');
+            
+            function createNutrientParticle() {
+                const particle = document.createElement('div');
+                particle.className = 'particle nutrient';
+                particle.style.left = '150px';
+                particle.style.top = '170px';
+                particles.appendChild(particle);
+                
+                // Animate downward movement
+                let pos = 170;
+                function animateDigestion() {
+                    pos += 3;
+                    particle.style.top = pos + 'px';
+                    
+                    if (pos > 350) {
+                        particle.remove();
+                    } else {
+                        requestAnimationFrame(animateDigestion);
+                    }
+                }
+                animateDigestion();
+            }
+            
+            setInterval(createNutrientParticle, 600);
+        }
+        
+        function simulateExcretion() {
+            const particles = document.getElementById('particles');
+            
+            function createWasteParticle() {
+                const particle = document.createElement('div');
+                particle.className = 'particle waste';
+                particle.style.left = (Math.random() > 0.5 ? '110px' : '190px');
+                particle.style.top = '200px';
+                particles.appendChild(particle);
+                
+                // Animate to exit
+                let pos = 200;
+                function animateExcretion() {
+                    pos += 4;
+                    particle.style.top = pos + 'px';
+                    
+                    if (pos > 350) {
+                        particle.remove();
+                    } else {
+                        requestAnimationFrame(animateExcretion);
+                    }
+                }
+                animateExcretion();
+            }
+            
+            setInterval(createWasteParticle, 700);
+        }
+        
+        function loadQuestion() {
+            const question = questions[currentQuestion];
+            document.getElementById('questionText').textContent = question.question;
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => selectOption(optionDiv, index === question.correct);
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            selectedOption = null;
+        }
+        
+        function selectOption(element, isCorrect) {
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedOption = { element, isCorrect };
+        }
+        
+        function checkQuizAnswer() {
+            if (!selectedOption) return;
+            
+            const resultDiv = document.getElementById('result');
+            
+            document.querySelectorAll('.option').forEach((opt, index) => {
+                const question = questions[currentQuestion];
+                if (index === question.correct) {
+                    opt.classList.add('correct');
+                } else if (opt.classList.contains('selected') && !selectedOption.isCorrect) {
+                    opt.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedOption.isCorrect) {
+                score += 10;
+                correctAnswers++;
+                resultDiv.textContent = '🎉 Correct! Well done!';
+                resultDiv.className = 'result correct';
+            } else {
+                resultDiv.textContent = '❌ Incorrect. The correct answer is highlighted in green.';
+                resultDiv.className = 'result incorrect';
+            }
+            
+            resultDiv.style.display = 'block';
+            updateDisplay();
+        }
+        
+        function nextQuestion() {
+            currentQuestion = (currentQuestion + 1) % questions.length;
+            loadQuestion();
+            document.getElementById('result').style.display = 'none';
+            
+            // Switch to relevant system
+            const questionSystem = questions[currentQuestion].system;
+            if (questionSystem !== currentSystem) {
+                switchSystem(questionSystem);
+                // Update the active tab
+                document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+                document.querySelector(`[onclick="switchSystem('${questionSystem}')"]`).classList.add('active');
+            }
+        }
+        
+        function runSimulation() {
+            stopAllProcesses();
+            
+            // Run simulation based on current system
+            switch(currentSystem) {
+                case 'respiratory':
+                    simulateBreathing();
+                    break;
+                case 'circulatory':
+                    simulateCirculation();
+                    break;
+                case 'digestive':
+                    simulateDigestion();
+                    break;
+                case 'excretory':
+                    simulateExcretion();
+                    break;
+                case 'nervous':
+                    // Simple nervous system simulation
+                    document.querySelectorAll('.organ').forEach(organ => {
+                        organ.style.animation = 'pulse 0.5s ease-in-out 3';
+                    });
+                    break;
+            }
+        }
+        
+        function updateDisplay() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('correct-answers').textContent = correctAnswers;
+        }
+        
+        // Initialize game
+        updateInfoPanel();
+        loadQuestion();
+        updateDisplay();
+        
+        // Auto-stop processes after 10 seconds
+        setInterval(() => {
+            if (document.querySelector('.process-btn.active')) {
+                setTimeout(stopAllProcesses, 10000);
+            }
+        }, 1000);
+    </script></html>

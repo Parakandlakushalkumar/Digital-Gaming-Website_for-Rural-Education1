@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algebra Escape Room Games</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .game-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 3px solid transparent;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+        
+        .game-card.active {
+            border-color: #4299e1;
+            transform: scale(1.02);
+        }
+        
+        .game-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .game-description {
+            color: #718096;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .progress-bar {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 20px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(45deg, #4299e1, #63b3ed);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        
+        .game-area {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 20px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .game-area.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .problem {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2d3748;
+            margin: 20px 0;
+            text-align: center;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 10px;
+            border-left: 5px solid #4299e1;
+        }
+        
+        .input-group {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        input[type="text"], input[type="number"] {
+            padding: 15px;
+            font-size: 1.2rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            width: 200px;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #4299e1, #63b3ed);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            font-weight: bold;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(66, 153, 225, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-play {
+            background: linear-gradient(45deg, #48bb78, #68d391);
+            font-size: 1rem;
+            padding: 10px 20px;
+        }
+        
+        .btn-back {
+            background: linear-gradient(45deg, #718096, #a0aec0);
+        }
+        
+        .feedback {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .feedback.correct {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 2px solid #48bb78;
+        }
+        
+        .feedback.incorrect {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 2px solid #e53e3e;
+        }
+        
+        .monster-parts {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .monster-part {
+            height: 80px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            border: 2px dashed #cbd5e0;
+            transition: all 0.5s ease;
+        }
+        
+        .monster-part.unlocked {
+            background: linear-gradient(45deg, #ffd89b, #19547b);
+            color: white;
+            border: 2px solid #4299e1;
+            animation: bounce 0.5s ease;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 60%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            80% { transform: translateY(-5px); }
+        }
+        
+        .tower {
+            height: 400px;
+            width: 100px;
+            background: linear-gradient(to top, #e2e8f0, #f7fafc);
+            margin: 20px auto;
+            border-radius: 10px;
+            border: 2px solid #cbd5e0;
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            padding: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tower-block {
+            width: 90%;
+            height: 40px;
+            background: linear-gradient(45deg, #4299e1, #63b3ed);
+            margin: 2px 0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            animation: dropIn 0.5s ease;
+        }
+        
+        @keyframes dropIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            font-weight: bold;
+            color: #4a5568;
+        }
+        
+        .stat {
+            text-align: center;
+            padding: 10px;
+            background: #f7fafc;
+            border-radius: 10px;
+            min-width: 100px;
+        }
+        
+        .code-display {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2d3748;
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 15px;
+            border: 3px dashed #cbd5e0;
+            letter-spacing: 10px;
+        }
+        
+        .treasure-map {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .map-spot {
+            height: 60px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            border: 2px solid #cbd5e0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .map-spot.current {
+            background: linear-gradient(45deg, #ffd89b, #19547b);
+            color: white;
+            animation: pulse 1s infinite;
+        }
+        
+        .map-spot.completed {
+            background: linear-gradient(45deg, #48bb78, #68d391);
+            color: white;
+        }
+        
+        .map-spot.treasure {
+            background: linear-gradient(45deg, #f6ad55, #ed8936);
+            color: white;
+            font-size: 2rem;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(66, 153, 225, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(66, 153, 225, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(66, 153, 225, 0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Algebra Escape Room Games 🔐</h1>
+        
+        <div id="gameSelect" class="game-grid">
+            <div class="game-card" onclick="startGame('escape')">
+                <div class="game-title">🔐 Algebra Escape Room</div>
+                <div class="game-description">Solve 5 algebra puzzles to escape from the locked room!</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="escape-progress">0/5</div>
+                </div>
+                <button class="btn btn-play">Play Game</button>
+            </div>
+            
+            <div class="game-card" onclick="startGame('monster')">
+                <div class="game-title">👾 Build the Monster</div>
+                <div class="game-description">Simplify expressions to unlock monster parts!</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="monster-progress">0/5</div>
+                </div>
+                <button class="btn btn-play">Play Game</button>
+            </div>
+            
+            <div class="game-card" onclick="startGame('treasure')">
+                <div class="game-title">🏝️ Treasure Island</div>
+                <div class="game-description">Navigate the map by solving algebra problems!</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="treasure-progress">0/5</div>
+                </div>
+                <button class="btn btn-play">Play Game</button>
+            </div>
+            
+            <div class="game-card" onclick="startGame('tower')">
+                <div class="game-title">🏗️ Expression Tower Builder</div>
+                <div class="game-description">Build the tallest tower by simplifying expressions!</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="tower-progress">0/5</div>
+                </div>
+                <button class="btn btn-play">Play Game</button>
+            </div>
+            
+            <div class="game-card" onclick="startGame('secret')">
+                <div class="game-title">🔎 Secret Code Algebra</div>
+                <div class="game-description">Decode the secret message by solving equations!</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="secret-progress">0/5</div>
+                </div>
+                <button class="btn btn-play">Play Game</button>
+            </div>
+        </div>
+        
+        <!-- Escape Room Game -->
+        <div id="escape-game" class="game-area">
+            <h2>🔐 Algebra Escape Room</h2>
+            <div class="problem" id="escape-problem"></div>
+            <div class="input-group">
+                <input type="text" id="escape-answer" placeholder="Enter your answer">
+                <br>
+                <button class="btn" onclick="checkEscape()">Submit Answer</button>
+            </div>
+            <div id="escape-feedback" class="feedback"></div>
+            <div class="game-stats">
+                <div class="stat">Room: <span id="escape-room">1</span>/5</div>
+                <div class="stat">Score: <span id="escape-score">0</span></div>
+            </div>
+            <button class="btn btn-back" onclick="backToSelect()">Back to Games</button>
+        </div>
+        
+        <!-- Monster Game -->
+        <div id="monster-game" class="game-area">
+            <h2>👾 Build the Monster</h2>
+            <div class="monster-parts">
+                <div class="monster-part" id="part-0">?</div>
+                <div class="monster-part" id="part-1">?</div>
+                <div class="monster-part" id="part-2">?</div>
+                <div class="monster-part" id="part-3">?</div>
+                <div class="monster-part" id="part-4">?</div>
+            </div>
+            <div class="problem" id="monster-problem"></div>
+            <div class="input-group">
+                <input type="text" id="monster-answer" placeholder="Simplified form">
+                <br>
+                <button class="btn" onclick="checkMonster()">Submit Answer</button>
+            </div>
+            <div id="monster-feedback" class="feedback"></div>
+            <div class="game-stats">
+                <div class="stat">Parts: <span id="monster-parts-count">0</span>/5</div>
+                <div class="stat">Score: <span id="monster-score">0</span></div>
+            </div>
+            <button class="btn btn-back" onclick="backToSelect()">Back to Games</button>
+        </div>
+        
+        <!-- Treasure Island Game -->
+        <div id="treasure-game" class="game-area">
+            <h2>🏝️ Algebra Treasure Island</h2>
+            <div class="treasure-map">
+                <div class="map-spot current" id="spot-0">🚢</div>
+                <div class="map-spot" id="spot-1">🌴</div>
+                <div class="map-spot" id="spot-2">⛰️</div>
+                <div class="map-spot" id="spot-3">🏜️</div>
+                <div class="map-spot treasure" id="spot-4">💰</div>
+            </div>
+            <div class="problem" id="treasure-problem"></div>
+            <div class="input-group">
+                <input type="text" id="treasure-answer" placeholder="Enter your answer">
+                <br>
+                <button class="btn" onclick="checkTreasure()">Submit Answer</button>
+            </div>
+            <div id="treasure-feedback" class="feedback"></div>
+            <div class="game-stats">
+                <div class="stat">Position: <span id="treasure-position">1</span>/5</div>
+                <div class="stat">Score: <span id="treasure-score">0</span></div>
+            </div>
+            <button class="btn btn-back" onclick="backToSelect()">Back to Games</button>
+        </div>
+        
+        <!-- Tower Builder Game -->
+        <div id="tower-game" class="game-area">
+            <h2>🏗️ Expression Tower Builder</h2>
+            <div class="tower" id="tower"></div>
+            <div class="problem" id="tower-problem"></div>
+            <div class="input-group">
+                <input type="text" id="tower-answer" placeholder="Simplified form">
+                <br>
+                <button class="btn" onclick="checkTower()">Submit Answer</button>
+            </div>
+            <div id="tower-feedback" class="feedback"></div>
+            <div class="game-stats">
+                <div class="stat">Height: <span id="tower-height">0</span>/5</div>
+                <div class="stat">Score: <span id="tower-score">0</span></div>
+            </div>
+            <button class="btn btn-back" onclick="backToSelect()">Back to Games</button>
+        </div>
+        
+        <!-- Secret Code Game -->
+        <div id="secret-game" class="game-area">
+            <h2>🔎 Secret Code with Algebra</h2>
+            <div class="code-display" id="secret-code">_ _ _ _ _</div>
+            <div class="problem" id="secret-problem"></div>
+            <div class="input-group">
+                <input type="number" id="secret-answer" placeholder="Enter number">
+                <br>
+                <button class="btn" onclick="checkSecret()">Submit Answer</button>
+            </div>
+            <div id="secret-feedback" class="feedback"></div>
+            <div class="game-stats">
+                <div class="stat">Codes: <span id="secret-codes">0</span>/5</div>
+                <div class="stat">Score: <span id="secret-score">0</span></div>
+            </div>
+            <button class="btn btn-back" onclick="backToSelect()">Back to Games</button>
+        </div>
+    </div>
+
+    <script>
+        // Game data and state
+        const games = {
+            escape: {
+                problems: [
+                    { question: "Simplify: 3x + 2x", answer: "5x" },
+                    { question: "Find the value of 2y + 3 when y = 4", answer: "11" },
+                    { question: "Simplify: 7a - 3a + 2a", answer: "6a" },
+                    { question: "Solve for x: x + 5 = 12", answer: "7" },
+                    { question: "Simplify: 4(x + 2) - 3x", answer: "x + 8" }
+                ],
+                current: 0,
+                score: 0
+            },
+            monster: {
+                problems: [
+                    { question: "Simplify: 2x + 3x", answer: "5x" },
+                    { question: "Simplify: 8y - 3y", answer: "5y" },
+                    { question: "Simplify: 4a + 2a - a", answer: "5a" },
+                    { question: "Simplify: 6b - 2b + 3b", answer: "7b" },
+                    { question: "Simplify: 5c + c - 2c", answer: "4c" }
+                ],
+                parts: ["👁️", "👁️", "👃", "👄", "🦾"],
+                current: 0,
+                score: 0,
+                unlocked: 0
+            },
+            treasure: {
+                problems: [
+                    { question: "Solve: x + 3 = 8", answer: "5" },
+                    { question: "Find: 3y - 2 when y = 4", answer: "10" },
+                    { question: "Simplify: 2(x + 4)", answer: "2x + 8" },
+                    { question: "Solve: 2x - 1 = 9", answer: "5" },
+                    { question: "Find: 5a + 2a - 3a when a = 2", answer: "8" }
+                ],
+                current: 0,
+                score: 0
+            },
+            tower: {
+                problems: [
+                    { question: "4x - 2x", answer: "2x" },
+                    { question: "6y + 2y - y", answer: "7y" },
+                    { question: "3(a + 1) - 2a", answer: "a + 3" },
+                    { question: "5b - 3b + 4b", answer: "6b" },
+                    { question: "2(c + 2) + c", answer: "3c + 4" }
+                ],
+                current: 0,
+                score: 0,
+                height: 0
+            },
+            secret: {
+                problems: [
+                    { question: "If x = 3, find 2x + 5", answer: 11, code: "A" },
+                    { question: "If y = 2, find 3y + 4", answer: 10, code: "L" },
+                    { question: "If a = 5, find a + 3", answer: 8, code: "G" },
+                    { question: "If b = 1, find 4b + 4", answer: 8, code: "E" },
+                    { question: "If c = 6, find c - 4", answer: 2, code: "B" }
+                ],
+                current: 0,
+                score: 0,
+                codes: []
+            }
+        };
+
+        let currentGame = '';
+
+        function startGame(gameType) {
+            currentGame = gameType;
+            document.getElementById('gameSelect').style.display = 'none';
+            document.getElementById(gameType + '-game').classList.add('active');
+            
+            // Reset game state
+            games[gameType].current = 0;
+            games[gameType].score = 0;
+            
+            if (gameType === 'monster') {
+                games[gameType].unlocked = 0;
+                for (let i = 0; i < 5; i++) {
+                    document.getElementById('part-' + i).textContent = '?';
+                    document.getElementById('part-' + i).classList.remove('unlocked');
+                }
+            }
+            
+            if (gameType === 'treasure') {
+                for (let i = 0; i < 5; i++) {
+                    const spot = document.getElementById('spot-' + i);
+                    spot.classList.remove('current', 'completed');
+                    if (i === 0) spot.classList.add('current');
+                }
+            }
+            
+            if (gameType === 'tower') {
+                document.getElementById('tower').innerHTML = '';
+                games[gameType].height = 0;
+            }
+            
+            if (gameType === 'secret') {
+                games[gameType].codes = [];
+                updateSecretCode();
+            }
+            
+            loadProblem(gameType);
+        }
+
+        function loadProblem(gameType) {
+            const game = games[gameType];
+            if (game.current < game.problems.length) {
+                document.getElementById(gameType + '-problem').textContent = game.problems[game.current].question;
+                document.getElementById(gameType + '-answer').value = '';
+                document.getElementById(gameType + '-feedback').textContent = '';
+                updateStats(gameType);
+            } else {
+                endGame(gameType);
+            }
+        }
+
+        function checkAnswer(gameType, userAnswer, correctAnswer) {
+            if (typeof correctAnswer === 'string') {
+                return userAnswer.toLowerCase().replace(/\s/g, '') === correctAnswer.toLowerCase().replace(/\s/g, '');
+            } else {
+                return parseInt(userAnswer) === correctAnswer;
+            }
+        }
+
+        function checkEscape() {
+            const userAnswer = document.getElementById('escape-answer').value;
+            const game = games.escape;
+            const feedback = document.getElementById('escape-feedback');
+            
+            if (checkAnswer('escape', userAnswer, game.problems[game.current].answer)) {
+                feedback.textContent = '🎉 Correct! Door unlocked!';
+                feedback.className = 'feedback correct';
+                game.score += 20;
+                game.current++;
+                setTimeout(() => loadProblem('escape'), 1500);
+            } else {
+                feedback.textContent = '❌ Try again! The door remains locked.';
+                feedback.className = 'feedback incorrect';
+            }
+        }
+
+        function checkMonster() {
+            const userAnswer = document.getElementById('monster-answer').value;
+            const game = games.monster;
+            const feedback = document.getElementById('monster-feedback');
+            
+            if (checkAnswer('monster', userAnswer, game.problems[game.current].answer)) {
+                feedback.textContent = '🎉 Correct! Monster part unlocked!';
+                feedback.className = 'feedback correct';
+                
+                const part = document.getElementById('part-' + game.unlocked);
+                part.textContent = game.parts[game.unlocked];
+                part.classList.add('unlocked');
+                
+                game.score += 20;
+                game.current++;
+                game.unlocked++;
+                setTimeout(() => loadProblem('monster'), 1500);
+            } else {
+                feedback.textContent = '❌ Wrong! Try again to unlock the part.';
+                feedback.className = 'feedback incorrect';
+            }
+        }
+
+        function checkTreasure() {
+            const userAnswer = document.getElementById('treasure-answer').value;
+            const game = games.treasure;
+            const feedback = document.getElementById('treasure-feedback');
+            
+            if (checkAnswer('treasure', userAnswer, game.problems[game.current].answer)) {
+                feedback.textContent = '🎉 Correct! Moving forward!';
+                feedback.className = 'feedback correct';
+                
+                document.getElementById('spot-' + game.current).classList.remove('current');
+                document.getElementById('spot-' + game.current).classList.add('completed');
+                
+                game.score += 20;
+                game.current++;
+                
+                if (game.current < 5) {
+                    document.getElementById('spot-' + game.current).classList.add('current');
+                }
+                
+                setTimeout(() => loadProblem('treasure'), 1500);
+            } else {
+                feedback.textContent = '❌ Wrong! You\'re stuck in quicksand!';
+                feedback.className = 'feedback incorrect';
+            }
+        }
+
+        function checkTower() {
+            const userAnswer = document.getElementById('tower-answer').value;
+            const game = games.tower;
+            const feedback = document.getElementById('tower-feedback');
+            
+            if (checkAnswer('tower', userAnswer, game.problems[game.current].answer)) {
+                feedback.textContent = '🎉 Correct! Block added to tower!';
+                feedback.className = 'feedback correct';
+                
+                const tower = document.getElementById('tower');
+                const block = document.createElement('div');
+                block.className = 'tower-block';
+                block.textContent = game.problems[game.current].answer;
+                tower.appendChild(block);
+                
+                game.score += 20;
+                game.current++;
+                game.height++;
+                setTimeout(() => loadProblem('tower'), 1500);
+            } else {
+                feedback.textContent = '❌ Wrong! Tower becomes shaky!';
+                feedback.className = 'feedback incorrect';
+            }
+        }
+
+        function checkSecret() {
+            const userAnswer = document.getElementById('secret-answer').value;
+            const game = games.secret;
+            const feedback = document.getElementById('secret-feedback');
+            
+            if (checkAnswer('secret', userAnswer, game.problems[game.current].answer)) {
+                feedback.textContent = '🎉 Correct! Code digit revealed!';
+                feedback.className = 'feedback correct';
+                
+                game.codes.push(game.problems[game.current].code);
+                updateSecretCode();
+                
+                game.score += 20;
+                game.current++;
+                setTimeout(() => loadProblem('secret'), 1500);
+            } else {
+                feedback.textContent = '❌ Wrong! Try again to reveal the code.';
+                feedback.className = 'feedback incorrect';
+            }
+        }
+
+        function updateSecretCode() {
+            const game = games.secret;
+            let codeDisplay = '';
+            for (let i = 0; i < 5; i++) {
+                if (i < game.codes.length) {
+                    codeDisplay += game.codes[i] + ' ';
+                } else {
+                    codeDisplay += '_ ';
+                }
+            }
+            document.getElementById('secret-code').textContent = codeDisplay.trim();
+        }
+
+        function updateStats(gameType) {
+            const game = games[gameType];
+            
+            if (gameType === 'escape') {
+                document.getElementById('escape-room').textContent = game.current + 1;
+                document.getElementById('escape-score').textContent = game.score;
+            } else if (gameType === 'monster') {
+                document.getElementById('monster-parts-count').textContent = game.unlocked;
+                document.getElementById('monster-score').textContent = game.score;
+            } else if (gameType === 'treasure') {
+                document.getElementById('treasure-position').textContent = game.current + 1;
+                document.getElementById('treasure-score').textContent = game.score;
+            } else if (gameType === 'tower') {
+                document.getElementById('tower-height').textContent = game.height;
+                document.getElementById('tower-score').textContent = game.score;
+            } else if (gameType === 'secret') {
+                document.getElementById('secret-codes').textContent = game.codes.length;
+                document.getElementById('secret-score').textContent = game.score;
+            }
+            
+            // Update progress bar
+            const progressBar = document.getElementById(gameType + '-progress');
+            const progress = (game.current / game.problems.length) * 100;
+            progressBar.style.width = progress + '%';
+            progressBar.textContent = game.current + '/' + game.problems.length;
+        }
+
+        function endGame(gameType) {
+            let message = '';
+            const game = games[gameType];
+            
+            switch (gameType) {
+                case 'escape':
+                    message = '🎉 Congratulations! You escaped the room! Final Score: ' + game.score;
+                    break;
+                case 'monster':
+                    message = '🎉 Monster completed! You built the perfect algebra monster! Final Score: ' + game.score;
+                    break;
+                case 'treasure':
+                    message = '🎉 Treasure found! You reached the treasure chest! Final Score: ' + game.score;
+                    break;
+                case 'tower':
+                    message = '🎉 Tower completed! You built a magnificent expression tower! Final Score: ' + game.score;
+                    break;
+                case 'secret':
+                    const secretMessage = game.codes.join('');
+                    message = '🎉 Secret revealed: "' + secretMessage + '" - Well Done, Algebra Master! Final Score: ' + game.score;
+                    break;
+            }
+            
+            document.getElementById(gameType + '-problem').textContent = message;
+            document.getElementById(gameType + '-answer').style.display = 'none';
+            document.querySelector('#' + gameType + '-game button[onclick*="check"]').style.display = 'none';
+            document.getElementById(gameType + '-feedback').textContent = '';
+            
+            // Update final progress
+            updateStats(gameType);
+        }
+
+        function backToSelect() {
+            // Hide current game
+            document.querySelectorAll('.game-area').forEach(area => {
+                area.classList.remove('active');
+            });
+            
+            // Show game selection
+            document.getElementById('gameSelect').style.display = 'grid';
+            
+            // Reset answer input and button visibility
+            if (currentGame) {
+                document.getElementById(currentGame + '-answer').style.display = 'inline-block';
+                document.querySelector('#' + currentGame + '-game button[onclick*="check"]').style.display = 'inline-block';
+            }
+        }
+
+        // Add enter key support for all inputs
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input[type="text"], input[type="number"]');
+            inputs.forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        const gameType = input.id.split('-')[0];
+                        switch (gameType) {
+                            case 'escape': checkEscape(); break;
+                            case 'monster': checkMonster(); break;
+                            case 'treasure': checkTreasure(); break;
+                            case 'tower': checkTower(); break;
+                            case 'secret': checkSecret(); break;
+                        }
+                    }
+                });
+            });
+        });
+
+        // Initialize progress bars
+        window.addEventListener('load', function() {
+            Object.keys(games).forEach(gameType => {
+                const progressBar = document.getElementById(gameType + '-progress');
+                progressBar.style.width = '0%';
+                progressBar.textContent = '0/' + games[gameType].problems.length;
+            });
+        });
+    </script>
+</body>
+</html>

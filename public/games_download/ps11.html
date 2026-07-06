@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Probability MCQ Games</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  body {
+    background: linear-gradient(135deg,#9ec5fe 0%,#4d82e4 100%);
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0; user-select: none; color:#05386b;
+  }
+  .container {
+    max-width: 840px;
+    margin: 36px auto;
+    background: #eaf3ff;
+    box-shadow: 0 10px 44px #4270cc8a;
+    border-radius: 24px;
+    padding: 32px 28px;
+  }
+  h1 {
+    font-size: 2.8em;
+    font-weight: 900;
+    color: #184a8a;
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .cards {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+  }
+  .card {
+    background: linear-gradient(45deg,#1a59d4, #7fabfd);
+    width: 175px;
+    height: 200px;
+    border-radius: 22px;
+    text-align: center;
+    color: white;
+    font-weight: 800;
+    font-size: 1.15em;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.25s ease, box-shadow 0.3s ease;
+    user-select: none;
+  }
+  .card span {
+    font-size: 3.5em;
+    margin-bottom: 14px;
+    animation: bounceEmoji 2.3s ease-in-out infinite;
+  }
+  @keyframes bounceEmoji {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  .card:hover {
+    transform: scale(1.07) rotate(-1.7deg);
+    box-shadow: 0 22px 58px rgba(23, 66, 118, 0.9);
+  }
+  .game {
+    display: none;
+    padding-top: 20px;
+    min-height: 460px;
+    position: relative;
+  }
+  .game.active { display: block;}
+  .backbtn {
+    position: absolute;
+    top: 18px;
+    right: 24px;
+    background: #1a54d8;
+    color: white;
+    border: none;
+    border-radius: 100px;
+    padding: 9px 27px;
+    font-weight: 700;
+    font-size: 1.05em;
+    cursor: pointer;
+    box-shadow: 0 3px 14px rgb(14 42 101 / 0.85);
+    user-select: none;
+    transition: background-color 0.3s ease;
+  }
+  .backbtn:hover {
+    background-color: #114fd1;
+  }
+  h2 {
+    font-size: 1.9em;
+    font-weight: 900;
+    color: #1a3b74;
+    text-align: center;
+    margin-bottom: 22px;
+  }
+  .question-count {
+    font-weight: 700;
+    font-size: 1.14em;
+    text-align: center;
+    margin-bottom: 18px;
+    color: #2f4275;
+    user-select: none;
+  }
+  .question-text {
+    font-weight: 900;
+    font-size: 1.34em;
+    text-align: center;
+    margin-bottom: 32px;
+    color: #1e2f61;
+    user-select: none;
+  }
+  .options {
+    max-width: 560px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 19px;
+  }
+  button.option-btn {
+    background: #3974d9;
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 1.15em;
+    padding: 17px 30px;
+    cursor: pointer;
+    box-shadow: 0 5px 18px rgba(42, 72, 140, 0.8);
+    transition: background-color 0.3s ease, transform 0.18s ease;
+    user-select: none;
+  }
+  button.option-btn:hover {
+    background-color: #2a5da8;
+    transform: scale(1.06);
+  }
+  button.option-btn.correct {
+    background-color: #27d18f !important;
+    box-shadow: 0 3px 14px #12714a !important;
+  }
+  button.option-btn.wrong {
+    animation: shake 0.52s ease;
+    background-color: #e34f53 !important;
+    box-shadow: 0 3px 14px #a02e30 !important;
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0);}
+    25%, 75% { transform: translateX(-6px);}
+    50% { transform: translateX(6px);}
+  }
+  .score-display {
+    text-align: center;
+    font-weight: 900;
+    font-size: 1.3em;
+    color: #225092;
+    margin-top: 34px;
+  }
+  .final-result {
+    margin-top: 36px;
+    background: #4884f7cc;
+    border-radius: 22px;
+    padding: 34px 28px;
+    color: white;
+    text-align: center;
+  }
+  .final-score {
+    font-size: 3.2em;
+    font-weight: 900;
+    margin-bottom: 16px;
+    text-shadow: 1px 2px 6px rgba(8,28,83,0.6);
+  }
+  .final-text {
+    font-size: 1.3em;
+    font-weight: 700;
+  }
+  .restart-btn {
+    margin-top: 22px;
+    cursor: pointer;
+    font-weight: 900;
+    font-size: 1.22em;
+    padding: 15px 48px;
+    background: #2a52d0;
+    border: none;
+    border-radius: 20px;
+    color: white;
+    box-shadow: 0 7px 25px #2749aecc;
+    user-select: none;
+    transition: background-color 0.3s ease;
+  }
+  .restart-btn:hover {
+    background: #1b347c;
+  }
+  /* Responsive */
+  @media (max-width: 700px) {
+    .cards {flex-direction: column; gap: 18px; align-items: center;}
+    .card {width: 86vw; height: 180px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Probability MCQ Games</h1>
+  <div class="cards" id="cardMenu">
+    <div class="card" onclick="startGame(0)"><span>🎲</span>Dice Roll Challenge</div>
+    <div class="card" onclick="startGame(1)"><span>🌀</span>Spinner Spin</div>
+    <div class="card" onclick="startGame(2)"><span>🔢</span>Data Sort Race</div>
+    <div class="card" onclick="startGame(3)"><span>🪙</span>Coin Flip Simulator</div>
+    <div class="card" onclick="startGame(4)"><span>📊</span>Graph It!</div>
+  </div>
+
+  <div id="quizContainer" style="display:none; position: relative;">
+    <button class="backbtn" onclick="goBack()">← Back</button>
+    <div class="question-count" id="questionCount"></div>
+    <div class="question-text" id="questionText"></div>
+    <div class="options" id="optionsContainer"></div>
+    <div class="score-display" id="scoreDisplay"></div>
+
+    <div id="finalResult" class="final-result" style="display:none;">
+      <div class="final-score" id="finalScore"></div>
+      <div class="final-text" id="finalMessage"></div>
+      <button class="restart-btn" onclick="restartGame()">Play Again</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const games = [
+    {
+      title: "Dice Roll Challenge",
+      questions: [
+        {q:"What is the probability of rolling a 4 on a fair six-sided die?", options:["1/2","1/6","1/4","1/3"], answer:"1/6"},
+        {q:"What is the probability of rolling an even number on a die?", options:["1/3","1/2","1/4","2/3"], answer:"1/2"},
+        {q:"Probability of rolling a number greater than 4?", options:["1/3","1/2","1/6","2/3"], answer:"1/3"},
+        {q:"Probability of rolling an odd number?", options:["2/3","1/6","1/2","1/4"], answer:"1/2"},
+        {q:"Probability of rolling a 6 or a 1?", options:["1/3","1/4","1/2","1/6"], answer:"1/3"},
+        {q:"What is chance of NOT rolling a 5?", options:["5/6","1/6","1/2","2/7"], answer:"5/6"},
+        {q:"Difference between probabilities of 2 and 5?", options:["0","1/6","1/3","1/4"], answer:"0"},
+        {q:"Probability of rolling a number less than 3?", options:["1/3","1/2","1/6","1/4"], answer:"1/3"},
+        {q:"Probability of rolling any number?", options:["1","0","1/6","1/4"], answer:"1"},
+        {q:"Probability of rolling a 3 or 4?", options:["1/3","1/4","1/6","1/2"], answer:"1/3"}
+      ]
+    },
+    {
+      title: "Spinner Spin",
+      questions: [
+        {q:"What is theoretical probability of spinner landing on 1 of 8 equal parts?", options:["1/4","1/8","1/2","1/6"], answer:"1/8"},
+        {q:"Landing on half the spinner sections probability?", options:["1/4","1/2","1/8","1/3"], answer:"1/2"},
+        {q:"Probability of landing on 3 parts?", options:["3/8","1/8","1/4","1/3"], answer:"3/8"},
+        {q:"Probability of NOT landing on 5 parts?", options:["5/8","3/8","1/4","1/2"], answer:"3/8"},
+        {q:"Probability of landing on one segment?", options:["1/10","1/8","1/9","1/6"], answer:"1/8"},
+        {q:"If spun 16 times expected to land on 4 segments?", options:["2","4","8","5"], answer:"4"},
+        {q:"Difference between probabilities of 2 and 8 segments?", options:["0","1/8","1/4","1/3"], answer:"0"},
+        {q:"Probability of landing on 1 segment of 10 parts?", options:["1/10","1/8","1/9","1/6"], answer:"1/10"},
+        {q:"Probability of landing on NONE of segments?", options:["0","1/8","1/10","1/6"], answer:"0"},
+        {q:"Probability of spinning and landing on opposite segment?", options:["1/8","1/4","1/6","1/2"], answer:"1/8"}
+      ]
+    },
+    {
+      title: "Data Sort Race",
+      questions: [
+        {q:"Which is the mean of 5, 10, 15?", options:["7.5","10","15","12"], answer:"10"},
+        {q:"Median of sorted data 1,3,4,5,10?", options:["3","4","5","1"], answer:"4"},
+        {q:"Mode of 5,7,7,8,9?", options:["5","7","8","9"], answer:"7"},
+        {q:"Average of 2,4,6,8,10?", options:["6","5","4","7"], answer:"6"},
+        {q:"Median of 1,2,3,4,5,6?", options:["3","4","6","2"], answer:"3.5"},
+        {q:"Mode of 3,3,3,2,1?", options:["1","2","3","4"], answer:"3"},
+        {q:"Mean of 10,20,30,40?", options:["25","20","30","35"], answer:"25"},
+        {q:"Median of 10,25,5?", options:["25","10","5","15"], answer:"10"},
+        {q:"Mode of 2,4,4,6,6,6?", options:["4","2","6","None"], answer:"6"},
+        {q:"Mean of 25,30,35,40,45?", options:["32","35","36","39"], answer:"35"}
+      ]
+    },
+    {
+      title: "Coin Flip Simulator",
+      questions: [
+        {q:"Probability of getting heads on one coin flip?", options:["1/2","1/4","1/3","1/5"], answer:"1/2"},
+        {q:"Probability of tails on one flip?", options:["1/3","1/2","1/6","1/4"], answer:"1/2"},
+        {q:"Probability of either heads or tails?", options:["1","1/3","1/4","0"], answer:"1"},
+        {q:"Probability of heads twice in a row?", options:["1/2","1/4","1/3","1/8"], answer:"1/4"},
+        {q:"Probability of tails twice?", options:["1/4","1/3","1/6","1/2"], answer:"1/4"},
+        {q:"Probability of heads then tails?", options:["1/3","1/4","1/6","1/2"], answer:"1/4"},
+        {q:"Probability of at least one heads in 2 flips?", options:["3/4","1/2","1/6","1/8"], answer:"3/4"},
+        {q:"Probability of no heads at all in 2 flips?", options:["1/4","1/2","1/3","1/6"], answer:"1/4"},
+        {q:"Probability of exactly one heads in 2 flips?", options:["1/4","2/4","3/4","1/2"], answer:"1/2"},
+        {q:"Probability of heads thrice in 3 flips?", options:["1/8","1/4","1/6","1/2"], answer:"1/8"}
+      ]
+    },
+    {
+      title: "Graph It!",
+      questions: [
+        {q:"What type of chart uses 'slices' to show parts?", options:["Bar chart","Pie chart","Line chart","Scatter plot"], answer:"Pie chart"},
+        {q:"Which chart is best for showing change over time?", options:["Bar chart","Pie chart","Line chart","Histogram"], answer:"Line chart"},
+        {q:"Which chart uses vertical bars to compare data?", options:["Pie chart","Bar chart","Scatter plot","Histogram"], answer:"Bar chart"},
+        {q:"How many degrees in a full pie chart?", options:["360","180","90","45"], answer:"360"},
+        {q:"What does a scatter plot show?", options:["Parts of whole","Data relation","Change","Totals"], answer:"Data relation"},
+        {q:"What chart shows frequency distribution?", options:["Histogram","Pie chart","Bar chart","Line chart"], answer:"Histogram"},
+        {q:"In pie chart, how to calculate slice angle?", options:["Value / total × 360", "Value × total","Value / total × 100", "Value × 100"], answer:"Value / total × 360"},
+        {q:"What is median in a data set?", options:["Middle value","Average","Mode","Difference"], answer:"Middle value"},
+        {q:"Which graph is best for categorical data?", options:["Line","Pie","Scatter","Histogram"], answer:"Pie"},
+        {q:"What represents data points in scatter plot?", options:["Dots","Bars","Slices","Lines"], answer:"Dots"}
+      ]
+    }
+  ];
+
+  let currentGame = null;
+  let currentQuestion = 0;
+  let score = 0;
+
+  const cardMenu = document.getElementById('cardMenu');
+  const quizContainer = document.getElementById('quizContainer');
+  const questionCount = document.getElementById('questionCount');
+  const questionText = document.getElementById('questionText');
+  const optionsContainer = document.getElementById('optionsContainer');
+  const scoreDisplay = document.getElementById('scoreDisplay');
+  const finalResult = document.getElementById('finalResult');
+  const finalScore = document.getElementById('finalScore');
+  const finalMessage = document.getElementById('finalMessage');
+
+  function startGame(idx) {
+    currentGame = idx;
+    currentQuestion = 0;
+    score = 0;
+    cardMenu.style.display = 'none';
+    quizContainer.style.display = 'block';
+    finalResult.style.display = 'none';
+    showQuestion();
+  }
+
+  function showQuestion() {
+    finalResult.style.display = 'none';
+    const game = games[currentGame];
+    const q = game.questions[currentQuestion];
+    questionCount.textContent = `Question ${currentQuestion + 1} of ${game.questions.length}`;
+    questionText.textContent = q.q;
+    optionsContainer.innerHTML = '';
+    scoreDisplay.textContent = `Score: ${score}`;
+
+    q.options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = opt;
+      btn.onclick = () => checkAnswer(btn, opt, q.answer);
+      optionsContainer.appendChild(btn);
+    });
+  }
+
+  function checkAnswer(btn, selected, correct) {
+    if(btn.classList.contains('correct') || btn.classList.contains('wrong')) return;
+    if(selected === correct) {
+      score++;
+      btn.classList.add('correct');
+      animateSparkle(btn);
+      setTimeout(() => nextQuestion(), 900);
+    } else {
+      btn.classList.add('wrong');
+      shakeBtn(btn);
+    }
+  }
+
+  function nextQuestion() {
+    currentQuestion++;
+    if(currentQuestion >= games[currentGame].questions.length) {
+      showResults();
+    } else {
+      showQuestion();
+    }
+  }
+
+  function showResults() {
+    questionCount.textContent = '';
+    questionText.textContent = '';
+    optionsContainer.innerHTML = '';
+    scoreDisplay.textContent = '';
+
+    finalScore.textContent = `Your final score: ${score} / ${games[currentGame].questions.length}`;
+    if(score >= games[currentGame].questions.length * 0.8) {
+      finalMessage.textContent = "Excellent work! You're a probability star! 🌟";
+    } else if(score >= games[currentGame].questions.length * 0.5) {
+      finalMessage.textContent = "Good job! Keep practicing to improve! 💪";
+    } else {
+      finalMessage.textContent = "Keep trying! Probability gets easier with practice! 🚀";
+    }
+    finalResult.style.display = 'block';
+  }
+
+  function restartGame(){
+    score = 0;
+    currentQuestion = 0;
+    finalResult.style.display = 'none';
+    showQuestion();
+  }
+
+  function goBack(){
+    quizContainer.style.display = 'none';
+    cardMenu.style.display = 'flex';
+  }
+
+  function animateSparkle(button){
+    const sparkle = document.createElement('div');
+    sparkle.className = 'sparkle';
+    sparkle.style.width = sparkle.style.height = '20px';
+    sparkle.style.left = (button.offsetWidth/2-10) + 'px';
+    sparkle.style.top = (button.offsetHeight/2-10) + 'px';
+    button.style.position = 'relative';
+    button.appendChild(sparkle);
+    setTimeout(() => sparkle.remove(), 900);
+  }
+
+  function shakeBtn(button){
+    button.classList.add('wrong');
+    setTimeout(() => button.classList.remove('wrong'), 520);
+  }
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Translation</title>
+<!-- ORIGINAL GAME CONTENT STARTS HERE -->
+<h1>🧬 Heredity & Evolution Simulator</h1>
+        <div class="game-info">
+            <span>Score: <span id="score">0</span></span>
+            <span>Generation: <span id="generation">1</span></span>
+            <span>Questions: <span id="correct-answers">0</span>/10</span><div class="genetics-lab" id="geneticsLab">
+            <div class="dna-helix" onclick="dnaClicked()" title="DNA Double Helix - Click to explore">
+                <div class="dna-strand"></div>
+                <div class="dna-strand"></div>
+                <div class="base-pair"></div>
+                <div class="base-pair"></div>
+                <div class="base-pair"></div>
+                <div class="base-pair"></div>
+                <div class="base-pair"></div>
+                <div class="base-pair"></div>
+                <div class="base-pair"></div><div class="chromosome chromosome-1" onclick="chromosomeClicked(1)" title="Chromosome 1">1</div>
+            <div class="chromosome chromosome-2" onclick="chromosomeClicked(2)" title="Chromosome 2">2</div>
+            <div class="chromosome chromosome-3" onclick="chromosomeClicked(3)" title="Chromosome 3">3</div>
+            <div class="chromosome chromosome-4" onclick="chromosomeClicked(4)" title="Chromosome 4">4</div>
+            
+            <div class="punnett-square" id="punnettSquare">
+                <div class="punnett-cell" onclick="punnettCellClicked(0, 0)"></div>
+                <div class="punnett-cell" onclick="punnettCellClicked(0, 1)"></div>
+                <div class="punnett-cell" onclick="punnettCellClicked(1, 0)"></div>
+                <div class="punnett-cell" onclick="punnettCellClicked(1, 1)"></div><div class="control-panel">
+            <button class="control-btn" onclick="startMendelian()">Mendelian Genetics</button>
+            <button class="control-btn" onclick="startInheritance()">Inheritance Patterns</button>
+            <button class="control-btn" onclick="startEvolution()">Evolution Simulation</button>
+            <button class="control-btn" onclick="startMutation()">Mutation Study</button><div class="trait-selector">
+            <h3>🎯 Select Trait to Study</h3>
+            <div class="trait-options">
+                <div class="trait-option" onclick="selectTrait('eye-color')">Eye Color</div>
+                <div class="trait-option" onclick="selectTrait('hair-color')">Hair Color</div>
+                <div class="trait-option" onclick="selectTrait('height')">Height</div>
+                <div class="trait-option" onclick="selectTrait('blood-type')">Blood Type</div>
+                <div class="trait-option" onclick="selectTrait('earlobe')">Earlobe Shape</div>
+                <div class="trait-option" onclick="selectTrait('dimples')">Dimples</div><div class="evolution-tree">
+            <h3>🌳 Evolution Tree</h3>
+            <p>Click on species to learn about their evolution:</p>
+            <div class="species" onclick="showSpeciesInfo('fish')">Fish</div>
+            <div class="species" onclick="showSpeciesInfo('amphibian')">Amphibian</div>
+            <div class="species" onclick="showSpeciesInfo('reptile')">Reptile</div>
+            <div class="species" onclick="showSpeciesInfo('bird')">Bird</div>
+            <div class="species" onclick="showSpeciesInfo('mammal')">Mammal</div>
+            <div class="species extinct" onclick="showSpeciesInfo('dinosaur')">Dinosaur</div>
+            <div class="species extinct" onclick="showSpeciesInfo('neanderthal')">Neanderthal</div><div class="info-panel" id="infoPanel">
+            <h3>🧬 Genetics Information</h3>
+            <p><strong>DNA:</strong> Contains genetic information in the form of genes.</p>
+            <p><strong>Chromosomes:</strong> Thread-like structures that carry genes.</p>
+            <p><strong>Genes:</strong> Units of heredity that determine traits.</p>
+            <p><strong>Alleles:</strong> Different forms of the same gene.</p><div class="quiz-section" id="quizSection">
+            <div class="question" id="questionText">
+                What is the basic unit of heredity?<div class="options" id="optionsContainer">
+                <div class="option" onclick="selectOption(this, false)">Chromosome</div>
+                <div class="option" onclick="selectOption(this, true)">Gene</div>
+                <div class="option" onclick="selectOption(this, false)">DNA</div>
+                <div class="option" onclick="selectOption(this, false)">Protein</div><div class="controls">
+            <button class="btn btn-simulate" onclick="runSimulation()">Run Simulation</button>
+            <button class="btn btn-quiz" onclick="checkQuizAnswer()">Submit Answer</button>
+            <button class="btn btn-next" onclick="nextQuestion()">Next Question</button><div id="result" class="result" style="display: none;"></div><script>
+        const questions = [
+            {
+                question: "What is the basic unit of heredity?",
+                options: ["Chromosome", "Gene", "DNA", "Protein"],
+                correct: 1
+            },
+            {
+                question: "Who is known as the 'Father of Genetics'?",
+                options: ["Charles Darwin", "Gregor Mendel", "James Watson", "Francis Crick"],
+                correct: 1
+            },
+            {
+                question: "What is the probability of getting a recessive trait from two heterozygous parents?",
+                options: ["25%", "50%", "75%", "100%"],
+                correct: 0
+            },
+            {
+                question: "What is evolution?",
+                options: ["Change in species over time", "Creation of new species", "Extinction of species", "Mutation of genes"],
+                correct: 0
+            },
+            {
+                question: "What is natural selection?",
+                options: ["Artificial breeding", "Survival of the fittest", "Random mutation", "Genetic engineering"],
+                correct: 1
+            },
+            {
+                question: "What is a dominant allele?",
+                options: ["An allele that is always expressed", "An allele that is never expressed", "An allele that is hidden", "An allele that is recessive"],
+                correct: 0
+            },
+            {
+                question: "What is the process by which new species are formed?",
+                options: ["Mutation", "Speciation", "Evolution", "Selection"],
+                correct: 1
+            },
+            {
+                question: "What is the genetic material in most organisms?",
+                options: ["RNA", "DNA", "Protein", "Carbohydrate"],
+                correct: 1
+            },
+            {
+                question: "What is a phenotype?",
+                options: ["Genetic makeup", "Physical appearance", "Chromosome number", "Gene sequence"],
+                correct: 1
+            },
+            {
+                question: "What is the theory of evolution by natural selection?",
+                options: ["Lamarck's theory", "Darwin's theory", "Mendel's theory", "Watson's theory"],
+                correct: 1
+            }
+        ];
+        
+        const speciesInfo = {
+            fish: "Fish: First vertebrates, evolved 500 million years ago. Developed gills for breathing underwater.",
+            amphibian: "Amphibian: First land vertebrates, evolved 350 million years ago. Can live both in water and on land.",
+            reptile: "Reptile: Evolved 300 million years ago. First fully terrestrial vertebrates with scaly skin.",
+            bird: "Bird: Evolved from dinosaurs 150 million years ago. Developed feathers and ability to fly.",
+            mammal: "Mammal: Evolved 200 million years ago. Characterized by hair, milk production, and warm-bloodedness.",
+            dinosaur: "Dinosaur: Ruled Earth for 160 million years. Extinct 65 million years ago due to asteroid impact.",
+            neanderthal: "Neanderthal: Human ancestor that lived 400,000-40,000 years ago. Extinct due to competition with modern humans."
+        };
+        
+        const traits = {
+            'eye-color': { dominant: 'Brown (B)', recessive: 'Blue (b)', ratio: '3:1' },
+            'hair-color': { dominant: 'Dark (D)', recessive: 'Light (d)', ratio: '3:1' },
+            'height': { dominant: 'Tall (T)', recessive: 'Short (t)', ratio: '3:1' },
+            'blood-type': { dominant: 'A (A)', recessive: 'O (a)', ratio: '3:1' },
+            'earlobe': { dominant: 'Free (F)', recessive: 'Attached (f)', ratio: '3:1' },
+            'dimples': { dominant: 'Present (D)', recessive: 'Absent (d)', ratio: '3:1' }
+        };
+        
+        let currentQuestion = 0;
+        let score = 0;
+        let correctAnswers = 0;
+        let selectedOption = null;
+        let currentTrait = 'eye-color';
+        let generation = 1;
+        
+        function dnaClicked() {
+            showInfo("DNA: Deoxyribonucleic acid contains the genetic instructions for all living organisms. It's made up of four bases: A, T, G, C.");
+        }
+        
+        function chromosomeClicked(number) {
+            showInfo(`Chromosome ${number}: Contains thousands of genes. Humans have 23 pairs of chromosomes.`);
+        }
+        
+        function punnettCellClicked(row, col) {
+            const cell = event.target;
+            const genotypes = ['AA', 'Aa', 'aA', 'aa'];
+            const genotype = genotypes[row * 2 + col];
+            
+            cell.textContent = genotype;
+            cell.classList.add('heterozygous');
+            
+            if (genotype === 'AA') {
+                cell.classList.add('dominant');
+            } else if (genotype === 'aa') {
+                cell.classList.add('recessive');
+            }
+        }
+        
+        function selectTrait(trait) {
+            currentTrait = trait;
+            document.querySelectorAll('.trait-option').forEach(opt => opt.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            const traitInfo = traits[trait];
+            showInfo(`${traitInfo.dominant} vs ${traitInfo.recessive}. Expected ratio: ${traitInfo.ratio}`);
+        }
+        
+        function showSpeciesInfo(species) {
+            showInfo(speciesInfo[species]);
+        }
+        
+        function showInfo(message) {
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'result correct';
+            infoDiv.textContent = message;
+            infoDiv.style.position = 'fixed';
+            infoDiv.style.top = '20px';
+            infoDiv.style.right = '20px';
+            infoDiv.style.zIndex = '1000';
+            infoDiv.style.maxWidth = '300px';
+            document.body.appendChild(infoDiv);
+            
+            setTimeout(() => {
+                infoDiv.remove();
+            }, 4000);
+        }
+        
+        function startMendelian() {
+            document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Show Punnett square
+            document.getElementById('punnettSquare').style.display = 'grid';
+            
+            // Animate chromosomes
+            document.querySelectorAll('.chromosome').forEach(chromosome => {
+                chromosome.style.animation = 'pulse 1s ease-in-out 3';
+            });
+        }
+        
+        function startInheritance() {
+            document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Show trait inheritance patterns
+            const traitInfo = traits[currentTrait];
+            showInfo(`Inheritance Pattern: ${traitInfo.dominant} is dominant over ${traitInfo.recessive}.`);
+        }
+        
+        function startEvolution() {
+            document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Animate DNA helix
+            document.querySelector('.dna-helix').style.animation = 'rotate 2s linear infinite';
+            
+            // Show evolution timeline
+            showInfo("Evolution: Gradual change in species over time through natural selection and genetic variation.");
+        }
+        
+        function startMutation() {
+            document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Animate base pairs
+            document.querySelectorAll('.base-pair').forEach((pair, index) => {
+                setTimeout(() => {
+                    pair.style.background = '#e74c3c';
+                    pair.style.animation = 'pulse 0.5s ease-in-out 3';
+                }, index * 200);
+            });
+            
+            showInfo("Mutation: Random changes in DNA that can lead to new traits and genetic variation.");
+        }
+        
+        function loadQuestion() {
+            const question = questions[currentQuestion];
+            document.getElementById('questionText').textContent = question.question;
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => selectOption(optionDiv, index === question.correct);
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            selectedOption = null;
+        }
+        
+        function selectOption(element, isCorrect) {
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedOption = { element, isCorrect };
+        }
+        
+        function checkQuizAnswer() {
+            if (!selectedOption) return;
+            
+            const resultDiv = document.getElementById('result');
+            
+            document.querySelectorAll('.option').forEach((opt, index) => {
+                const question = questions[currentQuestion];
+                if (index === question.correct) {
+                    opt.classList.add('correct');
+                } else if (opt.classList.contains('selected') && !selectedOption.isCorrect) {
+                    opt.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedOption.isCorrect) {
+                score += 10;
+                correctAnswers++;
+                resultDiv.textContent = '🎉 Correct! Well done!';
+                resultDiv.className = 'result correct';
+            } else {
+                resultDiv.textContent = '❌ Incorrect. The correct answer is highlighted in green.';
+                resultDiv.className = 'result incorrect';
+            }
+            
+            resultDiv.style.display = 'block';
+            updateDisplay();
+        }
+        
+        function nextQuestion() {
+            currentQuestion = (currentQuestion + 1) % questions.length;
+            loadQuestion();
+            document.getElementById('result').style.display = 'none';
+        }
+        
+        function runSimulation() {
+            // Run a comprehensive genetics simulation
+            startMendelian();
+            setTimeout(() => startInheritance(), 2000);
+            setTimeout(() => startEvolution(), 4000);
+            setTimeout(() => startMutation(), 6000);
+            
+            // Update generation
+            generation++;
+            document.getElementById('generation').textContent = generation;
+        }
+        
+        function updateDisplay() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('correct-answers').textContent = correctAnswers;
+        }
+        
+        // Initialize game
+        loadQuestion();
+        updateDisplay();
+        selectTrait('eye-color');
+    </script></html>

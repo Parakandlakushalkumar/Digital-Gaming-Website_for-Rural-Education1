@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Respiration & Circulation Adventure</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #7c3aed;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+            --light-bg: #f8fafc;
+            --dark-text: #1e293b;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px 0;
+        }
+
+        .game-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .game-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .game-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .game-content {
+            padding: 20px;
+            min-height: 400px;
+            display: none;
+        }
+
+        .game-preview {
+            padding: 20px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .play-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .play-btn:hover {
+            background: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Respiration Path Styles */
+        .path-container {
+            position: relative;
+            height: 200px;
+            margin: 30px 0;
+        }
+
+        .path-line {
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            width: 80%;
+            height: 4px;
+            background: #e5e7eb;
+            transform: translateY(-50%);
+        }
+
+        .path-point {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: white;
+            border: 3px solid var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: all 0.3s ease;
+        }
+
+        .path-point.active {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 0 20px rgba(79, 70, 229, 0.5);
+        }
+
+        .path-point.completed {
+            background: var(--success-color);
+            border-color: var(--success-color);
+        }
+
+        .oxygen-bubble {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: #3b82f6;
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: left 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+        }
+
+        /* Blood Flow Race Styles */
+        .race-track {
+            background: #f3f4f6;
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            height: 150px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .vessel {
+            position: absolute;
+            height: 40px;
+            background: #e5e7eb;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+
+        .blood-cell {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: #ef4444;
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: left 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 2px 10px rgba(239, 68, 68, 0.5);
+        }
+
+        /* Nutrient Delivery Styles */
+        .body-outline {
+            width: 200px;
+            height: 300px;
+            background: #f3f4f6;
+            border-radius: 100px 100px 0 0;
+            margin: 20px auto;
+            position: relative;
+            border: 3px solid #e5e7eb;
+        }
+
+        .organ {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .organ.highlight {
+            background: #fef3c7;
+            border-color: var(--warning-color);
+            transform: scale(1.1);
+        }
+
+        .nutrient {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            background: var(--info-color);
+            border-radius: 10px;
+            margin: 5px;
+            cursor: move;
+            text-align: center;
+            line-height: 50px;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
+        }
+
+        .nutrient:hover {
+            transform: scale(1.1);
+        }
+
+        .nutrient.dragging {
+            opacity: 0.5;
+        }
+
+        .drop-zone {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            border: 3px dashed var(--warning-color);
+            border-radius: 10px;
+            background: rgba(254, 243, 199, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .drop-zone.drag-over {
+            background: rgba(254, 243, 199, 0.7);
+            transform: scale(1.05);
+        }
+
+        /* Quiz Tower Styles */
+        .tower-container {
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            height: 300px;
+            margin: 20px 0;
+        }
+
+        .tower-level {
+            width: 200px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            margin: 2px;
+            border-radius: 5px;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-weight: 600;
+            transition: all 0.5s ease;
+            transform-origin: bottom;
+            opacity: 0;
+            transform: scaleY(0);
+        }
+
+        .tower-level.show {
+            opacity: 1;
+            transform: scaleY(1);
+        }
+
+        .tower-level.completed {
+            background: var(--success-color);
+        }
+
+        /* Circulation Puzzle Styles */
+        .puzzle-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .puzzle-piece {
+            width: 120px;
+            height: 80px;
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px;
+            cursor: move;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .puzzle-piece:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .puzzle-piece.dragging {
+            opacity: 0.5;
+        }
+
+        .puzzle-slot {
+            width: 130px;
+            height: 90px;
+            border: 3px dashed #e5e7eb;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .puzzle-slot.filled {
+            border-color: var(--success-color);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .puzzle-slot.drag-over {
+            border-color: var(--primary-color);
+            background: rgba(79, 70, 229, 0.1);
+            transform: scale(1.05);
+        }
+
+        /* Common Styles */
+        .question-box {
+            background: #f3f4f6;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 10px 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .option-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .option-btn.correct {
+            background: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+        }
+
+        .option-btn.incorrect {
+            background: var(--danger-color);
+            border-color: var(--danger-color);
+            color: white;
+        }
+
+        .feedback {
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            animation: slideIn 0.5s ease;
+            font-weight: 500;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feedback.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .feedback.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .feedback.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+
+        .progress-container {
+            background: #f3f4f6;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 15px 0;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.5s ease;
+            border-radius: 5px;
+        }
+
+        .score-display {
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            display: inline-block;
+            margin: 10px 0;
+        }
+
+        /* Animation for lungs */
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .lungs-animation {
+            animation: breathe 3s infinite ease-in-out;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .game-card {
+                margin-bottom: 20px;
+            }
+            
+            .puzzle-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container game-container">
+        <h1 class="text-center text-white mb-5">
+            <i class="bi bi-lungs"></i> Respiration & Circulation Adventure
+        </h1>
+        
+        <div class="row g-4">
+            <!-- Game 1: Respiration Path Adventure -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game1">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(1)" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <i class="bi bi-wind game-icon"></i>
+                        <h3>Respiration Path Adventure</h3>
+                        <p class="mb-0">Guide oxygen through the respiratory system</p>
+                    </div>
+                    <div class="game-preview" id="preview1">
+                        <p>Guide oxygen from nose → lungs → blood by answering questions about the respiratory system.</p>
+                        <button class="play-btn" onclick="startGame(1)">Start Adventure</button>
+                    </div>
+                    <div class="game-content" id="content1">
+                        <div class="path-container">
+                            <div class="path-line"></div>
+                            <div class="path-point active" id="path-nose" style="left: 10%;">👃</div>
+                            <div class="path-point" id="path-lungs" style="left: 45%;">🫁</div>
+                            <div class="path-point" id="path-blood" style="left: 80%;">🩸</div>
+                            <div class="oxygen-bubble" id="oxygen" style="left: 10%;">O₂</div>
+                        </div>
+                        <div class="question-box" id="respiration-question">
+                            <h5>Question: <span id="respiration-q-text"></span></h5>
+                            <div class="options-grid" id="respiration-options"></div>
+                        </div>
+                        <div id="respiration-feedback"></div>
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <span>Progress</span>
+                                <span id="respiration-progress-text">0/3</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="respiration-progress"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 2: Blood Flow Race -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game2">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(2)" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <i class="bi bi-droplet game-icon"></i>
+                        <h3>Blood Flow Race</h3>
+                        <p class="mb-0">Race a red blood cell through the circulatory system</p>
+                    </div>
+                    <div class="game-preview" id="preview2">
+                        <p>Answer questions about the heart and blood vessels to move your red blood cell forward in the race.</p>
+                        <button class="play-btn" onclick="startGame(2)">Start Race</button>
+                    </div>
+                    <div class="game-content" id="content2">
+                        <div class="race-track">
+                            <div class="vessel" style="left: 0; width: 25%;">Heart</div>
+                            <div class="vessel" style="left: 25%; width: 25%;">Arteries</div>
+                            <div class="vessel" style="left: 50%; width: 25%;">Capillaries</div>
+                            <div class="vessel" style="left: 75%; width: 25%;">Veins</div>
+                            <div class="blood-cell" id="blood-cell" style="left: 5%;">🩸</div>
+                        </div>
+                        <div class="question-box" id="blood-question">
+                            <h5>Question: <span id="blood-q-text"></span></h5>
+                            <div class="options-grid" id="blood-options"></div>
+                        </div>
+                        <div id="blood-feedback"></div>
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <span>Position</span>
+                                <span id="blood-progress-text">Start</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="blood-progress"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 3: Nutrient Delivery Challenge -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game3">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(3)" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <i class="bi bi-truck game-icon"></i>
+                        <h3>Nutrient Delivery Challenge</h3>
+                        <p class="mb-0">Deliver nutrients to the correct organs</p>
+                    </div>
+                    <div class="game-preview" id="preview3">
+                        <p>Drag nutrients like glucose and oxygen to the correct organs and tissues in the body.</p>
+                        <button class="play-btn" onclick="startGame(3)">Start Delivery</button>
+                    </div>
+                    <div class="game-content" id="content3">
+                        <div class="body-outline">
+                            <div class="organ" id="organ-brain" style="top: 20px; left: 70px;">🧠</div>
+                            <div class="organ" id="organ-heart" style="top: 80px; left: 70px;">❤️</div>
+                            <div class="organ" id="organ-muscle" style="top: 140px; left: 70px;">💪</div>
+                            <div class="drop-zone" id="drop-brain" style="top: 15px; left: 65px;"></div>
+                            <div class="drop-zone" id="drop-heart" style="top: 75px; left: 65px;"></div>
+                            <div class="drop-zone" id="drop-muscle" style="top: 135px; left: 65px;"></div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <div class="nutrient" draggable="true" id="nutrient-glucose">Glucose</div>
+                            <div class="nutrient" draggable="true" id="nutrient-oxygen">O₂</div>
+                            <div class="nutrient" draggable="true" id="nutrient-water">H₂O</div>
+                        </div>
+                        <div id="nutrient-feedback"></div>
+                        <div class="score-display">Score: <span id="nutrient-score">0</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 4: Respiration Quiz Tower -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game4">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(4)" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <i class="bi bi-building game-icon"></i>
+                        <h3>Respiration Quiz Tower</h3>
+                        <p class="mb-0">Build a tower with correct answers</p>
+                    </div>
+                    <div class="game-preview" id="preview4">
+                        <p>Answer questions about respiration to build each level of the tower. Complete all levels to see the lungs animation!</p>
+                        <button class="play-btn" onclick="startGame(4)">Start Quiz</button>
+                    </div>
+                    <div class="game-content" id="content4">
+                        <div class="tower-container" id="tower-container">
+                            <!-- Tower levels will be added dynamically -->
+                        </div>
+                        <div class="question-box" id="tower-question">
+                            <h5>Question: <span id="tower-q-text"></span></h5>
+                            <div class="options-grid" id="tower-options"></div>
+                        </div>
+                        <div id="tower-feedback"></div>
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <span>Tower Progress</span>
+                                <span id="tower-progress-text">0/5</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="tower-progress"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game 5: Circulation Puzzle -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="game-card" id="game5">
+                    <div class="game-header">
+                        <button class="back-btn" onclick="showPreview(5)" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <i class="bi bi-puzzle game-icon"></i>
+                        <h3>Circulation Puzzle</h3>
+                        <p class="mb-0">Assemble the blood circulation path</p>
+                    </div>
+                    <div class="game-preview" id="preview5">
+                        <p>Drag and drop the pieces to create the correct sequence of blood circulation through the body.</p>
+                        <button class="play-btn" onclick="startGame(5)">Start Puzzle</button>
+                    </div>
+                    <div class="game-content" id="content5">
+                        <div class="puzzle-container">
+                            <div>
+                                <h5 class="text-center mb-3">Drag Pieces</h5>
+                                <div class="puzzle-piece" draggable="true" data-piece="heart">Heart</div>
+                                <div class="puzzle-piece" draggable="true" data-piece="lungs">Lungs</div>
+                                <div class="puzzle-piece" draggable="true" data-piece="body">Body</div>
+                                <div class="puzzle-piece" draggable="true" data-piece="heart2">Heart</div>
+                            </div>
+                            <div>
+                                <h5 class="text-center mb-3">Drop Zone</h5>
+                                <div class="puzzle-slot" data-slot="1"></div>
+                                <div class="puzzle-slot" data-slot="2"></div>
+                                <div class="puzzle-slot" data-slot="3"></div>
+                                <div class="puzzle-slot" data-slot="4"></div>
+                            </div>
+                        </div>
+                        <div id="puzzle-feedback"></div>
+                        <div class="text-center mt-3">
+                            <button class="btn btn-game" onclick="checkPuzzle()">Check Solution</button>
+                            <button class="btn btn-game" onclick="resetPuzzle()">Reset</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game Data
+        const respirationQuestions = [
+            {
+                question: "Which organ is responsible for gas exchange?",
+                options: ["Nose", "Lungs", "Trachea", "Bronchi"],
+                correct: 1,
+                hint: "Think about where oxygen enters the blood."
+            },
+            {
+                question: "What do we breathe in?",
+                options: ["Carbon Dioxide", "Nitrogen", "Oxygen", "Hydrogen"],
+                correct: 2,
+                hint: "This gas is essential for life."
+            },
+            {
+                question: "What do we breathe out?",
+                options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Water Vapor"],
+                correct: 1,
+                hint: "This is a waste product of respiration."
+            }
+        ];
+
+        const bloodFlowQuestions = [
+            {
+                question: "Which vessel carries blood away from the heart?",
+                options: ["Veins", "Capillaries", "Arteries", "Venules"],
+                correct: 2,
+                position: 25
+            },
+            {
+                question: "Where does gas exchange occur?",
+                options: ["Heart", "Arteries", "Veins", "Capillaries"],
+                correct: 3,
+                position: 50
+            },
+            {
+                question: "Which vessel carries blood back to the heart?",
+                options: ["Arteries", "Capillaries", "Veins", "Arterioles"],
+                correct: 2,
+                position: 75
+            },
+            {
+                question: "What is the main organ of circulation?",
+                options: ["Lungs", "Liver", "Heart", "Brain"],
+                correct: 2,
+                position: 95
+            }
+        ];
+
+        const towerQuestions = [
+            {
+                question: "What is the process of breathing called?",
+                options: ["Circulation", "Respiration", "Digestion", "Excretion"],
+                correct: 1
+            },
+            {
+                question: "Which muscle helps in breathing?",
+                options: ["Biceps", "Diaphragm", "Quadriceps", "Triceps"],
+                correct: 1
+            },
+            {
+                question: "What is produced during anaerobic respiration?",
+                options: ["Oxygen", "Lactic Acid", "Glucose", "Water"],
+                correct: 1
+            },
+            {
+                question: "Where does aerobic respiration occur?",
+                options: ["Nucleus", "Mitochondria", "Cytoplasm", "Cell Membrane"],
+                correct: 1
+            },
+            {
+                question: "What is the chemical equation for aerobic respiration?",
+                options: ["C6H12O6 → 2C2H5OH + 2CO2", "C6H12O6 + 6O2 → 6CO2 + 6H2O", "6CO2 + 6H2O → C6H12O6 + 6O2", "2C2H5OH + 2CO2 → C6H12O6"],
+                correct: 1
+            }
+        ];
+
+        // Game States
+        let currentRespirationStep = 0;
+        let currentBloodQuestion = 0;
+        let nutrientScore = 0;
+        let currentTowerLevel = 0;
+        let puzzleSlots = {};
+
+        // Initialize Games
+        function initGames() {
+            // Setup drag and drop for nutrients
+            setupNutrientDragDrop();
+            // Setup drag and drop for puzzle
+            setupPuzzleDragDrop();
+        }
+
+        // Game Navigation
+        function startGame(gameNum) {
+            document.getElementById(`preview${gameNum}`).style.display = 'none';
+            document.getElementById(`content${gameNum}`).style.display = 'block';
+            document.querySelector(`#game${gameNum} .back-btn`).style.display = 'block';
+            
+            // Initialize specific game
+            switch(gameNum) {
+                case 1:
+                    initRespirationGame();
+                    break;
+                case 2:
+                    initBloodFlowGame();
+                    break;
+                case 3:
+                    initNutrientGame();
+                    break;
+                case 4:
+                    initTowerGame();
+                    break;
+                case 5:
+                    initPuzzleGame();
+                    break;
+            }
+        }
+
+        function showPreview(gameNum) {
+            document.getElementById(`preview${gameNum}`).style.display = 'flex';
+            document.getElementById(`content${gameNum}`).style.display = 'none';
+            document.querySelector(`#game${gameNum} .back-btn`).style.display = 'none';
+        }
+
+        // Game 1: Respiration Path Adventure
+        function initRespirationGame() {
+            currentRespirationStep = 0;
+            updateRespirationProgress();
+            loadRespirationQuestion();
+        }
+
+        function loadRespirationQuestion() {
+            if (currentRespirationStep >= respirationQuestions.length) {
+                showFeedback('respiration-feedback', '🎉 Congratulations! You completed the respiratory path!', 'success');
+                return;
+            }
+            
+            const question = respirationQuestions[currentRespirationStep];
+            document.getElementById('respiration-q-text').textContent = question.question;
+            
+            const optionsContainer = document.getElementById('respiration-options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => checkRespirationAnswer(index);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkRespirationAnswer(selectedIndex) {
+            const question = respirationQuestions[currentRespirationStep];
+            const options = document.querySelectorAll('#respiration-options .option-btn');
+            
+            options.forEach(btn => btn.disabled = true);
+            
+            if (selectedIndex === question.correct) {
+                options[selectedIndex].classList.add('correct');
+                showFeedback('respiration-feedback', '✅ Correct! Oxygen moves forward.', 'success');
+                
+                // Move oxygen bubble
+                const oxygen = document.getElementById('oxygen');
+                const positions = ['10%', '45%', '80%'];
+                oxygen.style.left = positions[currentRespirationStep + 1];
+                
+                // Update path points
+                const points = ['path-nose', 'path-lungs', 'path-blood'];
+                document.getElementById(points[currentRespirationStep]).classList.remove('active');
+                document.getElementById(points[currentRespirationStep]).classList.add('completed');
+                if (currentRespirationStep < 2) {
+                    document.getElementById(points[currentRespirationStep + 1]).classList.add('active');
+                }
+                
+                currentRespirationStep++;
+                updateRespirationProgress();
+                
+                setTimeout(() => {
+                    loadRespirationQuestion();
+                }, 1500);
+            } else {
+                options[selectedIndex].classList.add('incorrect');
+                showFeedback('respiration-feedback', `❌ Incorrect. Hint: ${question.hint}`, 'error');
+                
+                setTimeout(() => {
+                    options.forEach(btn => {
+                        btn.disabled = false;
+                        btn.classList.remove('incorrect');
+                    });
+                }, 2000);
+            }
+        }
+
+        function updateRespirationProgress() {
+            const progress = (currentRespirationStep / respirationQuestions.length) * 100;
+            document.getElementById('respiration-progress').style.width = progress + '%';
+            document.getElementById('respiration-progress-text').textContent = `${currentRespirationStep}/3`;
+        }
+
+        // Game 2: Blood Flow Race
+        function initBloodFlowGame() {
+            currentBloodQuestion = 0;
+            updateBloodProgress();
+            loadBloodQuestion();
+        }
+
+        function loadBloodQuestion() {
+            if (currentBloodQuestion >= bloodFlowQuestions.length) {
+                showFeedback('blood-feedback', '🏆 Race Complete! You reached the finish line!', 'success');
+                return;
+            }
+            
+            const question = bloodFlowQuestions[currentBloodQuestion];
+            document.getElementById('blood-q-text').textContent = question.question;
+            
+            const optionsContainer = document.getElementById('blood-options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => checkBloodAnswer(index);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkBloodAnswer(selectedIndex) {
+            const question = bloodFlowQuestions[currentBloodQuestion];
+            const options = document.querySelectorAll('#blood-options .option-btn');
+            
+            options.forEach(btn => btn.disabled = true);
+            
+            if (selectedIndex === question.correct) {
+                options[selectedIndex].classList.add('correct');
+                showFeedback('blood-feedback', '✅ Correct! Blood cell moves forward.', 'success');
+                
+                // Move blood cell
+                const bloodCell = document.getElementById('blood-cell');
+                bloodCell.style.left = question.position + '%';
+                
+                currentBloodQuestion++;
+                updateBloodProgress();
+                
+                setTimeout(() => {
+                    loadBloodQuestion();
+                }, 1500);
+            } else {
+                options[selectedIndex].classList.add('incorrect');
+                showFeedback('blood-feedback', '❌ Incorrect. Try again!', 'error');
+                
+                setTimeout(() => {
+                    options.forEach(btn => {
+                        btn.disabled = false;
+                        btn.classList.remove('incorrect');
+                    });
+                }, 2000);
+            }
+        }
+
+        function updateBloodProgress() {
+            const progress = (currentBloodQuestion / bloodFlowQuestions.length) * 100;
+            document.getElementById('blood-progress').style.width = progress + '%';
+            const positions = ['Start', 'Heart', 'Arteries', 'Capillaries', 'Finish'];
+            document.getElementById('blood-progress-text').textContent = positions[currentBloodQuestion];
+        }
+
+        // Game 3: Nutrient Delivery Challenge
+        function initNutrientGame() {
+            nutrientScore = 0;
+            updateNutrientScore();
+            resetNutrients();
+        }
+
+        function setupNutrientDragDrop() {
+            const nutrients = document.querySelectorAll('.nutrient');
+            const dropZones = document.querySelectorAll('.drop-zone');
+            
+            nutrients.forEach(nutrient => {
+                nutrient.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text', nutrient.id);
+                    nutrient.classList.add('dragging');
+                });
+                
+                nutrient.addEventListener('dragend', () => {
+                    nutrient.classList.remove('dragging');
+                });
+            });
+            
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    zone.classList.add('drag-over');
+                });
+                
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('drag-over');
+                });
+                
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+                    
+                    const nutrientId = e.dataTransfer.getData('text');
+                    const nutrient = document.getElementById(nutrientId);
+                    const organId = zone.id.replace('drop-', 'organ-');
+                    
+                    // Check if correct match
+                    if ((nutrientId === 'nutrient-glucose' && organId === 'organ-muscle') ||
+                        (nutrientId === 'nutrient-oxygen' && organId === 'organ-brain') ||
+                        (nutrientId === 'nutrient-water' && organId === 'organ-heart')) {
+                        
+                        // Correct match
+                        zone.appendChild(nutrient);
+                        nutrient.draggable = false;
+                        nutrient.style.cursor = 'default';
+                        nutrientScore += 10;
+                        updateNutrientScore();
+                        showFeedback('nutrient-feedback', '✅ Correct delivery! +10 points', 'success');
+                        
+                        // Highlight organ
+                        document.getElementById(organId).classList.add('highlight');
+                        setTimeout(() => {
+                            document.getElementById(organId).classList.remove('highlight');
+                        }, 1000);
+                        
+                    } else {
+                        // Wrong match
+                        showFeedback('nutrient-feedback', '❌ Wrong organ! Try again.', 'error');
+                    }
+                });
+            });
+        }
+
+        function updateNutrientScore() {
+            document.getElementById('nutrient-score').textContent = nutrientScore;
+        }
+
+        function resetNutrients() {
+            const nutrients = document.querySelectorAll('.nutrient');
+            const container = document.querySelector('#content3 .text-center');
+            
+            nutrients.forEach(nutrient => {
+                nutrient.draggable = true;
+                nutrient.style.cursor = 'move';
+                container.appendChild(nutrient);
+            });
+        }
+
+        // Game 4: Respiration Quiz Tower
+        function initTowerGame() {
+            currentTowerLevel = 0;
+            updateTowerProgress();
+            loadTowerQuestion();
+        }
+
+        function loadTowerQuestion() {
+            if (currentTowerLevel >= towerQuestions.length) {
+                showFeedback('tower-feedback', '🏰 Tower Complete! Watch the lungs breathe!', 'success');
+                animateLungs();
+                return;
+            }
+            
+            const question = towerQuestions[currentTowerLevel];
+            document.getElementById('tower-q-text').textContent = question.question;
+            
+            const optionsContainer = document.getElementById('tower-options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => checkTowerAnswer(index);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkTowerAnswer(selectedIndex) {
+            const question = towerQuestions[currentTowerLevel];
+            const options = document.querySelectorAll('#tower-options .option-btn');
+            
+            options.forEach(btn => btn.disabled = true);
+            
+            if (selectedIndex === question.correct) {
+                options[selectedIndex].classList.add('correct');
+                showFeedback('tower-feedback', '✅ Correct! Tower level built.', 'success');
+                
+                // Add tower level
+                const towerContainer = document.getElementById('tower-container');
+                const level = document.createElement('div');
+                level.className = 'tower-level';
+                level.textContent = `Level ${currentTowerLevel + 1}: ${question.options[selectedIndex]}`;
+                towerContainer.appendChild(level);
+                
+                setTimeout(() => {
+                    level.classList.add('show');
+                }, 100);
+                
+                currentTowerLevel++;
+                updateTowerProgress();
+                
+                setTimeout(() => {
+                    loadTowerQuestion();
+                }, 1500);
+            } else {
+                options[selectedIndex].classList.add('incorrect');
+                showFeedback('tower-feedback', '❌ Incorrect. Try again!', 'error');
+                
+                setTimeout(() => {
+                    options.forEach(btn => {
+                        btn.disabled = false;
+                        btn.classList.remove('incorrect');
+                    });
+                }, 2000);
+            }
+        }
+
+        function updateTowerProgress() {
+            const progress = (currentTowerLevel / towerQuestions.length) * 100;
+            document.getElementById('tower-progress').style.width = progress + '%';
+            document.getElementById('tower-progress-text').textContent = `${currentTowerLevel}/5`;
+        }
+
+        function animateLungs() {
+            const lungs = document.createElement('div');
+            lungs.style.fontSize = '5rem';
+            lungs.style.textAlign = 'center';
+            lungs.style.margin = '20px 0';
+            lungs.innerHTML = '🫁';
+            lungs.classList.add('lungs-animation');
+            
+            const feedback = document.getElementById('tower-feedback');
+            feedback.innerHTML = '';
+            feedback.appendChild(lungs);
+        }
+
+        // Game 5: Circulation Puzzle
+        function initPuzzleGame() {
+            puzzleSlots = {};
+            resetPuzzle();
+        }
+
+        function setupPuzzleDragDrop() {
+            const pieces = document.querySelectorAll('.puzzle-piece');
+            const slots = document.querySelectorAll('.puzzle-slot');
+            
+            pieces.forEach(piece => {
+                piece.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text', piece.dataset.piece);
+                    piece.classList.add('dragging');
+                });
+                
+                piece.addEventListener('dragend', () => {
+                    piece.classList.remove('dragging');
+                });
+            });
+            
+            slots.forEach(slot => {
+                slot.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    slot.classList.add('drag-over');
+                });
+                
+                slot.addEventListener('dragleave', () => {
+                    slot.classList.remove('drag-over');
+                });
+                
+                slot.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    slot.classList.remove('drag-over');
+                    
+                    const pieceId = e.dataTransfer.getData('text');
+                    const piece = document.querySelector(`[data-piece="${pieceId}"]`);
+                    
+                    if (slot.children.length === 0) {
+                        slot.appendChild(piece);
+                        slot.classList.add('filled');
+                        puzzleSlots[slot.dataset.slot] = pieceId;
+                    }
+                });
+            });
+        }
+
+        function checkPuzzle() {
+            const correctSequence = ['heart', 'lungs', 'body', 'heart2'];
+            const userSequence = [];
+            
+            for (let i = 1; i <= 4; i++) {
+                const slot = document.querySelector(`[data-slot="${i}"]`);
+                if (slot.children.length > 0) {
+                    userSequence.push(slot.children[0].dataset.piece);
+                } else {
+                    userSequence.push(null);
+                }
+            }
+            
+            if (JSON.stringify(userSequence) === JSON.stringify(correctSequence)) {
+                showFeedback('puzzle-feedback', '🎉 Correct! Blood flows: Heart → Lungs → Heart → Body', 'success');
+                animateBloodFlow();
+            } else {
+                showFeedback('puzzle-feedback', '❌ Incorrect sequence. Try again!', 'error');
+            }
+        }
+
+        function resetPuzzle() {
+            const slots = document.querySelectorAll('.puzzle-slot');
+            const container = document.querySelector('.puzzle-container > div:first-child');
+            
+            slots.forEach(slot => {
+                slot.classList.remove('filled');
+                while (slot.firstChild) {
+                    container.appendChild(slot.firstChild);
+                }
+            });
+            
+            puzzleSlots = {};
+        }
+
+        function animateBloodFlow() {
+            const animation = document.createElement('div');
+            animation.style.textAlign = 'center';
+            animation.style.margin = '20px 0';
+            animation.innerHTML = `
+                <div style="font-size: 2rem; animation: pulse 2s infinite;">
+                    ❤️ → 🫁 → ❤️ → 💪
+                </div>
+            `;
+            
+            const feedback = document.getElementById('puzzle-feedback');
+            feedback.innerHTML = '';
+            feedback.appendChild(animation);
+        }
+
+        // Utility Functions
+        function showFeedback(elementId, message, type) {
+            const feedback = document.getElementById(elementId);
+            feedback.innerHTML = `<div class="feedback ${type}">${message}</div>`;
+            setTimeout(() => {
+                feedback.innerHTML = '';
+            }, 3000);
+        }
+
+        // Initialize all games on load
+        window.onload = initGames;
+    </script>
+</body>
+</html>

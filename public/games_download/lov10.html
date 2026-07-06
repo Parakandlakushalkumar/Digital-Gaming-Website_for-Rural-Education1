@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with Translation</title>
+<!-- ORIGINAL GAME CONTENT STARTS HERE -->
+<h1>💡 Light: Reflection & Refraction Simulator</h1>
+        <div class="game-info">
+            <span>Score: <span id="score">0</span></span>
+            <span>Experiment: <span id="current-experiment">Reflection</span></span>
+            <span>Questions: <span id="correct-answers">0</span>/10</span><div class="simulation-area" id="simulationArea">
+            <div class="light-source" id="lightSource" style="left: 100px; top: 100px;" onclick="lightSourceClicked()" title="Light Source - Click to activate"></div>
+            <div class="mirror vertical" id="mirror" onclick="mirrorClicked()" title="Mirror - Click to change angle"></div>
+            <div class="lens convex" id="lens" onclick="lensClicked()" title="Lens - Click to change type"></div>
+            <div class="prism" id="prism" onclick="prismClicked()" title="Prism - Click to activate"></div><div class="control-panel">
+            <button class="control-btn" onclick="startReflection()">Reflection</button>
+            <button class="control-btn" onclick="startRefraction()">Refraction</button>
+            <button class="control-btn" onclick="startDispersion()">Dispersion</button>
+            <button class="control-btn" onclick="startTotalReflection()">Total Reflection</button><div class="experiment-area">
+            <h3>🔬 Light Experiments</h3>
+            <p>Adjust the angle and observe how light behaves with different optical elements.</p>
+            
+            <div class="angle-control">
+                <label>Angle of Incidence:</label>
+                <input type="range" class="angle-slider" id="angleSlider" min="0" max="90" value="45" oninput="updateAngle(this.value)">
+                <span id="angleValue">45°</span><div class="experiment-controls">
+                <button class="experiment-btn" onclick="fireLightRay()">Fire Light Ray</button>
+                <button class="experiment-btn" onclick="resetExperiment()">Reset</button>
+                <button class="experiment-btn" onclick="changeMedium()">Change Medium</button><div class="wavelength-display">
+                <div class="wavelength red" onclick="selectWavelength('red')" title="Red Light"></div>
+                <div class="wavelength orange" onclick="selectWavelength('orange')" title="Orange Light"></div>
+                <div class="wavelength yellow" onclick="selectWavelength('yellow')" title="Yellow Light"></div>
+                <div class="wavelength green" onclick="selectWavelength('green')" title="Green Light"></div>
+                <div class="wavelength blue" onclick="selectWavelength('blue')" title="Blue Light"></div>
+                <div class="wavelength indigo" onclick="selectWavelength('indigo')" title="Indigo Light"></div>
+                <div class="wavelength violet" onclick="selectWavelength('violet')" title="Violet Light"></div><div class="info-panel" id="infoPanel">
+            <h3>🔍 Light Properties</h3>
+            <p><strong>Reflection:</strong> Light bounces off surfaces. Angle of incidence = Angle of reflection.</p>
+            <p><strong>Refraction:</strong> Light bends when passing from one medium to another.</p>
+            <p><strong>Dispersion:</strong> White light splits into colors when passing through a prism.</p><div class="quiz-section" id="quizSection">
+            <div class="question" id="questionText">
+                What is the law of reflection?<div class="options" id="optionsContainer">
+                <div class="option" onclick="selectOption(this, false)">Light travels in straight lines</div>
+                <div class="option" onclick="selectOption(this, true)">Angle of incidence equals angle of reflection</div>
+                <div class="option" onclick="selectOption(this, false)">Light speed is constant</div>
+                <div class="option" onclick="selectOption(this, false)">Light can be bent by gravity</div><div class="controls">
+            <button class="btn btn-simulate" onclick="runSimulation()">Run Simulation</button>
+            <button class="btn btn-quiz" onclick="checkQuizAnswer()">Submit Answer</button>
+            <button class="btn btn-next" onclick="nextQuestion()">Next Question</button><div id="result" class="result" style="display: none;"></div></html>

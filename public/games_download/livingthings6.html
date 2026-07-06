@@ -1,0 +1,2008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biology Adventure Games for Kids</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .games-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+        }
+
+        .game-card:nth-child(1)::before { background: linear-gradient(90deg, #56ab2f 0%, #a8e063 100%); }
+        .game-card:nth-child(2)::before { background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%); }
+        .game-card:nth-child(3)::before { background: linear-gradient(90deg, #fc4a1a 0%, #f7b733 100%); }
+        .game-card:nth-child(4)::before { background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%); }
+        .game-card:nth-child(5)::before { background: linear-gradient(90deg, #f46b45 0%, #eea849 100%); }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .game-icon {
+            font-size: 4em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .game-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .game-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .play-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .play-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .game-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 1000;
+            overflow: auto;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: #ff5252;
+            transform: scale(1.05);
+        }
+
+        .success-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 5em;
+            z-index: 2000;
+            animation: successPop 1s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes successPop {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
+
+        .particle {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            z-index: 1500;
+            animation: particleFall 1.5s ease-out forwards;
+        }
+
+        @keyframes particleFall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(150px) rotate(360deg); opacity: 0; }
+        }
+
+        /* Habitat Match Styles */
+        #habitatMatchGame {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+            padding: 60px 20px;
+        }
+
+        .habitat-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .habitat-title {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 30px;
+            color: #2e7d32;
+        }
+
+        .score-display {
+            text-align: center;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: #2e7d32;
+            font-weight: bold;
+        }
+
+        .game-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .creatures-panel {
+            background: linear-gradient(135deg, #f1f8e9 0%, #dcedc8 100%);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            min-width: 300px;
+            flex: 1;
+        }
+
+        .panel-title {
+            text-align: center;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: #33691e;
+            font-weight: bold;
+        }
+
+        .creatures-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .creature {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: grab;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 2px solid #c8e6c9;
+        }
+
+        .creature:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .creature.dragging {
+            cursor: grabbing;
+            opacity: 0.6;
+            transform: scale(0.95);
+        }
+
+        .creature-icon {
+            font-size: 2.5em;
+            margin-bottom: 8px;
+        }
+
+        .creature-name {
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        .habitats-panel {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            min-width: 300px;
+            flex: 1;
+        }
+
+        .habitats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .habitat {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            min-height: 150px;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 3px dashed #81c784;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .habitat.forest {
+            background: linear-gradient(135deg, #81c784 0%, #66bb6a 100%);
+            color: white;
+        }
+
+        .habitat.desert {
+            background: linear-gradient(135deg, #ffb74d 0%, #ffa726 100%);
+            color: white;
+        }
+
+        .habitat.ocean {
+            background: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%);
+            color: white;
+        }
+
+        .habitat.arctic {
+            background: linear-gradient(135deg, #b3e5fc 0%, #81d4fa 100%);
+            color: #333;
+        }
+
+        .habitat-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .habitat-name {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .habitat.hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .habitat.filled {
+            border: 3px solid #4caf50;
+        }
+
+        .creature-in-habitat {
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 5px;
+            font-size: 1.5em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .hint-message {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            background: #fff3e0;
+            color: #e65100;
+            font-weight: bold;
+            display: none;
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #4caf50 0%, #8bc34a 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 30px 0;
+            font-size: 1.3em;
+            display: none;
+            box-shadow: 0 10px 30px rgba(76,175,80,0.3);
+        }
+
+        /* Plant Parts Puzzle Styles */
+        #plantPartsPuzzleGame {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            padding: 60px 20px;
+        }
+
+        .plant-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .plant-title {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 30px;
+            color: #00695c;
+        }
+
+        .plant-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 40px 0;
+            position: relative;
+            min-height: 400px;
+        }
+
+        .plant-svg {
+            width: 300px;
+            height: 400px;
+        }
+
+        .plant-part {
+            position: absolute;
+            background: rgba(255,255,255,0.8);
+            border: 2px dashed #4caf50;
+            border-radius: 8px;
+            padding: 8px;
+            font-weight: bold;
+            color: #2e7d32;
+            min-width: 80px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .plant-part:hover {
+            background: rgba(255,255,255,0.95);
+            transform: scale(1.05);
+        }
+
+        .plant-part.root {
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .plant-part.stem {
+            bottom: 180px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .plant-part.leaf {
+            top: 150px;
+            right: 80px;
+        }
+
+        .plant-part.flower {
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .labels-panel {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .labels-title {
+            text-align: center;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: #00695c;
+            font-weight: bold;
+        }
+
+        .labels-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .label-option {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: grab;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 2px solid #81c784;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        .label-option:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .label-option.dragging {
+            cursor: grabbing;
+            opacity: 0.6;
+            transform: scale(0.95);
+        }
+
+        .function-info {
+            background: #f1f8e9;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.1em;
+            color: #33691e;
+            min-height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Animal Quiz Safari Styles */
+        #animalQuizSafariGame {
+            background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);
+            padding: 60px 20px;
+        }
+
+        .safari-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .safari-title {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 30px;
+            color: #e65100;
+        }
+
+        .safari-jeep {
+            width: 150px;
+            height: 80px;
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+            border-radius: 15px;
+            margin: 20px auto;
+            position: relative;
+            transition: all 0.5s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .jeep-wheel {
+            position: absolute;
+            bottom: -10px;
+            width: 25px;
+            height: 25px;
+            background: #333;
+            border-radius: 50%;
+        }
+
+        .jeep-wheel.front {
+            right: 15px;
+        }
+
+        .jeep-wheel.back {
+            left: 15px;
+        }
+
+        .question-box {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .question-text {
+            font-size: 1.4em;
+            margin-bottom: 25px;
+            color: #e65100;
+            font-weight: bold;
+        }
+
+        .animal-image {
+            font-size: 4em;
+            margin: 20px 0;
+        }
+
+        .answer-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .answer-button {
+            background: white;
+            border: 2px solid #ff9800;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            color: #e65100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .answer-button:hover {
+            background: #fff3e0;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .progress-bar {
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff9800 0%, #f57c00 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        /* Food Chain Builder Styles */
+        #foodChainBuilderGame {
+            background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+            padding: 60px 20px;
+        }
+
+        .food-chain-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .food-chain-title {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 30px;
+            color: #0d47a1;
+        }
+
+        .chain-area {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            min-height: 200px;
+            position: relative;
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .chain-slot {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border: 3px dashed #64b5f6;
+            border-radius: 15px;
+            position: relative;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chain-slot.hover {
+            border-color: #4caf50;
+            background: rgba(76, 175, 80, 0.1);
+            transform: scale(1.05);
+        }
+
+        .chain-slot.filled {
+            border: 3px solid #4caf50;
+        }
+
+        .chain-arrow {
+            font-size: 2em;
+            color: #1976d2;
+        }
+
+        .organisms-panel {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .organisms-title {
+            text-align: center;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: #0d47a1;
+            font-weight: bold;
+        }
+
+        .organisms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+        }
+
+        .organism {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: grab;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 2px solid #90caf9;
+        }
+
+        .organism:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .organism.dragging {
+            cursor: grabbing;
+            opacity: 0.6;
+            transform: scale(0.95);
+        }
+
+        .organism-icon {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .organism-name {
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #0d47a1;
+        }
+
+        .chain-feedback {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            background: #e3f2fd;
+            color: #0d47a1;
+            font-weight: bold;
+            min-height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Living Things Sorter Styles */
+        #livingThingsSorterGame {
+            background: linear-gradient(135deg, #f46b45 0%, #eea849 100%);
+            padding: 60px 20px;
+        }
+
+        .sorter-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .sorter-title {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 30px;
+            color: #bf360c;
+        }
+
+        .categories-area {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .category {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border-radius: 15px;
+            padding: 25px;
+            min-width: 200px;
+            min-height: 250px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border: 3px dashed #ff9800;
+            transition: all 0.3s ease;
+        }
+
+        .category.plants {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-color: #4caf50;
+        }
+
+        .category.animals {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-color: #2196f3;
+        }
+
+        .category.herbivores {
+            background: linear-gradient(135deg, #f1f8e9 0%, #dcedc8 100%);
+            border-color: #8bc34a;
+        }
+
+        .category.carnivores {
+            background: linear-gradient(135deg, #fbe9e7 0%, #ffccbc 100%);
+            border-color: #ff5722;
+        }
+
+        .category.aquatic {
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+            border-color: #00bcd4;
+        }
+
+        .category.terrestrial {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-color: #ffc107;
+        }
+
+        .category.hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .category-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .category-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .category-desc {
+            font-size: 0.9em;
+            color: #5d4037;
+        }
+
+        .things-to-sort {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .things-title {
+            text-align: center;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: #bf360c;
+            font-weight: bold;
+        }
+
+        .things-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+        }
+
+        .thing-to-sort {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: grab;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 2px solid #ffcc80;
+        }
+
+        .thing-to-sort:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .thing-to-sort.dragging {
+            cursor: grabbing;
+            opacity: 0.6;
+            transform: scale(0.95);
+        }
+
+        .thing-icon {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .thing-name {
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #bf360c;
+        }
+
+        .sorted-item {
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 8px;
+            font-size: 1.5em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .sort-feedback {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            background: #fff3e0;
+            color: #e65100;
+            font-weight: bold;
+            min-height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .games-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-card {
+                padding: 20px;
+            }
+            
+            .game-area {
+                flex-direction: column;
+            }
+            
+            .categories-area {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌿 Biology Adventure Games 🌿</h1>
+        <p>Explore plants, animals, and ecosystems in a fun way!</p>
+    </div>
+
+    <div class="games-container">
+        <div class="game-card">
+            <div class="game-icon">🌳🏞️</div>
+            <h2 class="game-title">Habitat Match</h2>
+            <p class="game-description">Match animals and plants to their correct habitats. Learn where different living things call home!</p>
+            <button class="play-button" onclick="openGame('habitatMatch')">Play Now</button>
+        </div>
+
+        <div class="game-card">
+            <div class="game-icon">🌱</div>
+            <h2 class="game-title">Plant Parts Puzzle</h2>
+            <p class="game-description">Identify parts of plants and their functions. Discover how roots, stems, leaves, and flowers work!</p>
+            <button class="play-button" onclick="openGame('plantPartsPuzzle')">Play Now</button>
+        </div>
+
+        <div class="game-card">
+            <div class="game-icon">🐘🦁</div>
+            <h2 class="game-title">Animal Quiz Safari</h2>
+            <p class="game-description">Answer questions about animals' diet, habitat, and special features. Move your safari jeep forward with correct answers!</p>
+            <button class="play-button" onclick="openGame('animalQuizSafari')">Play Now</button>
+        </div>
+
+        <div class="game-card">
+            <div class="game-icon">🐇🦊🌾</div>
+            <h2 class="game-title">Food Chain Builder</h2>
+            <p class="game-description">Create food chains by arranging plants and animals in the correct order. Understand ecosystem relationships!</p>
+            <button class="play-button" onclick="openGame('foodChainBuilder')">Play Now</button>
+        </div>
+
+        <div class="game-card">
+            <div class="game-icon">🐢🌺</div>
+            <h2 class="game-title">Living Things Sorter</h2>
+            <p class="game-description">Sort living things into categories like plants vs animals, herbivores vs carnivores, aquatic vs terrestrial.</p>
+            <button class="play-button" onclick="openGame('livingThingsSorter')">Play Now</button>
+        </div>
+    </div>
+
+    <!-- Habitat Match Game -->
+    <div id="habitatMatchGame" class="game-screen">
+        <button class="back-button" onclick="closeGame()">← Back to Games</button>
+        <h2 style="text-align: center; color: white; margin-bottom: 30px; font-size: 2.5em;">🌳 Habitat Match 🏞️</h2>
+        
+        <div class="habitat-container">
+            <h3 class="habitat-title">Match each creature to its correct habitat!</h3>
+            
+            <div class="score-display" id="habitatScore">Score: 0</div>
+            
+            <div class="game-area">
+                <div class="creatures-panel">
+                    <h4 class="panel-title">🦋 Creatures</h4>
+                    <div class="creatures-grid" id="creaturesGrid">
+                        <!-- Creatures will be generated here -->
+                    </div>
+                </div>
+                
+                <div class="habitats-panel">
+                    <h4 class="panel-title">🏠 Habitats</h4>
+                    <div class="habitats-grid" id="habitatsGrid">
+                        <!-- Habitats will be generated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hint-message" id="habitatHint"></div>
+            
+            <div class="success-message" id="habitatSuccess">
+                🎉 Excellent! You've matched all creatures to their habitats! 🎉
+            </div>
+        </div>
+    </div>
+
+    <!-- Plant Parts Puzzle Game -->
+    <div id="plantPartsPuzzleGame" class="game-screen">
+        <button class="back-button" onclick="closeGame()">← Back to Games</button>
+        <h2 style="text-align: center; color: white; margin-bottom: 30px; font-size: 2.5em;">🌱 Plant Parts Puzzle</h2>
+        
+        <div class="plant-container">
+            <h3 class="plant-title">Drag the correct labels to each plant part!</h3>
+            
+            <div class="score-display" id="plantScore">Score: 0</div>
+            
+            <div class="plant-display">
+                <svg class="plant-svg" viewBox="0 0 300 400">
+                    <!-- Plant Stem -->
+                    <rect x="135" y="150" width="30" height="150" fill="#8bc34a" stroke="#689f38" stroke-width="2"/>
+                    
+                    <!-- Plant Leaves -->
+                    <ellipse cx="110" cy="180" rx="40" ry="20" fill="#4caf50" stroke="#388e3c" stroke-width="2" transform="rotate(-30 110 180)"/>
+                    <ellipse cx="190" cy="180" rx="40" ry="20" fill="#4caf50" stroke="#388e3c" stroke-width="2" transform="rotate(30 190 180)"/>
+                    
+                    <!-- Plant Flower -->
+                    <circle cx="150" cy="120" r="25" fill="#e91e63" stroke="#c2185b" stroke-width="2"/>
+                    <circle cx="150" cy="115" r="15" fill="#f06292" stroke="#880e4f" stroke-width="2"/>
+                    <circle cx="150" cy="110" r="8" fill="#fce4ec" stroke="#f8bbd0" stroke-width="2"/>
+                    
+                    <!-- Plant Roots -->
+                    <path d="M 150 300 Q 130 320 110 340 Q 130 350 150 360 Q 170 350 190 340 Q 170 320 150 300" 
+                          fill="#795548" stroke="#5d4037" stroke-width="2"/>
+                    <path d="M 150 300 Q 130 320 110 340" fill="none" stroke="#5d4037" stroke-width="2"/>
+                    <path d="M 150 300 Q 170 320 190 340" fill="none" stroke="#5d4037" stroke-width="2"/>
+                    
+                    <!-- Drop zones for labels -->
+                    <rect x="100" y="340" width="100" height="30" fill="rgba(255,255,255,0.8)" stroke="#4caf50" stroke-width="2" stroke-dasharray="5,5" class="drop-zone" data-part="root"/>
+                    <rect x="100" y="160" width="100" height="30" fill="rgba(255,255,255,0.8)" stroke="#4caf50" stroke-width="2" stroke-dasharray="5,5" class="drop-zone" data-part="stem"/>
+                    <rect x="50" y="160" width="100" height="30" fill="rgba(255,255,255,0.8)" stroke="#4caf50" stroke-width="2" stroke-dasharray="5,5" class="drop-zone" data-part="leaf"/>
+                    <rect x="100" y="90" width="100" height="30" fill="rgba(255,255,255,0.8)" stroke="#4caf50" stroke-width="2" stroke-dasharray="5,5" class="drop-zone" data-part="flower"/>
+                </svg>
+            </div>
+            
+            <div class="function-info" id="functionInfo">
+                Click on a plant part to see its function
+            </div>
+            
+            <div class="labels-panel">
+                <h4 class="labels-title">🏷️ Labels</h4>
+                <div class="labels-grid" id="labelsGrid">
+                    <!-- Labels will be generated here -->
+                </div>
+            </div>
+            
+            <div class="success-message" id="plantSuccess">
+                🌿 Perfect! You've labeled all plant parts correctly! 🌿
+            </div>
+        </div>
+    </div>
+
+    <!-- Animal Quiz Safari Game -->
+    <div id="animalQuizSafariGame" class="game-screen">
+        <button class="back-button" onclick="closeGame()">← Back to Games</button>
+        <h2 style="text-align: center; color: white; margin-bottom: 30px; font-size: 2.5em;">🐘 Animal Quiz Safari 🦁</h2>
+        
+        <div class="safari-container">
+            <h3 class="safari-title">Answer questions to move your safari jeep forward!</h3>
+            
+            <div class="safari-jeep" id="safariJeep">
+                🚙
+                <div class="jeep-wheel front"></div>
+                <div class="jeep-wheel back"></div>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="safariProgress"></div>
+            </div>
+            
+            <div class="question-box">
+                <div class="question-text" id="animalQuestion">Loading question...</div>
+                <div class="animal-image" id="animalImage"></div>
+                <div class="answer-options" id="answerOptions">
+                    <!-- Answer options will be generated here -->
+                </div>
+            </div>
+            
+            <div class="success-message" id="safariSuccess">
+                🏆 Amazing! You've completed the animal safari! 🏆
+            </div>
+        </div>
+    </div>
+
+    <!-- Food Chain Builder Game -->
+    <div id="foodChainBuilderGame" class="game-screen">
+        <button class="back-button" onclick="closeGame()">← Back to Games</button>
+        <h2 style="text-align: center; color: white; margin-bottom: 30px; font-size: 2.5em;">🐇 Food Chain Builder 🦊🌾</h2>
+        
+        <div class="food-chain-container">
+            <h3 class="food-chain-title">Build a correct food chain from producer to top predator!</h3>
+            
+            <div class="score-display" id="foodChainScore">Score: 0</div>
+            
+            <div class="chain-area" id="chainArea">
+                <!-- Chain slots will be generated here -->
+            </div>
+            
+            <div class="chain-feedback" id="chainFeedback">
+                Drag organisms to build the food chain
+            </div>
+            
+            <div class="organisms-panel">
+                <h4 class="organisms-title">🌿 Organisms</h4>
+                <div class="organisms-grid" id="organismsGrid">
+                    <!-- Organisms will be generated here -->
+                </div>
+            </div>
+            
+            <div class="success-message" id="foodChainSuccess">
+                🌟 Fantastic! You've built a perfect food chain! 🌟
+            </div>
+        </div>
+    </div>
+
+    <!-- Living Things Sorter Game -->
+    <div id="livingThingsSorterGame" class="game-screen">
+        <button class="back-button" onclick="closeGame()">← Back to Games</button>
+        <h2 style="text-align: center; color: white; margin-bottom: 30px; font-size: 2.5em;">🐢 Living Things Sorter 🌺</h2>
+        
+        <div class="sorter-container">
+            <h3 class="sorter-title">Sort living things into the correct categories!</h3>
+            
+            <div class="score-display" id="sorterScore">Score: 0</div>
+            
+            <div class="categories-area" id="categoriesArea">
+                <!-- Categories will be generated here -->
+            </div>
+            
+            <div class="things-to-sort">
+                <h4 class="things-title">🔍 Things to Sort</h4>
+                <div class="things-grid" id="thingsGrid">
+                    <!-- Things to sort will be generated here -->
+                </div>
+            </div>
+            
+            <div class="sort-feedback" id="sortFeedback">
+                Drag living things to their correct categories
+            </div>
+            
+            <div class="success-message" id="sorterSuccess">
+                ✨ Wonderful! You've sorted all living things correctly! ✨
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game Management
+        function openGame(gameId) {
+            document.getElementById(gameId + 'Game').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            // Initialize game-specific functionality
+            if (gameId === 'habitatMatch') initHabitatMatch();
+            if (gameId === 'plantPartsPuzzle') initPlantPartsPuzzle();
+            if (gameId === 'animalQuizSafari') initAnimalQuizSafari();
+            if (gameId === 'foodChainBuilder') initFoodChainBuilder();
+            if (gameId === 'livingThingsSorter') initLivingThingsSorter();
+        }
+
+        function closeGame() {
+            const gameScreens = document.querySelectorAll('.game-screen');
+            gameScreens.forEach(screen => {
+                screen.style.display = 'none';
+            });
+            document.body.style.overflow = 'auto';
+        }
+
+        // Utility function to create particles
+        function createParticles(x, y, count = 10) {
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                document.body.appendChild(particle);
+                
+                setTimeout(() => {
+                    particle.remove();
+                }, 1500);
+            }
+        }
+
+        // Utility function to show success animation
+        function showSuccessAnimation(emoji = '🎉') {
+            const successEl = document.createElement('div');
+            successEl.className = 'success-animation';
+            successEl.textContent = emoji;
+            document.body.appendChild(successEl);
+            
+            setTimeout(() => {
+                successEl.remove();
+            }, 1000);
+        }
+
+        // Habitat Match Game Logic
+        let habitatScore = 0;
+        let habitatMatches = 0;
+        let totalHabitatMatches = 8;
+
+        function initHabitatMatch() {
+            const creaturesGrid = document.getElementById('creaturesGrid');
+            const habitatsGrid = document.getElementById('habitatsGrid');
+            const scoreDisplay = document.getElementById('habitatScore');
+            const hintMessage = document.getElementById('habitatHint');
+            const successMessage = document.getElementById('habitatSuccess');
+            
+            // Reset
+            creaturesGrid.innerHTML = '';
+            habitatsGrid.innerHTML = '';
+            scoreDisplay.textContent = 'Score: 0';
+            hintMessage.style.display = 'none';
+            hintMessage.textContent = '';
+            successMessage.style.display = 'none';
+            habitatScore = 0;
+            habitatMatches = 0;
+            
+            // Define creatures and their habitats
+            const creatures = [
+                { name: 'Bear', icon: '🐻', habitat: 'forest' },
+                { name: 'Fox', icon: '🦊', habitat: 'forest' },
+                { name: 'Camel', icon: '🐪', habitat: 'desert' },
+                { name: 'Scorpion', icon: '🦂', habitat: 'desert' },
+                { name: 'Fish', icon: '🐠', habitat: 'ocean' },
+                { name: 'Whale', icon: '🐋', habitat: 'ocean' },
+                { name: 'Penguin', icon: '🐧', habitat: 'arctic' },
+                { name: 'Polar Bear', icon: '🐻‍❄️', habitat: 'arctic' }
+            ];
+            
+            // Shuffle creatures
+            const shuffledCreatures = [...creatures].sort(() => Math.random() - 0.5);
+            
+            // Create creature cards
+            shuffledCreatures.forEach(creature => {
+                const creatureCard = document.createElement('div');
+                creatureCard.className = 'creature';
+                creatureCard.draggable = true;
+                creatureCard.dataset.habitat = creature.habitat;
+                creatureCard.dataset.name = creature.name;
+                
+                const icon = document.createElement('div');
+                icon.className = 'creature-icon';
+                icon.textContent = creature.icon;
+                
+                const name = document.createElement('div');
+                name.className = 'creature-name';
+                name.textContent = creature.name;
+                
+                creatureCard.appendChild(icon);
+                creatureCard.appendChild(name);
+                creaturesGrid.appendChild(creatureCard);
+            });
+            
+            // Create habitat cards
+            const habitats = [
+                { name: 'Forest', icon: '🌲', class: 'forest' },
+                { name: 'Desert', icon: '🏜️', class: 'desert' },
+                { name: 'Ocean', icon: '🌊', class: 'ocean' },
+                { name: 'Arctic', icon: '🧊', class: 'arctic' }
+            ];
+            
+            habitats.forEach(habitat => {
+                const habitatCard = document.createElement('div');
+                habitatCard.className = `habitat ${habitat.class}`;
+                habitatCard.dataset.habitat = habitat.class;
+                
+                const icon = document.createElement('div');
+                icon.className = 'habitat-icon';
+                icon.textContent = habitat.icon;
+                
+                const name = document.createElement('div');
+                name.className = 'habitat-name';
+                name.textContent = habitat.name;
+                
+                habitatCard.appendChild(icon);
+                habitatCard.appendChild(name);
+                habitatsGrid.appendChild(habitatCard);
+            });
+            
+            // Initialize drag and drop
+            const creatureCards = document.querySelectorAll('.creature');
+            const habitatCards = document.querySelectorAll('.habitat');
+            let draggedCreature = null;
+            
+            creatureCards.forEach(creature => {
+                creature.addEventListener('dragstart', (e) => {
+                    draggedCreature = e.target;
+                    e.target.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'copy';
+                });
+                
+                creature.addEventListener('dragend', (e) => {
+                    e.target.classList.remove('dragging');
+                });
+            });
+            
+            habitatCards.forEach(habitat => {
+                habitat.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'copy';
+                    habitat.classList.add('hover');
+                });
+                
+                habitat.addEventListener('dragleave', () => {
+                    habitat.classList.remove('hover');
+                });
+                
+                habitat.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    habitat.classList.remove('hover');
+                    
+                    if (draggedCreature && draggedCreature.dataset.habitat === habitat.dataset.habitat) {
+                        // Create creature in habitat
+                        const creatureInHabitat = document.createElement('div');
+                        creatureInHabitat.className = 'creature-in-habitat';
+                        creatureInHabitat.textContent = draggedCreature.querySelector('.creature-icon').textContent;
+                        
+                        habitat.appendChild(creatureInHabitat);
+                        habitat.classList.add('filled');
+                        
+                        // Hide original creature
+                        draggedCreature.style.opacity = '0';
+                        draggedCreature.style.pointerEvents = 'none';
+                        
+                        // Update score
+                        habitatScore += 10;
+                        habitatMatches += 1;
+                        scoreDisplay.textContent = `Score: ${habitatScore}`;
+                        
+                        // Create particles
+                        const rect = habitat.getBoundingClientRect();
+                        createParticles(rect.left + rect.width/2, rect.top + rect.height/2, 8);
+                        
+                        // Check if all creatures are matched
+                        if (habitatMatches >= totalHabitatMatches) {
+                            setTimeout(() => {
+                                successMessage.style.display = 'block';
+                                showSuccessAnimation('🌳');
+                                createParticles(window.innerWidth / 2, window.innerHeight / 2, 20);
+                            }, 500);
+                        }
+                    } else {
+                        // Show hint
+                        hintMessage.textContent = `${draggedCreature.dataset.name} doesn't live in the ${habitat.querySelector('.habitat-name').textContent}. Try again!`;
+                        hintMessage.style.display = 'block';
+                        
+                        setTimeout(() => {
+                            hintMessage.style.display = 'none';
+                        }, 3000);
+                    }
+                });
+            });
+        }
+
+        // Plant Parts Puzzle Game Logic
+        let plantScore = 0;
+        let plantPartsLabeled = 0;
+        const plantPartsFunctions = {
+            root: "Absorbs water and nutrients from the soil",
+            stem: "Supports the plant and transports water and nutrients",
+            leaf: "Makes food for the plant through photosynthesis",
+            flower: "Helps the plant reproduce by making seeds"
+        };
+
+        function initPlantPartsPuzzle() {
+            const functionInfo = document.getElementById('functionInfo');
+            const labelsGrid = document.getElementById('labelsGrid');
+            const scoreDisplay = document.getElementById('plantScore');
+            const successMessage = document.getElementById('plantSuccess');
+            
+            // Reset
+            scoreDisplay.textContent = 'Score: 0';
+            functionInfo.textContent = 'Click on a plant part to see its function';
+            successMessage.style.display = 'none';
+            plantScore = 0;
+            plantPartsLabeled = 0;
+            
+            // Create label options
+            const labels = [
+                { text: 'Root', part: 'root' },
+                { text: 'Stem', part: 'stem' },
+                { text: 'Leaf', part: 'leaf' },
+                { text: 'Flower', part: 'flower' }
+            ];
+            
+            // Shuffle labels
+            const shuffledLabels = [...labels].sort(() => Math.random() - 0.5);
+            
+            shuffledLabels.forEach(label => {
+                const labelOption = document.createElement('div');
+                labelOption.className = 'label-option';
+                labelOption.draggable = true;
+                labelOption.dataset.part = label.part;
+                labelOption.textContent = label.text;
+                
+                labelsGrid.appendChild(labelOption);
+            });
+            
+            // Add click events to plant parts
+            const plantParts = document.querySelectorAll('.drop-zone');
+            plantParts.forEach(part => {
+                part.addEventListener('click', function() {
+                    functionInfo.textContent = `${this.dataset.part.charAt(0).toUpperCase() + this.dataset.part.slice(1)}: ${plantPartsFunctions[this.dataset.part]}`;
+                });
+            });
+            
+            // Initialize drag and drop
+            const labelOptions = document.querySelectorAll('.label-option');
+            let draggedLabel = null;
+            
+            labelOptions.forEach(label => {
+                label.addEventListener('dragstart', (e) => {
+                    draggedLabel = e.target;
+                    e.target.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'copy';
+                });
+                
+                label.addEventListener('dragend', (e) => {
+                    e.target.classList.remove('dragging');
+                });
+            });
+            
+            plantParts.forEach(part => {
+                part.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'copy';
+                });
+                
+                part.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    
+                    if (draggedLabel && draggedLabel.dataset.part === part.dataset.part) {
+                        // Add label to plant part
+                        part.textContent = draggedLabel.textContent;
+                        part.style.background = 'rgba(76, 175, 80, 0.2)';
+                        part.style.border = '2px solid #4caf50';
+                        part.style.borderStyle = 'solid';
+                        
+                        // Hide original label
+                        draggedLabel.style.opacity = '0';
+                        draggedLabel.style.pointerEvents = 'none';
+                        
+                        // Update score
+                        plantScore += 10;
+                        plantPartsLabeled += 1;
+                        scoreDisplay.textContent = `Score: ${plantScore}`;
+                        
+                        // Create particles
+                        const rect = part.getBoundingClientRect();
+                        createParticles(rect.left + rect.width/2, rect.top + rect.height/2, 8);
+                        
+                        // Check if all parts are labeled
+                        if (plantPartsLabeled >= 4) {
+                            setTimeout(() => {
+                                successMessage.style.display = 'block';
+                                showSuccessAnimation('🌱');
+                                createParticles(window.innerWidth / 2, window.innerHeight / 2, 20);
+                            }, 500);
+                        }
+                    }
+                });
+            });
+        }
+
+        // Animal Quiz Safari Game Logic
+        let safariQuestionIndex = 0;
+        let safariScore = 0;
+        let safariProgress = 0;
+
+        const animalQuestions = [
+            {
+                question: "What do lions primarily eat?",
+                animal: "🦁",
+                options: ["Plants", "Meat", "Insects", "Nectar"],
+                correct: 1
+            },
+            {
+                question: "Where do penguins live?",
+                animal: "🐧",
+                options: ["Desert", "Forest", "Arctic", "Jungle"],
+                correct: 2
+            },
+            {
+                question: "What do rabbits eat?",
+                animal: "🐰",
+                options: ["Other animals", "Fish", "Plants", "Bugs"],
+                correct: 2
+            },
+            {
+                question: "Where do camels live?",
+                animal: "🐪",
+                options: ["Ocean", "Desert", "Forest", "Mountains"],
+                correct: 1
+            },
+            {
+                question: "What do frogs eat?",
+                animal: "🐸",
+                options: ["Grass", "Seeds", "Insects", "Nectar"],
+                correct: 2
+            },
+            {
+                question: "Which animal is a herbivore?",
+                animal: "🐘",
+                options: ["Lion", "Elephant", "Tiger", "Eagle"],
+                correct: 1
+            },
+            {
+                question: "Which animal lives in the ocean?",
+                animal: "🐠",
+                options: ["Camel", "Penguin", "Dolphin", "Bear"],
+                correct: 2
+            },
+            {
+                question: "What do carnivores eat?",
+                animal: "🦁",
+                options: ["Plants only", "Other animals", "Both plants and animals", "Insects only"],
+                correct: 1
+            }
+        ];
+
+        function initAnimalQuizSafari() {
+            const animalQuestion = document.getElementById('animalQuestion');
+            const animalImage = document.getElementById('animalImage');
+            const answerOptions = document.getElementById('answerOptions');
+            const safariProgress = document.getElementById('safariProgress');
+            const safariJeep = document.getElementById('safariJeep');
+            const successMessage = document.getElementById('safariSuccess');
+            
+            // Reset
+            safariQuestionIndex = 0;
+            safariScore = 0;
+            safariProgress = 0;
+            safariProgress.style.width = '0%';
+            safariJeep.style.transform = 'translateX(0)';
+            successMessage.style.display = 'none';
+            
+            // Load first question
+            loadSafariQuestion();
+        }
+
+        function loadSafariQuestion() {
+            const animalQuestion = document.getElementById('animalQuestion');
+            const animalImage = document.getElementById('animalImage');
+            const answerOptions = document.getElementById('answerOptions');
+            
+            if (safariQuestionIndex >= animalQuestions.length) {
+                // All questions answered
+                document.getElementById('safariSuccess').style.display = 'block';
+                showSuccessAnimation('🏆');
+                createParticles(window.innerWidth / 2, window.innerHeight / 2, 25);
+                return;
+            }
+            
+            const question = animalQuestions[safariQuestionIndex];
+            
+            animalQuestion.textContent = question.question;
+            animalImage.textContent = question.animal;
+            
+            // Shuffle options
+            const shuffledOptions = [...question.options].map((option, index) => ({
+                text: option,
+                index: index
+            })).sort(() => Math.random() - 0.5);
+            
+            answerOptions.innerHTML = '';
+            shuffledOptions.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'answer-button';
+                button.textContent = option.text;
+                button.onclick = () => checkSafariAnswer(option.index);
+                answerOptions.appendChild(button);
+            });
+        }
+
+        function checkSafariAnswer(answerIndex) {
+            const safariProgress = document.getElementById('safariProgress');
+            const safariJeep = document.getElementById('safariJeep');
+            const question = animalQuestions[safariQuestionIndex];
+            
+            if (answerIndex === question.correct) {
+                // Correct answer
+                safariScore += 20;
+                safariQuestionIndex += 1;
+                
+                // Move jeep forward
+                safariProgress += 20;
+                safariProgress.style.width = safariProgress + '%';
+                safariJeep.style.transform = `translateX(${safariProgress * 5}px)`;
+                
+                // Create particles
+                const rect = safariJeep.getBoundingClientRect();
+                createParticles(rect.left + rect.width/2, rect.top + rect.height/2, 10);
+                
+                // Load next question
+                setTimeout(() => {
+                    loadSafariQuestion();
+                }, 1000);
+            } else {
+                // Wrong answer - shake the jeep
+                safariJeep.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    safariJeep.style.animation = '';
+                }, 500);
+            }
+        }
+
+        // Food Chain Builder Game Logic
+        let foodChainScore = 0;
+        let foodChainsBuilt = 0;
+
+        function initFoodChainBuilder() {
+            const chainArea = document.getElementById('chainArea');
+            const organismsGrid = document.getElementById('organismsGrid');
+            const chainFeedback = document.getElementById('chainFeedback');
+            const scoreDisplay = document.getElementById('foodChainScore');
+            const successMessage = document.getElementById('foodChainSuccess');
+            
+            // Reset
+            chainArea.innerHTML = '';
+            organismsGrid.innerHTML = '';
+            chainFeedback.textContent = 'Drag organisms to build the food chain';
+            scoreDisplay.textContent = 'Score: 0';
+            successMessage.style.display = 'none';
+            foodChainScore = 0;
+            foodChainsBuilt = 0;
+            
+            // Create chain slots
+            const slots = [
+                { position: 0, type: 'producer', accepts: ['plant'] },
+                { position: 1, type: 'primary', accepts: ['herbivore'] },
+                { position: 2, type: 'secondary', accepts: ['carnivore'] },
+                { position: 3, type: 'top', accepts: ['apex'] }
+            ];
+            
+            slots.forEach((slot, index) => {
+                const chainSlot = document.createElement('div');
+                chainSlot.className = 'chain-slot';
+                chainSlot.dataset.type = slot.type;
+                chainSlot.dataset.position = slot.position;
+                
+                const slotLabel = document.createElement('div');
+                slotLabel.style.position = 'absolute';
+                slotLabel.style.bottom = '-30px';
+                slotLabel.style.left = '50%';
+                slotLabel.style.transform = 'translateX(-50%)';
+                slotLabel.style.fontSize = '0.9em';
+                slotLabel.style.fontWeight = 'bold';
+                slotLabel.textContent = slot.type.charAt(0).toUpperCase() + slot.type.slice(1);
+                
+                chainSlot.appendChild(slotLabel);
+                chainArea.appendChild(chainSlot);
+                
+                // Add arrow after each slot except the last
+                if (index < slots.length - 1) {
+                    const arrow = document.createElement('div');
+                    arrow.className = 'chain-arrow';
+                    arrow.textContent = '→';
+                    chainArea.appendChild(arrow);
+                }
+            });
+            
+            // Create organisms
+            const organisms = [
+                { name: 'Grass', icon: '🌱', type: 'plant', level: 0 },
+                { name: 'Algae', icon: '🟢', type: 'plant', level: 0 },
+                { name: 'Rabbit', icon: '🐰', type: 'herbivore', level: 1 },
+                { name: 'Deer', icon: '🦌', type: 'herbivore', level: 1 },
+                { name: 'Fox', icon: '🦊', type: 'carnivore', level: 2 },
+                { name: 'Snake', icon: '🐍', type: 'carnivore', level: 2 },
+                { name: 'Eagle', icon: '🦅', type: 'apex', level: 3 },
+                { name: 'Lion', icon: '🦁', type: 'apex', level: 3 }
+            ];
+            
+            // Shuffle organisms
+            const shuffledOrganisms = [...organisms].sort(() => Math.random() - 0.5);
+            
+            shuffledOrganisms.forEach(organism => {
+                const organismCard = document.createElement('div');
+                organismCard.className = 'organism';
+                organismCard.draggable = true;
+                organismCard.dataset.type = organism.type;
+                organismCard.dataset.level = organism.level;
+                organismCard.dataset.name = organism.name;
+                
+                const icon = document.createElement('div');
+                icon.className = 'organism-icon';
+                icon.textContent = organism.icon;
+                
+                const name = document.createElement('div');
+                name.className = 'organism-name';
+                name.textContent = organism.name;
+                
+                organismCard.appendChild(icon);
+                organismCard.appendChild(name);
+                organismsGrid.appendChild(organismCard);
+            });
+            
+            // Initialize drag and drop
+            const organismCards = document.querySelectorAll('.organism');
+            const chainSlots = document.querySelectorAll('.chain-slot');
+            let draggedOrganism = null;
+            
+            organismCards.forEach(organism => {
+                organism.addEventListener('dragstart', (e) => {
+                    draggedOrganism = e.target;
+                    e.target.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'copy';
+                });
+                
+                organism.addEventListener('dragend', (e) => {
+                    e.target.classList.remove('dragging');
+                });
+            });
+            
+            chainSlots.forEach(slot => {
+                slot.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'copy';
+                    slot.classList.add('hover');
+                });
+                
+                slot.addEventListener('dragleave', () => {
+                    slot.classList.remove('hover');
+                });
+                
+                slot.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    slot.classList.remove('hover');
+                    
+                    if (draggedOrganism && slot.dataset.accepts.includes(draggedOrganism.dataset.type)) {
+                        // Create organism in slot
+                        const organismInSlot = document.createElement('div');
+                        organismInSlot.className = 'sorted-item';
+                        organismInSlot.textContent = draggedOrganism.querySelector('.organism-icon').textContent;
+                        organismInSlot.title = draggedOrganism.dataset.name;
+                        
+                        slot.appendChild(organismInSlot);
+                        slot.classList.add('filled');
+                        
+                        // Hide original organism
+                        draggedOrganism.style.opacity = '0';
+                        draggedOrganism.style.pointerEvents = 'none';
+                        
+                        // Update score
+                        foodChainScore += 15;
+                        scoreDisplay.textContent = `Score: ${foodChainScore}`;
+                        
+                        // Create particles
+                        const rect = slot.getBoundingClientRect();
+                        createParticles(rect.left + rect.width/2, rect.top + rect.height/2, 8);
+                        
+                        // Check if chain is complete
+                        const filledSlots = document.querySelectorAll('.chain-slot.filled');
+                        if (filledSlots.length === 4) {
+                            foodChainsBuilt += 1;
+                            chainFeedback.textContent = 'Great! You built a complete food chain!';
+                            
+                            setTimeout(() => {
+                                if (foodChainsBuilt >= 2) {
+                                    successMessage.style.display = 'block';
+                                    showSuccessAnimation('🌟');
+                                    createParticles(window.innerWidth / 2, window.innerHeight / 2, 25);
+                                } else {
+                                    // Reset for next chain
+                                    initFoodChainBuilder();
+                                }
+                            }, 2000);
+                        }
+                    } else {
+                        chainFeedback.textContent = 'This organism doesn\'t belong in this position of the food chain.';
+                    }
+                });
+            });
+        }
+
+        // Living Things Sorter Game Logic
+        let sorterScore = 0;
+        let sortedItems = 0;
+
+        function initLivingThingsSorter() {
+            const categoriesArea = document.getElementById('categoriesArea');
+            const thingsGrid = document.getElementById('thingsGrid');
+            const sortFeedback = document.getElementById('sortFeedback');
+            const scoreDisplay = document.getElementById('sorterScore');
+            const successMessage = document.getElementById('sorterSuccess');
+            
+            // Reset
+            categoriesArea.innerHTML = '';
+            thingsGrid.innerHTML = '';
+            sortFeedback.textContent = 'Drag living things to their correct categories';
+            scoreDisplay.textContent = 'Score: 0';
+            successMessage.style.display = 'none';
+            sorterScore = 0;
+            sortedItems = 0;
+            
+            // Create categories
+            const categories = [
+                { name: 'Plants', icon: '🌿', type: 'plants', desc: 'Living things that make their own food' },
+                { name: 'Animals', icon: '🐾', type: 'animals', desc: 'Living things that eat other living things' },
+                { name: 'Herbivores', icon: '🐰', type: 'herbivores', desc: 'Animals that eat plants' },
+                { name: 'Carnivores', icon: '🦁', type: 'carnivores', desc: 'Animals that eat other animals' },
+                { name: 'Aquatic', icon: '🐠', type: 'aquatic', desc: 'Living things that live in water' },
+                { name: 'Terrestrial', icon: '🐾', type: 'terrestrial', desc: 'Living things that live on land' }
+            ];
+            
+            // Shuffle and select 3 random categories
+            const shuffledCategories = [...categories].sort(() => Math.random() - 0.5).slice(0, 3);
+            
+            shuffledCategories.forEach(category => {
+                const categoryCard = document.createElement('div');
+                categoryCard.className = `category ${category.type}`;
+                categoryCard.dataset.type = category.type;
+                
+                const icon = document.createElement('div');
+                icon.className = 'category-icon';
+                icon.textContent = category.icon;
+                
+                const name = document.createElement('div');
+                name.className = 'category-name';
+                name.textContent = category.name;
+                
+                const desc = document.createElement('div');
+                desc.className = 'category-desc';
+                desc.textContent = category.desc;
+                
+                categoryCard.appendChild(icon);
+                categoryCard.appendChild(name);
+                categoryCard.appendChild(desc);
+                categoriesArea.appendChild(categoryCard);
+            });
+            
+            // Create things to sort
+            const things = [
+                { name: 'Oak Tree', icon: '🌳', types: ['plants', 'terrestrial'] },
+                { name: 'Rose', icon: '🌹', types: ['plants', 'terrestrial'] },
+                { name: 'Seaweed', icon: '🌿', types: ['plants', 'aquatic'] },
+                { name: 'Lion', icon: '🦁', types: ['animals', 'carnivores', 'terrestrial'] },
+                { name: 'Rabbit', icon: '🐰', types: ['animals', 'herbivores', 'terrestrial'] },
+                { name: 'Shark', icon: '🦈', types: ['animals', 'carnivores', 'aquatic'] },
+                { name: 'Cow', icon: '🐄', types: ['animals', 'herbivores', 'terrestrial'] },
+                { name: 'Fish', icon: '🐟', types: ['animals', 'aquatic'] },
+                { name: 'Eagle', icon: '🦅', types: ['animals', 'carnivores', 'terrestrial'] }
+            ];
+            
+            // Shuffle and select random things
+            const shuffledThings = [...things].sort(() => Math.random() - 0.5).slice(0, 6);
+            
+            shuffledThings.forEach(thing => {
+                const thingCard = document.createElement('div');
+                thingCard.className = 'thing-to-sort';
+                thingCard.draggable = true;
+                thingCard.dataset.types = JSON.stringify(thing.types);
+                thingCard.dataset.name = thing.name;
+                
+                const icon = document.createElement('div');
+                icon.className = 'thing-icon';
+                icon.textContent = thing.icon;
+                
+                const name = document.createElement('div');
+                name.className = 'thing-name';
+                name.textContent = thing.name;
+                
+                thingCard.appendChild(icon);
+                thingCard.appendChild(name);
+                thingsGrid.appendChild(thingCard);
+            });
+            
+            // Initialize drag and drop
+            const thingCards = document.querySelectorAll('.thing-to-sort');
+            const categoryCards = document.querySelectorAll('.category');
+            let draggedThing = null;
+            
+            thingCards.forEach(thing => {
+                thing.addEventListener('dragstart', (e) => {
+                    draggedThing = e.target;
+                    e.target.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'copy';
+                });
+                
+                thing.addEventListener('dragend', (e) => {
+                    e.target.classList.remove('dragging');
+                });
+            });
+            
+            categoryCards.forEach(category => {
+                category.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'copy';
+                    category.classList.add('hover');
+                });
+                
+                category.addEventListener('dragleave', () => {
+                    category.classList.remove('hover');
+                });
+                
+                category.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    category.classList.remove('hover');
+                    
+                    if (draggedThing) {
+                        const thingTypes = JSON.parse(draggedThing.dataset.types);
+                        
+                        if (thingTypes.includes(category.dataset.type)) {
+                            // Create thing in category
+                            const thingInCategory = document.createElement('div');
+                            thingInCategory.className = 'sorted-item';
+                            thingInCategory.textContent = draggedThing.querySelector('.thing-icon').textContent;
+                            thingInCategory.title = draggedThing.dataset.name;
+                            
+                            category.appendChild(thingInCategory);
+                            
+                            // Hide original thing
+                            draggedThing.style.opacity = '0';
+                            draggedThing.style.pointerEvents = 'none';
+                            
+                            // Update score
+                            sorterScore += 10;
+                            sortedItems += 1;
+                            scoreDisplay.textContent = `Score: ${sorterScore}`;
+                            
+                            // Create particles
+                            const rect = category.getBoundingClientRect();
+                            createParticles(rect.left + rect.width/2, rect.top + rect.height/2, 8);
+                            
+                            // Check if all things are sorted
+                            if (sortedItems >= shuffledThings.length) {
+                                setTimeout(() => {
+                                    successMessage.style.display = 'block';
+                                    showSuccessAnimation('✨');
+                                    createParticles(window.innerWidth / 2, window.innerHeight / 2, 25);
+                                }, 500);
+                            }
+                        } else {
+                            sortFeedback.textContent = `${draggedThing.dataset.name} doesn't belong in the ${category.querySelector('.category-name').textContent} category.`;
+                        }
+                    }
+                });
+            });
+        }
+
+        // Add shake animation for wrong answers
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

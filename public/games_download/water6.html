@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Water & Environment Games</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #c2e9fb 0%, #81a4cd 100%);
+      color: #093164;
+      min-height: 100vh;
+      user-select: none;
+    }
+    .container {
+      max-width: 900px;
+      margin: 38px auto;
+      background: #f9fafa;
+      border-radius: 24px;
+      box-shadow: 0 10px 40px rgba(37,62,91,.15);
+      padding: 28px 30px 40px 30px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.75em;
+      margin-bottom: 28px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      color: #054a91;
+      text-shadow: 1px 1px 2px #acd9ff;
+    }
+    .cards {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 28px;
+      margin-bottom: 30px;
+    }
+    .card {
+      width: 185px;
+      height: 210px;
+      background: linear-gradient(135deg, #3b8cff 0%, #add8ff 100%);
+      border-radius: 20px;
+      color: white;
+      font-size: 1.12em;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.2em;
+      cursor: pointer;
+      box-shadow: 0 8px 26px rgb(7 62 136 / 0.33);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      user-select: none;
+    }
+    .card span {
+      font-size: 3.5em;
+      margin-bottom: 14px;
+      user-select: none;
+      animation: bounceEmoji 1.9s ease infinite alternate;
+    }
+    @keyframes bounceEmoji {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-7px);}
+    }
+    .card:hover {
+      transform: scale(1.07) rotate(-1.8deg);
+      box-shadow: 0 22px 52px rgb(13 60 190 / 0.45);
+    }
+    .game {
+      display: none;
+      min-height: 440px;
+      position: relative;
+      animation: fadeGames 0.7s ease;
+    }
+    .game.active {display:block;}
+    @keyframes fadeGames {
+      from {opacity:0; transform: scale(0.95);}
+      to {opacity:1; transform: scale(1);}
+    }
+    .backbtn {
+      position: absolute;
+      top: 22px;
+      right: 22px;
+      background: #2786ff;
+      color: white;
+      border: none;
+      border-radius: 100px;
+      padding: 9px 26px;
+      font-weight: 700;
+      font-size: 1.05em;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgb(20 70 155 / 0.6);
+      transition: background-color 0.25s ease, box-shadow 0.3s ease;
+      user-select: none;
+    }
+    .backbtn:hover {
+      background: #145cbf;
+      box-shadow: 0 8px 22px rgb(20 55 150 / 0.9);
+    }
+    h2 {
+      font-weight: 900;
+      font-size: 1.95em;
+      margin: 12px 0 12px 0;
+      color: #054f99;
+      text-align: center;
+      user-select: none;
+    }
+    .score {
+      user-select: none;
+      font-weight: 700;
+      font-size: 1.22em;
+      color: #2e5c92;
+      text-align: center;
+      margin-bottom: 18px;
+    }
+    .feedback {
+      font-weight: 700;
+      font-size: 1.18em;
+      color: #164273;
+      min-height: 34px;
+      margin-top: 14px;
+      user-select: none;
+      text-align: center;
+    }
+    button {
+      background: #1a61d6;
+      border: none;
+      border-radius: 16px;
+      color: white;
+      font-weight: 700;
+      font-size: 1.17em;
+      padding: 12px 28px;
+      cursor: pointer;
+      box-shadow: 0 5px 22px rgb(24 91 195 / 0.7);
+      margin-top: 14px;
+      user-select: none;
+      transition: background-color 0.25s ease;
+    }
+    button:hover {
+      background: #103f97;
+      box-shadow: 0 7px 28px rgb(18 61 135 / 0.85);
+    }
+    /* Water Saver */
+    #water-saver-game {
+      position: relative;
+      height: 310px;
+      background: linear-gradient(180deg, #9ad8f7, #3385ef);
+      border-radius: 20px;
+      overflow: hidden;
+      user-select: none;
+    }
+    .tap {
+      position: absolute;
+      width: 90px;
+      height: 140px;
+      border-radius: 10px;
+      background: linear-gradient(135deg,#4a72bf 0%, #7ca1ff 100%);
+      box-shadow: inset 2px 3px 15px #2f4e9d;
+      cursor: pointer;
+      transition: filter 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4.5em;
+      color: #d0e9fd;
+      user-select: none;
+    }
+    .tap.ran {
+      filter: brightness(1);
+    }
+    .tap.off {
+      filter: brightness(0.2) grayscale(0.8);
+      cursor: default;
+      color: #96baf9;
+      box-shadow: none;
+    }
+    .water {
+      position: absolute;
+      width: 6px;
+      height: 54px;
+      background: #56a0ffcc;
+      bottom: 10px;
+      left: 50%;
+      margin-left: -3px;
+      border-radius: 8px;
+      animation: drip 1.25s infinite ease-in-out;
+    }
+    @keyframes drip {
+      0%,100% {opacity: 0;}
+      50% {opacity: 1;}
+    }
+    /* Air Pollution Catcher */
+    #pollution-game {
+      position: relative;
+      height: 320px;
+      background: linear-gradient(180deg, #a2d2ff 0%, #3a8ee6 100%);
+      border-radius: 20px;
+      overflow: hidden;
+      user-select: none;
+    }
+    .falling-object {
+      position: absolute;
+      font-size: 2.9em;
+      cursor: pointer;
+      user-select: none;
+      filter: drop-shadow(0 0 3px #203771cc);
+      transition: transform 0.3s ease;
+    }
+    .balloon {
+      color: #ff7e5f;
+      filter: drop-shadow(0 0 8px #ff7e5faa);
+    }
+    .smoke {
+      color: #554d4a;
+      filter: drop-shadow(0 0 8px #554d4aaa);
+    }
+    /* Garbage Sorter */
+    #garbage-sorter-game {
+      user-select: none;
+      min-height: 340px;
+    }
+    .bins {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .bin {
+      width: 120px;
+      height: 130px;
+      border-radius: 15px;
+      border: 3px solid #3b8dff;
+      background: #aad8ff;
+      color: #2e62b9;
+      font-weight: 700;
+      font-size: 1.12em;
+      text-align: center;
+      padding-top: 20px;
+      user-select: none;
+    }
+    .drag-item {
+      margin: 0 0 15px 15px;
+      padding: 7px 12px;
+      background: #559bfc;
+      cursor: grab;
+      color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgb(0 70 160 / 0.7);
+      user-select: none;
+      display: inline-block;
+      font-weight: 700;
+      font-size: 1.1em;
+    }
+    .drag-item:active {
+      cursor: grabbing;
+    }
+    /* Conveyor belt for recycle factory */
+    #recycle-factory-game {
+      min-height: 340px;
+      position: relative;
+      user-select: none;
+    }
+    .conveyor {
+      height: 100px;
+      width: 100%;
+      background: linear-gradient(135deg, #c1d7fa 0%, #496dbd 70%, #25407a 100%);
+      border-radius: 14px;
+      box-shadow: inset 0 8px 20px #b0c9f3;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 25px;
+    }
+    .waste-item {
+      width: 90px;
+      height: 90px;
+      background: #8fafed;
+      border-radius: 16px;
+      margin: 5px 20px;
+      float: left;
+      cursor: grab;
+      color: #1a2f72;
+      font-weight: 700;
+      font-size: 1.25em;
+      line-height: 90px;
+      text-align: center;
+      box-shadow: 0 7px 18px #2e4a91;
+      user-select: none;
+      transition: transform 0.17s ease;
+    }
+    .recycle-machine {
+      width: 115px;
+      height: 105px;
+      border-radius: 19px;
+      background: #5a8dff;
+      box-shadow: 0 8px 26px rgb(23 92 229 / 0.42);
+      margin: 0 25px;
+      color: #d0e5ff;
+      font-weight: 700;
+      font-size: 1.27em;
+      text-align: center;
+      line-height: 105px;
+      cursor: grab;
+      user-select: none;
+      transition: transform 0.22s ease;
+    }
+    /* Clean the city */
+    #clean-city-game {
+      min-height: 370px;
+      position: relative;
+      background: linear-gradient(180deg, #d9f7d9 0%, #65a863 100%);
+      border-radius: 18px;
+      padding: 22px 15px 40px 15px;
+      user-select: none;
+    }
+    .street {
+      width: 100%;
+      height: 290px;
+      background: repeating-linear-gradient(45deg, #7abc74 0 20px, #6ba35e 20px 40px);
+      border-radius: 20px;
+      position: relative;
+      box-shadow: inset 0 0 10px #33512199;
+    }
+    .trash {
+      position: absolute;
+      width: 42px;
+      height: 42px;
+      background: #d95f5fcc;
+      border-radius: 50%;
+      box-shadow: 0 0 9px #862323cc;
+      cursor: pointer;
+      transition: transform 0.18s ease;
+      display: flex;
+      justify-content: center;
+      align-items:center;
+      color:#fff;
+      font-size: 22px;
+      user-select:none;
+    }
+    .trash:hover {
+      transform: scale(1.28) rotate(5deg);
+    }
+    .hazard {
+      width: 48px;
+      height: 48px;
+      background: #565656cc;
+      border-radius: 18px;
+      box-shadow: 0 0 12px #333333cc;
+      position: absolute;
+      cursor: not-allowed;
+      color: #ddd;
+      font-weight: bolder;
+      font-size: 32px;
+      user-select:none;
+      display: flex;
+      justify-content: center;
+      align-items:center;
+    }
+    .greenery {
+      position: absolute;
+      border-radius: 50%;
+      user-select:none;
+      pointer-events:none;
+      opacity: 0.8;
+      animation: growPlants 1.7s forwards ease;
+    }
+    @keyframes growPlants {
+      from {transform: scale(0);}
+      to {transform: scale(1);}
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Water & Environment Games</h1>
+  <div id="cardMenu" class="cards">
+    <div class="card" onclick="showGame(0)"><span>🚿💧</span>Water Saver<br><small>Turn off taps fast!</small></div>
+    <div class="card" onclick="showGame(1)"><span>🌬️😷</span>Air Pollution Catcher<br><small>Catch clean air, avoid smoke</small></div>
+    <div class="card" onclick="showGame(2)"><span>🗑️♻️</span>Garbage Sorter<br><small>Sort waste into bins</small></div>
+    <div class="card" onclick="showGame(3)"><span>🔄🏭</span>Recycle Factory<br><small>Match waste to machines</small></div>
+    <div class="card" onclick="showGame(4)"><span>🌍🧹</span>Clean the City<br><small>Click trash & grow plants</small></div>
+  </div>
+
+  <!-- Water Saver Challenge -->
+  <div class="game" id="game0">
+    <button class="backbtn" onclick="backToMenu()">← Back</button>
+    <h2>Water Saver Challenge 🚿💧</h2>
+    <div class="score" id="score0">Score: 0</div>
+    <div id="water-saver-game"></div>
+    <div class="feedback" id="feedback0"></div>
+  </div>
+
+  <!-- Air Pollution Catcher -->
+  <div class="game" id="game1">
+    <button class="backbtn" onclick="backToMenu()">← Back</button>
+    <h2>Air Pollution Catcher 🌬️😷</h2>
+    <div class="score" id="score1">Score: 0</div>
+    <div id="pollution-game"></div>
+    <div class="feedback" id="feedback1"></div>
+  </div>
+
+  <!-- Garbage Sorter -->
+  <div class="game" id="game2">
+    <button class="backbtn" onclick="backToMenu()">← Back</button>
+    <h2>Garbage Sorter 🗑️♻️</h2>
+    <div class="score" id="score2">Score: 0</div>
+    <div id="garbage-sorter-game"></div>
+    <div class="bins" id="bins"></div>
+    <div class="feedback" id="feedback2"></div>
+  </div>
+
+  <!-- Recycle Factory -->
+  <div class="game" id="game3">
+    <button class="backbtn" onclick="backToMenu()">← Back</button>
+    <h2>Recycle Factory 🔄🏭</h2>
+    <div class="score" id="score3">Score: 0</div>
+    <div class="conveyor" id="conveyor"></div>
+    <div class="machines" id="recycle-machines" style="display:flex; justify-content:center; gap:25px;"></div>
+    <div class="feedback" id="feedback3"></div>
+  </div>
+
+  <!-- Clean the City -->
+  <div class="game" id="game4">
+    <button class="backbtn" onclick="backToMenu()">← Back</button>
+    <h2>Clean the City 🌍🧹</h2>
+    <div class="score" id="score4">Score: 0</div>
+    <div class="street" id="street"></div>
+    <div class="feedback" id="feedback4"></div>
+  </div>
+</div>
+
+<script>
+  // Navigation
+  let scores = [0,0,0,0,0];
+  let currentGame = -1;
+  function showGame(idx){
+    currentGame = idx;
+    document.getElementById('cardMenu').style.display = 'none';
+    for(let i=0;i<5;i++){
+      document.getElementById('game'+i).classList.remove('active');
+    }
+    document.getElementById('game'+idx).classList.add('active');
+    if(idx===0) startWaterSaver();
+    else if(idx===1) startPollutionCatcher();
+    else if(idx===2) startGarbageSorter();
+    else if(idx===3) startRecycleFactory();
+    else if(idx===4) startCleanCity();
+  }
+  function backToMenu(){
+    for(let i=0;i<5;i++){
+      document.getElementById('game'+i).classList.remove('active');
+    }
+    document.getElementById('cardMenu').style.display = 'flex';
+  }
+
+  // 1. Water Saver Challenge
+  function startWaterSaver(){
+    const container=document.getElementById('water-saver-game');
+    const scoreEl=document.getElementById('score0');
+    const feedbackEl=document.getElementById('feedback0');
+    container.innerHTML='';
+    feedbackEl.textContent='';
+    scores[0] = scores[0]||0;
+    scoreEl.textContent = 'Score: ' + scores[0];
+
+    // Create 4 taps at random horizontal positions
+    let tapsCount=4; 
+    const tapElements = [];
+    for(let i=0;i<tapsCount;i++){
+      let tap=document.createElement('div');
+      tap.className='tap ran';
+      tap.style.bottom = `${30 + i*25}px`;
+      tap.style.left = `${Math.floor(Math.random()*70)+10}%`;
+      tap.innerHTML = '🚰';
+      tap.dataset.running = 'true';
+      // Add water drop element inside
+      let water=document.createElement('div');
+      water.className='water';
+      tap.appendChild(water);
+      tap.addEventListener('click',()=>{
+        if(tap.dataset.running === 'true'){
+          tap.dataset.running = 'false';
+          tap.classList.remove('ran');
+          tap.classList.add('off');
+          tap.querySelector('.water').style.animationPlayState = 'paused';
+          scores[0]++;
+          scoreEl.textContent = 'Score: ' + scores[0];
+          feedbackEl.textContent = 'Great! You stopped the water.';
+          // Check win:
+          if(scores[0]%tapsCount === 0){
+            setTimeout(()=>{
+              feedbackEl.textContent = 'Super! Water saved! Next round...';
+              startWaterSaver();
+            },1100);
+          }
+        }
+      });
+      container.appendChild(tap);
+      tapElements.push(tap);
+    }
+  }
+
+  // 2. Air Pollution Catcher
+  function startPollutionCatcher(){
+    const container=document.getElementById('pollution-game');
+    const scoreEl=document.getElementById('score1');
+    const feedbackEl=document.getElementById('feedback1');
+    container.innerHTML='';
+    feedbackEl.textContent='';
+    scores[1] = scores[1]||0;
+    scoreEl.textContent = 'Score: ' + scores[1];
+
+    // Setup game area and falling items
+    container.style.position = 'relative';
+
+    const items = [];
+    let gameRunning = true;
+
+    function createFallingObject(type) {
+      let obj = document.createElement('div');
+      obj.className = 'falling-object ' + (type === 'balloon' ? 'balloon' : 'smoke');
+      obj.textContent = type === 'balloon' ? '🎈' : '💨';
+      obj.style.left = Math.random() * (container.offsetWidth - 40) + 'px';
+      obj.style.top = '-40px';
+      container.appendChild(obj);
+
+      obj.speed = Math.random() * 1.8 + 1.4;
+
+      obj.move = function() {
+        if (!gameRunning) return;
+        let top = parseFloat(obj.style.top);
+        obj.style.top = (top + obj.speed) + 'px';
+        if (top > container.offsetHeight) {
+          container.removeChild(obj);
+          items.splice(items.indexOf(obj), 1);
+        }
+      };
+
+      obj.onclick = function() {
+        if (!gameRunning) return;
+        if (type === 'balloon') {
+          scores[1]++;
+          scoreEl.textContent = 'Score: ' + scores[1];
+          feedbackEl.textContent = 'GOOD! Clean air caught!';
+        } else {
+          scores[1] = Math.max(0, scores[1] - 1);
+          scoreEl.textContent = 'Score: ' + scores[1];
+          feedbackEl.textContent = 'Avoid pollution!';
+        }
+        container.removeChild(obj);
+        items.splice(items.indexOf(obj), 1);
+      };
+
+      items.push(obj);
+    }
+
+    // Game loop
+    function gameLoop() {
+      if (!gameRunning) return;
+      // Move items
+      items.forEach(obj => obj.move());
+      // Add new objects randomly
+      if (Math.random() < 0.06) createFallingObject('balloon');
+      if (Math.random() < 0.04) createFallingObject('smoke');
+
+      requestAnimationFrame(gameLoop);
+    }
+    gameLoop();
+
+    // Reset game on back or restart logic handled outside
+  }
+
+  // 3. Garbage Sorter
+  function startGarbageSorter(){
+    const container=document.getElementById('garbage-sorter-game');
+    const binsContainer=document.getElementById('bins');
+    const feedbackEl=document.getElementById('feedback2');
+    const scoreEl=document.getElementById('score2');
+    container.innerHTML = '';
+    binsContainer.innerHTML = '';
+    feedbackEl.textContent = '';
+    scores[2] = scores[2]||0;
+    scoreEl.textContent = 'Score: ' + scores[2];
+
+    // Items and bins
+    const items = [
+      {name:'Banana Peel', type:'organic'},
+      {name:'Plastic Bottle', type:'plastic'},
+      {name:'Newspaper', type:'paper'},
+      {name:'Glass Bottle', type:'glass'}
+    ];
+    const bins = [
+      {name:'Organic ♻️', type:'organic'},
+      {name:'Plastic 🧴', type:'plastic'},
+      {name:'Paper 📄', type:'paper'},
+      {name:'Glass 🍶', type:'glass'}
+    ];
+
+    // Create draggable items container
+    let itemsContainer = document.createElement('div');
+    itemsContainer.style.marginBottom = '25px';
+
+    items.forEach((item, i) => {
+      let d = document.createElement('div');
+      d.className = 'drag-item';
+      d.textContent = item.name;
+      d.draggable = true;
+      d.dataset.type = item.type;
+      d.id = 'item-'+i;
+
+      d.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', d.id);
+      });
+      itemsContainer.appendChild(d);
+    });
+    container.appendChild(itemsContainer);
+
+    // Create bins and setup drag-drop logic
+    bins.forEach(bin => {
+      let b = document.createElement('div');
+      b.className = 'bin';
+      b.textContent = bin.name;
+      b.dataset.type = bin.type;
+
+      b.ondragover = e => e.preventDefault();
+      b.ondrop = e => {
+        e.preventDefault();
+        let draggedId = e.dataTransfer.getData('text/plain');
+        let draggedEl = document.getElementById(draggedId);
+        if(!draggedEl) return;
+
+        if(draggedEl.dataset.type === b.dataset.type) {
+          b.appendChild(draggedEl);
+          draggedEl.draggable = false;
+          draggedEl.style.backgroundColor = '#4caf50cc';
+          scores[2]++;
+          scoreEl.textContent = 'Score: ' + scores[2];
+          feedbackEl.textContent = 'Great! Correct bin.';
+          // Check if all sorted
+          if(scores[2] === items.length) {
+            setTimeout(()=>{
+              feedbackEl.textContent = 'You sorted all waste! Well done!';
+              setTimeout(()=>startGarbageSorter(),1200);
+              scores[2] = 0;
+              scoreEl.textContent = 'Score: ' + scores[2];
+            }, 900);
+          }
+        } else {
+          feedbackEl.textContent = 'Oops! Wrong bin, try again!';
+        }
+      };
+      binsContainer.appendChild(b);
+    });
+  }
+
+  // 4. Recycle Factory
+  function startRecycleFactory(){
+    const conveyor = document.getElementById('conveyor');
+    const machinesContainer = document.getElementById('recycle-machines');
+    const feedbackEl = document.getElementById('feedback3');
+    const scoreEl = document.getElementById('score3');
+
+    conveyor.innerHTML = '';
+    machinesContainer.innerHTML = '';
+    feedbackEl.textContent = '';
+    scores[3] = scores[3]||0;
+    scoreEl.textContent = 'Score: ' + scores[3];
+
+    const wasteItems = [
+      {name:'Paper', machine:'paper shredder'},
+      {name:'Plastic', machine:'plastic melter'},
+      {name:'Banana Peel', machine:'compost bin'},
+      {name:'Glass', machine:'glass recycler'}
+    ];
+
+    const machines = [
+      'paper shredder','plastic melter','compost bin','glass recycler'
+    ];
+
+    // Create waste items on conveyor
+    wasteItems.forEach((item, i) => {
+      let wasteDiv = document.createElement('div');
+      wasteDiv.className = 'waste-item';
+      wasteDiv.textContent = item.name;
+      wasteDiv.draggable = true;
+      wasteDiv.dataset.match = item.machine;
+      wasteDiv.id = 'waste-'+i;
+
+      wasteDiv.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', wasteDiv.id);
+      });
+
+      conveyor.appendChild(wasteDiv);
+    });
+
+    // Create machines as drop zones
+    machines.forEach(machine => {
+      let machineDiv = document.createElement('div');
+      machineDiv.className = 'recycle-machine';
+      machineDiv.textContent = machine.toUpperCase();
+      machineDiv.dataset.machine = machine;
+
+      machineDiv.ondragover = e => e.preventDefault();
+      machineDiv.ondrop = e => {
+        e.preventDefault();
+        let draggedId = e.dataTransfer.getData('text/plain');
+        let draggedEl = document.getElementById(draggedId);
+        if(!draggedEl) return;
+
+        if(draggedEl.dataset.match === machineDiv.dataset.machine) {
+          machineDiv.appendChild(draggedEl);
+          draggedEl.draggable = false;
+          draggedEl.style.backgroundColor = '#4caf50cc';
+          scores[3]++;
+          scoreEl.textContent = 'Score: ' + scores[3];
+          feedbackEl.textContent = 'Nice! Matched correctly.';
+          if(scores[3] === wasteItems.length) {
+            setTimeout(()=>{
+              feedbackEl.textContent = 'Awesome! All waste processed!';
+              setTimeout(startRecycleFactory,1100);
+              scores[3] = 0;
+              scoreEl.textContent = 'Score: ' + scores[3];
+            },900);
+          }
+        } else {
+          feedbackEl.textContent = 'Check the machine! Wrong match!';
+        }
+      };
+      machinesContainer.appendChild(machineDiv);
+    });
+  }
+
+  // 5. Clean the City
+  function startCleanCity(){
+    const street = document.getElementById('street');
+    const scoreEl = document.getElementById('score4');
+    const feedbackEl = document.getElementById('feedback4');
+    street.innerHTML = '';
+    feedbackEl.textContent = '';
+    scores[4] = scores[4]||0;
+    scoreEl.textContent = 'Score: ' + scores[4];
+
+    // Garbage and hazards data
+    let items = [];
+    let hazards = [];
+
+    // positions for items/hazards
+    const positions = [
+      {x:40,y:25}, {x:90,y:57}, {x:160,y:100}, {x:240,y:70}, {x:310,y:90},
+      {x:360,y:35}, {x:420,y:70}, {x:480,y:40}, {x:530,y:85}, {x:600,y:60}
+    ];
+
+    function randomInt(max) { return Math.floor(Math.random()*max); }
+    let garbageIcons = ['🍌','🥤','📰','🍾', '🗑️', '🍕', '🧻'];
+    let hazardIcons = ['💥','🔪','🛢️'];
+
+    // Place 8 garbage randomly & 2 hazards
+    while (items.length < 8) {
+      let pos = positions[randomInt(positions.length)];
+      if (!items.some(i=>Math.abs(i.x-pos.x)<40 && Math.abs(i.y-pos.y)<40)) {
+        items.push({x: pos.x, y: pos.y, icon: garbageIcons[randomInt(garbageIcons.length)], cleaned: false});
+      }
+    }
+    while (hazards.length < 2) {
+      let pos = positions[randomInt(positions.length)];
+      if (!items.some(i=>Math.abs(i.x-pos.x)<40 && Math.abs(i.y-pos.y)<40) &&
+          !hazards.some(h=>Math.abs(h.x-pos.x)<40 && Math.abs(h.y-pos.y)<40))
+      {
+        hazards.push({x: pos.x, y: pos.y, icon: hazardIcons[randomInt(hazardIcons.length)], clicked: false});
+      }
+    }
+
+    // Create trash elements
+    items.forEach((item, idx) => {
+      let div = document.createElement('div');
+      div.className = 'trash';
+      div.style.left = item.x + 'px';
+      div.style.top = item.y + 'px';
+      div.textContent = item.icon;
+      div.title = "Click to clean!";
+      div.onclick = () => {
+        if (item.cleaned) return;
+        item.cleaned = true;
+        div.style.display = 'none';
+        scores[4]++;
+        scoreEl.textContent = 'Score: ' + scores[4];
+        feedbackEl.textContent = 'Nice! Garbage cleaned!';
+        // Plant a flower or tree
+        let greenery = document.createElement('div');
+        greenery.className = 'greenery';
+        greenery.style.position = 'absolute';
+        greenery.style.left = (item.x + 10) + 'px';
+        greenery.style.top = (item.y + 10) + 'px';
+        greenery.style.width = '32px';
+        greenery.style.height = '32px';
+        greenery.style.backgroundImage = scores[4]%2 === 0
+          ? 'url("https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Flower_icon.svg/768px-Flower_icon.svg.png")'
+          : 'url("https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Tree_icon.svg/768px-Tree_icon.svg.png")';
+        greenery.style.backgroundSize = 'contain';
+        greenery.style.backgroundRepeat = 'no-repeat';
+        greenery.style.zIndex = '1';
+        street.appendChild(greenery);
+      };
+      street.appendChild(div);
+    });
+
+    // Create hazard elements
+    hazards.forEach((haz, idx) => {
+      let div = document.createElement('div');
+      div.className = 'hazard';
+      div.style.left = haz.x + 'px';
+      div.style.top = haz.y + 'px';
+      div.textContent = haz.icon;
+      div.title = "Don't touch!";
+      div.onclick = () => {
+        if (haz.clicked) return;
+        haz.clicked = true;
+        div.style.opacity = '0.4';
+        feedbackEl.textContent = 'Careful! That\'s a hazard!';
+        scores[4] = Math.max(0, scores[4]-1);
+        scoreEl.textContent = 'Score: ' + scores[4];
+      };
+      street.appendChild(div);
+    });
+  }
+
+  // Initialize on DOM ready
+  document.addEventListener('DOMContentLoaded', () => {
+    backToMenu();
+  });
+</script>
+</body>
+</html>

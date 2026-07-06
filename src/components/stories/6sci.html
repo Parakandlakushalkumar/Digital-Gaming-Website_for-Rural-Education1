@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maya's Science Adventure</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            text-align: center;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255,255,255,0.1) 10px,
+                rgba(255,255,255,0.1) 20px
+            );
+            animation: move 20s linear infinite;
+        }
+        
+        @keyframes move {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .story-section {
+            padding: 30px;
+            border-bottom: 3px solid #f0f0f0;
+            position: relative;
+        }
+        
+        .story-section:last-child {
+            border-bottom: none;
+        }
+        
+        .topic-badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .illustration {
+            width: 100%;
+            height: 200px;
+            border-radius: 15px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .illustration::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.2);
+            border-radius: 15px;
+        }
+        
+        .food-bg { background: linear-gradient(45deg, #ff6b6b, #feca57); }
+        .materials-bg { background: linear-gradient(45deg, #74b9ff, #0984e3); }
+        .living-bg { background: linear-gradient(45deg, #00b894, #55a3ff); }
+        .motion-bg { background: linear-gradient(45deg, #a29bfe, #6c5ce7); }
+        .light-bg { background: linear-gradient(45deg, #fdcb6e, #e17055); }
+        .environment-bg { background: linear-gradient(45deg, #00cec9, #81ecec); }
+        
+        .translation-tabs {
+            display: flex;
+            margin: 20px 0 10px 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 10px;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-button.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .tab-button:hover {
+            background: #e9ecef;
+        }
+        
+        .tab-button.active:hover {
+            background: linear-gradient(45deg, #764ba2, #667eea);
+        }
+        
+        .translation-content {
+            display: none;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 0 0 10px 10px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .translation-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .story-text {
+            font-size: 1.1em;
+            line-height: 1.8;
+            text-align: justify;
+        }
+        
+        .character {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff7675, #fd79a8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-weight: bold;
+            margin: 0 2px;
+        }
+        
+        .science-highlight {
+            background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+            padding: 2px 6px;
+            border-radius: 5px;
+            font-weight: bold;
+            color: #2d3436;
+        }
+        
+        .footer {
+            background: linear-gradient(45deg, #2d3436, #636e72);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+        }
+    </style>
+    <script>
+        function showTranslation(button, contentId) {
+            // Hide all translation contents in the same section
+            const section = button.closest('.story-section');
+            const contents = section.querySelectorAll('.translation-content');
+            const buttons = section.querySelectorAll('.tab-button');
+            
+            contents.forEach(content => content.classList.remove('active'));
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected content and activate button
+            document.getElementById(contentId).classList.add('active');
+            button.classList.add('active');
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌟 Maya's Amazing Science Adventure 🌟</h1>
+            <p>A Journey Through the Wonders of Science</p>
+        </div>
+        
+        <!-- Topic 1: Food -->
+        <div class="story-section">
+            <div class="topic-badge">🍎 Topic 1: Food - Sources, Components, Balance</div>
+            <div class="illustration food-bg">🥗🍎🥛</div>
+            
+            <div class="translation-tabs">
+                <button class="tab-button active" onclick="showTranslation(this, 'food-en')">English</button>
+                <button class="tab-button" onclick="showTranslation(this, 'food-tel')">తెలుగు</button>
+                <button class="tab-button" onclick="showTranslation(this, 'food-hin')">हिंदी</button>
+            </div>
+            
+            <div class="translation-content active" id="food-en">
+                <div class="story-text">
+                    <span class="character">Maya</span> woke up early in her village, feeling hungry after a long night's sleep. Her grandmother was preparing a <span class="science-highlight">balanced breakfast</span> with fresh vegetables from their garden, milk from their cow, and grains from their fields. "Maya," her grandmother said, "our food comes from different <span class="science-highlight">sources</span> - plants give us carbohydrates and vitamins, animals provide proteins and fats, and we need all these <span class="science-highlight">components</span> to stay healthy and strong!"
+                </div>
+            </div>
+            
+            <div class="translation-content" id="food-tel">
+                <div class="story-text">
+                    <span class="character">మాయ</span> తన గ్రామంలో తెల్లవారుజామున లేచింది, రాత్రి గాఢ నిద్రపోయిన తరువాత ఆకలితో ఉంది. ఆమె అజ్జమ్మ తమ తోట నుంచి తాజా కూరగాయలు, తమ ఆవు నుంచి పాలు, మరియు తమ పొలాల నుంచి ధాన్యాలతో <span class="science-highlight">సమతుల్య ఉదయాహారం</span> తయారు చేస్తోంది. "మాయ," ఆమె అజ్జమ్మ అన్నారు, "మన ఆహారం వేర్వేరు <span class="science-highlight">మూలాల</span> నుంచి వస్తుంది - మొక్కలు మనకు కార్బోహైడ్రేట్లు మరియు విటమిన్లు ఇస్తాయి, జంతువులు మనకు ప్రోటీన్లు మరియు కొవ్వులు అందిస్తాయి, మరియు ఆరోగ్యంగా మరియు బలంగా ఉండటానికి ఈ అన్ని <span class="science-highlight">భాగాలు</span> అవసరం!"
+                </div>
+            </div>
+            
+            <div class="translation-content" id="food-hin">
+                <div class="story-text">
+                    <span class="character">माया</span> अपने गांव में सुबह जल्दी उठी, रात भर की गहरी नींद के बाद भूख महसूस कर रही थी। उसकी दादी अपने बगीचे से ताज़ी सब्जियों, अपनी गाय से दूध, और अपने खेतों से अनाज के साथ एक <span class="science-highlight">संतुलित नाश्ता</span> तैयार कर रही थी। "माया," उसकी दादी ने कहा, "हमारा भोजन अलग-अलग <span class="science-highlight">स्रोतों</span> से आता है - पेड़-पौधे हमें कार्बोहाइड्रेट और विटामिन देते हैं, जानवर हमें प्रोटीन और वसा प्रदान करते हैं, और स्वस्थ और मजबूत रहने के लिए हमें इन सभी <span class="science-highlight">घटकों</span> की जरूरत होती है!"
+                </div>
+            </div>
+        </div>
+        
+        <!-- Topic 2: Materials -->
+        <div class="story-section">
+            <div class="topic-badge">🔧 Topic 2: Materials - Properties, Grouping, Changes</div>
+            <div class="illustration materials-bg">⚙🧪🔩</div>
+            
+            <div class="translation-tabs">
+                <button class="tab-button active" onclick="showTranslation(this, 'materials-en')">English</button>
+                <button class="tab-button" onclick="showTranslation(this, 'materials-tel')">తెలుగు</button>
+                <button class="tab-button" onclick="showTranslation(this, 'materials-hin')">हिंदी</button>
+            </div>
+            
+            <div class="translation-content active" id="materials-en">
+                <div class="story-text">
+                    After breakfast, <span class="character">Maya</span> decided to help her father repair their bicycle. She noticed how different materials had different <span class="science-highlight">properties</span> - the steel frame was strong and hard, the rubber tires were flexible, and the plastic seat was lightweight. Her father explained how we <span class="science-highlight">group materials</span> based on their characteristics: metals conduct heat and electricity, non-metals are usually poor conductors, and when materials undergo <span class="science-highlight">chemical changes</span> like rusting, they form new substances with different properties!
+                </div>
+            </div>
+            
+            <div class="translation-content" id="materials-tel">
+                <div class="story-text">
+                    ఉదయాహారం తర్వాత, <span class="character">మాయ</span> తన తండ్రికి వారి సైకిల్ బాగుచేయడంలో సహాయం చేయాలని నిర్ణయించుకుంది. వివిధ పదార్థాలకు వేర్వేరు <span class="science-highlight">లక్షణాలు</span> ఉన్నాయని ఆమె గమనించింది - ఉక్కు చట్రం బలంగా మరియు గట్టిగా ఉంది, రబ్బరు టైర్లు వంచనీయంగా ఉన్నాయి, మరియు ప్లాస్టిక్ సీటు తేలికగా ఉంది. ఆమె తండ్రి వారి లక్షణాల ఆధారంగా మనం ఎలా <span class="science-highlight">పదార్థాలను వర్గీకరిస్తామో</span> వివరించాడు: లోహాలు వేడిమి మరియు విద్యుత్తును వాహనం చేస్తాయి, అలోహాలు సాధారణంగా దుర్వాహకాలు, మరియు పదార్థాలు తుప్పు వంటి <span class="science-highlight">రసాయన మార్పులు</span> చెందినప్పుడు, అవి వేర్వేరు లక్షణాలతో కొత్త పదార్థాలను ఏర్పరుస్తాయి!
+                </div>
+            </div>
+            
+            <div class="translation-content" id="materials-hin">
+                <div class="story-text">
+                    नाश्ते के बाद, <span class="character">माया</span> ने अपने पिता की साइकिल ठीक करने में मदद करने का फैसला किया। उसने देखा कि अलग-अलग सामग्रियों के अलग-अलग <span class="science-highlight">गुण</span> होते हैं - स्टील का फ्रेम मजबूत और कठोर था, रबड़ के टायर लचीले थे, और प्लास्टिक की सीट हल्की थी। उसके पिता ने समझाया कि हम अपनी विशेषताओं के आधार पर <span class="science-highlight">सामग्रियों को समूहीकृत</span> कैसे करते हैं: धातुएं गर्मी और बिजली का संचालन करती हैं, अधातुएं आमतौर पर खराब संवाहक होती हैं, और जब सामग्रियां जंग लगने जैसे <span class="science-highlight">रासायनिक परिवर्तन</span> से गुजरती हैं, तो वे अलग-अलग गुणों के साथ नए पदार्थ बनाती हैं!
+                </div>
+            </div>
+        </div>
+        
+        <!-- Topic 3: Living Things -->
+        <div class="story-section">
+            <div class="topic-badge">🌱 Topic 3: Living Things - Plants, Animals, Habitat</div>
+            <div class="illustration living-bg">🌳🦋🏞</div>
+            
+            <div class="translation-tabs">
+                <button class="tab-button active" onclick="showTranslation(this, 'living-en')">English</button>
+                <button class="tab-button" onclick="showTranslation(this, 'living-tel')">తెలుగు</button>
+                <button class="tab-button" onclick="showTranslation(this, 'living-hin')">हिंदी</button>
+            </div>
+            
+            <div class="translation-content active" id="living-en">
+                <div class="story-text">
+                    While cycling to the nearby forest, <span class="character">Maya</span> observed the amazing diversity of life around her. She saw how <span class="science-highlight">plants</span> had adapted to their environment - tall trees reaching for sunlight, creeping vines finding support, and small shrubs thriving in shady areas. The <span class="science-highlight">animals</span> too had found their perfect homes: birds nested in tree branches, insects lived among flower petals, and small mammals burrowed in the ground. Each creature had found its perfect <span class="science-highlight">habitat</span> where it could get food, water, shelter, and reproduce successfully!
+                </div>
+            </div>
+            
+            <div class="translation-content" id="living-tel">
+                <div class="story-text">
+                    దగ్గరలోని అడవికి సైకిల్‌తో వెళ్లుతూ, <span class="character">మాయ</span> తన చుట్టూ ఉన్న జీవుల అద్భుతమైన వైవిధ్యాన్ని గమనించింది. <span class="science-highlight">మొక్కలు</span> తమ పర్యావరణానికి ఎలా అనుకూలమైనవో ఆమె చూసింది - ఎత్తైన చెట్లు సూర్యకాంతి కోసం ఎత్తుకు చేరుతున్నాయి, పాకే తీగలు ఆధారం వెతుకుతున్నాయి, మరియు చిన్న పొదలు నీడ ప్రాంతాలలో వర్ధిల్లుతున్నాయి. <span class="science-highlight">జంతువులు</span> కూడా తమ పరిపూర్ణ గృహాలను కనుగొన్నాయి: పక్షులు చెట్ల కొమ్మలలో గూళ్లు కట్టాయి, కీటకాలు పూల రేకుల మధ్య నివసించాయి, మరియు చిన్న క్షీరదాలు భూమిలో బొరియలు వేశాయి. ప్రతి జీవి తన పరిపూర్ణ <span class="science-highlight">నివాసస్థానాన్ని</span> కనుగొంది, అక్కడ అది ఆహారం, నీరు, ఆశ్రయం పొంది విజయవంతంగా సంతానోత్పత్తి చేయగలదు!
+                </div>
+            </div>
+            
+            <div class="translation-content" id="living-hin">
+                <div class="story-text">
+                    पास के जंगल में साइकिल चलाते समय, <span class="character">माया</span> ने अपने चारों ओर जीवन की अद्भुत विविधता देखी। उसने देखा कि <span class="science-highlight">पेड़-पौधे</span> अपने वातावरण के अनुकूल कैसे हो गए थे - ऊंचे पेड़ सूर्य की रोशनी के लिए ऊंचाई तक पहुंच रहे थे, रेंगने वाली बेलें सहारा ढूंढ रही थीं, और छोटी झाड़ियां छायादार क्षेत्रों में फल-फूल रही थीं। <span class="science-highlight">जानवरों</span> ने भी अपने बेहतरीन घर ढूंढ लिए थे: पक्षियों ने पेड़ों की शाखाओं में घोंसले बनाए, कीड़े फूलों की पंखुड़ियों के बीच रहते थे, और छोटे स्तनधारी जमीन में बिल बनाते थे। हर जीव ने अपना बेहतरीन <span class="science-highlight">आवास</span> ढूंढ लिया था जहां वह भोजन, पानी, आश्रय पा सकता था और सफलतापूर्वक प्रजनन कर सकता था!
+                </div>
+            </div>
+        </div>
+        
+        <!-- Topic 4: Motion & Measurement -->
+        <div class="story-section">
+            <div class="topic-badge">🚴 Topic 4: Motion & Measurement</div>
+            <div class="illustration motion-bg">📏⚡🎯</div>
+            
+            <div class="translation-tabs">
+                <button class="tab-button active" onclick="showTranslation(this, 'motion-en')">English</button>
+                <button class="tab-button" onclick="showTranslation(this, 'motion-tel')">తెలుగు</button>
+                <button class="tab-button" onclick="showTranslation(this, 'motion-hin')">हिंदी</button>
+            </div>
+            
+            <div class="translation-content active" id="motion-en">
+                <div class="story-text">
+                    As <span class="character">Maya</span> pedaled faster, she began to understand <span class="science-highlight">motion</span> in a new way. Her bicycle moved in a straight line when she pedaled forward, but turned in curved paths when she steered. She used her speedometer to <span class="science-highlight">measure</span> that she was traveling at 15 kilometers per hour. When she applied brakes, friction slowed her down, and when she pedaled uphill, she had to work against gravity. Maya realized that motion involves distance, time, speed, and forces - and we can measure all of these to understand how objects move!
+                </div>
+            </div>
+            
+            <div class="translation-content" id="motion-tel">
+                <div class="story-text">
+                    <span class="character">మాయ</span> వేగంగా పెడల్ వేస్తున్నప్పుడు, ఆమె <span class="science-highlight">చలనను</span> కొత్త విధంగా అర్థం చేసుకోవడం మొదలుపెట్టింది. ఆమె ముందుకు పెడల్ వేసినప్పుడు ఆమె సైకిల్ సరళ రేఖలో కదిలింది, కానీ ఆమె హ్యాండిల్ తిప్పినప్పుడు వంకర మార్గాలలో తిరిగింది. ఆమె గంటకు 15 కిలోమీటర్ల వేగంతో ప్రయాణిస్తున్నట్లు తన స్పీడోమీటర్‌ని ఉపయోగించి <span class="science-highlight">కొలవడం</span> చేసింది. ఆమె బ్రేక్‌లు వేసినప్పుడు, రాపిడి ఆమెను వేగాన్ని తగ్గించింది, మరియు ఆమె కొండపైకి పెడల్ వేసినప్పుడు, ఆమె గురుత్వాకర్షణకు వ్యతిరేకంగా పనిచేయాల్సి వచ్చింది. మాయ గ్రహించింది చలనలో దూరం, సమయం, వేగం మరియు బలాలు ఉంటాయని - మరియు వస్తువులు ఎలా కదులుతాయో అర్థం చేసుకోవడానికి మనం వీటన్నింటిని కొలవగలమని!
+                </div>
+            </div>
+            
+            <div class="translation-content" id="motion-hin">
+                <div class="story-text">
+                    जैसे ही <span class="character">माया</span> तेजी से पैडल मारने लगी, वह <span class="science-highlight">गति</span> को एक नए तरीके से समझने लगी। जब वह आगे की ओर पैडल मारती थी तो उसकी साइकिल सीधी रेखा में चलती थी, लेकिन जब वह हैंडल घुमाती थी तो वक्राकार रास्तों में मुड़ती थी। उसने अपने स्पीडोमीटर का उपयोग करके <span class="science-highlight">माप</span> किया कि वह 15 किलोमीटर प्रति घंटा की रफ्तार से यात्रा कर रही थी। जब उसने ब्रेक लगाया, तो घर्षण ने उसकी गति धीमी कर दी, और जब वह चढ़ाई पर पैडल मारती थी, तो उसे गुरुत्वाकर्षण के विरुद्ध काम करना पड़ता था। माया ने महसूस किया कि गति में दूरी, समय, गति और बल शामिल होते हैं - और हम इन सभी को माप सकते हैं ताकि समझ सकें कि वस्तुएं कैसे चलती हैं!
+                </div>
+            </div>
+        </div>
+        
+        <!-- Topic 5: Light, Shadows, Electricity -->
+        <div class="story-section">
+            <div class="topic-badge">💡 Topic 5: Light, Shadows, Electricity</div>
+            <div class="illustration light-bg">🌞🔦⚡</div>
+            
+            <div class="translation-tabs">
+                <button class="tab-button active" onclick="showTranslation(this, 'light-en')">English</button>
+                <button class="tab-button" onclick="showTranslation(this, 'light-tel')">తెలుగు</button>
+                <button class="tab-button" onclick="showTranslation(this, 'light-hin')">हिंदी</button>
+            </div>
+            
+            <div class="translation-content active" id="light-en">
+                <div class="story-text">
+                    As the sun began to set, <span class="character">Maya</span> switched on her bicycle's dynamo-powered LED light. She marveled at how the movement of her wheels generated <span class="science-highlight">electricity</span> that powered the bright light. The <span class="science-highlight">light</span> traveled in straight lines, creating long <span class="science-highlight">shadows</span> of trees and rocks on the path. When she aimed her flashlight at her hand, she could see how opaque objects block light completely, translucent objects allow some light through, and transparent objects let light pass freely. Maya understood that light, shadows, and electricity are all connected in amazing ways!
+                </div>
+            </div>
+            
+            <div class="translation-content" id="light-tel">
+                <div class="story-text">
+                    సూర్యుడు అస్తమించడం మొదలుపెట్టినప్పుడు, <span class="character">మాయ</span> తన సైకిల్ యొక్క డైనమో-శక్తితో పనిచేసే LED లైట్‌ను ఆన్ చేసింది. ఆమె చక్రాల కదలిక ప్రకాశవంతమైన కాంతిని శక్తిని అందించే <span class="science-highlight">విద్యుత్తును</span> ఎలా ఉత్పత్తి చేస్తుందో చూసి ఆశ్చర్యపోయింది. <span class="science-highlight">కాంతి</span> సరళ రేఖలలో ప్రయాణించి, మార్గంలో చెట్లు మరియు రాళ్ళ పొడవైన <span class="science-highlight">నీడలను</span> సృష్టించింది. ఆమె తన చేతిపై ఫ్లాష్‌లైట్‌ను గురిపెట్టినప్పుడు, అపారదర్శక వస్తువులు కాంతిని పూర్తిగా అడ్డుకుంటాయని, పారభాస్వర వస్తువులు కొంత కాంతిని అనుమతిస్తాయని, మరియు పారదర్శక వస్తువులు కాంతిని స్వేచ్చగా వెళ్లనిస్తాయని ఆమె చూడగలిగింది. కాంతి, నీడలు మరియు విద్యుత్తు అన్నీ అద్భుతమైన విధాలలో అనుసంధానించబడి ఉన్నాయని మాయ అర్థం చేసుకుంది!
+                </div>
+            </div>
+            
+            <div class="translation-content" id="light-hin">
+                <div class="story-text">
+                    जैसे ही सूरज डूबने लगा, <span class="character">माया</span> ने अपनी साइकिल की डायनेमो से चलने वाली LED लाइट चालू की। वह इस बात से हैरान थी कि उसके पहियों की गति कैसे <span class="science-highlight">बिजली</span> उत्पन्न करती है जो चमकदार रोशनी को शक्ति देती है। <span class="science-highlight">प्रकाश</span> सीधी रेखाओं में यात्रा करता है, रास्ते में पेड़ों और चट्टानों की लंबी <span class="science-highlight">छाया</span> बनाता है। जब उसने अपने हाथ पर टॉर्च की रोशनी डाली, तो वह देख सकी कि कैसे अपारदर्शी वस्तुएं प्रकाश को पूरी तरह से रोकती हैं, पारभासी वस्तुएं कुछ प्रकाश को जाने देती हैं, और पारदर्शी वस्तुएं प्रकाश को स्वतंत्र रूप से गुजरने देती हैं। माया ने समझा कि प्रकाश, छाया और बिजली सभी अद्भुत तरीकों से जुड़े हुए हैं!
+                </div>
+            </div>
+        </div>
+        
+        <!-- Topic 6: Water, Air, Garbage & Waste -->
+        <div class="story-section">
+            <div class="topic-badge">🌍 Topic 6: Water, Air, Garbage & Waste</div>
+            <div class="illustration environment-bg">💧🌬♻</div>
+            
+            <div class="translation-tabs">
+                <button class="tab-button active" onclick="showTranslation(this, 'environment-en')">English</button>
+                <button class="tab-button" onclick="showTranslation(this, 'environment-tel')">తెలుగు</button>
+                <button class="tab-button" onclick="showTranslation(this, 'environment-hin')">हिंदी</button>
+            </div>
+            
+            <div class="translation-content active" id="environment-en">
+                <div class="story-text">
+                    On her way back home, <span class="character">Maya</span> stopped by a stream to drink fresh <span class="science-highlight">water</span>. She noticed how the flowing water was crystal clear upstream but slightly polluted downstream where people had dumped <span class="science-highlight">garbage</span>. The evening <span class="science-highlight">air</span> felt fresh and clean in the forest but became smoky near the village where people were burning <span class="science-highlight">waste</span>. Maya realized that we must protect our environment by properly managing waste, keeping water sources clean, and reducing air pollution. She decided to start a cleanliness campaign in her school to teach everyone about the importance of environmental conservation!
+                </div>
+            </div>
+            
+            <div class="translation-content" id="environment-tel">
+                <div class="story-text">
+                    ఇంటికి తిరిగి వెళ్లే దారిలో, <span class="character">మాయ</span> తాజా <span class="science-highlight">నీరు</span> తాగడానికి ఒక వాగు దగ్గర ఆగింది. ప్రవహించే నీరు ఎగువన స్ఫటికం లాగా స్పష్టంగా ఉండగా, ప్రజలు <span class="science-highlight">చెత్తను</span> వేసిన దిగువన కొంచెం కలుషితమైనట్లు ఆమె గమనించింది. సాయంత్రం <span class="science-highlight">గాలి</span> అడవిలో తాజాగా మరియు స్వచ్ఛంగా అనిపించింది కానీ ప్రజలు <span class="science-highlight">వ్యర్థాలను</span> కాల్చిన గ్రామం దగ్గర పొగతో నిండిపోయింది. వ్యర్థాలను సరిగ్గా నిర్వహించడం, నీటి వనరులను శుభ్రంగా ఉంచడం మరియు వాయు కాలుష్యాన్ని తగ్గించడం ద్వారా మనం మన పర్యావరణాన్ని రక్షించాలని మాయ గ్రహించింది. పర్యావరణ పరిరక్షణ యొక్క ప్రాముఖ్యత గురించి అందరికీ నేర్పడానికి తన పాఠశాలలో పరిశుభ్రత ప్రచారాన్ని ప్రారంభించాలని ఆమె నిర్ణయించుకుంది!
+                </div>
+            </div>
+            
+            <div class="translation-content" id="environment-hin">
+                <div class="story-text">
+                    घर वापस जाते समय, <span class="character">माया</span> एक नाले के पास रुकी ताजा <span class="science-highlight">पानी</span> पी सके। उसने देखा कि बहता हुआ पानी ऊपर की ओर कैसे बिल्कुल साफ था लेकिन नीचे की ओर थोड़ा प्रदूषित था जहां लोगों ने <span class="science-highlight">कचरा</span> फेंका था। शाम की <span class="science-highlight">हवा</span> जंगल में ताज़ा और साफ लग रही थी लेकिन गाँव के पास धुआँ भरी हो गई थी जहाँ लोग <span class="science-highlight">कूड़ा</span> जला रहे थे। माया ने महसूस किया कि हमें कचरे का उचित प्रबंधन करके, पानी के स्रोतों को साफ रखकर, और वायु प्रदूषण को कम करके अपने पर्यावरण की रक्षा करनी चाहिए। उसने अपने स्कूल में एक सफाई अभियान शुरू करने का फैसला किया ताकि सभी को पर्यावरण संरक्षण के महत्व के बारे में सिखाया जा सके!
+                </div>
+            </div>
+        </div>
+        
+        <!-- Conclusion -->
+        <div class="story-section">
+            <div class="topic-badge">🎓 Maya's Learning Journey Completed!</div>
+            <div class="illustration" style="background: linear-gradient(45deg, #ff9a9e, #fecfef, #fecfef, #a8edea); height: 150px;">🌟📚✨</div>
+            
+            <div class="translation-tabs">
+                <button class="tab-button active" onclick="showTranslation(this, 'conclusion-en')">English</button>
+                <button class="tab-button" onclick="showTranslation(this, 'conclusion-tel')">తెలుగు</button>
+                <button class="tab-button" onclick="showTranslation(this, 'conclusion-hin')">हिंदी</button>
+            </div>
+            
+            <div class="translation-content active" id="conclusion-en">
+                <div class="story-text">
+                    That night, <span class="character">Maya</span> wrote in her diary: "Today I learned that science is everywhere around us! From the balanced food we eat to the materials we use, from the living creatures that share our world to the motion that takes us places, from light that brightens our path to the environment we must protect - everything is connected in the beautiful web of science. Tomorrow, I'll share these discoveries with my friends and together we'll explore even more wonders of our amazing world!"
+                </div>
+            </div>
+            
+            <div class="translation-content" id="conclusion-tel">
+                <div class="story-text">
+                    ఆ రాత్రి, <span class="character">మాయ</span> తన డైరీలో రాసింది: "ఈరోజు నేను విజ్ఞాన శాస్త్రం మన చుట్టూ ప్రతిచోటా ఉందని తెలుసుకున్నాను! మనం తినే సమతుల్య ఆహారం నుంచి మనం ఉపయోగించే పదార్థాల వరకు, మన ప్రపంచాన్ని పంచుకునే జీవుల నుంచి మనల్ని చోట్లకు తీసుకెళ్లే చలనం వరకు, మన మార్గాన్ని ప్రకాశవంతం చేసే కాంతి నుంచి మనం రక్షించాల్సిన పర్యావరణం వరకు - అన్నీ విజ్ఞాన శాస్త్రం అనే అందమైన వలయంలో అనుసంధానించబడి ఉన్నాయి. రేపు, నేను ఈ అన్వేషణలను నా స్నేహితులతో పంచుకుంటాను మరియు కలిసి మన అద్భుతమైన ప్రపంచంలోని మరిన్ని అద్భుతాలను అన్వేషిస్తాము!"
+                </div>
+            </div>
+            
+            <div class="translation-content" id="conclusion-hin">
+                <div class="story-text">
+                    उस रात, <span class="character">माया</span> ने अपनी डायरी में लिखा: "आज मैंने सीखा कि विज्ञान हमारे चारों ओर हर जगह है! हमारे खाने के संतुलित भोजन से लेकर हमारे उपयोग की सामग्रियों तक, हमारी दुनिया को साझा करने वाले जीवों से लेकर हमें जगहों तक ले जाने वाली गति तक, हमारे रास्ते को रोशन करने वाले प्रकाश से लेकर हमें सुरक्षित रखने वाले पर्यावरण तक - सब कुछ विज्ञान के सुंदर जाल में जुड़ा हुआ है। कल, मैं इन खोजों को अपने दोस्तों के साथ साझा करूंगी और मिलकर हम अपनी अद्भुत दुनिया के और भी चमत्कारों का पता लगाएंगे!"
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>🌟 Remember: Science is all around us, waiting to be discovered! 🌟</p>
+            <p>विज्ञान हमारे चारों ओर है, खोजे जाने की प्रतीक्षा में! | విజ్ఞాన శాస్త్రం మన చుట్టూ ఉంది, కనుగొనబడటానికి వేచి ఉంది!</p>
+        </div>
+    </div>
+</body>
+</html>
