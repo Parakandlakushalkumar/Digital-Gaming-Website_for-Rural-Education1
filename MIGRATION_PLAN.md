@@ -1,4 +1,4 @@
-# MIGRATION PLAN: Supabase to MERN Stack
+e# MIGRATION PLAN: Supabase to MERN Stack
 
 ## PHASE 1: ANALYSIS COMPLETE
 
